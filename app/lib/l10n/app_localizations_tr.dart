@@ -1,0 +1,1209 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Turkish (`tr`).
+class AppLocalizationsTr extends AppLocalizations {
+  AppLocalizationsTr([String locale = 'tr']) : super(locale);
+
+  @override
+  String get appName => 'MeetPoint';
+
+  @override
+  String get tagline => 'Tanış, konuş, kazan.';
+
+  @override
+  String get loginTitle => 'Tekrar hoş geldin';
+
+  @override
+  String get registerTitle => 'Hesap oluştur';
+
+  @override
+  String get email => 'E-posta';
+
+  @override
+  String get password => 'Şifre';
+
+  @override
+  String get passwordHint => 'En az 8 karakter';
+
+  @override
+  String get login => 'Giriş yap';
+
+  @override
+  String get register => 'Kayıt ol';
+
+  @override
+  String get noAccount => 'Hesabın yok mu? Kayıt ol';
+
+  @override
+  String get haveAccount => 'Zaten hesabın var mı? Giriş yap';
+
+  @override
+  String get setupTitle => 'Profilini oluştur';
+
+  @override
+  String get editProfile => 'Profili düzenle';
+
+  @override
+  String get photos => 'Fotoğraflar';
+
+  @override
+  String photosHint(int max) {
+    return 'En az 1, en fazla $max fotoğraf. İlk fotoğraf kapak fotoğrafın olur.';
+  }
+
+  @override
+  String get displayName => 'Görünen ad';
+
+  @override
+  String get birthDate => 'Doğum tarihi';
+
+  @override
+  String get selectDate => 'Tarih seç';
+
+  @override
+  String get gender => 'Cinsiyet';
+
+  @override
+  String get male => 'Erkek';
+
+  @override
+  String get female => 'Kadın';
+
+  @override
+  String get other => 'Diğer';
+
+  @override
+  String get interestedIn => 'İlgilendiğin';
+
+  @override
+  String get men => 'Erkekler';
+
+  @override
+  String get women => 'Kadınlar';
+
+  @override
+  String get everyone => 'Herkes';
+
+  @override
+  String get bio => 'Hakkımda';
+
+  @override
+  String get city => 'Şehir';
+
+  @override
+  String get country => 'Ülke';
+
+  @override
+  String get save => 'Kaydet';
+
+  @override
+  String get continueLabel => 'Devam et';
+
+  @override
+  String get requiredField => 'Bu alan zorunlu';
+
+  @override
+  String get photoRequired => 'En az bir fotoğraf ekle';
+
+  @override
+  String get saved => 'Kaydedildi';
+
+  @override
+  String get navDiscover => 'Keşfet';
+
+  @override
+  String get navRequests => 'İstekler';
+
+  @override
+  String get navChats => 'Sohbetler';
+
+  @override
+  String get navWallet => 'Cüzdan';
+
+  @override
+  String get navProfile => 'Profil';
+
+  @override
+  String get noMoreProfiles => 'Şimdilik gösterilecek yeni kimse yok';
+
+  @override
+  String get refresh => 'Yenile';
+
+  @override
+  String get itsAMatch => 'Eşleştiniz!';
+
+  @override
+  String matchBody(String name) {
+    return '$name ile eşleştin. Artık ücretsiz mesajlaşabilirsiniz.';
+  }
+
+  @override
+  String get sendMessage => 'Mesaj gönder';
+
+  @override
+  String get keepSwiping => 'Keşfetmeye devam';
+
+  @override
+  String get messageRequest => 'Mesaj isteği';
+
+  @override
+  String get voiceCall => 'Sesli arama';
+
+  @override
+  String get videoCall => 'Görüntülü arama';
+
+  @override
+  String coins(int count) {
+    return '$count jeton';
+  }
+
+  @override
+  String requestDialogTitle(String name) {
+    return '$name kişisine mesaj isteği';
+  }
+
+  @override
+  String get requestDialogHint => 'İlk mesajını yaz...';
+
+  @override
+  String requestCostInfo(int price) {
+    return '$price jeton bloke edilir. Kabul edilirse karşı tarafa geçer; reddedilir ya da 24 saat içinde cevaplanmazsa sana iade edilir.';
+  }
+
+  @override
+  String confirmRequestTitle(String kind) {
+    return '$kind isteği gönderilsin mi?';
+  }
+
+  @override
+  String get send => 'Gönder';
+
+  @override
+  String get cancel => 'Vazgeç';
+
+  @override
+  String get requestSent => 'İstek gönderildi';
+
+  @override
+  String get topUp => 'Jeton yükle';
+
+  @override
+  String get inbox => 'Gelen';
+
+  @override
+  String get outbox => 'Giden';
+
+  @override
+  String get noRequests => 'Henüz istek yok';
+
+  @override
+  String get accept => 'Kabul et';
+
+  @override
+  String get reject => 'Reddet';
+
+  @override
+  String get cancelRequest => 'Geri çek';
+
+  @override
+  String get statusPending => 'Bekliyor';
+
+  @override
+  String get statusAccepted => 'Kabul edildi';
+
+  @override
+  String get statusRejected => 'Reddedildi';
+
+  @override
+  String get statusCancelled => 'Geri çekildi';
+
+  @override
+  String get statusExpired => 'Süresi doldu';
+
+  @override
+  String expiresIn(int hours) {
+    return '$hours sa içinde düşer';
+  }
+
+  @override
+  String earnOnAccept(int price) {
+    return 'Kabul edersen +$price jeton kazanırsın';
+  }
+
+  @override
+  String get callComingSoon =>
+      'Arama özelliği yakında geliyor. Jetonlar bakiyene eklendi.';
+
+  @override
+  String get noChats =>
+      'Henüz sohbet yok. Keşfet\'te birini beğen ya da mesaj isteği gönder.';
+
+  @override
+  String get typeMessage => 'Mesaj yaz...';
+
+  @override
+  String get matchedChat => 'Eşleşme';
+
+  @override
+  String get requestChat => 'Mesaj isteği';
+
+  @override
+  String get balance => 'Bakiye';
+
+  @override
+  String get cashable => 'Bozdurulabilir';
+
+  @override
+  String get cashableInfo =>
+      'Sadece başkalarından kazandığın jetonlar paraya çevrilebilir.';
+
+  @override
+  String get cashout => 'Paraya çevir';
+
+  @override
+  String get comingSoon => 'Yakında';
+
+  @override
+  String get buyCoins => 'Jeton satın al';
+
+  @override
+  String get testModeNote =>
+      'Test modu: ödeme alınmaz, jetonlar anında eklenir.';
+
+  @override
+  String get history => 'Hareketler';
+
+  @override
+  String get noHistory => 'Henüz hareket yok';
+
+  @override
+  String get txPurchase => 'Jeton satın alımı';
+
+  @override
+  String get txHold => 'İstek için bloke';
+
+  @override
+  String get txRefund => 'İade';
+
+  @override
+  String get txEarn => 'Kazanç';
+
+  @override
+  String get txSpend => 'Harcama';
+
+  @override
+  String get txCashout => 'Paraya çevirme';
+
+  @override
+  String get txGrant => 'Hediye';
+
+  @override
+  String coinsAdded(int count) {
+    return '$count jeton eklendi';
+  }
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get logout => 'Çıkış yap';
+
+  @override
+  String get block => 'Engelle';
+
+  @override
+  String get report => 'Şikayet et';
+
+  @override
+  String blockConfirm(String name) {
+    return '$name engellensin mi? Seni göremez ve sana ulaşamaz.';
+  }
+
+  @override
+  String get blocked => 'Engellendi';
+
+  @override
+  String get reportTitle => 'Şikayet sebebi';
+
+  @override
+  String get reportFake => 'Sahte profil';
+
+  @override
+  String get reportInappropriate => 'Uygunsuz içerik';
+
+  @override
+  String get reportHarassment => 'Taciz';
+
+  @override
+  String get reportScam => 'Dolandırıcılık';
+
+  @override
+  String get reportUnderage => '18 yaş altı';
+
+  @override
+  String get reportOther => 'Diğer';
+
+  @override
+  String get reportSent => 'Şikayetin alındı, teşekkürler.';
+
+  @override
+  String get errGeneric => 'Bir şeyler ters gitti. Tekrar dene.';
+
+  @override
+  String get errNetwork => 'Sunucuya ulaşılamadı.';
+
+  @override
+  String get errInvalidCredentials => 'E-posta veya şifre hatalı.';
+
+  @override
+  String get errEmailTaken => 'Bu e-posta zaten kayıtlı.';
+
+  @override
+  String get errUnderage =>
+      'MeetPoint\'i kullanmak için 18 yaşından büyük olmalısın.';
+
+  @override
+  String get errInsufficientBalance => 'Yeterli jetonun yok.';
+
+  @override
+  String get errAlreadyPending => 'Bu kişiye zaten bekleyen bir isteğin var.';
+
+  @override
+  String get errAlreadyInConversation => 'Bu kişiyle zaten sohbetin var.';
+
+  @override
+  String get errTooManyPhotos => 'En fazla 6 fotoğraf ekleyebilirsin.';
+
+  @override
+  String get errValidation => 'Lütfen bilgileri kontrol et.';
+
+  @override
+  String get errExpired => 'Bu isteğin süresi dolmuş.';
+
+  @override
+  String get errNotPending => 'Bu istek artık geçerli değil.';
+
+  @override
+  String get errBlocked => 'Bu kişiyle artık mesajlaşamazsın.';
+
+  @override
+  String interestLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'coffee': 'Kahve',
+      'travel': 'Seyahat',
+      'music': 'Müzik',
+      'concerts': 'Konserler',
+      'movies': 'Sinema',
+      'series': 'Diziler',
+      'books': 'Kitaplar',
+      'photography': 'Fotoğrafçılık',
+      'art': 'Sanat',
+      'cooking': 'Yemek yapmak',
+      'foodie': 'Gurme',
+      'wine': 'Şarap',
+      'fitness': 'Fitness',
+      'yoga': 'Yoga',
+      'running': 'Koşu',
+      'cycling': 'Bisiklet',
+      'hiking': 'Doğa yürüyüşü',
+      'camping': 'Kamp',
+      'football': 'Futbol',
+      'basketball': 'Basketbol',
+      'gaming': 'Oyun',
+      'tech': 'Teknoloji',
+      'fashion': 'Moda',
+      'dancing': 'Dans',
+      'pets': 'Evcil hayvanlar',
+      'nature': 'Doğa',
+      'beach': 'Plaj',
+      'meditation': 'Meditasyon',
+      'anime': 'Anime',
+      'volunteering': 'Gönüllülük',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String promptQuestion(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'perfect_sunday': 'Mükemmel bir pazar günüm...',
+      'laugh': 'Beni en çok güldüren şey...',
+      'green_flag': 'Birinde aradığım yeşil bayrak...',
+      'travel_dream': 'Hayalimdeki seyahat...',
+      'unpopular_opinion': 'Popüler olmayan bir fikrim...',
+      'simple_pleasures': 'Basit mutluluklarım...',
+      'looking_for': 'Aradığım kişi...',
+      'two_truths': 'İki doğru, bir yalan...',
+      'first_date': 'İdeal ilk buluşma...',
+      'song': 'Şu an dilime dolanan şarkı...',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String lookingForLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'relationship': 'Ciddi ilişki',
+      'casual': 'Eğlenceli bir şeyler',
+      'friendship': 'Yeni arkadaşlar',
+      'chat': 'Sadece sohbet',
+      'unsure': 'Henüz emin değilim',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String educationLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'high_school': 'Lise',
+      'bachelor': 'Lisans',
+      'master': 'Yüksek lisans',
+      'phd': 'Doktora',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zodiacLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'aries': 'Koç',
+      'taurus': 'Boğa',
+      'gemini': 'İkizler',
+      'cancer': 'Yengeç',
+      'leo': 'Aslan',
+      'virgo': 'Başak',
+      'libra': 'Terazi',
+      'scorpio': 'Akrep',
+      'sagittarius': 'Yay',
+      'capricorn': 'Oğlak',
+      'aquarius': 'Kova',
+      'pisces': 'Balık',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String habitLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'no': 'Hayır',
+      'sometimes': 'Bazen',
+      'yes': 'Evet',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get obNameTitle => 'Adın ne?';
+
+  @override
+  String get obNameHint => 'Profilinde bu isim görünecek.';
+
+  @override
+  String get obBirthTitle => 'Doğum tarihin ne?';
+
+  @override
+  String get obBirthHint => 'Profilinde sadece yaşın görünür.';
+
+  @override
+  String obAgeLabel(int age) {
+    return '$age yaşındasın';
+  }
+
+  @override
+  String get obGenderTitle => 'Kendini nasıl tanımlıyorsun?';
+
+  @override
+  String get obInterestedTitle => 'Kimlerle tanışmak istiyorsun?';
+
+  @override
+  String get obPhotosTitle => 'Fotoğraflarını ekle';
+
+  @override
+  String get obPhotosHint =>
+      'En az 1 fotoğraf gerekli. 3 ve üzeri fotoğrafı olan profiller daha çok eşleşiyor.';
+
+  @override
+  String get obInterestsTitle => 'Nelerden hoşlanırsın?';
+
+  @override
+  String obInterestsHint(int min, int max) {
+    return '$min ile $max arası seç';
+  }
+
+  @override
+  String get obLookingTitle => 'Burada ne arıyorsun?';
+
+  @override
+  String get obPromptsTitle => 'Kendinden bahset';
+
+  @override
+  String get obPromptsHint =>
+      'En fazla 3 soru seçip cevapla. Sohbet başlatmanın en kolay yolu.';
+
+  @override
+  String get obBasicsTitle => 'Biraz daha detay';
+
+  @override
+  String get obBasicsHint =>
+      'Hepsi isteğe bağlı, istediğin zaman değiştirebilirsin.';
+
+  @override
+  String get skip => 'Atla';
+
+  @override
+  String get finish => 'Profilimi oluştur';
+
+  @override
+  String get addPrompt => 'Soru ekle';
+
+  @override
+  String get choosePrompt => 'Bir soru seç';
+
+  @override
+  String get yourAnswer => 'Cevabın';
+
+  @override
+  String get height => 'Boy';
+
+  @override
+  String heightCm(int cm) {
+    return '$cm cm';
+  }
+
+  @override
+  String get job => 'Meslek';
+
+  @override
+  String get education => 'Eğitim';
+
+  @override
+  String get zodiac => 'Burç';
+
+  @override
+  String get smoking => 'Sigara';
+
+  @override
+  String get drinking => 'Alkol';
+
+  @override
+  String get lookingFor => 'Aradığı';
+
+  @override
+  String get interests => 'İlgi alanları';
+
+  @override
+  String get prompts => 'Sorular';
+
+  @override
+  String get basics => 'Temel bilgiler';
+
+  @override
+  String get notSpecified => 'Belirtilmedi';
+
+  @override
+  String get makeCover => 'Kapak fotoğrafı yap';
+
+  @override
+  String get deletePhoto => 'Fotoğrafı sil';
+
+  @override
+  String get cover => 'Kapak';
+
+  @override
+  String get edit => 'Düzenle';
+
+  @override
+  String get personalInfo => 'Kişisel bilgiler';
+
+  @override
+  String profileCompletion(int percent) {
+    return 'Profilin %$percent tamamlandı';
+  }
+
+  @override
+  String commonInterests(int count) {
+    return '$count ortak ilgi alanı';
+  }
+
+  @override
+  String stepOf(int step, int total) {
+    return '$step/$total';
+  }
+
+  @override
+  String get clear => 'Temizle';
+
+  @override
+  String get previewProfile => 'Profilimi önizle';
+
+  @override
+  String get viewProfile => 'Profili gör';
+
+  @override
+  String get done => 'Tamam';
+
+  @override
+  String get forgotPassword => 'Şifremi unuttum';
+
+  @override
+  String get resetTitle => 'Şifreni sıfırla';
+
+  @override
+  String get resetHint => 'E-posta adresine 6 haneli bir kod göndereceğiz.';
+
+  @override
+  String get sendCode => 'Kod gönder';
+
+  @override
+  String codeSentTo(String email) {
+    return '$email adresine 6 haneli bir kod gönderdik.';
+  }
+
+  @override
+  String get newPassword => 'Yeni şifre';
+
+  @override
+  String get resetDone => 'Şifren güncellendi';
+
+  @override
+  String get verifyEmailTitle => 'E-postanı doğrula';
+
+  @override
+  String get code => 'Kod';
+
+  @override
+  String get verify => 'Doğrula';
+
+  @override
+  String get resendCode => 'Kodu tekrar gönder';
+
+  @override
+  String resendIn(int seconds) {
+    return '$seconds sn sonra tekrar gönderebilirsin';
+  }
+
+  @override
+  String get codeResent => 'Yeni kod gönderildi';
+
+  @override
+  String get useAnotherAccount => 'Başka hesapla giriş yap';
+
+  @override
+  String get termsOfService => 'Kullanım Koşulları';
+
+  @override
+  String get privacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String termsConsent(String terms, String privacy) {
+    return '18 yaşından büyüğüm; $terms ve $privacy metinlerini okudum, kabul ediyorum.';
+  }
+
+  @override
+  String get mustAcceptTerms => 'Devam etmek için koşulları kabul etmelisin.';
+
+  @override
+  String get deleteAccount => 'Hesabı sil';
+
+  @override
+  String get deleteAccountWarning =>
+      'Bu işlem geri alınamaz. Profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.';
+
+  @override
+  String get confirmWithPassword => 'Onaylamak için şifreni gir';
+
+  @override
+  String get accountDeleted => 'Hesabın silindi';
+
+  @override
+  String get legal => 'Yasal';
+
+  @override
+  String get verifyProfile => 'Profilini doğrula';
+
+  @override
+  String get verifyProfileHint =>
+      'Mavi tik al, daha çok güven ve eşleşme kazan.';
+
+  @override
+  String get verifiedLabel => 'Doğrulanmış profil';
+
+  @override
+  String get verificationPendingLabel => 'Doğrulama inceleniyor';
+
+  @override
+  String get verificationRejectedLabel => 'Doğrulama onaylanmadı, tekrar dene';
+
+  @override
+  String get verifyTitle => 'Mavi tik al';
+
+  @override
+  String get verifyStep =>
+      'Aşağıdaki pozu yaparak bir selfie çek. Selfie\'n sadece doğrulama ekibimiz tarafından görülür, profilinde yayınlanmaz.';
+
+  @override
+  String get takeSelfie => 'Selfie çek';
+
+  @override
+  String get retake => 'Yeniden çek';
+
+  @override
+  String get verificationSubmitted =>
+      'Başvurun alındı. Genellikle 24 saat içinde incelenir.';
+
+  @override
+  String poseLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'peace_sign': '✌️ Barış işareti yap',
+      'thumbs_up': '👍 Başparmağını kaldır',
+      'hand_on_head': '🙋 Elini başına koy',
+      'point_up': '☝️ Yukarıyı göster',
+      'wave': '👋 El salla',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get errCodeInvalid => 'Kod hatalı.';
+
+  @override
+  String get errCodeExpired =>
+      'Kodun süresi doldu ya da çok fazla deneme yapıldı. Yeni kod iste.';
+
+  @override
+  String get errCodeCooldown => 'Yeni kod istemeden önce biraz bekle.';
+
+  @override
+  String get errRateLimited =>
+      'Çok hızlı gidiyorsun, biraz bekleyip tekrar dene.';
+
+  @override
+  String get errBanned =>
+      'Hesabın topluluk kurallarını ihlal ettiği için askıya alındı.';
+
+  @override
+  String get errAlreadyVerified => 'Profilin zaten doğrulanmış.';
+
+  @override
+  String get errVerificationPending => 'Başvurun zaten inceleniyor.';
+
+  @override
+  String kmAway(int km) {
+    return '$km km uzakta';
+  }
+
+  @override
+  String get filters => 'Filtreler';
+
+  @override
+  String get ageRange => 'Yaş aralığı';
+
+  @override
+  String get maxDistance => 'En fazla uzaklık';
+
+  @override
+  String get anyDistance => 'Fark etmez';
+
+  @override
+  String get apply => 'Uygula';
+
+  @override
+  String get locationRationale =>
+      'Yakınındaki kişileri gösterebilmemiz için konumuna ihtiyacımız var. Tam konumun kimseyle paylaşılmaz, sadece yaklaşık mesafe görünür.';
+
+  @override
+  String get enableLocation => 'Konumu aç';
+
+  @override
+  String get superLike => 'Süper beğeni';
+
+  @override
+  String get superLikeSent => 'Süper beğeni gönderildi ⭐';
+
+  @override
+  String get superLikedYou => 'Seni süper beğendi';
+
+  @override
+  String get boost => 'Öne çıkar';
+
+  @override
+  String get boostTitle => 'Profilini öne çıkar';
+
+  @override
+  String boostBody(int minutes) {
+    return '$minutes dakika boyunca keşfette en üstte gösterilirsin. Daha çok kişi seni görür.';
+  }
+
+  @override
+  String boostActive(int minutes) {
+    return '$minutes dk';
+  }
+
+  @override
+  String get likesYou => 'Seni beğenenler';
+
+  @override
+  String likesYouCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kişi seni beğendi',
+      one: '1 kişi seni beğendi',
+      zero: 'Henüz kimse seni beğenmedi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String likesLockedBody(int hours) {
+    return 'Seni kimlerin beğendiğini gör, beğenirsen anında eşleş. $hours saat boyunca açık kalır.';
+  }
+
+  @override
+  String get seeWhoLikes => 'Kimler olduğunu gör';
+
+  @override
+  String get noLikesYet =>
+      'Henüz seni beğenen yok. Profilini tamamla ya da öne çıkar!';
+
+  @override
+  String get typing => 'yazıyor...';
+
+  @override
+  String get photo => 'Fotoğraf';
+
+  @override
+  String get viewOncePhoto => 'Tek seferlik fotoğraf';
+
+  @override
+  String get tapToView => 'Görmek için dokun';
+
+  @override
+  String get photoOpened => 'Açıldı';
+
+  @override
+  String get photoSent => 'Gönderildi';
+
+  @override
+  String get viewOnceHint => 'Fotoğraf bir kez açılabilir, sonra silinir.';
+
+  @override
+  String get sendPhoto => 'Fotoğraf gönder';
+
+  @override
+  String newMessageFrom(String name, String text) {
+    return '$name: $text';
+  }
+
+  @override
+  String newMatchWith(String name) {
+    return 'Yeni eşleşme: $name 💞';
+  }
+
+  @override
+  String get newRequestBanner => 'Yeni bir istek aldın';
+
+  @override
+  String get view => 'Gör';
+
+  @override
+  String get errAlreadyBoosted => 'Profilin zaten öne çıkarılmış.';
+
+  @override
+  String get errAlreadyViewed => 'Bu fotoğraf zaten açıldı.';
+
+  @override
+  String get mostPopular => 'En popüler';
+
+  @override
+  String firstPurchaseBanner(int pct) {
+    return 'İlk alımına %$pct bonus jeton!';
+  }
+
+  @override
+  String bonusCoins(int count) {
+    return '+$count bonus';
+  }
+
+  @override
+  String get paymentProcessing => 'Ödemen işleniyor...';
+
+  @override
+  String purchaseDone(int count) {
+    return '$count jeton hesabına eklendi 🎉';
+  }
+
+  @override
+  String get txBonus => 'İlk alım bonusu';
+
+  @override
+  String get txClawback => 'İade (jeton geri alındı)';
+
+  @override
+  String get errStoreUnavailable =>
+      'Mağazaya şu an ulaşılamıyor. Biraz sonra tekrar dene.';
+
+  @override
+  String perMinute(int count) {
+    return '$count/dk';
+  }
+
+  @override
+  String startCallTitle(String kind) {
+    return '$kind başlatılsın mı?';
+  }
+
+  @override
+  String startCallInfo(int rate) {
+    return 'Dakika başı $rate jeton. İlk dakika karşı taraf açınca düşer, bakiyen bitince arama kendiliğinden sonlanır.';
+  }
+
+  @override
+  String get callAction => 'Ara';
+
+  @override
+  String get calling => 'Aranıyor…';
+
+  @override
+  String get isCallingYou => 'seni arıyor';
+
+  @override
+  String earnPerMinute(int rate) {
+    return 'Dakika başı $rate jeton kazanırsın';
+  }
+
+  @override
+  String get answer => 'Aç';
+
+  @override
+  String get decline => 'Reddet';
+
+  @override
+  String spentCoins(int count) {
+    return 'Harcanan: $count';
+  }
+
+  @override
+  String earnedCoins(int count) {
+    return 'Kazanılan: $count';
+  }
+
+  @override
+  String get lowBalanceWarning =>
+      'Bakiyen bir sonraki dakikaya yetmiyor, arama bu dakikanın sonunda bitecek.';
+
+  @override
+  String get videoBlurred => 'Güvenliğin için görüntü bulanık başlar';
+
+  @override
+  String get revealVideo => 'Görüntüyü aç';
+
+  @override
+  String get waitingVideo => 'Görüntü bekleniyor…';
+
+  @override
+  String get simulationMode => 'Test modu';
+
+  @override
+  String get mute => 'Sessiz';
+
+  @override
+  String get camera => 'Kamera';
+
+  @override
+  String get flipCamera => 'Çevir';
+
+  @override
+  String get speaker => 'Hoparlör';
+
+  @override
+  String get gift => 'Hediye';
+
+  @override
+  String get endCall => 'Bitir';
+
+  @override
+  String get sendGiftTitle => 'Hediye gönder';
+
+  @override
+  String get giftInfo => 'Jetonların tamamı karşı tarafa geçer.';
+
+  @override
+  String giftReceived(String emoji, int count) {
+    return '$emoji hediye aldın! +$count jeton';
+  }
+
+  @override
+  String giftSent(String emoji) {
+    return '$emoji gönderildi';
+  }
+
+  @override
+  String get callEnded => 'Arama bitti';
+
+  @override
+  String get callEndedBalance => 'Bakiye bittiği için arama sona erdi.';
+
+  @override
+  String get callEndedDisconnect => 'Bağlantı koptuğu için arama sona erdi.';
+
+  @override
+  String get callMissed => 'Cevapsız arama';
+
+  @override
+  String get callNoAnswer => 'Cevap yok';
+
+  @override
+  String get callDeclined => 'Arama reddedildi';
+
+  @override
+  String get callCancelled => 'Arama iptal edildi';
+
+  @override
+  String get rateCallTitle => 'Görüşme nasıldı?';
+
+  @override
+  String get reportProblem => 'Sorun mu vardı? Bildir';
+
+  @override
+  String get callHistory => 'Aramalar';
+
+  @override
+  String get noCallsYet =>
+      'Henüz arama yok. Bir profilden sesli ya da görüntülü arama başlatabilirsin.';
+
+  @override
+  String get callBack => 'Geri ara';
+
+  @override
+  String missedCallFrom(String name) {
+    return 'Cevapsız arama: $name';
+  }
+
+  @override
+  String get errBusy => 'Şu an başka bir görüşmede, biraz sonra tekrar dene.';
+
+  @override
+  String get errAlreadyInCall => 'Zaten bir görüşmedesin.';
+
+  @override
+  String get errCallGone => 'Bu arama artık geçerli değil.';
+
+  @override
+  String get errCallerBalance =>
+      'Arayanın bakiyesi yetmediği için arama başlamadı.';
+
+  @override
+  String get txCall => 'Arama';
+
+  @override
+  String get txGift => 'Hediye';
+
+  @override
+  String get cashoutAvailable => 'Çekilebilir bakiye';
+
+  @override
+  String cashoutMinInfo(int coins, String usd) {
+    return 'En az $coins jeton ($usd) birikince çekebilirsin.';
+  }
+
+  @override
+  String get cashoutNeedVerify =>
+      'Para çekmek için profilini mavi tikle doğrulaman gerekiyor. Bu, sahte hesaplara karşı seni ve kazancını korur.';
+
+  @override
+  String get cashoutAmount => 'Tutar';
+
+  @override
+  String get cashoutMethod => 'Ödeme yöntemi';
+
+  @override
+  String get accountHolder => 'Hesap sahibinin adı soyadı';
+
+  @override
+  String get paypalEmail => 'PayPal e-postası';
+
+  @override
+  String cashoutSubmit(String usd) {
+    return 'Talep gönder · $usd';
+  }
+
+  @override
+  String get cashoutProcessingInfo =>
+      'Ödemeler 3–5 iş günü içinde yapılır. Talep incelenirken iptal edebilirsin.';
+
+  @override
+  String get cashoutRequested => 'Talebin alındı 👍';
+
+  @override
+  String cashoutNotEnough(int coins) {
+    return 'Çekilebilir bakiyen henüz $coins jetona ulaşmadı. Aramalar ve kabul ettiğin isteklerle kazanmaya devam et!';
+  }
+
+  @override
+  String get payoutStatusPending => 'İnceleniyor';
+
+  @override
+  String get payoutStatusPaid => 'Ödendi';
+
+  @override
+  String get payoutStatusRejected => 'Reddedildi';
+
+  @override
+  String get payoutStatusCancelled => 'İptal edildi';
+
+  @override
+  String get payoutCancel => 'Talebi iptal et';
+
+  @override
+  String get payoutCancelled => 'Talep iptal edildi, jetonlar geri eklendi.';
+
+  @override
+  String get payoutHistory => 'Talepler';
+
+  @override
+  String payoutReason(String reason) {
+    return 'Sebep: $reason';
+  }
+
+  @override
+  String payoutReference(String ref) {
+    return 'İşlem no: $ref';
+  }
+
+  @override
+  String get errVerificationRequired =>
+      'Önce profilini mavi tikle doğrulamalısın.';
+
+  @override
+  String get errBelowMinimum => 'Tutar alt sınırın altında.';
+
+  @override
+  String get errInsufficientCashable =>
+      'Çekilebilir bakiyen bu tutar için yetmiyor.';
+
+  @override
+  String get errInvalidIban =>
+      'IBAN geçersiz görünüyor, kontrol edip tekrar dene.';
+
+  @override
+  String get errAccountNameRequired => 'Hesap sahibinin adını yaz.';
+
+  @override
+  String get errPayoutPending => 'Zaten incelenen bir talebin var.';
+
+  @override
+  String get txCashoutRefund => 'Para çekme iadesi';
+}

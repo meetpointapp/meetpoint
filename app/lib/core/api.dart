@@ -1,0 +1,245 @@
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'config.dart';
+import 'models.dart';
+
+// Sunucunun döndürdüğü hata kodu (ör. "insufficient_balance")
+class ApiException implements Exception {
+  final String code;
+  final int? status;
+  const ApiException(this.code, [this.status]);
+  @override
+  String toString() => 'ApiException($code)';
+}
+
+class Api {
+  // onSessionInvalid: oturum geçersizleşince (şifre değişti, hesap yasaklandı) çağrılır
+  Api(String? token, {this.onSessionInvalid})
+      : _hasToken = token != null,
+        _dio = Dio(BaseOptions(
+          baseUrl: apiBaseUrl,
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 20),
+          headers: {if (token != null) 'Authorization': 'Bearer $token'},
+        ));
+
+  final Dio _dio;
+  final bool _hasToken;
+  final void Function(String code)? onSessionInvalid;
+
+  Future<dynamic> _send(Future<Response<dynamic>> Function() call) async {
+    try {
+      return (await call()).data;
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      if (data is Map && data['error'] is String) {
+        final code = data['error'] as String;
+        if (_hasToken && (code == 'banned' || code == 'invalid_token')) onSessionInvalid?.call(code);
+        throw ApiException(code, e.response?.statusCode);
+      }
+      if (e.response == null) throw const ApiException('network');
+      throw ApiException('http_${e.response!.statusCode}', e.response!.statusCode);
+    }
+  }
+
+  Future<dynamic> _get(String path, [Map<String, dynamic>? query]) =>
+      _send(() => _dio.get(path, queryParameters: query));
+  Future<dynamic> _post(String path, [Object? body]) => _send(() => _dio.post(path, data: body));
+  Future<dynamic> _put(String path, [Object? body]) => _send(() => _dio.put(path, data: body));
+  Future<dynamic> _delete(String path, [Object? body]) => _send(() => _dio.delete(path, data: body));
+
+  // Kimlik
+  ({String token, String userId}) _tokenOf(dynamic r) => (token: r['token'] as String, userId: r['userId'] as String);
+
+  Future<({String token, String userId})> login(String email, String password) async =>
+      _tokenOf(await _post('/auth/login', {'email': email, 'password': password}));
+
+  Future<({String token, String userId})> register(String email, String password, String locale) async =>
+      _tokenOf(await _post('/auth/register', {
+        'email': email,
+        'password': password,
+        'locale': locale,
+        'acceptTerms': true,
+      }));
+
+  Future<void> verifyEmail(String code) => _post('/auth/verify-email', {'code': code});
+
+  Future<void> resendCode() => _post('/auth/resend-code');
+
+  Future<void> forgotPassword(String email) => _post('/auth/forgot-password', {'email': email});
+
+  Future<({String token, String userId})> resetPassword(String email, String code, String password) async =>
+      _tokenOf(await _post('/auth/reset-password', {'email': email, 'code': code, 'password': password}));
+
+  Future<void> deleteAccount(String password) => _delete('/me', {'password': password});
+
+  // Mavi tik: sunucu rastgele bir poz atar, kullanıcı o pozla selfie yükler
+  Future<String> startVerification() async => (await _post('/me/verification/start'))['pose'] as String;
+
+  Future<void> uploadSelfie(XFile file) async {
+    final bytes = await file.readAsBytes();
+    final name = file.name.isEmpty ? 'selfie.jpg' : file.name;
+    final subtype = name.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+    await _post('/me/verification', FormData.fromMap({
+      'selfie': MultipartFile.fromBytes(bytes, filename: name, contentType: DioMediaType('image', subtype)),
+    }));
+  }
+
+  // Profil
+  Future<Me> me() async => Me.fromJson(await _get('/me'));
+
+  Future<void> saveProfile(Map<String, dynamic> data) => _put('/me/profile', data);
+
+  Future<void> setLocale(String locale) => _put('/me/locale', {'locale': locale});
+
+  Future<Photo> uploadPhoto(XFile file) async {
+    final name = file.name.isEmpty ? 'photo.jpg' : file.name;
+    final ext = name.split('.').last.toLowerCase();
+    final subtype = switch (ext) { 'png' => 'png', 'webp' => 'webp', 'heic' => 'heic', _ => 'jpeg' };
+    final form = FormData.fromMap({
+      'photo': MultipartFile.fromBytes(
+        await file.readAsBytes(),
+        filename: name,
+        contentType: DioMediaType('image', subtype),
+      ),
+    });
+    return Photo.fromJson(await _post('/me/photos', form));
+  }
+
+  Future<void> deletePhoto(String id) => _delete('/me/photos/$id');
+
+  Future<void> reorderPhotos(List<String> ids) => _put('/me/photos/order', {'ids': ids});
+
+  Future<PublicProfile> user(String id) async => PublicProfile.fromJson(await _get('/users/$id'));
+
+  // Keşfet
+  Future<List<PublicProfile>> discover() async =>
+      [for (final p in (await _get('/discover') as List)) PublicProfile.fromJson(p)];
+
+  // direction: like | pass | superlike (süper beğeni jetonla)
+  Future<({bool match, String? conversationId})> swipe(String toId, String direction) async {
+    final r = await _post('/swipes', {'toId': toId, 'direction': direction});
+    return (match: r['match'] as bool, conversationId: r['conversationId'] as String?);
+  }
+
+  Future<void> updateLocation(double latitude, double longitude) =>
+      _put('/me/location', {'latitude': latitude, 'longitude': longitude});
+
+  Future<void> saveFilters(DiscoverFilters f) => _put('/me/filters', f.toJson());
+
+  // Jetonla alınan özellikler
+  Future<DateTime> boost() async => DateTime.parse((await _post('/boost'))['boostedUntil'] as String).toLocal();
+
+  Future<LikesInfo> likes() async => LikesInfo.fromJson(await _get('/likes'));
+
+  Future<void> unlockLikes() => _post('/likes/unlock');
+
+  // Push bildirim cihazı
+  Future<void> registerDevice(String token, String platform) =>
+      _post('/me/devices', {'token': token, 'platform': platform});
+
+  Future<void> unregisterDevice(String token) => _delete('/me/devices', {'token': token});
+
+  // Cüzdan
+  Future<WalletInfo> wallet() async => WalletInfo.fromJson(await _get('/wallet'));
+
+  // Test modu satın alma (mağaza bağlı değilken); dönen değer: yüklenen jeton + bonus
+  Future<({int coins, int bonus})> devTopUp(String packId) async {
+    final r = await _post('/wallet/dev-topup', {'packId': packId});
+    return (coins: r['coins'] as int, bonus: r['bonus'] as int);
+  }
+
+  // Mağaza satın alımından sonra: sunucu RevenueCat'ten eksik işlemleri çekip yükler
+  Future<int> syncWallet() async => (await _post('/wallet/sync'))['credited'] as int;
+
+  // İletişim istekleri
+  Future<void> sendRequest(String toId, RequestKind kind, {String note = ''}) =>
+      _post('/requests', {'toId': toId, 'kind': requestKindApi(kind), 'note': note});
+
+  Future<List<ContactRequest>> requests({required bool inbox}) async => [
+        for (final r in (await _get('/requests', {'box': inbox ? 'inbox' : 'outbox'}) as List))
+          ContactRequest.fromJson(r),
+      ];
+
+  Future<String?> acceptRequest(String id) async =>
+      (await _post('/requests/$id/accept'))['conversationId'] as String?;
+
+  Future<void> rejectRequest(String id) => _post('/requests/$id/reject');
+
+  Future<void> cancelRequest(String id) => _post('/requests/$id/cancel');
+
+  // Para çekme
+  Future<List<Payout>> payouts() async => [for (final p in (await _get('/payouts') as List)) Payout.fromJson(p)];
+
+  Future<Payout> requestPayout({
+    required int coins,
+    required PayoutMethod method,
+    required String accountName,
+    required String accountValue,
+  }) async =>
+      Payout.fromJson(await _post('/payouts', {
+        'coins': coins,
+        'method': method.name,
+        'accountName': accountName,
+        'accountValue': accountValue,
+      }));
+
+  Future<void> cancelPayout(String id) => _post('/payouts/$id/cancel');
+
+  // Aramalar
+  Future<CallInfo> startCall(String toId, CallKind kind) async =>
+      CallInfo.fromJson(await _post('/calls', {'toId': toId, 'kind': callKindApi(kind)}));
+
+  Future<CallInfo> acceptCall(String id) async => CallInfo.fromJson(await _post('/calls/$id/accept'));
+
+  // Çalarken arayan: iptal · aranan: ret · görüşmede: bitir
+  Future<CallInfo> hangUp(String id) async => CallInfo.fromJson(await _post('/calls/$id/hangup'));
+
+  Future<CallInfo> call(String id) async => CallInfo.fromJson(await _get('/calls/$id'));
+
+  Future<List<CallInfo>> calls() async => [for (final c in (await _get('/calls') as List)) CallInfo.fromJson(c)];
+
+  // Hediye gönder; kalan bakiyeyi döndürür
+  Future<int> sendGift(String callId, String giftId) async =>
+      (await _post('/calls/$callId/gifts', {'giftId': giftId}))['balance'] as int;
+
+  Future<void> rateCall(String id, int rating, {String? reportReason}) =>
+      _post('/calls/$id/rate', {'rating': rating, 'reportReason': ?reportReason});
+
+  // Sohbet
+  Future<List<Conversation>> conversations() async =>
+      [for (final c in (await _get('/conversations') as List)) Conversation.fromJson(c)];
+
+  Future<List<ChatMessage>> messages(String conversationId) async =>
+      [for (final m in (await _get('/conversations/$conversationId/messages') as List)) ChatMessage.fromJson(m)];
+
+  Future<ChatMessage> sendMessage(String conversationId, String body) async =>
+      ChatMessage.fromJson(await _post('/conversations/$conversationId/messages', {'body': body}));
+
+  Future<void> markRead(String conversationId) => _post('/conversations/$conversationId/read');
+
+  // Tek seferlik fotoğraf
+  Future<ChatMessage> sendPhoto(String conversationId, XFile file) async {
+    final name = file.name.isEmpty ? 'photo.jpg' : file.name;
+    final subtype = name.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+    final form = FormData.fromMap({
+      'photo': MultipartFile.fromBytes(await file.readAsBytes(), filename: name, contentType: DioMediaType('image', subtype)),
+    });
+    return ChatMessage.fromJson(await _post('/conversations/$conversationId/photos', form));
+  }
+
+  // Fotoğrafı aç (sadece bir kez); baytlar bellekte gösterilir, cihaza kaydedilmez
+  Future<Uint8List> openPhoto(String messageId) async {
+    final data = await _send(() => _dio.get<List<int>>('/messages/$messageId/photo',
+        options: Options(responseType: ResponseType.bytes)));
+    return Uint8List.fromList(data as List<int>);
+  }
+
+  // Güvenlik
+  Future<void> block(String toId) => _post('/blocks', {'toId': toId});
+
+  Future<void> report(String toId, String reason) => _post('/reports', {'toId': toId, 'reason': reason});
+}

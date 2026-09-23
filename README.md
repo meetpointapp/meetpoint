@@ -1,0 +1,163 @@
+# MeetPoint
+
+Tanış, konuş, kazan. Flutter (Android + iOS) arkadaşlık uygulaması + Node.js sunucu.
+
+```
+meetpoint/
+  app/      Flutter uygulaması (TR + EN)
+  server/   Node.js + Express + Prisma + Socket.IO (lokalde SQLite)
+    admin/    Web yönetim paneli (http://localhost:4000/admin)
+    legal/    Kullanım koşulları ve gizlilik politikası (TASLAK)
+  docs/     Faz önizlemeleri, yayın rehberi, mağaza metinleri
+```
+
+Yayına geçiş adımları: [docs/yayin-rehberi.md](docs/yayin-rehberi.md) · Mağaza metinleri: [docs/magaza-metinleri.md](docs/magaza-metinleri.md) · Tüm ayarlar: [server/.env.example](server/.env.example)
+
+## Lokalde çalıştırma
+
+**1. Sunucu** (`server/` klasöründe):
+
+```bash
+npm install
+cp .env.example .env
+npx prisma migrate dev
+npm run db:seed
+npm run dev
+```
+
+Sunucu `http://localhost:4000` adresinde çalışır. Seed hesapları (şifre hepsinde `password123`):
+
+- **Uygulama:** `test@meetpoint.dev`. Hesapta 1000 jeton, 2 gelen istek ve seni önceden beğenmiş 2 profil var.
+- **Yönetim paneli:** `admin@meetpoint.dev`. Adres: http://localhost:4000/admin. Panelde bekleyen 1 mavi tik başvurusu ve 1 açık şikayet var. Sekmeler: özet, şikayetler, mavi tik, kullanıcılar, satışlar, ödemeler, hatalar.
+
+**E-postalar:** Lokalde e-posta sunucusu yok. Doğrulama ve şifre sıfırlama kodları `server/dev-mails/` klasörüne yazılır ve sunucu konsoluna basılır.
+
+**2. Uygulama** (`app/` klasöründe):
+
+```bash
+flutter run -d edge
+```
+
+- Android emülatörü: `flutter run` (sunucuya `10.0.2.2:4000` üzerinden bağlanır)
+- Gerçek telefon (aynı Wi-Fi): `flutter run --dart-define=API_URL=http://<bilgisayar-ip>:4000`
+
+## Jeton ekonomisi
+
+Ayarlar `server/src/config.ts` dosyasında.
+
+- **Gelir kaynağı:** sadece jeton satışı (1000 jeton = $19.99). Kullanıcılar arası transferde kesinti yok.
+- **Mesaj isteği (50 jeton):** İstek gönderilince jeton bloke edilir. Kabul edilirse alıcıya geçer; red, iptal veya 24 saat dolumunda iade edilir.
+- **Arama (dakika başı):** Sesli 15, görüntülü 30 jeton/dk. Her dakikanın başında arayandan alınıp arananın hesabına geçer (ilk dakika açılınca). Bakiye bir sonraki dakikaya yetmezse arayan uyarılır ve arama dakika sonunda biter. Cevapsız, reddedilen veya iptal edilen aramada jeton alınmaz.
+- **Arama içi hediyeler:** 🌹 20, ❤️ 50, 🧸 100, 💎 250 jeton. Tamamı alıcıya geçer.
+- **Bozdurma:** Sadece kazanılan jetonlar bozdurulabilir. Kur 1 jeton = $0.01. Satış fiyatı ile bu kur arasındaki fark, mağaza kesintisini karşılar ve kârı oluşturur.
+- **Para çekme (manuel onay):** En az 2000 jeton ($20) ve mavi tik gerekir. Kullanıcı IBAN veya PayPal ile talep eder, jetonlar hemen düşülür. Yönetim ödemeyi elle yapıp işlem numarasıyla "Ödendi" işaretler. Reddedilen ya da kullanıcının iptal ettiği talepte jetonlar geri gelir ve yine bozdurulabilir kalır. Aynı anda tek bekleyen talep olabilir; bekleyen talep varken hesap silinemez. Ödenmiş kayıtlar hesap silinse de muhasebe için saklanır. Kurallar: `server/src/payouts.ts`.
+- **Bakiye kaydı:** Bakiye hiçbir yerde elle tutulmaz. `WalletEntry` tablosundaki hareketlerin toplamıdır.
+
+## Güvenlik (Faz 3)
+
+- **Kayıt:** Koşul onayı (18+, kullanım koşulları, gizlilik) zorunlu. E-posta 6 haneli kodla doğrulanmadan uygulama kullanılamaz. Kod 10 dakika geçerli, en fazla 5 deneme, tekrar gönderme 60 saniyede bir.
+- **Şifre sıfırlama:** E-posta koduyla yapılır. Şifre değişince diğer cihazlardaki oturumlar kapanır.
+- **Mavi tik:** Sunucu rastgele bir poz atar, kullanıcı o pozla selfie çeker ve yönetim panelinden elle onaylanır. Selfie'ler `private-uploads/` klasöründe durur, herkese açık adreslerden erişilemez.
+- **Yasaklama:** Oturumlar anında kapanır, bekleyen istekler iade edilir, profil keşfetten ve profil sayfalarından kalkar.
+- **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
+- **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
+
+**Yayından önce yapılacaklar:**
+
+- `NODE_ENV=production` ayarlanmalı.
+- Güçlü bir `JWT_SECRET` belirlenmeli.
+- E-posta için `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` ve `MAIL_FROM` tanımlanmalı.
+- `server/legal/` metinleri bir hukukçuya inceletilmeli ve köşeli parantezli şirket bilgileri doldurulmalı.
+
+## Push bildirimleri (Firebase) kurulumu
+
+Uygulama açıkken gelen anlık bildirimler zaten çalışıyor. Uygulama kapalıyken bildirim gelmesi için bir Firebase projesi gerekiyor.
+
+1. https://console.firebase.google.com adresinde **Proje ekle**'ye tıklayıp `meetpoint` adıyla bir proje oluştur.
+2. Terminalde (`app\` klasöründe) şu komutları çalıştır:
+
+```bash
+npm install -g firebase-tools
+firebase login
+dart pub global activate flutterfire_cli
+flutterfire configure --platforms=android,ios,web
+```
+
+   Bu işlem `lib/firebase_options.dart` dosyasını gerçek ayarlarla değiştirir. `flutterfire` komutu bulunamazsa `%LOCALAPPDATA%\Pub\Cache\bin` klasörünü PATH'e ekle.
+3. Firebase konsolunda **Proje ayarları → Hizmet hesapları → Yeni özel anahtar oluştur**'a tıkla. İnen dosyayı `server\firebase-service-account.json` olarak kaydet ve `server\.env` dosyasına şu satırı ekle:
+   `FIREBASE_SERVICE_ACCOUNT=firebase-service-account.json`
+
+Firebase ayarlı değilken sunucu bildirimleri konsola `[push dev]` olarak yazar.
+
+## Ödeme (RevenueCat) kurulumu: yayından önce
+
+Mağaza bağlanana kadar cüzdan **test modunda** çalışır (web'de ve anahtar verilmemişse): ödeme alınmaz, ama satın alma sunucuda gerçekle aynı yoldan geçer (ilk alım bonusu dahil). Yayında test yükleme ucu kapalıdır.
+
+1. **Mağaza ürünleri:** Google Play Console ve App Store Connect'te 4 adet **tüketilebilir (consumable)** ürün oluştur: `coins_500`, `coins_1000`, `coins_2500`, `coins_6000`. Taban fiyatlar 9,99 / 19,99 / 44,99 / 99,99 $; mağaza her ülke için yerel fiyatı kendisi belirler.
+2. **RevenueCat:** Bir proje aç, Android ve iOS uygulamalarını ekle, aynı 4 ürünü tanımla. Uygulamayı genel SDK anahtarlarıyla derle:
+
+```bash
+flutter build appbundle --dart-define=REVENUECAT_ANDROID_KEY=goog_xxx
+```
+
+```bash
+flutter build ipa --dart-define=REVENUECAT_IOS_KEY=appl_xxx
+```
+
+3. **Webhook:** RevenueCat panelinde **Integrations → Webhooks** bölümüne gir. URL olarak `https://<sunucu-adresi>/webhooks/revenuecat` gir, Authorization değeri olarak uzun rastgele bir metin belirle. Sunucunun `.env` dosyasına ekle:
+
+```
+REVENUECAT_WEBHOOK_AUTH="Bearer <belirlediğin-metin>"
+REVENUECAT_SECRET_KEY="sk_xxx"
+```
+
+Kurallar `server/src/purchases.ts` dosyasında:
+
+- Aynı mağaza işlemi iki kez yüklenmez.
+- İadede verilen jetonlar (bonus dahil) geri alınır. Bakiye eksiye düşebilir; eksi bakiyede harcama yapılamaz.
+- Sandbox (test) satın alımlar yüklenir ama gelir raporuna girmez.
+
+## Sesli ve görüntülü arama (Agora) kurulumu: yayından önce
+
+Agora anahtarı verilmeden aramalar **test modunda** çalışır: çalma, kabul, dakika başı ücret, hediye ve puanlama gerçek. Sadece ses ve görüntü aktarılmaz (ekranda "Test modu" yazar, görüntü yerine profil fotoğrafı görünür). Web sürümü her zaman test modundadır.
+
+1. [console.agora.io](https://console.agora.io) üzerinden bir proje aç, **App ID** ve **App Certificate** değerlerini al (güvenli mod: token ile).
+2. Sunucunun `.env` dosyasına ekle:
+
+```
+AGORA_APP_ID="xxxxxxxx"
+AGORA_APP_CERT="xxxxxxxx"
+```
+
+3. Uygulamada ek ayar gerekmez: sunucu her arama için kısa ömürlü token üretir, kanal adı arama kimliğidir.
+4. iOS derlemesinde `ios/Podfile` içindeki `post_install` bloğuna `permission_handler` için kamera ve mikrofon izin makrolarını ekle (`PERMISSION_CAMERA=1`, `PERMISSION_MICROPHONE=1`).
+
+Kurallar `server/src/calls.ts` dosyasında:
+
+- Aynı anda tek arama: meşgul kişi aranamaz.
+- 45 sn cevaplanmayan arama cevapsız sayılır.
+- Bağlantısı kopan taraf 20 sn içinde dönmezse arama biter. Sunucu yeniden başlarsa yarım kalan aramalar kapanır.
+- Görüntülü aramada karşı tarafın görüntüsü bulanık başlar; kullanıcı dokununca netleşir.
+- Arama sonrası 1-5 puan verilebilir, isteğe bağlı sorun bildirimi yönetim paneline şikayet olarak düşer.
+
+## Hata takibi
+
+Uygulamadaki yakalanmamış hatalar (yayın derlemesinde) ve sunucudaki 500 hataları yönetim panelinin **Hatalar** sekmesine düşer. Harici servis gerekmez. Aynı hata tek satırda toplanır, kaç kez ve en son ne zaman olduğu görünür. "Çözüldü" denen hata tekrar olursa yeniden açılır.
+
+## Yol haritası
+
+Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
+
+- [x] **Faz 1 · Temel:** kayıt, profil ve fotoğraflar, keşfet ve eşleşme, sohbet, jeton cüzdanı, ücretli istekler, engelleme ve şikayet
+- [x] **Faz 2 · Görünüm ve ilk izlenim:** marka kimliği (Inter, mercan-turuncu gradyan, uygulama ikonu), 9 adımlı kayıt sihirbazı, ilgi alanları, profil soruları ve temel bilgiler, yeni keşfet kartı ve profil sayfası, yükleniyor iskeletleri ve animasyonlar, karanlık mod
+- [x] **Faz 3 · Güven ve güvenlik:** e-posta doğrulama ve şifre sıfırlama, koşul onayı ve yasal metinler, hesap silme, hız sınırlama ve yasaklama, selfie ile mavi tik, web yönetim paneli
+- [x] **Faz 4 · Etkileşim:** konum ve yaklaşık mesafe, yaş ve mesafe filtreleri, süper beğeni (30 jeton), öne çıkarma (150 jeton / 30 dk), seni beğenenler (200 jeton / 24 saat), okundu bilgisi, "yazıyor...", okunmamış sayacı, tek seferlik fotoğraf, uygulama içi bildirimler, FCM push altyapısı
+- [x] **Faz 5 · Gerçek ödeme (IAP):** RevenueCat webhook'u ve senkronizasyon (aynı işlem iki kez yüklenmez), iadede jeton geri alma, 50 jeton kayıt hediyesi, %50 ilk alım bonusu, "en popüler" paket, mağazanın yerel fiyatları, yönetimde satış/gelir raporu. Mağaza hesapları yayına yakın bağlanacak.
+- [x] **Faz 6 · Sesli ve görüntülü arama:** dakika başı ücret (sesli 15, görüntülü 30 jeton/dk), Agora altyapısı ve test modu, gelen/giden/görüşme ekranları, bulanık başlayan görüntü, arama içi hediyeler, arama sonrası puan ve sorun bildirimi, arama geçmişi, yönetimde arama istatistikleri
+- [x] **Faz 7 · Para çekme ve yayın hazırlığı:** manuel onaylı para çekme (IBAN/PayPal, min. $20, mavi tik şartı), yönetimde Ödemeler ve Hatalar sekmeleri, uygulama ve sunucu hata takibi, yayında eksik ayarla açılmayan sunucu, `.env.example`, yayın rehberi, mağaza metinleri (TR/EN), yasal taslak güncellemeleri, GitHub özel depo
+- [ ] **Faz 8 · Yayın:** şirket, alan adı, VPS + PostgreSQL + HTTPS, mağaza hesapları, RevenueCat/Firebase/Agora anahtarları, gerçek cihaz testleri, avukat onaylı yasal metinler
+
+## Notlar
+
+- SQLite'ta Prisma `Json @default("[]")` alanları için hatalı bir varsayılan değer üretiyor (`DEFAULT []`). Uygulama her zaman değer gönderdiği için sorun olmuyor; eski satırlar `fix_json_defaults` migration'ı ile onarıldı. PostgreSQL'e geçince bu durum ortadan kalkacak.
+- `npm run db:seed`, `@meetpoint.dev` ve `@test.com` hesaplarını silip demo verisini yeniden oluşturur.

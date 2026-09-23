@@ -1,0 +1,368 @@
+// MeetPoint veritabanı şeması.
+// Lokalde SQLite; yayına çıkarken provider = "postgresql" yapılıp migrate edilecek.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  locale       String   @default("tr")
+  createdAt    DateTime @default(now())
+
+  // Güvenlik
+  emailVerifiedAt DateTime?
+  tokenVersion    Int       @default(0) // şifre değişince eski oturumlar geçersiz olur
+  isAdmin         Boolean   @default(false)
+  bannedAt        DateTime?
+  banReason       String    @default("")
+  termsAcceptedAt DateTime?
+  termsVersion    String    @default("")
+
+  // Selfie ile profil doğrulama (mavi tik): none | pending | approved | rejected
+  verificationStatus String    @default("none")
+  verificationPose   String    @default("") // doğrulama başlatılınca atanan poz
+  verifiedAt         DateTime?
+
+  // Jetonla alınan özellikler
+  boostedUntil       DateTime? // öne çıkarma bitişi
+  likesUnlockedUntil DateTime? // "seni beğenenler" erişimi bitişi
+
+  emailCodes    EmailCode[]
+  verifications VerificationRequest[]
+  devices       Device[]
+  purchases     Purchase[]
+  callsMade     Call[]     @relation("CallCaller")
+  callsReceived Call[]     @relation("CallCallee")
+  giftsSent     CallGift[] @relation("GiftFrom")
+  giftsReceived CallGift[] @relation("GiftTo")
+  payouts       Payout[]
+
+  profile Profile?
+  photos  Photo[]
+
+  swipesGiven    Swipe[] @relation("SwipeFrom")
+  swipesReceived Swipe[] @relation("SwipeTo")
+
+  walletEntries WalletEntry[]
+
+  requestsSent     ContactRequest[] @relation("RequestFrom")
+  requestsReceived ContactRequest[] @relation("RequestTo")
+
+  conversationsA Conversation[] @relation("ConvA")
+  conversationsB Conversation[] @relation("ConvB")
+  messages       Message[]
+
+  blocksGiven    Block[]  @relation("BlockFrom")
+  blocksReceived Block[]  @relation("BlockTo")
+  reportsGiven   Report[] @relation("ReportFrom")
+  reportsAgainst Report[] @relation("ReportTo")
+}
+
+model Profile {
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  birthDate   DateTime
+  gender      String // "male" | "female" | "other"
+  interestedIn String // "male" | "female" | "everyone"
+  bio         String   @default("")
+  city        String   @default("")
+  country     String   @default("")
+  // Katalog kimlikleri: src/catalog.ts
+  interests   Json     @default("[]") // ["coffee", "travel", ...] en fazla 5
+  prompts     Json     @default("[]") // [{ id: "perfect_sunday", answer: "..." }] en fazla 3
+  // Temel bilgiler (boş = belirtilmemiş)
+  lookingFor  String   @default("") // relationship | casual | friendship | chat | unsure
+  heightCm    Int?
+  job         String   @default("")
+  education   String   @default("") // high_school | bachelor | master | phd
+  zodiac      String   @default("")
+  smoking     String   @default("") // no | sometimes | yes
+  drinking    String   @default("") // no | sometimes | yes
+
+  // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
+  latitude   Float?
+  longitude  Float?
+  locationAt DateTime?
+
+  // Keşfet filtreleri
+  filterMinAge Int @default(18)
+  filterMaxAge Int @default(80)
+  filterMaxKm  Int @default(0) // 0 = mesafe sınırı yok
+
+  updatedAt   DateTime @updatedAt
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  path      String
+  position  Int
+  createdAt DateTime @default(now())
+
+  @@index([userId, position])
+}
+
+model Swipe {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  from      User     @relation("SwipeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("SwipeTo", fields: [toId], references: [id], onDelete: Cascade)
+  direction String // "like" | "pass" | "superlike" (jetonla; eşleşme açısından beğeni sayılır)
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId])
+  @@index([toId, direction])
+}
+
+// Bakiye hiçbir yerde elle tutulmaz: bakiye = bu tablodaki amount toplamı.
+// Her hareket (satın alma, bloke, transfer, iade, harcama, bozdurma) ayrı satırdır.
+model WalletEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int // pozitif = giriş, negatif = çıkış
+  type      String // PURCHASE | BONUS | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | GRANT | CLAWBACK
+  // EARN satırları bozdurulabilir jetonlardır; PURCHASE/GRANT bozdurulamaz.
+  requestId String?
+  note      String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// Ücretli iletişim isteği: gönderenden jeton bloke edilir,
+// kabul edilirse alıcıya EARN olarak geçer, red/süre dolumunda iade edilir.
+model ContactRequest {
+  id          String    @id @default(cuid())
+  fromId      String
+  toId        String
+  from        User      @relation("RequestFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to          User      @relation("RequestTo", fields: [toId], references: [id], onDelete: Cascade)
+  kind        String // MESSAGE | VOICE | VIDEO
+  price       Int
+  status      String    @default("PENDING") // PENDING | ACCEPTED | REJECTED | CANCELLED | EXPIRED
+  note        String    @default("") // MESSAGE isteğindeki ilk mesaj
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  respondedAt DateTime?
+
+  @@index([toId, status])
+  @@index([fromId, status])
+}
+
+// İki kullanıcı arasındaki sohbet. Eşleşme (karşılıklı beğeni) veya
+// kabul edilen mesaj isteği ile açılır. userAId < userBId (sıralı) tutulur.
+model Conversation {
+  id        String    @id @default(cuid())
+  userAId   String
+  userBId   String
+  userA     User      @relation("ConvA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB     User      @relation("ConvB", fields: [userBId], references: [id], onDelete: Cascade)
+  origin    String // MATCH | REQUEST
+  createdAt DateTime  @default(now())
+  messages  Message[]
+
+  @@unique([userAId, userBId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  kind           String       @default("text") // text | photo
+  body           String
+  // Tek seferlik fotoğraf: özel klasörde durur, alıcı bir kez açınca dosya silinir
+  photoPath      String?
+  viewedAt       DateTime?
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+// Jeton satın alımları (RevenueCat üzerinden App Store / Google Play).
+// transactionId benzersiz: aynı mağaza işlemi iki kez jetona dönüşemez.
+model Purchase {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store         String // app_store | play_store | dev
+  productId     String
+  transactionId String    @unique
+  coins         Int // paketteki jeton
+  bonusCoins    Int       @default(0) // ilk alım bonusu
+  priceUsd      Float? // mağazanın bildirdiği USD karşılığı (rapor için)
+  currency      String    @default("")
+  sandbox       Boolean   @default(false)
+  status        String    @default("COMPLETED") // COMPLETED | REFUNDED
+  refundedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// Sesli/görüntülü arama. Dakika başı ücret: her dakikanın başında arayanın jetonu
+// arananın hesabına (EARN) geçer; bakiye yetmezse arama biter.
+model Call {
+  id            String     @id @default(cuid())
+  callerId      String
+  calleeId      String
+  caller        User       @relation("CallCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  callee        User       @relation("CallCallee", fields: [calleeId], references: [id], onDelete: Cascade)
+  kind          String // VOICE | VIDEO
+  ratePerMin    Int
+  status        String     @default("RINGING") // RINGING | ACTIVE | ENDED | MISSED | DECLINED | CANCELLED
+  endReason     String     @default("") // hangup | balance | disconnect | server_restart
+  billedMinutes Int        @default(0)
+  totalCoins    Int        @default(0) // dakika ücretleri toplamı
+  giftCoins     Int        @default(0)
+  callerRating  Int? // arayanın aranana verdiği puan (1-5)
+  calleeRating  Int? // arananın arayana verdiği puan
+  createdAt     DateTime   @default(now())
+  answeredAt    DateTime?
+  endedAt       DateTime?
+  gifts         CallGift[]
+
+  @@index([callerId, createdAt])
+  @@index([calleeId, createdAt])
+  @@index([status])
+}
+
+// Arama içi hediye: jetonun tamamı alıcıya geçer (EARN)
+model CallGift {
+  id        String   @id @default(cuid())
+  callId    String
+  call      Call     @relation(fields: [callId], references: [id], onDelete: Cascade)
+  fromId    String
+  toId      String
+  from      User     @relation("GiftFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("GiftTo", fields: [toId], references: [id], onDelete: Cascade)
+  giftId    String
+  coins     Int
+  createdAt DateTime @default(now())
+
+  @@index([callId])
+}
+
+// Para çekme talebi. Talep anında jeton CASHOUT ile düşülür; red/iptalde CASHOUT_REFUND ile geri verilir.
+// Ödeme yönetimden elle yapılır (şirket kurulana kadar). Hesap silinse de kayıt muhasebe için kalır.
+model Payout {
+  id           String    @id @default(cuid())
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email        String // talep anındaki e-posta (hesap silinirse de görünsün)
+  coins        Int
+  usd          Float
+  method       String // iban | paypal
+  accountName  String    @default("") // hesap sahibi
+  accountValue String // IBAN veya PayPal e-postası
+  status       String    @default("PENDING") // PENDING | PAID | REJECTED | CANCELLED
+  reference    String    @default("") // yönetimin girdiği havale/işlem numarası
+  adminNote    String    @default("") // red sebebi
+  createdAt    DateTime  @default(now())
+  processedAt  DateTime?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// Hata takibi: uygulamadan gelen ve sunucuda oluşan beklenmeyen hatalar.
+// Aynı hata (mesaj + yığının ilk satırları) tek satırda toplanır, sayısı artar.
+model ErrorLog {
+  id          String    @id @default(cuid())
+  fingerprint String    @unique
+  source      String // app | server
+  platform    String    @default("") // android | ios | web | server
+  appVersion  String    @default("")
+  message     String
+  stack       String    @default("")
+  context     String    @default("") // ekran yolu veya istek (GET /discover)
+  lastUserId  String    @default("")
+  count       Int       @default(1)
+  firstSeen   DateTime  @default(now())
+  lastSeen    DateTime  @default(now())
+  resolvedAt  DateTime? // çözüldü işaretlenir; tekrar olursa yeniden açılır
+
+  @@index([resolvedAt, lastSeen])
+}
+
+// Push bildirim cihaz jetonları (FCM)
+model Device {
+  token     String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform  String // android | ios | web
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Block {
+  fromId    String
+  toId      String
+  from      User     @relation("BlockFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("BlockTo", fields: [toId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([fromId, toId])
+}
+
+model Report {
+  id         String    @id @default(cuid())
+  fromId     String
+  toId       String
+  from       User      @relation("ReportFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to         User      @relation("ReportTo", fields: [toId], references: [id], onDelete: Cascade)
+  reason     String
+  details    String    @default("")
+  status     String    @default("OPEN") // OPEN | RESOLVED
+  resolution String    @default("") // dismissed | photo_removed | banned
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status, createdAt])
+}
+
+// E-posta ile gönderilen tek kullanımlık kodlar (doğrulama ve şifre sıfırlama)
+model EmailCode {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   String // verify | reset
+  codeHash  String
+  attempts  Int       @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, purpose, createdAt])
+}
+
+// Selfie doğrulama başvurusu: selfie herkese açık değildir, sadece yönetim panelinden görülür
+model VerificationRequest {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pose       String
+  selfiePath String
+  status     String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  note       String    @default("")
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status, createdAt])
+}

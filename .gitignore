@@ -1,0 +1,5 @@
+# İşletim sistemi ve editör
+.DS_Store
+Thumbs.db
+.idea/
+*.log

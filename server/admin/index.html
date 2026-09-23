@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MeetPoint Yönetim</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Giriş -->
+  <section id="login" class="login hidden">
+    <form id="login-form" class="card login-card">
+      <div class="logo">meetpoint</div>
+      <p class="muted">Yönetim paneli</p>
+      <input id="login-email" type="email" placeholder="E-posta" autocomplete="username" required>
+      <input id="login-password" type="password" placeholder="Şifre" autocomplete="current-password" required>
+      <button type="submit" class="btn primary">Giriş yap</button>
+      <p id="login-error" class="error"></p>
+    </form>
+  </section>
+
+  <!-- Panel -->
+  <section id="app" class="hidden">
+    <header class="topbar">
+      <div class="logo">meetpoint <span class="badge-admin">yönetim</span></div>
+      <nav id="tabs">
+        <button data-tab="overview" class="tab active">Özet</button>
+        <button data-tab="reports" class="tab">Şikayetler <span id="count-reports" class="count"></span></button>
+        <button data-tab="verifications" class="tab">Mavi tik <span id="count-verifications" class="count"></span></button>
+        <button data-tab="users" class="tab">Kullanıcılar</button>
+        <button data-tab="purchases" class="tab">Satışlar</button>
+        <button data-tab="payouts" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
+        <button data-tab="errors" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
+      </nav>
+      <button id="logout" class="btn ghost">Çıkış</button>
+    </header>
+
+    <main>
+      <div id="tab-overview" class="panel">
+        <div id="stats" class="stats"></div>
+      </div>
+
+      <div id="tab-reports" class="panel hidden">
+        <div class="toolbar">
+          <div class="seg">
+            <button data-status="OPEN" class="seg-btn active">Açık</button>
+            <button data-status="RESOLVED" class="seg-btn">Çözülmüş</button>
+          </div>
+        </div>
+        <div id="reports" class="list"></div>
+      </div>
+
+      <div id="tab-verifications" class="panel hidden">
+        <p class="muted">Selfie'deki kişi profil fotoğraflarıyla aynı mı ve istenen pozu yapıyor mu? İkisi de uyuyorsa onayla.</p>
+        <div id="verifications" class="list"></div>
+      </div>
+
+      <div id="tab-purchases" class="panel hidden">
+        <p class="muted">Gelir; iade edilmemiş, test (sandbox) olmayan mağaza satışlarının mağazanın bildirdiği USD karşılığıdır. Mağaza payı (%15–30) düşülmemiştir.</p>
+        <div id="purchases" class="list"></div>
+      </div>
+
+      <div id="tab-payouts" class="panel hidden">
+        <div class="toolbar">
+          <div class="seg">
+            <button data-pstatus="PENDING" class="seg-btn active">Bekleyen</button>
+            <button data-pstatus="PAID" class="seg-btn">Ödenen</button>
+            <button data-pstatus="REJECTED" class="seg-btn">Reddedilen</button>
+            <button data-pstatus="CANCELLED" class="seg-btn">İptal</button>
+          </div>
+        </div>
+        <p class="muted">Ödemeyi bankadan veya PayPal'dan elle yap, sonra havale/işlem numarasıyla "Ödendi" işaretle. Reddedilen talepte jetonlar kullanıcıya geri döner. Şikayeti çok olan veya yeni hesaplara dikkat.</p>
+        <div id="payouts" class="list"></div>
+      </div>
+
+      <div id="tab-errors" class="panel hidden">
+        <div class="toolbar">
+          <div class="seg">
+            <button data-estatus="0" class="seg-btn active">Açık</button>
+            <button data-estatus="1" class="seg-btn">Çözülmüş</button>
+          </div>
+        </div>
+        <p class="muted">Uygulamada ve sunucuda oluşan beklenmeyen hatalar. Aynı hata tek satırda toplanır. Düzelttikten sonra "Çözüldü" de; tekrar olursa yeniden açılır.</p>
+        <div id="errors" class="list"></div>
+      </div>
+
+      <div id="tab-users" class="panel hidden">
+        <div class="toolbar">
+          <input id="user-search" type="search" placeholder="E-posta veya isim ara">
+        </div>
+        <div id="users" class="list"></div>
+      </div>
+    </main>
+  </section>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="admin.js"></script>
+</body>
+</html>

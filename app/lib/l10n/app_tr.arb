@@ -1,0 +1,696 @@
+{
+  "@@locale": "tr",
+  "appName": "MeetPoint",
+  "tagline": "Tanış, konuş, kazan.",
+  "loginTitle": "Tekrar hoş geldin",
+  "registerTitle": "Hesap oluştur",
+  "email": "E-posta",
+  "password": "Şifre",
+  "passwordHint": "En az 8 karakter",
+  "login": "Giriş yap",
+  "register": "Kayıt ol",
+  "noAccount": "Hesabın yok mu? Kayıt ol",
+  "haveAccount": "Zaten hesabın var mı? Giriş yap",
+  "setupTitle": "Profilini oluştur",
+  "editProfile": "Profili düzenle",
+  "photos": "Fotoğraflar",
+  "photosHint": "En az 1, en fazla {max} fotoğraf. İlk fotoğraf kapak fotoğrafın olur.",
+  "@photosHint": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "displayName": "Görünen ad",
+  "birthDate": "Doğum tarihi",
+  "selectDate": "Tarih seç",
+  "gender": "Cinsiyet",
+  "male": "Erkek",
+  "female": "Kadın",
+  "other": "Diğer",
+  "interestedIn": "İlgilendiğin",
+  "men": "Erkekler",
+  "women": "Kadınlar",
+  "everyone": "Herkes",
+  "bio": "Hakkımda",
+  "city": "Şehir",
+  "country": "Ülke",
+  "save": "Kaydet",
+  "continueLabel": "Devam et",
+  "requiredField": "Bu alan zorunlu",
+  "photoRequired": "En az bir fotoğraf ekle",
+  "saved": "Kaydedildi",
+  "navDiscover": "Keşfet",
+  "navRequests": "İstekler",
+  "navChats": "Sohbetler",
+  "navWallet": "Cüzdan",
+  "navProfile": "Profil",
+  "noMoreProfiles": "Şimdilik gösterilecek yeni kimse yok",
+  "refresh": "Yenile",
+  "itsAMatch": "Eşleştiniz!",
+  "matchBody": "{name} ile eşleştin. Artık ücretsiz mesajlaşabilirsiniz.",
+  "@matchBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sendMessage": "Mesaj gönder",
+  "keepSwiping": "Keşfetmeye devam",
+  "messageRequest": "Mesaj isteği",
+  "voiceCall": "Sesli arama",
+  "videoCall": "Görüntülü arama",
+  "coins": "{count} jeton",
+  "@coins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "requestDialogTitle": "{name} kişisine mesaj isteği",
+  "@requestDialogTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "requestDialogHint": "İlk mesajını yaz...",
+  "requestCostInfo": "{price} jeton bloke edilir. Kabul edilirse karşı tarafa geçer; reddedilir ya da 24 saat içinde cevaplanmazsa sana iade edilir.",
+  "@requestCostInfo": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "confirmRequestTitle": "{kind} isteği gönderilsin mi?",
+  "@confirmRequestTitle": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "send": "Gönder",
+  "cancel": "Vazgeç",
+  "requestSent": "İstek gönderildi",
+  "topUp": "Jeton yükle",
+  "inbox": "Gelen",
+  "outbox": "Giden",
+  "noRequests": "Henüz istek yok",
+  "accept": "Kabul et",
+  "reject": "Reddet",
+  "cancelRequest": "Geri çek",
+  "statusPending": "Bekliyor",
+  "statusAccepted": "Kabul edildi",
+  "statusRejected": "Reddedildi",
+  "statusCancelled": "Geri çekildi",
+  "statusExpired": "Süresi doldu",
+  "expiresIn": "{hours} sa içinde düşer",
+  "@expiresIn": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "earnOnAccept": "Kabul edersen +{price} jeton kazanırsın",
+  "@earnOnAccept": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "callComingSoon": "Arama özelliği yakında geliyor. Jetonlar bakiyene eklendi.",
+  "noChats": "Henüz sohbet yok. Keşfet'te birini beğen ya da mesaj isteği gönder.",
+  "typeMessage": "Mesaj yaz...",
+  "matchedChat": "Eşleşme",
+  "requestChat": "Mesaj isteği",
+  "balance": "Bakiye",
+  "cashable": "Bozdurulabilir",
+  "cashableInfo": "Sadece başkalarından kazandığın jetonlar paraya çevrilebilir.",
+  "cashout": "Paraya çevir",
+  "comingSoon": "Yakında",
+  "buyCoins": "Jeton satın al",
+  "testModeNote": "Test modu: ödeme alınmaz, jetonlar anında eklenir.",
+  "history": "Hareketler",
+  "noHistory": "Henüz hareket yok",
+  "txPurchase": "Jeton satın alımı",
+  "txHold": "İstek için bloke",
+  "txRefund": "İade",
+  "txEarn": "Kazanç",
+  "txSpend": "Harcama",
+  "txCashout": "Paraya çevirme",
+  "txGrant": "Hediye",
+  "coinsAdded": "{count} jeton eklendi",
+  "@coinsAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "language": "Dil",
+  "logout": "Çıkış yap",
+  "block": "Engelle",
+  "report": "Şikayet et",
+  "blockConfirm": "{name} engellensin mi? Seni göremez ve sana ulaşamaz.",
+  "@blockConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "blocked": "Engellendi",
+  "reportTitle": "Şikayet sebebi",
+  "reportFake": "Sahte profil",
+  "reportInappropriate": "Uygunsuz içerik",
+  "reportHarassment": "Taciz",
+  "reportScam": "Dolandırıcılık",
+  "reportUnderage": "18 yaş altı",
+  "reportOther": "Diğer",
+  "reportSent": "Şikayetin alındı, teşekkürler.",
+  "errGeneric": "Bir şeyler ters gitti. Tekrar dene.",
+  "errNetwork": "Sunucuya ulaşılamadı.",
+  "errInvalidCredentials": "E-posta veya şifre hatalı.",
+  "errEmailTaken": "Bu e-posta zaten kayıtlı.",
+  "errUnderage": "MeetPoint'i kullanmak için 18 yaşından büyük olmalısın.",
+  "errInsufficientBalance": "Yeterli jetonun yok.",
+  "errAlreadyPending": "Bu kişiye zaten bekleyen bir isteğin var.",
+  "errAlreadyInConversation": "Bu kişiyle zaten sohbetin var.",
+  "errTooManyPhotos": "En fazla 6 fotoğraf ekleyebilirsin.",
+  "errValidation": "Lütfen bilgileri kontrol et.",
+  "errExpired": "Bu isteğin süresi dolmuş.",
+  "errNotPending": "Bu istek artık geçerli değil.",
+  "errBlocked": "Bu kişiyle artık mesajlaşamazsın.",
+  "interestLabel": "{id, select, coffee{Kahve} travel{Seyahat} music{Müzik} concerts{Konserler} movies{Sinema} series{Diziler} books{Kitaplar} photography{Fotoğrafçılık} art{Sanat} cooking{Yemek yapmak} foodie{Gurme} wine{Şarap} fitness{Fitness} yoga{Yoga} running{Koşu} cycling{Bisiklet} hiking{Doğa yürüyüşü} camping{Kamp} football{Futbol} basketball{Basketbol} gaming{Oyun} tech{Teknoloji} fashion{Moda} dancing{Dans} pets{Evcil hayvanlar} nature{Doğa} beach{Plaj} meditation{Meditasyon} anime{Anime} volunteering{Gönüllülük} other{{id}}}",
+  "@interestLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "promptQuestion": "{id, select, perfect_sunday{Mükemmel bir pazar günüm...} laugh{Beni en çok güldüren şey...} green_flag{Birinde aradığım yeşil bayrak...} travel_dream{Hayalimdeki seyahat...} unpopular_opinion{Popüler olmayan bir fikrim...} simple_pleasures{Basit mutluluklarım...} looking_for{Aradığım kişi...} two_truths{İki doğru, bir yalan...} first_date{İdeal ilk buluşma...} song{Şu an dilime dolanan şarkı...} other{{id}}}",
+  "@promptQuestion": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "lookingForLabel": "{id, select, relationship{Ciddi ilişki} casual{Eğlenceli bir şeyler} friendship{Yeni arkadaşlar} chat{Sadece sohbet} unsure{Henüz emin değilim} other{{id}}}",
+  "@lookingForLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "educationLabel": "{id, select, high_school{Lise} bachelor{Lisans} master{Yüksek lisans} phd{Doktora} other{{id}}}",
+  "@educationLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacLabel": "{id, select, aries{Koç} taurus{Boğa} gemini{İkizler} cancer{Yengeç} leo{Aslan} virgo{Başak} libra{Terazi} scorpio{Akrep} sagittarius{Yay} capricorn{Oğlak} aquarius{Kova} pisces{Balık} other{{id}}}",
+  "@zodiacLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "habitLabel": "{id, select, no{Hayır} sometimes{Bazen} yes{Evet} other{{id}}}",
+  "@habitLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "obNameTitle": "Adın ne?",
+  "obNameHint": "Profilinde bu isim görünecek.",
+  "obBirthTitle": "Doğum tarihin ne?",
+  "obBirthHint": "Profilinde sadece yaşın görünür.",
+  "obAgeLabel": "{age} yaşındasın",
+  "@obAgeLabel": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "obGenderTitle": "Kendini nasıl tanımlıyorsun?",
+  "obInterestedTitle": "Kimlerle tanışmak istiyorsun?",
+  "obPhotosTitle": "Fotoğraflarını ekle",
+  "obPhotosHint": "En az 1 fotoğraf gerekli. 3 ve üzeri fotoğrafı olan profiller daha çok eşleşiyor.",
+  "obInterestsTitle": "Nelerden hoşlanırsın?",
+  "obInterestsHint": "{min} ile {max} arası seç",
+  "@obInterestsHint": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "obLookingTitle": "Burada ne arıyorsun?",
+  "obPromptsTitle": "Kendinden bahset",
+  "obPromptsHint": "En fazla 3 soru seçip cevapla. Sohbet başlatmanın en kolay yolu.",
+  "obBasicsTitle": "Biraz daha detay",
+  "obBasicsHint": "Hepsi isteğe bağlı, istediğin zaman değiştirebilirsin.",
+  "skip": "Atla",
+  "finish": "Profilimi oluştur",
+  "addPrompt": "Soru ekle",
+  "choosePrompt": "Bir soru seç",
+  "yourAnswer": "Cevabın",
+  "height": "Boy",
+  "heightCm": "{cm} cm",
+  "@heightCm": {
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  },
+  "job": "Meslek",
+  "education": "Eğitim",
+  "zodiac": "Burç",
+  "smoking": "Sigara",
+  "drinking": "Alkol",
+  "lookingFor": "Aradığı",
+  "interests": "İlgi alanları",
+  "prompts": "Sorular",
+  "basics": "Temel bilgiler",
+  "notSpecified": "Belirtilmedi",
+  "makeCover": "Kapak fotoğrafı yap",
+  "deletePhoto": "Fotoğrafı sil",
+  "cover": "Kapak",
+  "edit": "Düzenle",
+  "personalInfo": "Kişisel bilgiler",
+  "profileCompletion": "Profilin %{percent} tamamlandı",
+  "@profileCompletion": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "commonInterests": "{count} ortak ilgi alanı",
+  "@commonInterests": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stepOf": "{step}/{total}",
+  "@stepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "clear": "Temizle",
+  "previewProfile": "Profilimi önizle",
+  "viewProfile": "Profili gör",
+  "done": "Tamam",
+  "forgotPassword": "Şifremi unuttum",
+  "resetTitle": "Şifreni sıfırla",
+  "resetHint": "E-posta adresine 6 haneli bir kod göndereceğiz.",
+  "sendCode": "Kod gönder",
+  "codeSentTo": "{email} adresine 6 haneli bir kod gönderdik.",
+  "@codeSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "newPassword": "Yeni şifre",
+  "resetDone": "Şifren güncellendi",
+  "verifyEmailTitle": "E-postanı doğrula",
+  "code": "Kod",
+  "verify": "Doğrula",
+  "resendCode": "Kodu tekrar gönder",
+  "resendIn": "{seconds} sn sonra tekrar gönderebilirsin",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "codeResent": "Yeni kod gönderildi",
+  "useAnotherAccount": "Başka hesapla giriş yap",
+  "termsOfService": "Kullanım Koşulları",
+  "privacyPolicy": "Gizlilik Politikası",
+  "termsConsent": "18 yaşından büyüğüm; {terms} ve {privacy} metinlerini okudum, kabul ediyorum.",
+  "@termsConsent": {
+    "placeholders": {
+      "terms": {
+        "type": "String"
+      },
+      "privacy": {
+        "type": "String"
+      }
+    }
+  },
+  "mustAcceptTerms": "Devam etmek için koşulları kabul etmelisin.",
+  "deleteAccount": "Hesabı sil",
+  "deleteAccountWarning": "Bu işlem geri alınamaz. Profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.",
+  "confirmWithPassword": "Onaylamak için şifreni gir",
+  "accountDeleted": "Hesabın silindi",
+  "legal": "Yasal",
+  "verifyProfile": "Profilini doğrula",
+  "verifyProfileHint": "Mavi tik al, daha çok güven ve eşleşme kazan.",
+  "verifiedLabel": "Doğrulanmış profil",
+  "verificationPendingLabel": "Doğrulama inceleniyor",
+  "verificationRejectedLabel": "Doğrulama onaylanmadı, tekrar dene",
+  "verifyTitle": "Mavi tik al",
+  "verifyStep": "Aşağıdaki pozu yaparak bir selfie çek. Selfie'n sadece doğrulama ekibimiz tarafından görülür, profilinde yayınlanmaz.",
+  "takeSelfie": "Selfie çek",
+  "retake": "Yeniden çek",
+  "verificationSubmitted": "Başvurun alındı. Genellikle 24 saat içinde incelenir.",
+  "poseLabel": "{id, select, peace_sign{✌️ Barış işareti yap} thumbs_up{👍 Başparmağını kaldır} hand_on_head{🙋 Elini başına koy} point_up{☝️ Yukarıyı göster} wave{👋 El salla} other{{id}}}",
+  "@poseLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "errCodeInvalid": "Kod hatalı.",
+  "errCodeExpired": "Kodun süresi doldu ya da çok fazla deneme yapıldı. Yeni kod iste.",
+  "errCodeCooldown": "Yeni kod istemeden önce biraz bekle.",
+  "errRateLimited": "Çok hızlı gidiyorsun, biraz bekleyip tekrar dene.",
+  "errBanned": "Hesabın topluluk kurallarını ihlal ettiği için askıya alındı.",
+  "errAlreadyVerified": "Profilin zaten doğrulanmış.",
+  "errVerificationPending": "Başvurun zaten inceleniyor.",
+  "kmAway": "{km} km uzakta",
+  "@kmAway": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
+  "filters": "Filtreler",
+  "ageRange": "Yaş aralığı",
+  "maxDistance": "En fazla uzaklık",
+  "anyDistance": "Fark etmez",
+  "apply": "Uygula",
+  "locationRationale": "Yakınındaki kişileri gösterebilmemiz için konumuna ihtiyacımız var. Tam konumun kimseyle paylaşılmaz, sadece yaklaşık mesafe görünür.",
+  "enableLocation": "Konumu aç",
+  "superLike": "Süper beğeni",
+  "superLikeSent": "Süper beğeni gönderildi ⭐",
+  "superLikedYou": "Seni süper beğendi",
+  "boost": "Öne çıkar",
+  "boostTitle": "Profilini öne çıkar",
+  "boostBody": "{minutes} dakika boyunca keşfette en üstte gösterilirsin. Daha çok kişi seni görür.",
+  "@boostBody": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "boostActive": "{minutes} dk",
+  "@boostActive": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "likesYou": "Seni beğenenler",
+  "likesYouCount": "{count, plural, =0{Henüz kimse seni beğenmedi} =1{1 kişi seni beğendi} other{{count} kişi seni beğendi}}",
+  "@likesYouCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "likesLockedBody": "Seni kimlerin beğendiğini gör, beğenirsen anında eşleş. {hours} saat boyunca açık kalır.",
+  "@likesLockedBody": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "seeWhoLikes": "Kimler olduğunu gör",
+  "noLikesYet": "Henüz seni beğenen yok. Profilini tamamla ya da öne çıkar!",
+  "typing": "yazıyor...",
+  "photo": "Fotoğraf",
+  "viewOncePhoto": "Tek seferlik fotoğraf",
+  "tapToView": "Görmek için dokun",
+  "photoOpened": "Açıldı",
+  "photoSent": "Gönderildi",
+  "viewOnceHint": "Fotoğraf bir kez açılabilir, sonra silinir.",
+  "sendPhoto": "Fotoğraf gönder",
+  "newMessageFrom": "{name}: {text}",
+  "@newMessageFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "newMatchWith": "Yeni eşleşme: {name} 💞",
+  "@newMatchWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newRequestBanner": "Yeni bir istek aldın",
+  "view": "Gör",
+  "errAlreadyBoosted": "Profilin zaten öne çıkarılmış.",
+  "errAlreadyViewed": "Bu fotoğraf zaten açıldı.",
+  "mostPopular": "En popüler",
+  "firstPurchaseBanner": "İlk alımına %{pct} bonus jeton!",
+  "@firstPurchaseBanner": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusCoins": "+{count} bonus",
+  "@bonusCoins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "paymentProcessing": "Ödemen işleniyor...",
+  "purchaseDone": "{count} jeton hesabına eklendi 🎉",
+  "@purchaseDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "txBonus": "İlk alım bonusu",
+  "txClawback": "İade (jeton geri alındı)",
+  "errStoreUnavailable": "Mağazaya şu an ulaşılamıyor. Biraz sonra tekrar dene.",
+  "perMinute": "{count}/dk",
+  "@perMinute": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "startCallTitle": "{kind} başlatılsın mı?",
+  "@startCallTitle": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "startCallInfo": "Dakika başı {rate} jeton. İlk dakika karşı taraf açınca düşer, bakiyen bitince arama kendiliğinden sonlanır.",
+  "@startCallInfo": {
+    "placeholders": {
+      "rate": {
+        "type": "int"
+      }
+    }
+  },
+  "callAction": "Ara",
+  "calling": "Aranıyor…",
+  "isCallingYou": "seni arıyor",
+  "earnPerMinute": "Dakika başı {rate} jeton kazanırsın",
+  "@earnPerMinute": {
+    "placeholders": {
+      "rate": {
+        "type": "int"
+      }
+    }
+  },
+  "answer": "Aç",
+  "decline": "Reddet",
+  "spentCoins": "Harcanan: {count}",
+  "@spentCoins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "earnedCoins": "Kazanılan: {count}",
+  "@earnedCoins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lowBalanceWarning": "Bakiyen bir sonraki dakikaya yetmiyor, arama bu dakikanın sonunda bitecek.",
+  "videoBlurred": "Güvenliğin için görüntü bulanık başlar",
+  "revealVideo": "Görüntüyü aç",
+  "waitingVideo": "Görüntü bekleniyor…",
+  "simulationMode": "Test modu",
+  "mute": "Sessiz",
+  "camera": "Kamera",
+  "flipCamera": "Çevir",
+  "speaker": "Hoparlör",
+  "gift": "Hediye",
+  "endCall": "Bitir",
+  "sendGiftTitle": "Hediye gönder",
+  "giftInfo": "Jetonların tamamı karşı tarafa geçer.",
+  "giftReceived": "{emoji} hediye aldın! +{count} jeton",
+  "@giftReceived": {
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "giftSent": "{emoji} gönderildi",
+  "@giftSent": {
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      }
+    }
+  },
+  "callEnded": "Arama bitti",
+  "callEndedBalance": "Bakiye bittiği için arama sona erdi.",
+  "callEndedDisconnect": "Bağlantı koptuğu için arama sona erdi.",
+  "callMissed": "Cevapsız arama",
+  "callNoAnswer": "Cevap yok",
+  "callDeclined": "Arama reddedildi",
+  "callCancelled": "Arama iptal edildi",
+  "rateCallTitle": "Görüşme nasıldı?",
+  "reportProblem": "Sorun mu vardı? Bildir",
+  "callHistory": "Aramalar",
+  "noCallsYet": "Henüz arama yok. Bir profilden sesli ya da görüntülü arama başlatabilirsin.",
+  "callBack": "Geri ara",
+  "missedCallFrom": "Cevapsız arama: {name}",
+  "@missedCallFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errBusy": "Şu an başka bir görüşmede, biraz sonra tekrar dene.",
+  "errAlreadyInCall": "Zaten bir görüşmedesin.",
+  "errCallGone": "Bu arama artık geçerli değil.",
+  "errCallerBalance": "Arayanın bakiyesi yetmediği için arama başlamadı.",
+  "txCall": "Arama",
+  "txGift": "Hediye",
+  "cashoutAvailable": "Çekilebilir bakiye",
+  "cashoutMinInfo": "En az {coins} jeton ({usd}) birikince çekebilirsin.",
+  "@cashoutMinInfo": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "usd": {
+        "type": "String"
+      }
+    }
+  },
+  "cashoutNeedVerify": "Para çekmek için profilini mavi tikle doğrulaman gerekiyor. Bu, sahte hesaplara karşı seni ve kazancını korur.",
+  "cashoutAmount": "Tutar",
+  "cashoutMethod": "Ödeme yöntemi",
+  "accountHolder": "Hesap sahibinin adı soyadı",
+  "paypalEmail": "PayPal e-postası",
+  "cashoutSubmit": "Talep gönder · {usd}",
+  "@cashoutSubmit": {
+    "placeholders": {
+      "usd": {
+        "type": "String"
+      }
+    }
+  },
+  "cashoutProcessingInfo": "Ödemeler 3–5 iş günü içinde yapılır. Talep incelenirken iptal edebilirsin.",
+  "cashoutRequested": "Talebin alındı 👍",
+  "cashoutNotEnough": "Çekilebilir bakiyen henüz {coins} jetona ulaşmadı. Aramalar ve kabul ettiğin isteklerle kazanmaya devam et!",
+  "@cashoutNotEnough": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "payoutStatusPending": "İnceleniyor",
+  "payoutStatusPaid": "Ödendi",
+  "payoutStatusRejected": "Reddedildi",
+  "payoutStatusCancelled": "İptal edildi",
+  "payoutCancel": "Talebi iptal et",
+  "payoutCancelled": "Talep iptal edildi, jetonlar geri eklendi.",
+  "payoutHistory": "Talepler",
+  "payoutReason": "Sebep: {reason}",
+  "@payoutReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutReference": "İşlem no: {ref}",
+  "@payoutReference": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "errVerificationRequired": "Önce profilini mavi tikle doğrulamalısın.",
+  "errBelowMinimum": "Tutar alt sınırın altında.",
+  "errInsufficientCashable": "Çekilebilir bakiyen bu tutar için yetmiyor.",
+  "errInvalidIban": "IBAN geçersiz görünüyor, kontrol edip tekrar dene.",
+  "errAccountNameRequired": "Hesap sahibinin adını yaz.",
+  "errPayoutPending": "Zaten incelenen bir talebin var.",
+  "txCashoutRefund": "Para çekme iadesi"
+}
