@@ -5,7 +5,7 @@ Tanış, konuş, kazan. Flutter (Android + iOS) arkadaşlık uygulaması + Node.
 ```
 meetpoint/
   app/      Flutter uygulaması (TR + EN)
-  server/   Node.js + Express + Prisma + Socket.IO (lokalde SQLite)
+  server/   Node.js + Express + Prisma + Socket.IO + PostgreSQL
     admin/    Web yönetim paneli (http://localhost:4000/admin)
     legal/    Kullanım koşulları ve gizlilik politikası (TASLAK)
   docs/     Faz önizlemeleri, yayın rehberi, mağaza metinleri
@@ -15,12 +15,18 @@ Yayına geçiş adımları: [docs/yayin-rehberi.md](docs/yayin-rehberi.md) · Ma
 
 ## Lokalde çalıştırma
 
-**1. Sunucu** (`server/` klasöründe):
+**1. Veritabanı** (`server/` klasöründe, ayrı bir terminalde açık kalır). Gömülü PostgreSQL'dir; bilgisayara kurulum gerekmez, veriler `server/.pgdata` klasöründe kalır:
 
 ```bash
 npm install
 cp .env.example .env
-npx prisma migrate dev
+npm run db
+```
+
+**2. Sunucu** (`server/` klasöründe, ikinci terminal). İlk seferde migration ve örnek veri:
+
+```bash
+npx prisma migrate deploy
 npm run db:seed
 npm run dev
 ```
@@ -32,7 +38,7 @@ Sunucu `http://localhost:4000` adresinde çalışır. Seed hesapları (şifre he
 
 **E-postalar:** Lokalde e-posta sunucusu yok. Doğrulama ve şifre sıfırlama kodları `server/dev-mails/` klasörüne yazılır ve sunucu konsoluna basılır.
 
-**2. Uygulama** (`app/` klasöründe):
+**3. Uygulama** (`app/` klasöründe):
 
 ```bash
 flutter run -d edge
@@ -74,7 +80,9 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Mesaj isteği (50 jeton):** İstek gönderilince jeton bloke edilir. Kabul edilirse alıcıya geçer; red, iptal veya 24 saat dolumunda iade edilir.
 - **Arama (dakika başı):** Sesli 15, görüntülü 30 jeton/dk. Her dakikanın başında arayandan alınıp arananın hesabına geçer (ilk dakika açılınca). Bakiye bir sonraki dakikaya yetmezse arayan uyarılır ve arama dakika sonunda biter. Cevapsız, reddedilen veya iptal edilen aramada jeton alınmaz.
 - **Arama içi hediyeler:** 🌹 20, ❤️ 50, 🧸 100, 💎 250 jeton. Tamamı alıcıya geçer.
-- **Bozdurma:** Sadece kazanılan jetonlar bozdurulabilir. Kur 1 jeton = $0.01. Satış fiyatı ile bu kur arasındaki fark, mağaza kesintisini karşılar ve kârı oluşturur.
+- **Cüzdan kovaları:** Bakiye 4 kovada tutulur: satın alınan, bonus/hediye, kazanç ve bonustan kazanç. Bonus ve hediye jetonları harcanabilir. Ama karşı tarafa geçtiğinde *bozdurulamaz* kazanç olur; böylece promosyonlar asla nakde dönüşmez. Harcama sırası: bonus → bonustan kazanç → satın alınan → kazanç (bozdurulabilir kazanç en son harcanır). Kurallar `server/src/wallet.ts` dosyasında.
+- **Eşzamanlılık:** Her para hareketi kullanıcının cüzdan satırını kilitler. Aynı anda gelen istekler sırayla işlenir; çift harcama ve eksi bakiye imkânsızdır. `npm run verify:ledger` her cüzdanın hareket defteriyle birebir eşleştiğini denetler (testler her çalıştırmanın sonunda da denetler).
+- **Bozdurma:** Sadece gerçek parayla ödenmiş jetondan gelen kazanç bozdurulabilir. Kur 1 jeton = $0.01. Satış fiyatı ile bu kur arasındaki fark, mağaza kesintisini karşılar ve kârı oluşturur.
 - **Para çekme (manuel onay):** En az 2000 jeton ($20) ve mavi tik gerekir. Kullanıcı IBAN veya PayPal ile talep eder, jetonlar hemen düşülür. Yönetim ödemeyi elle yapıp işlem numarasıyla "Ödendi" işaretler. Reddedilen ya da kullanıcının iptal ettiği talepte jetonlar geri gelir ve yine bozdurulabilir kalır. Aynı anda tek bekleyen talep olabilir; bekleyen talep varken hesap silinemez. Ödenmiş kayıtlar hesap silinse de muhasebe için saklanır. Kurallar: `server/src/payouts.ts`.
 - **Bakiye kaydı:** Bakiye hiçbir yerde elle tutulmaz. `WalletEntry` tablosundaki hareketlerin toplamıdır.
 

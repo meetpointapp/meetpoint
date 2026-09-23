@@ -260,7 +260,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cashableInfo =>
-      'Only coins you earn from others can be withdrawn.';
+      'Earnings paid to you with purchased coins can be cashed out.';
 
   @override
   String get cashout => 'Withdraw';
@@ -1230,4 +1230,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errNotFound =>
       'We couldn\'t find that. It may have been removed or is no longer available.';
+
+  @override
+  String promoEarnings(int count) {
+    return 'Earned from bonus coins: $count';
+  }
+
+  @override
+  String get promoEarningsInfo =>
+      'Comes from payments made with bonus and gift coins. You can spend it in the app, but it can\'t be cashed out.';
 }

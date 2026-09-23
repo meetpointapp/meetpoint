@@ -563,7 +563,7 @@ abstract class AppLocalizations {
   /// No description provided for @cashableInfo.
   ///
   /// In tr, this message translates to:
-  /// **'Sadece başkalarından kazandığın jetonlar paraya çevrilebilir.'**
+  /// **'Satın alınmış jetonlarla sana ödenen kazançlar paraya çevrilebilir.'**
   String get cashableInfo;
 
   /// No description provided for @cashout.
@@ -2071,6 +2071,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir.'**
   String get errNotFound;
+
+  /// No description provided for @promoEarnings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bonus jetonlardan kazanç: {count}'**
+  String promoEarnings(int count);
+
+  /// No description provided for @promoEarningsInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bonus ve hediye jetonlarıyla yapılan ödemelerden gelir. Uygulamada harcayabilirsin, paraya çevrilemez.'**
+  String get promoEarningsInfo;
 }
 
 class _AppLocalizationsDelegate

@@ -58,12 +58,13 @@ export const economy = {
   // usd yalnızca referans: kullanıcı mağazanın yerel fiyatını görür.
   coinPacks: [
     { id: 'coins_500', coins: 500, usd: 9.99, popular: false },
-    { id: 'coins_1000', coins: 1000, usd: 19.99, popular: true },
+    { id: 'coins_1000', coins: 1000, usd: 18.99, popular: true },
     { id: 'coins_2500', coins: 2500, usd: 44.99, popular: false },
     { id: 'coins_6000', coins: 6000, usd: 99.99, popular: false },
   ],
 
-  // Teşvikler: e-posta doğrulanınca hediye (bozdurulamaz), ilk satın almada ek jeton
+  // Teşvikler: e-posta doğrulanınca hediye, ilk satın almada ek jeton. İkisi de "promo" kovasına girer:
+  // harcanabilir ama karşı tarafta bozdurulamaz kazanca dönüşür (platform zarar edemez).
   signupBonus: 50,
   firstPurchaseBonusPct: 50,
 

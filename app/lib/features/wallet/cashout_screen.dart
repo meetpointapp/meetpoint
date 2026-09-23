@@ -107,6 +107,12 @@ class _AvailableCard extends StatelessWidget {
         const SizedBox(height: 8),
         Text(l.cashoutMinInfo(rules.minCoins, rules.usdOf(rules.minCoins)),
             style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+        if (wallet.promoEarnings > 0) ...[
+          const SizedBox(height: 10),
+          Text(l.promoEarnings(wallet.promoEarnings),
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+          Text(l.promoEarningsInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+        ],
       ]),
     );
   }

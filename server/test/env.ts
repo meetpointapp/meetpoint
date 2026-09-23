@@ -2,11 +2,13 @@
 // Zamanlamalar kısaltılmıştır (1 "dakika" = 3 sn) ki arama testleri hızlı çalışsın.
 export const TEST_PORT = 4010;
 export const FAKE_REVENUECAT_PORT = 4100;
+// Testlerin kendi geçici PostgreSQL'i (geliştirme veritabanından ayrı, test bitince silinir)
+export const TEST_PG_PORT = 5434;
 
 export const testEnv: Record<string, string> = {
   NODE_ENV: 'test',
   PORT: String(TEST_PORT),
-  DATABASE_URL: 'file:./test.db?connection_limit=1',
+  DATABASE_URL: `postgresql://meetpoint:meetpoint-dev@localhost:${TEST_PG_PORT}/meetpoint_test`,
   JWT_SECRET: 'test-only-secret-at-least-32-characters-long',
   UPLOAD_DIR: 'test-data/uploads',
   PRIVATE_UPLOAD_DIR: 'test-data/private-uploads',

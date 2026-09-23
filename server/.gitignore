@@ -11,3 +11,5 @@ test-data/
 prisma/test.db*
 prisma/*.db-wal
 prisma/*.db-shm
+.pgdata/
+prisma/*.bak*

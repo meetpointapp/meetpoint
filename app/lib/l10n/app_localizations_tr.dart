@@ -260,7 +260,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cashableInfo =>
-      'Sadece başkalarından kazandığın jetonlar paraya çevrilebilir.';
+      'Satın alınmış jetonlarla sana ödenen kazançlar paraya çevrilebilir.';
 
   @override
   String get cashout => 'Paraya çevir';
@@ -1220,4 +1220,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errNotFound =>
       'Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir.';
+
+  @override
+  String promoEarnings(int count) {
+    return 'Bonus jetonlardan kazanç: $count';
+  }
+
+  @override
+  String get promoEarningsInfo =>
+      'Bonus ve hediye jetonlarıyla yapılan ödemelerden gelir. Uygulamada harcayabilirsin, paraya çevrilemez.';
 }

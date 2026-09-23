@@ -5,9 +5,15 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import { credit, debit } from '../src/wallet';
 
 const prisma = new PrismaClient();
 const uploadDir = process.env.UPLOAD_DIR ?? 'uploads';
+
+// Demo hesaplara satın alınmış sayılan jeton (DEV_CREDIT → "paid" kovası): harcadıklarında karşı taraf
+// bozdurulabilir kazanç elde eder, para çekme akışı demo edilebilir
+const devCredit = (userId: string, coins: number) =>
+  prisma.$transaction((tx) => credit(tx, userId, { paid: coins }, 'DEV_CREDIT', { note: 'seed' }));
 
 // Bağımlılıksız basit PNG üretici: iki renk arası dikey gradyan (yer tutucu fotoğraf)
 function gradientPng(file: string, top: [number, number, number], bottom: [number, number, number], dir = uploadDir) {
@@ -183,7 +189,7 @@ async function main() {
   });
   gradientPng(`seed-${test.id}.png`, [52, 58, 64], [134, 142, 150]);
   await prisma.photo.create({ data: { userId: test.id, path: `seed-${test.id}.png`, position: 0 } });
-  await prisma.walletEntry.create({ data: { userId: test.id, amount: 1000, type: 'GRANT', note: 'seed' } });
+  await devCredit(test.id, 1000);
 
   const created: { id: string; name: string }[] = [];
   for (const [i, u] of demoUsers.entries()) {
@@ -218,7 +224,7 @@ async function main() {
       gradientPng(file, p === 0 ? a : b, p === 0 ? b : a);
       await prisma.photo.create({ data: { userId: user.id, path: file, position: p } });
     }
-    await prisma.walletEntry.create({ data: { userId: user.id, amount: 2000, type: 'GRANT', note: 'seed' } });
+    await devCredit(user.id, 2000);
     if (u.likesTest) {
       await prisma.swipe.create({ data: { fromId: user.id, toId: test.id, direction: 'like' } });
     }
@@ -236,7 +242,7 @@ async function main() {
     const req = await prisma.contactRequest.create({
       data: { fromId: from.id, toId: test.id, kind: r.kind, price: r.price, note: r.note, expiresAt },
     });
-    await prisma.walletEntry.create({ data: { userId: from.id, amount: -r.price, type: 'HOLD', requestId: req.id } });
+    await prisma.$transaction((tx) => debit(tx, from.id, r.price, 'HOLD', { requestId: req.id }));
   }
 
   // Örnek arama geçmişi (Aramalar ekranı boş görünmesin)

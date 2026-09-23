@@ -8,7 +8,7 @@ import { distanceKm } from '../geo';
 import { swipeLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
-import { addEntry, getBalance } from '../wallet';
+import { debit, lockWallet } from '../wallet';
 import { publicProfile } from './profile';
 
 export const discoverRouter = Router();
@@ -78,11 +78,12 @@ discoverRouter.post('/swipes', swipeLimiter, async (req, res) => {
   if (!target || target.bannedAt || (await isBlockedEitherWay(me, toId))) throw new HttpError(404, 'not_found');
 
   await prisma.$transaction(async (tx) => {
+    // Süper beğenide önce cüzdan kilitlenir: eşzamanlı iki istek çift ücret alamaz
+    if (direction === 'superlike') await lockWallet(tx, me);
     const existing = await tx.swipe.findUnique({ where: { fromId_toId: { fromId: me, toId } } });
     // Süper beğeni jetonla: aynı kişiye ikinci kez ücret alınmaz
     if (direction === 'superlike' && existing?.direction !== 'superlike') {
-      if ((await getBalance(me, tx)) < economy.superLikePrice) throw new HttpError(402, 'insufficient_balance');
-      await addEntry(tx, { userId: me, amount: -economy.superLikePrice, type: 'SPEND', note: 'superlike' });
+      await debit(tx, me, economy.superLikePrice, 'SPEND', { note: 'superlike' });
     }
     await tx.swipe.upsert({
       where: { fromId_toId: { fromId: me, toId } },

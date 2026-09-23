@@ -7,7 +7,7 @@ import { requestLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { closeRequest, expireStaleRequests } from '../requestService';
-import { addEntry, getBalance } from '../wallet';
+import { credit, debit, earningsFrom, heldBuckets, lockWallet } from '../wallet';
 import { publicProfile } from './profile';
 
 export const requestsRouter = Router();
@@ -33,13 +33,14 @@ requestsRouter.post('/requests', requestLimiter, async (req, res) => {
   const expiresAt = new Date(Date.now() + economy.requestTtlHours * 3600_000);
 
   const request = await prisma.$transaction(async (tx) => {
+    // Önce cüzdan kilitlenir: aynı kişiye eşzamanlı iki istek "bekleyen istek yok" kontrolünü birlikte geçemez
+    await lockWallet(tx, me);
     const pending = await tx.contactRequest.findFirst({ where: { fromId: me, toId, kind, status: 'PENDING' } });
     if (pending) throw new HttpError(409, 'request_already_pending');
-    if ((await getBalance(me, tx)) < price) throw new HttpError(402, 'insufficient_balance');
 
     const r = await tx.contactRequest.create({ data: { fromId: me, toId, kind, price, note, expiresAt } });
     // Jeton bloke: gönderenden düşülür, kabulde alıcıya geçer, redde iade edilir
-    await addEntry(tx, { userId: me, amount: -price, type: 'HOLD', requestId: r.id });
+    await debit(tx, me, price, 'HOLD', { requestId: r.id });
     return r;
   });
 
@@ -84,8 +85,10 @@ requestsRouter.post('/requests/:id/accept', async (req, res) => {
     });
     if (count !== 1) throw new HttpError(409, 'request_not_pending');
 
-    // Kesinti yok: bloke edilen jetonun tamamı alıcıya geçer
-    await addEntry(tx, { userId: me, amount: r.price, type: 'EARN', requestId: id });
+    // Kesinti yok: bloke edilen jetonun tamamı alıcıya geçer (promosyon jetonu kısmı bozdurulamaz kazanç olur)
+    const hold = await tx.walletEntry.findFirst({ where: { requestId: id, type: 'HOLD', userId: r.fromId } });
+    const held = hold ? heldBuckets(hold) : { paid: r.price, promo: 0, earned: 0, earnedPromo: 0 };
+    await credit(tx, me, earningsFrom(held), 'EARN', { requestId: id });
 
     let conversationId: string | null = null;
     if (r.kind === 'MESSAGE') {

@@ -20,13 +20,21 @@ describe('Para çekme (Faz 7)', () => {
     const payer = await makeUser('Emre', 'male', 'female');
     await call(payer.t, 'POST', '/wallet/dev-topup', { packId: 'coins_6000' });
 
-    // Kazanç: görüntülü arama + 9 elmas hediye = 30 + 2250
+    // Kazanç: görüntülü arama + 21 elmas hediye. Ödeyenin promosyon jetonları (3000 ilk alım bonusu +
+    // 50 kayıt hediyesi) önce harcanır ve karşı tarafta bozdurulamaz kazanç olur; kalanı satın alınmış
+    // jetondur ve bozdurulabilir kazanç olur.
+    const PROMO = 3050;
     const c = await call(payer.t, 'POST', '/calls', { toId: earner.id, kind: 'VIDEO' });
     await call(earner.t, 'POST', `/calls/${c.id}/accept`);
-    for (let i = 0; i < 9; i++) await call(payer.t, 'POST', `/calls/${c.id}/gifts`, { giftId: 'diamond' });
+    for (let i = 0; i < 21; i++) await call(payer.t, 'POST', `/calls/${c.id}/gifts`, { giftId: 'diamond' });
     await call(payer.t, 'POST', `/calls/${c.id}/hangup`);
+    const spentInfo = await call(payer.t, 'GET', `/calls/${c.id}`);
+    const spent = spentInfo.totalCoins + spentInfo.giftCoins;
+    const cashable0 = spent - PROMO;
     let w = await wallet(earner);
-    check('earner cashable 2280', w.cashable === 2280, `cashable=${w.cashable} bal=${w.balance}`);
+    check('earnings from bonus coins are not cashable', w.promoEarnings === PROMO, `promoEarnings=${w.promoEarnings}`);
+    check('earnings from purchased coins are cashable', w.cashable === cashable0 && cashable0 >= 2200, `cashable=${w.cashable} expected=${cashable0}`);
+    check('balance includes both', w.balance === spent + 50, `bal=${w.balance}`);
     check('wallet exposes cashout rules', w.cashout?.minCoins === 2000 && w.cashout?.usdPerCoin === 0.01 && w.cashout?.pending === null);
 
     const base = { coins: 2000, method: 'iban', accountName: 'Ece Yılmaz', accountValue: TR_IBAN };
@@ -43,7 +51,7 @@ describe('Para çekme (Faz 7)', () => {
     // Doğrulamalar
     const below = await call(earner.t, 'POST', '/payouts', { ...base, coins: 1999 });
     check('below minimum rejected', below.http === 400 && below.error === 'below_minimum');
-    const tooMuch = await call(earner.t, 'POST', '/payouts', { ...base, coins: 2500 });
+    const tooMuch = await call(earner.t, 'POST', '/payouts', { ...base, coins: cashable0 + 1 });
     check('more than cashable rejected', tooMuch.http === 402 && tooMuch.error === 'insufficient_cashable');
     const badIban = await call(earner.t, 'POST', '/payouts', { ...base, accountValue: 'TR33 0006 1005 1978 6457 8413 27' });
     check('bad IBAN checksum rejected', badIban.http === 400 && badIban.error === 'invalid_iban');
@@ -58,7 +66,7 @@ describe('Para çekme (Faz 7)', () => {
     const p1 = await call(earner.t, 'POST', '/payouts', base);
     check('payout requested', p1.http === 201 && p1.status === 'PENDING' && p1.usd === 20 && p1.accountHint === '•••• 1326', JSON.stringify(p1).slice(0, 140));
     w = await wallet(earner);
-    check('coins deducted on request', w.cashable === 280 && w.cashout.pending?.id === p1.id, `cashable=${w.cashable}`);
+    check('coins deducted on request', w.cashable === cashable0 - 2000 && w.cashout.pending?.id === p1.id, `cashable=${w.cashable}`);
     const dup = await call(earner.t, 'POST', '/payouts', { ...base, coins: 2000 });
     check('only one pending payout', dup.http === 409 || dup.http === 402);
     const del = await call(earner.t, 'DELETE', '/me', { password: 'password123' });
@@ -68,7 +76,7 @@ describe('Para çekme (Faz 7)', () => {
     const cancel = await call(earner.t, 'POST', `/payouts/${p1.id}/cancel`);
     check('payout cancelled', cancel.http === 200 && cancel.status === 'CANCELLED');
     w = await wallet(earner);
-    check('cancel restores cashable', w.cashable === 2280 && w.cashout.pending === null, `cashable=${w.cashable}`);
+    check('cancel restores cashable', w.cashable === cashable0 && w.cashout.pending === null, `cashable=${w.cashable}`);
     const cancel2 = await call(earner.t, 'POST', `/payouts/${p1.id}/cancel`);
     check('double cancel -> 409', cancel2.http === 409);
 
@@ -77,14 +85,14 @@ describe('Para çekme (Faz 7)', () => {
     check('paypal payout requested', p2.http === 201 && p2.accountHint === 'e•••@example.com', p2.accountHint);
     const pend = await call(admin, 'GET', '/admin/api/payouts');
     const adminRow = pend._arr?.find((p) => p.id === p2.id);
-    check('admin sees full account + user info', adminRow?.accountValue === 'ece@example.com' && adminRow?.user?.verified === true && adminRow?.user?.cashableLeft === 280);
+    check('admin sees full account + user info', adminRow?.accountValue === 'ece@example.com' && adminRow?.user?.verified === true && adminRow?.user?.cashableLeft === cashable0 - 2000);
     const noAuth = await call(earner.t, 'GET', '/admin/api/payouts');
     check('payout admin API needs admin', noAuth.http === 403);
     const rejectNoNote = await call(admin, 'POST', `/admin/api/payouts/${p2.id}/reject`, { note: '' });
     check('reject needs a reason', rejectNoNote.http === 400);
     await call(admin, 'POST', `/admin/api/payouts/${p2.id}/reject`, { note: 'PayPal hesabı doğrulanamadı' });
     w = await wallet(earner);
-    check('reject restores cashable', w.cashable === 2280);
+    check('reject restores cashable', w.cashable === cashable0);
     const mine = await call(earner.t, 'GET', '/payouts');
     check('user sees rejection reason', mine._arr?.find((p) => p.id === p2.id)?.adminNote === 'PayPal hesabı doğrulanamadı');
 
@@ -97,7 +105,7 @@ describe('Para çekme (Faz 7)', () => {
     const rejectPaid = await call(admin, 'POST', `/admin/api/payouts/${p3.id}/reject`, { note: 'geç kalmış red' });
     check('cannot reject paid payout', rejectPaid.http === 409);
     w = await wallet(earner);
-    check('paid coins stay deducted', w.cashable === 80 && w.entries.some((e) => e.type === 'CASHOUT' && e.amount === -2200), `cashable=${w.cashable}`);
+    check('paid coins stay deducted', w.cashable === cashable0 - 2200 && w.entries.some((e) => e.type === 'CASHOUT' && e.amount === -2200), `cashable=${w.cashable}`);
     const stats = await call(admin, 'GET', '/admin/api/stats');
     check('stats include payouts', stats.payoutsPaidUsd >= 22 && typeof stats.payoutsPending === 'number');
 

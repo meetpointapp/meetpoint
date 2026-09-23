@@ -294,6 +294,7 @@ class WalletEntry {
 class WalletInfo {
   final int balance;
   final int cashable;
+  final int promoEarnings; // bonus/hediye jetonlarından kazanç: harcanabilir, paraya çevrilemez
   final double cashableUsd;
   final List<WalletEntry> entries;
   final List<CoinPack> packs;
@@ -307,6 +308,7 @@ class WalletInfo {
   const WalletInfo({
     required this.balance,
     required this.cashable,
+    this.promoEarnings = 0,
     required this.cashableUsd,
     required this.entries,
     required this.packs,
@@ -321,6 +323,7 @@ class WalletInfo {
   factory WalletInfo.fromJson(Map<String, dynamic> j) => WalletInfo(
         balance: j['balance'],
         cashable: j['cashable'],
+        promoEarnings: j['promoEarnings'] ?? 0,
         cashableUsd: (j['cashableUsd'] as num).toDouble(),
         entries: [for (final e in (j['entries'] as List)) WalletEntry.fromJson(e)],
         packs: [for (final p in (j['packs'] as List)) CoinPack.fromJson(p)],

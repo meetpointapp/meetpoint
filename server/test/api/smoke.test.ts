@@ -52,7 +52,8 @@ describe('Temel akışlar (Faz 1)', () => {
     w = await call(ali.t, 'GET', '/wallet');
     check('sender refunded rejected request', w.balance === 1500, `balance=${w.balance}`);
     const zw = await call(zeynep.t, 'GET', '/wallet');
-    check('receiver earned 50 (+50 gift), cashable 50', zw.balance === 100 && zw.cashable === 50, `bal=${zw.balance} cash=${zw.cashable}`);
+    // Ali'nin ilk harcaması bonus/hediye jetonlarından: Zeynep'in kazancı harcanabilir ama bozdurulamaz
+    check('receiver earned 50 (+50 gift) from bonus coins: not cashable', zw.balance === 100 && zw.cashable === 0 && zw.promoEarnings === 50, `bal=${zw.balance} cash=${zw.cashable} promo=${zw.promoEarnings}`);
     check('ali purchased coins not cashable', w.cashable === 0);
 
     const convs = await call(zeynep.t, 'GET', '/conversations');

@@ -5,7 +5,7 @@ import { HttpError, isBlockedEitherWay, prisma } from './db';
 import { notify } from './notify';
 import { emitToUser, isOnline, onUserOffline } from './realtime';
 import { publicProfile } from './routes/profile';
-import { addEntry, getBalance } from './wallet';
+import { getBalance, transfer } from './wallet';
 
 // Sesli/görüntülü arama yaşam döngüsü:
 //   RINGING → ACTIVE → ENDED   (normal)
@@ -108,12 +108,14 @@ async function chargeMinute(id: string): Promise<boolean> {
   const result = await prisma.$transaction(async (tx) => {
     const call = await tx.call.findUnique({ where: { id } });
     if (!call || call.status !== 'ACTIVE') return null;
-    const balance = await getBalance(call.callerId, tx);
-    if (balance < call.ratePerMin) return { ok: false as const, call };
-    await addEntry(tx, { userId: call.callerId, amount: -call.ratePerMin, type: 'CALL', note: `call:${id}` });
-    await addEntry(tx, { userId: call.calleeId, amount: call.ratePerMin, type: 'EARN', note: `call:${id}` });
+    try {
+      await transfer(tx, call.callerId, call.calleeId, call.ratePerMin, { debit: 'CALL', credit: 'EARN' }, { note: `call:${id}` });
+    } catch (e) {
+      if (e instanceof HttpError && e.code === 'insufficient_balance') return { ok: false as const, call };
+      throw e;
+    }
     await tx.call.update({ where: { id }, data: { billedMinutes: { increment: 1 }, totalCoins: { increment: call.ratePerMin } } });
-    return { ok: true as const, call, remaining: balance - call.ratePerMin };
+    return { ok: true as const, call, remaining: await getBalance(call.callerId, tx) };
   });
   if (!result) return false;
   if (!result.ok) return false;
@@ -185,9 +187,7 @@ export async function sendGift(id: string, fromId: string, giftId: string) {
   const toId = call.callerId === fromId ? call.calleeId : call.callerId;
 
   await prisma.$transaction(async (tx) => {
-    if ((await getBalance(fromId, tx)) < gift.coins) throw new HttpError(402, 'insufficient_balance');
-    await addEntry(tx, { userId: fromId, amount: -gift.coins, type: 'GIFT', note: `call:${id}:${gift.id}` });
-    await addEntry(tx, { userId: toId, amount: gift.coins, type: 'EARN', note: `gift:${id}:${gift.id}` });
+    await transfer(tx, fromId, toId, gift.coins, { debit: 'GIFT', credit: 'EARN' }, { note: `gift:${id}:${gift.id}` });
     await tx.callGift.create({ data: { callId: id, fromId, toId, giftId: gift.id, coins: gift.coins } });
     await tx.call.update({ where: { id }, data: { giftCoins: { increment: gift.coins } } });
   });

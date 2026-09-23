@@ -133,7 +133,7 @@
   "requestChat": "Mesaj isteği",
   "balance": "Bakiye",
   "cashable": "Bozdurulabilir",
-  "cashableInfo": "Sadece başkalarından kazandığın jetonlar paraya çevrilebilir.",
+  "cashableInfo": "Satın alınmış jetonlarla sana ödenen kazançlar paraya çevrilebilir.",
   "cashout": "Paraya çevir",
   "comingSoon": "Yakında",
   "buyCoins": "Jeton satın al",
@@ -696,5 +696,14 @@
   "errInvalidImage": "Bu fotoğraf biçimi desteklenmiyor. JPG, PNG, WEBP veya HEIC seç.",
   "errAlreadyRated": "Bu görüşmeyi zaten puanladın.",
   "errPayoutProcessed": "Bu talep zaten işleme alınmış.",
-  "errNotFound": "Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir."
+  "errNotFound": "Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir.",
+  "promoEarnings": "Bonus jetonlardan kazanç: {count}",
+  "promoEarningsInfo": "Bonus ve hediye jetonlarıyla yapılan ödemelerden gelir. Uygulamada harcayabilirsin, paraya çevrilemez.",
+  "@promoEarnings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

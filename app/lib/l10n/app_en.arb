@@ -77,7 +77,7 @@
   "requestChat": "Message request",
   "balance": "Balance",
   "cashable": "Withdrawable",
-  "cashableInfo": "Only coins you earn from others can be withdrawn.",
+  "cashableInfo": "Earnings paid to you with purchased coins can be cashed out.",
   "cashout": "Withdraw",
   "comingSoon": "Coming soon",
   "buyCoins": "Buy coins",
@@ -328,5 +328,7 @@
   "errInvalidImage": "This photo format isn't supported. Choose a JPG, PNG, WEBP or HEIC.",
   "errAlreadyRated": "You've already rated this call.",
   "errPayoutProcessed": "This request has already been processed.",
-  "errNotFound": "We couldn't find that. It may have been removed or is no longer available."
+  "errNotFound": "We couldn't find that. It may have been removed or is no longer available.",
+  "promoEarnings": "Earned from bonus coins: {count}",
+  "promoEarningsInfo": "Comes from payments made with bonus and gift coins. You can spend it in the app, but it can't be cashed out."
 }

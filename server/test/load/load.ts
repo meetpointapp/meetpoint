@@ -161,9 +161,13 @@ async function main() {
     expectTrue(gAfter >= 0, `hediye yarışı: bakiye eksiye düştü (${gAfter})`);
     expectTrue(giftOk <= Math.floor(gBefore / 250), `hediye yarışı: ${giftOk} hediye geçti, bakiye en fazla ${Math.floor(gBefore / 250)} hediyeye yeterdi`);
 
-    // 9. Genel: hiçbir bakiye eksi değil
+    // 9. Genel: hiçbir bakiye eksi değil ve her cüzdan hareket defteriyle birebir eşleşiyor
     const balances = await pool(users, 50, async (u) => (await c.call(u.t, 'GET', '/wallet')).balance as number);
     expectTrue(balances.every((b) => b >= 0), 'eksi bakiyeli kullanıcı var');
+    process.env.DATABASE_URL = testEnv.DATABASE_URL;
+    const { verifyLedger } = await import('../../src/wallet');
+    const inconsistent = await verifyLedger();
+    expectTrue(inconsistent.length === 0, `defterle eşleşmeyen cüzdan: ${inconsistent.length}`);
   } finally {
     sockets.forEach((l) => l.s.disconnect());
     await teardown();

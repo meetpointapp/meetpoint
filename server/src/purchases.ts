@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import { economy } from './config';
 import { prisma } from './db';
 import { emitToUser } from './realtime';
-import { addEntry } from './wallet';
+import { credit, lockWallet } from './wallet';
 
 export type Store = 'app_store' | 'play_store' | 'dev';
 
@@ -51,8 +51,9 @@ export async function creditPurchase(input: PurchaseInput): Promise<{ credited: 
           sandbox: input.sandbox ?? false,
         },
       });
-      await addEntry(tx, { userId: input.userId, amount: pack.coins, type: 'PURCHASE', note: `${input.store}:${pack.id}:${purchase.id}` });
-      if (bonus > 0) await addEntry(tx, { userId: input.userId, amount: bonus, type: 'BONUS', note: `first_purchase:${purchase.id}` });
+      await credit(tx, input.userId, { paid: pack.coins }, 'PURCHASE', { note: `${input.store}:${pack.id}:${purchase.id}` });
+      // Bonus promosyon kovasına: harcanabilir ama karşı tarafta bozdurulamaz kazanca dönüşür
+      if (bonus > 0) await credit(tx, input.userId, { promo: bonus }, 'BONUS', { note: `first_purchase:${purchase.id}` });
       return { credited: true, coins: pack.coins, bonus };
     });
     if (result.credited) emitToUser(input.userId, 'wallet:updated', { coins: result.coins, bonus: result.bonus });
@@ -75,17 +76,19 @@ export async function refundPurchase(transactionId: string): Promise<boolean> {
       data: { status: 'REFUNDED', refundedAt: new Date() },
     });
     if (count !== 1) return null;
-    await addEntry(tx, { userId: p.userId, amount: -(p.coins + p.bonusCoins), type: 'CLAWBACK', note: `refund:${p.id}` });
+    await credit(tx, p.userId, { paid: -p.coins, promo: -p.bonusCoins }, 'CLAWBACK', { note: `refund:${p.id}` });
     return p.userId;
   });
   if (refunded) emitToUser(refunded, 'wallet:updated', {});
   return refunded !== null;
 }
 
-// E-posta doğrulanınca bir kez hediye jeton (bozdurulamaz: GRANT)
+// E-posta doğrulanınca bir kez hediye jeton (promosyon kovası). Kilit: eşzamanlı iki doğrulama çift hediye veremez.
 export async function grantSignupBonus(userId: string) {
   if (economy.signupBonus <= 0) return;
-  const given = await prisma.walletEntry.findFirst({ where: { userId, type: 'GRANT', note: 'signup_bonus' } });
-  if (given) return;
-  await addEntry(prisma, { userId, amount: economy.signupBonus, type: 'GRANT', note: 'signup_bonus' });
+  await prisma.$transaction(async (tx) => {
+    await lockWallet(tx, userId);
+    const given = await tx.walletEntry.findFirst({ where: { userId, type: 'GRANT', note: 'signup_bonus' } });
+    if (!given) await credit(tx, userId, { promo: economy.signupBonus }, 'GRANT', { note: 'signup_bonus' });
+  });
 }

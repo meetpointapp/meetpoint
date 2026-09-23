@@ -14,7 +14,9 @@
     "test:api": "vitest run --project api",
     "test:watch": "vitest --project unit",
     "typecheck:test": "tsc -p test",
-    "test:load": "tsx test/load/load.ts"
+    "test:load": "tsx test/load/load.ts",
+    "db": "tsx scripts/db.ts",
+    "verify:ledger": "tsx scripts/verify-ledger.ts"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,7 @@
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@socket.io/postgres-adapter": "^0.5.0",
     "agora-token": "^2.0.6",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -32,6 +35,8 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.4.0",
     "nodemailer": "^10.0.10",
+    "pg": "^8.23.0",
+    "sharp": "^0.35.4",
     "socket.io": "^4.8.3",
     "zod": "^4.6.5"
   },
@@ -43,6 +48,8 @@
     "@types/multer": "^2.2.0",
     "@types/node": "^26.6.2",
     "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "embedded-postgres": "^18.4.0-beta.17",
     "prisma": "^6.19.3",
     "socket.io-client": "^4.8.3",
     "tsx": "^4.23.15",

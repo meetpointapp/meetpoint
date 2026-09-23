@@ -100,7 +100,8 @@ describe('Aramalar (Faz 6)', () => {
     check('no billing after end', fin.billedMinutes === 2 && fin.totalCoins === 30 && fin.giftCoins === 20);
     check('caller final balance 750', (await bal(caller)) === 750);
     const cw = await call(callee.t, 'GET', '/wallet');
-    check('callee earned 50 cashable (30 min + 20 gift)', cw.cashable === 50 && cw.balance === 100, `bal=${cw.balance} cash=${cw.cashable}`);
+    // Arayan bonus jetonlarıyla ödedi (500'lük paket bonusu + kayıt hediyesi): kazanç bozdurulamaz
+    check('callee earned 50 from bonus coins: spendable, not cashable', cw.balance === 100 && cw.cashable === 0 && cw.promoEarnings === 50, `bal=${cw.balance} cash=${cw.cashable} promo=${cw.promoEarnings}`);
 
     // --- Puanlama
     const r1 = await call(caller.t, 'POST', `/calls/${callId}/rate`, { rating: 5 });

@@ -6,22 +6,25 @@ import { config, economy, revenueCat } from '../config';
 import { HttpError, prisma } from '../db';
 import { payoutDto } from '../payouts';
 import { creditPurchase, packById, type Store } from '../purchases';
-import { getBalance, getCashable } from '../wallet';
+import { cashableOf, getBalance, getBuckets, total } from '../wallet';
 
 export const walletRouter = Router();
 
 walletRouter.get('/wallet', async (req, res) => {
   const userId = uid(req);
-  const [balance, cashable, entries, purchaseCount, pendingPayout] = await Promise.all([
-    getBalance(userId),
-    getCashable(userId),
+  const [buckets, entries, purchaseCount, pendingPayout] = await Promise.all([
+    getBuckets(userId),
     prisma.walletEntry.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take: 50 }),
     prisma.purchase.count({ where: { userId } }),
     prisma.payout.findFirst({ where: { userId, status: 'PENDING' } }),
   ]);
+  const balance = total(buckets);
+  const cashable = cashableOf(buckets);
   res.json({
     balance,
     cashable,
+    // Bonus/hediye jetonlarından gelen kazanç: harcanabilir ama paraya çevrilemez
+    promoEarnings: buckets.earnedPromo,
     cashableUsd: +(cashable * economy.cashoutUsdPerCoin).toFixed(2),
     cashout: {
       minCoins: economy.cashoutMinCoins,

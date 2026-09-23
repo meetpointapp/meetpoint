@@ -4,7 +4,7 @@ import { HttpError, prisma } from './db';
 import { maskAccount, normalizeIban } from './iban';
 import { notify } from './notify';
 import { emitToUser } from './realtime';
-import { addEntry, getCashable } from './wallet';
+import { credit, debitCashable, lockWallet } from './wallet';
 
 // Para çekme: kullanıcı talep eder, kazanılmış jetonları hemen düşülür (CASHOUT).
 // Yönetim ödemeyi elle yapıp "ödendi" işaretler; reddedilen ya da kullanıcının iptal ettiği
@@ -46,8 +46,9 @@ export async function requestPayout(
   }
 
   const payout = await prisma.$transaction(async (tx) => {
+    // Kilit önce: eşzamanlı iki talep "bekleyen talep yok" kontrolünü birlikte geçemez
+    await lockWallet(tx, userId);
     if (await tx.payout.count({ where: { userId, status: 'PENDING' } })) throw new HttpError(409, 'payout_pending');
-    if ((await getCashable(userId, tx)) < input.coins) throw new HttpError(402, 'insufficient_cashable');
     const p = await tx.payout.create({
       data: {
         userId,
@@ -59,7 +60,7 @@ export async function requestPayout(
         accountValue,
       },
     });
-    await addEntry(tx, { userId, amount: -input.coins, type: 'CASHOUT', note: `payout:${p.id}` });
+    await debitCashable(tx, userId, input.coins, 'CASHOUT', { note: `payout:${p.id}` });
     return p;
   });
   emitToUser(userId, 'wallet:updated', {});
@@ -75,7 +76,7 @@ export async function closePayout(id: string, status: 'CANCELLED' | 'REJECTED', 
     });
     if (count !== 1) throw new HttpError(409, 'payout_not_pending');
     const p = await tx.payout.findUniqueOrThrow({ where: { id } });
-    if (p.userId) await addEntry(tx, { userId: p.userId, amount: p.coins, type: 'CASHOUT_REFUND', note: `payout:${id}` });
+    if (p.userId) await credit(tx, p.userId, { earned: p.coins }, 'CASHOUT_REFUND', { note: `payout:${id}` });
     return p;
   });
   if (payout.userId) {

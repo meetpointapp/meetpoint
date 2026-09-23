@@ -149,6 +149,21 @@ class _BalanceCard extends StatelessWidget {
                 style: theme.textTheme.titleMedium?.copyWith(color: onCard, fontWeight: FontWeight.w700),
               ),
               Text(l.cashableInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+              if (wallet.promoEarnings > 0) ...[
+                const SizedBox(height: 6),
+                Tooltip(
+                  message: l.promoEarningsInfo,
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Flexible(
+                      child: Text(l.promoEarnings(wallet.promoEarnings),
+                          style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.info_outline_rounded, size: 14, color: Colors.white70),
+                  ]),
+                ),
+              ],
             ]),
           ),
           const SizedBox(width: 12),

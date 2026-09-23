@@ -1,6 +1,6 @@
 import { HttpError, prisma } from './db';
 import { emitToUser } from './realtime';
-import { addEntry } from './wallet';
+import { credit, heldBuckets } from './wallet';
 
 // Süresi dolan bekleyen istekleri düşürüp gönderene iade eder.
 export async function expireStaleRequests() {
@@ -23,7 +23,9 @@ export async function closeRequest(id: string, status: 'REJECTED' | 'CANCELLED' 
       data: { status, respondedAt: new Date() },
     });
     if (count !== 1) throw new HttpError(409, 'request_not_pending');
-    await addEntry(tx, { userId: r.fromId, amount: r.price, type: 'REFUND', requestId: id });
+    // Bloke edilen jeton, alındığı kovalara aynen geri döner
+    const hold = await tx.walletEntry.findFirst({ where: { requestId: id, type: 'HOLD', userId: r.fromId } });
+    await credit(tx, r.fromId, hold ? heldBuckets(hold) : { paid: r.price }, 'REFUND', { requestId: id });
     return r;
   });
   emitToUser(request.fromId, 'request:updated', { id, status });

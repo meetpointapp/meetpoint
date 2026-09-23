@@ -1,12 +1,12 @@
-// MeetPoint veritabanı şeması.
-// Lokalde SQLite; yayına çıkarken provider = "postgresql" yapılıp migrate edilecek.
+// MeetPoint veritabanı şeması (PostgreSQL).
+// Geliştirmede gömülü PostgreSQL: npm run db (server/scripts/db.ts)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -51,6 +51,7 @@ model User {
   swipesGiven    Swipe[] @relation("SwipeFrom")
   swipesReceived Swipe[] @relation("SwipeTo")
 
+  wallet        Wallet?
   walletEntries WalletEntry[]
 
   requestsSent     ContactRequest[] @relation("RequestFrom")
@@ -125,20 +126,36 @@ model Swipe {
   @@index([toId, direction])
 }
 
-// Bakiye hiçbir yerde elle tutulmaz: bakiye = bu tablodaki amount toplamı.
-// Her hareket (satın alma, bloke, transfer, iade, harcama, bozdurma) ayrı satırdır.
+// Kullanıcının güncel bakiyesi, 4 kovada (bkz. src/wallet.ts). Her para hareketi bu satırı kilitler.
+// Kovalar her zaman WalletEntry kova toplamlarına eşittir (verifyLedger denetler).
+model Wallet {
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paid        Int      @default(0) // satın alınan: harcanabilir, bozdurulamaz
+  promo       Int      @default(0) // hediye/bonus: harcanabilir, bozdurulamaz
+  earned      Int      @default(0) // gerçek parayla ödenmiş jetondan kazanç: bozdurulabilir
+  earnedPromo Int      @default(0) // promosyon jetondan kazanç: bozdurulamaz
+  updatedAt   DateTime @updatedAt
+}
+
+// Her para hareketi ayrı satır (denetim izi). amount = kova değişimlerinin toplamı.
 model WalletEntry {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount    Int // pozitif = giriş, negatif = çıkış
-  type      String // PURCHASE | BONUS | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | GRANT | CLAWBACK
-  // EARN satırları bozdurulabilir jetonlardır; PURCHASE/GRANT bozdurulamaz.
-  requestId String?
-  note      String   @default("")
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int // pozitif = giriş, negatif = çıkış
+  type        String // PURCHASE | BONUS | GRANT | DEV_CREDIT | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | CLAWBACK | OPENING
+  // Kova değişimleri
+  paid        Int      @default(0)
+  promo       Int      @default(0)
+  earned      Int      @default(0)
+  earnedPromo Int      @default(0)
+  requestId   String?
+  note        String   @default("")
+  createdAt   DateTime @default(now())
 
   @@index([userId, createdAt])
+  @@index([requestId])
 }
 
 // Ücretli iletişim isteği: gönderenden jeton bloke edilir,

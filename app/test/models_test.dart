@@ -116,6 +116,7 @@ void main() {
       expect(w.cashout.minCoins, 2000);
       expect(w.cashout.pending, isNull);
       expect(w.cashout.usdOf(2500), '\$25.00');
+      expect(w.promoEarnings, 0); // alan yoksa 0
     });
 
     test('eski sunucu yanıtında (callRates/gifts/cashout yok) varsayılanlar', () {
