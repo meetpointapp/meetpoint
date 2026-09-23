@@ -181,6 +181,10 @@ Kurallar `server/src/calls.ts` dosyasında:
 - **Hız sınırları:** Sayaçlar PostgreSQL'de, tüm sunucularda ortak.
 - `test/api/cluster.test.ts` ikinci bir sunucu açıp lideri arama ortasında öldürerek bunların hepsini doğrular.
 
+## Fotoğraflar
+
+Yüklenen her fotoğraf sunucuda yeniden kodlanır: konum (GPS) ve cihaz bilgisi silinir, yön düzeltilir, sahte veya zararlı dosyalar (SVG, görüntü olmayan içerik) reddedilir. Profil fotoğraflarının 3 boyu üretilir (240/720/1440 px, WebP): uygulama listelerde küçüğünü, tam ekranda büyüğünü kullanır. Fotoğraflar imzalı, süreli adreslerle (`/media`) sunulur. Depolama katmanı (`server/src/storage.ts`) yayında S3 uyumlu nesne depolamaya geçecek şekilde tasarlandı.
+
 ## Hata takibi
 
 Uygulamadaki yakalanmamış hatalar (yayın derlemesinde) ve sunucudaki 500 hataları yönetim panelinin **Hatalar** sekmesine düşer. Harici servis gerekmez. Aynı hata tek satırda toplanır, kaç kez ve en son ne zaman olduğu görünür. "Çözüldü" denen hata tekrar olursa yeniden açılır.
@@ -200,7 +204,7 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
 - [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
-- [ ] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
+- [x] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
 - [ ] **Faz 10 · Güvenlik sertleştirme:** EXIF temizleme, oturum yönetimi, yönetimde 2FA + roller + işlem kaydı, hassas veri şifreleme, ASVS denetimi
 - [ ] **Faz 11 · KVKK uyumu:** veri envanteri, ayrı açık rızalar, yeniden onay, md. 11 hakları, otomatik imha, ihlal altyapısı
 - [ ] **Faz 12 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, görsel moderasyon katmanı, arama ve sohbet güvenliği, kaldırma süreçleri

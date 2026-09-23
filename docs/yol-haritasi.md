@@ -23,9 +23,9 @@ Her fazda en az 5 adım var. İşaretler:
 | # | Açık | Risk | Faz |
 |---|---|---|---|
 | 1 | ~~Sunucu testleri repoda değil~~ | ✅ Faz 8'de çözüldü | 8 |
-| 2 | Bakiye kontrolü kilitsiz | PostgreSQL'de eşzamanlı iki harcama aynı jetonu iki kez harcayabilir | 9 |
-| 3 | Arama ücretlendirme zamanlayıcıları bellekte | Sunucu yeniden başlarsa aramalar kesilir; birden fazla sunucuya büyünemez | 9 |
-| 4 | Yüklenen fotoğraflar olduğu gibi saklanıyor (EXIF silinmiyor) | Fotoğraftaki GPS konumu diğer kullanıcılara sızabilir | 10 |
+| 2 | ~~Bakiye kontrolü kilitsiz~~ | ✅ Faz 9'da çözüldü (kilitli cüzdan) | 9 |
+| 3 | ~~Arama zamanlayıcıları bellekte~~ | ✅ Faz 9'da çözüldü (veritabanı + lider seçimi) | 9 |
+| 4 | ~~Fotoğraflarda EXIF/GPS~~ | ✅ Faz 9'da çözüldü (yeniden kodlama) | 9 |
 | 5 | IBAN'lar veritabanında şifresiz | Veri sızıntısında finansal bilgi ifşası | 10 |
 | 6 | Yönetim panelinde iki adımlı doğrulama, yetki seviyeleri ve işlem kaydı yok | Tek şifre ile tüm yetki; kim ne yaptı bilinmez | 10 |
 | 7 | Oturum 30 gün geçerli, cihaz listesi ve oturum kapatma yok | Çalınan telefonda hesap açık kalır | 10 |
@@ -58,6 +58,30 @@ Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ 
 | **Fiyat kararı:** "En popüler" 1000'lik paket jeton başına 500'lükten biraz pahalı | 13 |
 | **Ekonomi kararı:** %50 ilk alım bonusu ve kayıt hediyesi, harcanınca başkasının bozdurulabilir kazancına dönüşüyor. KDV ve mağaza payından sonra jeton başı gelir bozdurma kurunun altına inebiliyor (zarar). %30 mağaza payında 6000'lik paket bonussuz da zararda. | 13 |
 
+### Faz 9'da bulunanlar
+
+Faz 9 tamamlandı. Sunucuda 51 test (13 uçtan uca senaryo), uygulamada 35 test; her test çalıştırması cüzdan defteri denetimiyle bitiyor.
+
+**Düzeltilenler:**
+- **Çift harcama:** PostgreSQL'in gerçek eşzamanlılığında görüldü (50 jetonla 10 istek → -450; 3'e yeten bakiyeyle 18 hediye → -3715). Kilitli cüzdanla kapandı.
+- **Kontrol-yap yarışları:** öne çıkarma, beğenenleri açma, süper beğeni, istek, para çekme ve aynı kişiye eşzamanlı arama kontrolleri artık kilit altında.
+- **Keşfet:** sadece en yeni 200 kullanıcıya bakıyordu. Kullanıcı sayısı büyüyünce eski süper beğenenler ve yakındakiler kayboluyordu.
+- **Sohbet:** sadece son 50 mesaj görülebiliyordu. Sayfalama eklendi.
+- **Arama ücretlendirmesi:** lider çökmesinde kaçırılan dakikalar yok sayılıyordu. Ses/görüntü Agora'da sürdüğü için kısa kesintide tamamlanıyor.
+- **Anlık mesaj gecikmesi** yoğunlukta 0,58 sn'ye çıkmıştı; 0,11 sn'ye indi.
+- **Test altyapısı:** Windows'ta test sunucuları başlatan süreçle birlikte ölüyordu; bir testin verisi diğerinin destesini dolduruyordu.
+
+**Kullanıcı kararıyla eklenenler:** Bonus ve hediye jetonlarından gelen kazanç bozdurulamaz (cüzdan kovaları). 1000'lik paket $18.99.
+
+**Yük testi (200 kullanıcı, PostgreSQL):** 2.920 işlem, hata yok, tutarlılık denetimlerinin hepsi geçti.
+
+| İşlem | p95 |
+|---|---|
+| Keşfet | 114 ms |
+| Kaydırma | 103 ms |
+| Mesaj gönderme | 84 ms |
+| Mesajın karşıya ulaşması | 125 ms |
+
 ---
 
 ## Faz 8 · Test altyapısı ve sürekli entegrasyon ✅
@@ -72,7 +96,7 @@ Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ 
 6. 🛠 GitHub Actions: her gönderimde tip kontrolü, sunucu testleri, Flutter analyze ve testleri. GitHub deposu açılınca devreye girer.
 7. 🛠 Yük testi betiği: eşzamanlı kullanıcı, mesajlaşma ve arama; darboğaz raporu.
 
-## Faz 9 · Veri ve altyapı sağlamlaştırma
+## Faz 9 · Veri ve altyapı sağlamlaştırma ✅
 
 **Amaç:** Para ve arama verisinin hiçbir koşulda bozulmaması; yeniden başlatmaya ve büyümeye dayanıklılık.
 
@@ -80,7 +104,7 @@ Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ 
 2. 🛠 **Kilitli cüzdan.** Çift harcama imkânsız olur. Defter ile bakiyenin tutarlılığını doğrulayan otomatik kontrol eklenir.
 3. 🛠 **Kalıcı iş kuyruğu.** Arama dakikaları, cevapsız arama, istek süresi ve imha işleri yeniden başlatmada kaldığı yerden devam eder.
 4. 🛠 **Çift işlem önleme (idempotency).** Satın alma, hediye, mesaj ve para çekme tekrar gönderilse de bir kez işlenir.
-5. 🛠 **Çok sunuculu çalışma.** Redis ile anlık bağlantılar ve hız sınırları ortak tutulur.
+5. 🛠 **Çok sunuculu çalışma.** Anlık bağlantılar ve hız sınırları sunucular arasında ortak. Redis yerine PostgreSQL kullanılır: bir servis eksik, lokalde test edilebilir.
 6. 🛠 **Fotoğraf depolama.** Otomatik küçük ve orta boy üretimi, süreli imzalı bağlantılar, S3 uyumlu depolamaya hazır katman.
 7. 🛠 **Sorgu disiplini.** İndeksler, sayfalama (keşfet, sohbet, geçmiş, panel listeleri), sorgu performans ölçümü. Keşfet filtrelemesi veritabanında yapılır; yük testi hedefi p95 < 300 ms.
 
@@ -88,7 +112,7 @@ Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ 
 
 **Amaç:** OWASP ASVS Seviye 2 düzeyine uygunluk.
 
-1. 🛠 **Fotoğraf güvenliği.** Yeniden kodlama, EXIF/GPS silme, gerçek dosya türü ve boyut kontrolü.
+1. ~~🛠 **Fotoğraf güvenliği.**~~ ✅ Faz 9'da yapıldı (yeniden kodlama, EXIF/GPS silme, gerçek tür kontrolü, imzalı adresler).
 2. 🛠 **Oturumlar.** Kısa ömürlü erişim jetonu ve yenileme; aktif cihazlar listesi; tek tek oturum kapatma; yeni cihaz girişinde e-posta uyarısı.
 3. 🛠 **Yönetim paneli.** İki adımlı doğrulama (TOTP), roller (moderatör / finans / süper yönetici), silinemez işlem kaydı.
 4. 🛠 **Hassas veri şifreleme.** IBAN, PayPal ve kimlik bilgileri alan düzeyinde şifreli; anahtar veritabanı dışında.
