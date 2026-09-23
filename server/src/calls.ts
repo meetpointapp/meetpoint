@@ -1,9 +1,9 @@
 import { RtcRole, RtcTokenBuilder } from 'agora-token';
-import type { Call, Photo, Profile, User } from '@prisma/client';
+import type { Call, Photo, Prisma, Profile, User } from '@prisma/client';
 import { agora, callTiming, economy, type CallKind } from './config';
 import { HttpError, isBlockedEitherWay, prisma } from './db';
 import { notify } from './notify';
-import { emitToUser, isOnline, onUserOffline } from './realtime';
+import { emitToUser, isOnline, onUserOffline, onUserOnline } from './realtime';
 import { publicProfile } from './routes/profile';
 import { getBalance, transfer } from './wallet';
 
@@ -11,27 +11,18 @@ import { getBalance, transfer } from './wallet';
 //   RINGING → ACTIVE → ENDED   (normal)
 //   RINGING → DECLINED | CANCELLED | MISSED
 // Dakika başı ücret: her dakikanın BAŞINDA arayandan alınır ve arananın hesabına (EARN) geçer.
-// Bakiye bir sonraki dakikaya yetmezse arama biter. Tüm geçişler koşullu güncellemeyle
-// yapılır: aynı arama iki kez kabul edilemez, aynı dakika iki kez ücretlendirilemez.
+// Bakiye bir sonraki dakikaya yetmezse arama biter.
+//
+// Zamanlamalar (cevapsız sayılma, dakika ücreti, bağlantı kopması) bellekte değil veritabanında
+// (ringDeadline, nextBillingAt, callerGraceAt, calleeGraceAt). Zamanı gelen işleri zamanlayıcı
+// (scheduler.ts) işler: sunucu yeniden başlasa veya birden fazla sunucu çalışsa da arama ve
+// ücretlendirme kaldığı yerden devam eder. Her geçiş koşullu güncelleme veya satır kilidiyle yapılır:
+// aynı arama iki kez kabul edilemez, aynı dakika iki kez ücretlendirilemez.
 
 const LIVE = ['RINGING', 'ACTIVE'];
-const timers = new Map<string, { ring?: NodeJS.Timeout; bill?: NodeJS.Timeout; grace?: NodeJS.Timeout }>();
+const secondsFromNow = (s: number, now = Date.now()) => new Date(now + s * 1000);
 
-function timerOf(id: string) {
-  let t = timers.get(id);
-  if (!t) timers.set(id, (t = {}));
-  return t;
-}
-
-function clearTimers(id: string) {
-  const t = timers.get(id);
-  if (!t) return;
-  if (t.ring) clearTimeout(t.ring);
-  if (t.bill) clearInterval(t.bill);
-  if (t.grace) clearTimeout(t.grace);
-  timers.delete(id);
-}
-
+type Tx = Prisma.TransactionClient;
 type UserWithProfile = User & { profile: Profile | null; photos: Photo[] };
 type CallWithUsers = Call & { caller: UserWithProfile; callee: UserWithProfile };
 const withUsers = { caller: { include: { profile: true, photos: true } }, callee: { include: { profile: true, photos: true } } } as const;
@@ -68,7 +59,10 @@ export function callDto(call: CallWithUsers, viewerId: string) {
 
 const load = (id: string) => prisma.call.findUnique({ where: { id }, include: withUsers });
 
-async function transition(id: string, from: string[], data: Partial<Call>) {
+// Canlı aramayı bitiren ortak alanlar: zamanlayıcı son tarihleri temizlenir
+const closed = { ringDeadline: null, nextBillingAt: null, callerGraceAt: null, calleeGraceAt: null };
+
+async function transition(id: string, from: string[], data: Prisma.CallUpdateManyMutationInput) {
   const { count } = await prisma.call.updateMany({ where: { id, status: { in: from } }, data });
   return count === 1;
 }
@@ -80,9 +74,14 @@ async function broadcast(id: string, event: string, extra: Record<string, unknow
   emitToUser(call.calleeId, event, { ...callDto(call, call.calleeId), ...extra });
 }
 
-async function isBusy(userId: string) {
-  return (await prisma.call.count({ where: { status: { in: LIVE }, OR: [{ callerId: userId }, { calleeId: userId }] } })) > 0;
+// Kullanıcı başına kilit (işlem süresince): "meşgul mü?" kontrolü ile arama oluşturma arasına
+// başka bir arama giremesin. Kilitler her zaman aynı sırayla alınır.
+async function lockUsers(tx: Tx, ids: string[]) {
+  for (const id of [...ids].sort()) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`user:${id}`}))`;
 }
+
+const isBusy = async (tx: Tx, userId: string) =>
+  (await tx.call.count({ where: { status: { in: LIVE }, OR: [{ callerId: userId }, { calleeId: userId }] } })) > 0;
 
 export async function startCall(callerId: string, calleeId: string, kind: CallKind) {
   if (callerId === calleeId) throw new HttpError(400, 'invalid_target');
@@ -92,56 +91,68 @@ export async function startCall(callerId: string, calleeId: string, kind: CallKi
   }
   const rate = economy.callRates[kind];
   if ((await getBalance(callerId)) < rate) throw new HttpError(402, 'insufficient_balance');
-  if (await isBusy(callerId)) throw new HttpError(409, 'already_in_call');
-  if (await isBusy(calleeId)) throw new HttpError(409, 'busy');
 
-  const call = await prisma.call.create({ data: { callerId, calleeId, kind, ratePerMin: rate }, include: withUsers });
-  timerOf(call.id).ring = setTimeout(() => void missCall(call.id), callTiming.ringSeconds * 1000);
+  const call = await prisma.$transaction(async (tx) => {
+    await lockUsers(tx, [callerId, calleeId]);
+    if (await isBusy(tx, callerId)) throw new HttpError(409, 'already_in_call');
+    if (await isBusy(tx, calleeId)) throw new HttpError(409, 'busy');
+    return tx.call.create({
+      data: { callerId, calleeId, kind, ratePerMin: rate, ringDeadline: secondsFromNow(callTiming.ringSeconds) },
+      include: withUsers,
+    });
+  });
 
   emitToUser(calleeId, 'call:incoming', callDto(call, calleeId));
   void notify(calleeId, 'call', callerId, kind, { callId: call.id });
   return callDto(call, callerId);
 }
 
-// Dakikanın ücretini al. false: bakiye yetmedi (arama bitirilmeli)
-async function chargeMinute(id: string): Promise<boolean> {
+// Zamanı gelmiş dakikanın ücretini al. Satır kilidi: aynı dakika iki kez alınamaz.
+// Ses/görüntü Agora üzerinden akar: sunucumuz kısa süre çökse de kullanıcılar konuşmaya devam eder.
+// Bu yüzden kısa kesintide (en fazla MAX_CATCHUP dakika) kaçırılan dakikalar her turda bir tane
+// olmak üzere tamamlanır. Daha uzun kesintide konuşmanın sürdüğü bilinemez: o süre ücretlendirilmez,
+// takvim şimdiden devam eder.
+const MAX_CATCHUP = 3;
+export async function chargeDueMinute(id: string, now = new Date()): Promise<'charged' | 'ended' | 'skip'> {
+  const billingMs = callTiming.billingSeconds * 1000;
   const result = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT 1 FROM "Call" WHERE "id" = ${id} FOR UPDATE`;
     const call = await tx.call.findUnique({ where: { id } });
-    if (!call || call.status !== 'ACTIVE') return null;
+    if (!call || call.status !== 'ACTIVE' || !call.nextBillingAt || call.nextBillingAt > now) return null;
     try {
       await transfer(tx, call.callerId, call.calleeId, call.ratePerMin, { debit: 'CALL', credit: 'EARN' }, { note: `call:${id}` });
     } catch (e) {
       if (e instanceof HttpError && e.code === 'insufficient_balance') return { ok: false as const, call };
       throw e;
     }
-    await tx.call.update({ where: { id }, data: { billedMinutes: { increment: 1 }, totalCoins: { increment: call.ratePerMin } } });
+    const longOutage = now.getTime() - call.nextBillingAt.getTime() > billingMs * MAX_CATCHUP;
+    const next = new Date((longOutage ? now.getTime() : call.nextBillingAt.getTime()) + billingMs);
+    await tx.call.update({
+      where: { id },
+      data: { billedMinutes: { increment: 1 }, totalCoins: { increment: call.ratePerMin }, nextBillingAt: next },
+    });
     return { ok: true as const, call, remaining: await getBalance(call.callerId, tx) };
   });
-  if (!result) return false;
-  if (!result.ok) return false;
+  if (!result) return 'skip';
+  if (!result.ok) {
+    await endCall(id, 'balance');
+    return 'ended';
+  }
   await broadcast(id, 'call:charged');
   // Bir sonraki dakikaya yetmeyecekse arayanı uyar
   if (result.remaining < result.call.ratePerMin) emitToUser(result.call.callerId, 'call:low_balance', { id });
-  return true;
+  return 'charged';
 }
 
 export async function acceptCall(id: string, userId: string) {
   const call = await load(id);
   if (!call || call.calleeId !== userId) throw new HttpError(404, 'not_found');
-  if (!(await transition(id, ['RINGING'], { status: 'ACTIVE', answeredAt: new Date() }))) {
+  const now = new Date();
+  // İlk dakika kabul anında alınır: ücret anı "şimdi"
+  if (!(await transition(id, ['RINGING'], { status: 'ACTIVE', answeredAt: now, ringDeadline: null, nextBillingAt: now }))) {
     throw new HttpError(409, 'call_not_ringing');
   }
-  const t = timerOf(id);
-  if (t.ring) clearTimeout(t.ring);
-
-  // İlk dakika kabul anında alınır
-  if (!(await chargeMinute(id))) {
-    await endCall(id, 'balance');
-    throw new HttpError(402, 'caller_insufficient_balance');
-  }
-  t.bill = setInterval(async () => {
-    if (!(await chargeMinute(id).catch(() => false))) await endCall(id, 'balance');
-  }, callTiming.billingSeconds * 1000);
+  if ((await chargeDueMinute(id, now)) === 'ended') throw new HttpError(402, 'caller_insufficient_balance');
 
   const fresh = (await load(id))!;
   emitToUser(call.callerId, 'call:accepted', { ...callDto(fresh, call.callerId), media: mediaFor(id, 1) });
@@ -149,15 +160,13 @@ export async function acceptCall(id: string, userId: string) {
 }
 
 export async function endCall(id: string, reason: 'hangup' | 'balance' | 'disconnect' | 'server_restart') {
-  const ended = await transition(id, ['ACTIVE'], { status: 'ENDED', endReason: reason, endedAt: new Date() });
-  clearTimers(id);
+  const ended = await transition(id, ['ACTIVE'], { status: 'ENDED', endReason: reason, endedAt: new Date(), ...closed });
   if (ended) await broadcast(id, 'call:ended');
   return ended;
 }
 
 async function missCall(id: string) {
-  if (await transition(id, ['RINGING'], { status: 'MISSED', endedAt: new Date() })) {
-    clearTimers(id);
+  if (await transition(id, ['RINGING'], { status: 'MISSED', endedAt: new Date(), ...closed })) {
     await broadcast(id, 'call:ended');
   }
 }
@@ -168,8 +177,7 @@ export async function hangUp(id: string, userId: string) {
   if (!call || (call.callerId !== userId && call.calleeId !== userId)) throw new HttpError(404, 'not_found');
   if (call.status === 'RINGING') {
     const status = call.callerId === userId ? 'CANCELLED' : 'DECLINED';
-    if (await transition(id, ['RINGING'], { status, endedAt: new Date() })) {
-      clearTimers(id);
+    if (await transition(id, ['RINGING'], { status, endedAt: new Date(), ...closed })) {
       await broadcast(id, 'call:ended');
     }
   } else if (call.status === 'ACTIVE') {
@@ -230,26 +238,73 @@ export async function getCall(id: string, userId: string) {
   return { ...callDto(call, userId), media };
 }
 
-// Bağlantısı kopan kullanıcı: kısa bir süre içinde dönmezse aramayı sonlandır
-onUserOffline(async (userId) => {
-  const calls = await prisma.call.findMany({
-    where: { status: { in: LIVE }, OR: [{ callerId: userId }, { calleeId: userId }] },
-  });
-  for (const c of calls) {
-    // Aranan çevrimdışıyken çalmaya devam eder (push ile uyanabilir); diğer durumlar beklemeye alınır
-    if (c.status === 'RINGING' && c.calleeId === userId) continue;
-    const t = timerOf(c.id);
-    if (t.grace) clearTimeout(t.grace);
-    t.grace = setTimeout(async () => {
-      if (isOnline(userId)) return;
-      if (c.status === 'RINGING') await hangUp(c.id, userId).catch(() => {});
-      else await endCall(c.id, 'disconnect');
-    }, callTiming.disconnectGraceSeconds * 1000);
-  }
+// --- Bağlantı kopması: kullanıcı küme genelinde çevrimdışı olunca bekleme süresi başlar,
+// geri gelince iptal edilir. Aranan çalarken çevrimdışı olabilir (bildirimle uyanır).
+async function markAway(userId: string, until: Date) {
+  await prisma.call.updateMany({ where: { status: { in: LIVE }, callerId: userId, callerGraceAt: null }, data: { callerGraceAt: until } });
+  await prisma.call.updateMany({ where: { status: 'ACTIVE', calleeId: userId, calleeGraceAt: null }, data: { calleeGraceAt: until } });
+}
+
+onUserOffline((userId) => markAway(userId, secondsFromNow(callTiming.disconnectGraceSeconds)));
+
+onUserOnline(async (userId) => {
+  await prisma.call.updateMany({ where: { status: { in: LIVE }, callerId: userId, callerGraceAt: { not: null } }, data: { callerGraceAt: null } });
+  await prisma.call.updateMany({ where: { status: { in: LIVE }, calleeId: userId, calleeGraceAt: { not: null } }, data: { calleeGraceAt: null } });
 });
 
-// Sunucu yeniden başlarsa yarım kalan aramaları kapat (zamanlayıcılar bellekteydi)
-export async function recoverCalls() {
-  await prisma.call.updateMany({ where: { status: 'ACTIVE' }, data: { status: 'ENDED', endReason: 'server_restart', endedAt: new Date() } });
-  await prisma.call.updateMany({ where: { status: 'RINGING' }, data: { status: 'MISSED', endedAt: new Date() } });
+// --- Zamanlayıcı (sadece lider sunucuda çalışır) ---
+
+// Zamanı gelen son tarihleri işle: cevapsız aramalar, dakika ücretleri, bağlantısı kopanlar
+export async function processCallDeadlines(now = new Date()) {
+  const ringing = await prisma.call.findMany({ where: { status: 'RINGING', ringDeadline: { lte: now } }, select: { id: true }, take: 200 });
+  for (const { id } of ringing) await missCall(id).catch((e) => console.error('missCall', id, e));
+
+  const due = await prisma.call.findMany({ where: { status: 'ACTIVE', nextBillingAt: { lte: now } }, select: { id: true }, take: 500 });
+  for (const { id } of due) await chargeDueMinute(id, now).catch((e) => console.error('chargeDueMinute', id, e));
+
+  const away = await prisma.call.findMany({
+    where: { status: { in: LIVE }, OR: [{ callerGraceAt: { lte: now } }, { calleeGraceAt: { lte: now } }] },
+    take: 200,
+  });
+  for (const c of away) {
+    for (const [userId, graceAt, field] of [
+      [c.callerId, c.callerGraceAt, 'callerGraceAt'],
+      [c.calleeId, c.calleeGraceAt, 'calleeGraceAt'],
+    ] as const) {
+      if (!graceAt || graceAt > now) continue;
+      // Son kontrol: bu arada başka bir sunucuya bağlanmış olabilir
+      if (await isOnline(userId)) {
+        await prisma.call.update({ where: { id: c.id }, data: { [field]: null } });
+      } else if (c.status === 'RINGING') {
+        await hangUp(c.id, userId).catch(() => {});
+      } else {
+        await endCall(c.id, 'disconnect');
+      }
+      break;
+    }
+  }
+}
+
+// Canlı aramalarda taraflar gerçekten bağlı mı? (Çöken bir sunucudaki bağlantılar "koptu" olayı
+// üretmez; bu tarama onları yakalar.) Bağlı olmayan taraf için bekleme süresi başlatılır.
+export async function sweepCallPresence(now = new Date()) {
+  const live = await prisma.call.findMany({ where: { status: { in: LIVE } }, take: 500 });
+  const until = secondsFromNow(callTiming.disconnectGraceSeconds, now.getTime());
+  for (const c of live) {
+    if (!c.callerGraceAt && !(await isOnline(c.callerId))) {
+      await prisma.call.updateMany({ where: { id: c.id, callerGraceAt: null }, data: { callerGraceAt: until } });
+    }
+    if (c.status === 'ACTIVE' && !c.calleeGraceAt && !(await isOnline(c.calleeId))) {
+      await prisma.call.updateMany({ where: { id: c.id, calleeGraceAt: null }, data: { calleeGraceAt: until } });
+    }
+  }
+}
+
+// Zamanlayıcı sütunlarından önceki (eski sürüm) yarım kalmış aramalar: kapat
+export async function closeLegacyCalls() {
+  await prisma.call.updateMany({
+    where: { status: 'ACTIVE', nextBillingAt: null },
+    data: { status: 'ENDED', endReason: 'server_restart', endedAt: new Date(), ...closed },
+  });
+  await prisma.call.updateMany({ where: { status: 'RINGING', ringDeadline: null }, data: { status: 'MISSED', endedAt: new Date(), ...closed } });
 }

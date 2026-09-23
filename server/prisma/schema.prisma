@@ -254,9 +254,16 @@ model Call {
   endedAt       DateTime?
   gifts         CallGift[]
 
+  // Zamanlayıcı son tarihleri (veritabanında: sunucu yeniden başlasa veya çoğalsa da kaybolmaz)
+  ringDeadline  DateTime? // bu ana kadar cevaplanmazsa cevapsız
+  nextBillingAt DateTime? // bir sonraki dakikanın ücret anı
+  callerGraceAt DateTime? // arayanın bağlantısı koptu: bu ana kadar dönmezse arama biter
+  calleeGraceAt DateTime? // arananın bağlantısı koptu
+
   @@index([callerId, createdAt])
   @@index([calleeId, createdAt])
-  @@index([status])
+  @@index([status, ringDeadline])
+  @@index([status, nextBillingAt])
 }
 
 // Arama içi hediye: jetonun tamamı alıcıya geçer (EARN)
@@ -315,6 +322,25 @@ model ErrorLog {
   resolvedAt  DateTime? // çözüldü işaretlenir; tekrar olursa yeniden açılır
 
   @@index([resolvedAt, lastSeen])
+}
+
+// Hız sınırlama sayaçları: birden fazla sunucu aynı sayacı paylaşır
+model RateLimitHit {
+  key     String   @id // sınırlayıcı:anahtar (IP veya kullanıcı)
+  hits    Int
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
+// Socket.IO PostgreSQL adaptörünün büyük/ikili mesajlar için kullandığı tablo (sunucular arası olaylar).
+// Adaptör bu tabloyu kendisi okur/yazar; uygulama kodu kullanmaz.
+model SocketIoAttachment {
+  id        BigInt   @unique @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  payload   Bytes?
+
+  @@map("socket_io_attachments")
 }
 
 // Push bildirim cihaz jetonları (FCM)

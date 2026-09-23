@@ -21,8 +21,8 @@ export const uniqueTag = () => `${Date.now()}${Math.floor(Math.random() * 1000)}
 
 // HTTP kodu `http` alanında döner (bazı yanıtların kendi `status` alanı var, ör. arama durumu).
 // Dizi yanıtlar `_arr` alanında.
-export async function call(token: string | null | undefined, method: string, p: string, body?: unknown): Promise<any> {
-  const res = await fetch(B + p, {
+export async function call(token: string | null | undefined, method: string, p: string, body?: unknown, base = B): Promise<any> {
+  const res = await fetch(base + p, {
     method,
     headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -91,9 +91,21 @@ export const adminToken = () => login('admin@meetpoint.dev');
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// Koşul sağlanana kadar bekle (zamanlamaya bağlı testlerde sabit bekleme yerine). Süre dolarsa
+// son değeri döndürür; test bunu kontrol edip anlamlı hata verir.
+export async function waitFor<T>(get: () => Promise<T> | T, ok: (v: T) => boolean, timeoutMs = 8000, everyMs = 100): Promise<T> {
+  const until = Date.now() + timeoutMs;
+  let v = await get();
+  while (!ok(v) && Date.now() < until) {
+    await sleep(everyMs);
+    v = await get();
+  }
+  return v;
+}
+
 // Anlık olay dinleyici (Socket.IO)
-export function listen(token: string): Promise<{ s: Socket; events: { name: string; payload: any }[]; has: (n: string) => boolean }> {
-  const s = io(B, { auth: { token }, transports: ['websocket'] });
+export function listen(token: string, base = B): Promise<{ s: Socket; events: { name: string; payload: any }[]; has: (n: string) => boolean }> {
+  const s = io(base, { auth: { token }, transports: ['websocket'], reconnection: false });
   const events: { name: string; payload: any }[] = [];
   s.onAny((name, payload) => events.push({ name, payload }));
   return new Promise((resolve) => s.on('connect', () => resolve({ s, events, has: (n) => events.some((e) => e.name === n) })));

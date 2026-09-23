@@ -1,7 +1,7 @@
 // Faz 6: dakika başı sesli/görüntülü arama, hediyeler, puanlama, geçmiş.
 // Test sunucusu kısa arama zamanlamalarıyla çalışır (test/env.ts).
 import { describe, it } from 'vitest';
-import { B, call, check, listen, registerVerified, upload } from '../helpers';
+import { B, call, check, listen, registerVerified, upload, waitFor } from '../helpers';
 
 describe('Aramalar (Faz 6)', () => {
   it('senaryo', async () => {
@@ -70,8 +70,8 @@ describe('Aramalar (Faz 6)', () => {
     check('caller got call:accepted', callerSock.has('call:accepted'));
     check('caller charged 15', (await bal(caller)) === 785);
 
-    await sleep(3300); // bir "dakika" daha
-    const mid = await call(caller.t, 'GET', `/calls/${callId}`);
+    // bir "dakika" (3 sn) daha: zamanlayıcı ikinci dakikayı almalı
+    const mid = await waitFor(() => call(caller.t, 'GET', `/calls/${callId}`), (c) => c.billedMinutes >= 2);
     check('second minute billed', mid.billedMinutes === 2 && mid.totalCoins === 30, `min=${mid.billedMinutes}`);
     check('caller got call:charged events', callerSock.events.filter((e) => e.name === 'call:charged').length >= 2);
 
@@ -118,8 +118,7 @@ describe('Aramalar (Faz 6)', () => {
 
     // --- Cevapsız / ret / iptal
     const c2 = await call(caller.t, 'POST', '/calls', { toId: callee.id, kind: 'VIDEO' });
-    await sleep(4600);
-    const missed = await call(caller.t, 'GET', `/calls/${c2.id}`);
+    const missed = await waitFor(() => call(caller.t, 'GET', `/calls/${c2.id}`), (c) => c.status !== 'RINGING');
     check('unanswered -> MISSED', missed.status === 'MISSED');
     const lateAccept = await call(callee.t, 'POST', `/calls/${c2.id}/accept`);
     check('cannot accept missed call', lateAccept.http === 409);
@@ -135,12 +134,12 @@ describe('Aramalar (Faz 6)', () => {
     // --- Bakiye bitince arama biter: sadece 50 hediyesi olan kullanıcı, görüntülü 30/dk
     const poorCaller = await makeUser('Oya', 'female', 'male');
     const poorSock = await listen(poorCaller.t);
+    // Gerçekte aramayı açan kişi uygulamada bağlıdır (bağlı olmayan taraf "bağlantı koptu" sayılır)
+    const otherSock = await listen(other.t);
     const c5 = await call(poorCaller.t, 'POST', '/calls', { toId: other.id, kind: 'VIDEO' });
     await call(other.t, 'POST', `/calls/${c5.id}/accept`);
-    await sleep(200);
-    check('low balance warning sent', poorSock.has('call:low_balance'));
-    await sleep(3300);
-    const ranOut = await call(poorCaller.t, 'GET', `/calls/${c5.id}`);
+    check('low balance warning sent', await waitFor(() => poorSock.has('call:low_balance'), Boolean, 2000));
+    const ranOut = await waitFor(() => call(poorCaller.t, 'GET', `/calls/${c5.id}`), (c) => c.status !== 'ACTIVE');
     check('call ends when balance runs out', ranOut.status === 'ENDED' && ranOut.endReason === 'balance' && ranOut.billedMinutes === 1, `${ranOut.http}/${ranOut.endReason}`);
     check('poor caller left with 20', (await bal(poorCaller)) === 20);
 
@@ -148,8 +147,8 @@ describe('Aramalar (Faz 6)', () => {
     const c6 = await call(caller.t, 'POST', '/calls', { toId: callee.id, kind: 'VOICE' });
     await call(callee.t, 'POST', `/calls/${c6.id}/accept`);
     callerSock.s.disconnect();
-    await sleep(2600);
-    const dropped = await call(callee.t, 'GET', `/calls/${c6.id}`);
+    const dropped = await waitFor(() => call(callee.t, 'GET', `/calls/${c6.id}`), (c) => c.status !== 'ACTIVE');
+    check('disconnect waited for grace period (2 s)', new Date(dropped.endedAt).getTime() - Date.now() > -60_000);
     check('disconnect -> ended after grace', dropped.status === 'ENDED' && dropped.endReason === 'disconnect', `${dropped.http}/${dropped.endReason}`);
 
     // --- Engelleme
@@ -167,5 +166,6 @@ describe('Aramalar (Faz 6)', () => {
 
     calleeSock.s.disconnect();
     poorSock.s.disconnect();
+    otherSock.s.disconnect();
   });
 });

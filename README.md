@@ -173,6 +173,14 @@ Kurallar `server/src/calls.ts` dosyasında:
 - Görüntülü aramada karşı tarafın görüntüsü bulanık başlar; kullanıcı dokununca netleşir.
 - Arama sonrası 1-5 puan verilebilir, isteğe bağlı sorun bildirimi yönetim paneline şikayet olarak düşer.
 
+## Çok sunuculu çalışma ve dayanıklılık
+
+- **Zamanlayıcı:** Arama dakika ücretleri, cevapsız arama, bağlantı kopması ve süresi dolan istekler bellekte değil veritabanında tutulur (`server/src/scheduler.ts`). Sunucu yeniden başlasa da arama ve ücretlendirme kaldığı yerden devam eder.
+- **Liderlik:** Birden fazla sunucu çalışırken zamanlanmış işleri yalnızca biri yapar; PostgreSQL kilidiyle seçilir. Lider çökerse diğeri birkaç saniyede devralır. Kısa kesintide kaçırılan arama dakikaları tamamlanır; 3 dakikayı aşan kesinti ücretlendirilmez.
+- **Anlık olaylar:** Socket.IO PostgreSQL adaptörüyle sunucular arasında taşınır. Arayan bir sunucuya, aranan diğerine bağlı olabilir. Redis gerekmez.
+- **Hız sınırları:** Sayaçlar PostgreSQL'de, tüm sunucularda ortak.
+- `test/api/cluster.test.ts` ikinci bir sunucu açıp lideri arama ortasında öldürerek bunların hepsini doğrular.
+
 ## Hata takibi
 
 Uygulamadaki yakalanmamış hatalar (yayın derlemesinde) ve sunucudaki 500 hataları yönetim panelinin **Hatalar** sekmesine düşer. Harici servis gerekmez. Aynı hata tek satırda toplanır, kaç kez ve en son ne zaman olduğu görünür. "Çözüldü" denen hata tekrar olursa yeniden açılır.

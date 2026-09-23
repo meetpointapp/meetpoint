@@ -4,11 +4,11 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { ZodError } from 'zod';
 import { requireAdmin, requireAuth, requireVerifiedEmail } from './auth';
 import { assertProductionConfig, config } from './config';
-import { recoverCalls } from './calls';
-import { HttpError } from './db';
+import { HttpError, prisma } from './db';
 import { recordError } from './errors';
-import { initRealtime } from './realtime';
-import { expireStaleRequests } from './requestService';
+import { pool } from './pgPool';
+import { closeRealtime, initRealtime } from './realtime';
+import { isLeader, startScheduler, stopScheduler } from './scheduler';
 import { adminRouter } from './routes/admin';
 import { authRouter } from './routes/auth';
 import { boostsRouter } from './routes/boosts';
@@ -36,7 +36,8 @@ app.use('/uploads', express.static(config.uploadDir));
 app.use('/admin', express.static('admin'));
 
 app.get('/health', (_req, res) => {
-  res.json({ ok: true });
+  // Geliştirmede süreç kimliği de döner (çok sunuculu testler için)
+  res.json({ ok: true, scheduler: isLeader() ? 'leader' : 'follower', ...(config.isProduction ? {} : { pid: process.pid }) });
 });
 app.use('/legal', legalRouter);
 app.use('/webhooks/revenuecat', revenueCatRouter);
@@ -77,11 +78,23 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
 const server = http.createServer(app);
 initRealtime(server);
 
-setInterval(() => void expireStaleRequests(), 60_000);
+server.listen(config.port, () => {
+  console.log(`MeetPoint server http://localhost:${config.port}`);
+  startScheduler();
+});
 
-// Önce yarım kalan aramaları kapat (zamanlayıcıları bellekteydi), sonra dinlemeye başla
-void recoverCalls().then(() =>
-  server.listen(config.port, () => {
-    console.log(`MeetPoint server http://localhost:${config.port}`);
-  }),
-);
+// Düzgün kapanma: liderlik kilidini bırak (başka sunucu hemen devralsın), bağlantıları kapat
+let stopping = false;
+async function shutdown(signal: string) {
+  if (stopping) return;
+  stopping = true;
+  console.log(`${signal}: kapanıyor...`);
+  await stopScheduler();
+  await closeRealtime().catch(() => {});
+  server.close();
+  await prisma.$disconnect();
+  await pool.end().catch(() => {});
+  process.exit(0);
+}
+process.on('SIGINT', () => void shutdown('SIGINT'));
+process.on('SIGTERM', () => void shutdown('SIGTERM'));

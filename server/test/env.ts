@@ -22,6 +22,10 @@ export const testEnv: Record<string, string> = {
   CALL_DISCONNECT_GRACE_SECONDS: '2',
   // Hata kayıtları testte hızlı yazılsın
   ERROR_FLUSH_MS: '100',
+  // Zamanlayıcı testte sık döner: 100 ms tur, liderlik 0,5 sn'de devralınır, bağlantı taraması 1 sn
+  SCHEDULER_TICK_MS: '100',
+  LEADER_RETRY_MS: '500',
+  PRESENCE_SWEEP_MS: '1000',
   // Testte bu servisler kapalı (varsa geliştiricinin .env değerleri devralınmasın)
   SMTP_HOST: '',
   FIREBASE_SERVICE_ACCOUNT: '',

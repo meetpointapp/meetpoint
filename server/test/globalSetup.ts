@@ -1,4 +1,5 @@
 import { type ChildProcess, execSync, spawn } from 'node:child_process';
+import type { TestProject } from 'vitest/node';
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
@@ -56,17 +57,37 @@ function cleanupStale() {
   fs.rmSync(dataRoot, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 }
 
+// Test dosyalarının ek sunucu başlatabilmesi için gerçek veritabanı adresi (port her çalıştırmada değişebilir)
+declare module 'vitest' {
+  export interface ProvidedContext {
+    databaseUrl: string;
+  }
+}
+
+// Testlerin başlattığı ek sunucuların kayıt dosyası: bitişte hepsi kapatılır
+export const EXTRA_PIDS = path.join(dataRoot, 'extra-pids.txt');
+
 // Aynı test veritabanına ek sunucu örneği (çok sunuculu senaryolar için)
-export function spawnServer(port: number, logName: string) {
-  const env = { ...process.env, ...testEnv, PORT: String(port) };
-  const child = spawn(process.execPath, ['--import', 'tsx', 'src/index.ts'], { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
-  const log = fs.createWriteStream(path.join(dataRoot, logName));
-  child.stdout?.pipe(log);
-  child.stderr?.pipe(log);
+export function spawnServer(port: number, logName: string, databaseUrl = testEnv.DATABASE_URL) {
+  const env = { ...process.env, ...testEnv, DATABASE_URL: databaseUrl, PORT: String(port) };
+  // Sunucuyu başlatan test süreci bitince sunucu yaşamaya devam etmeli: çıktı doğrudan dosyaya (boru
+  // değil) ve "detached" (Windows'ta aksi halde ebeveyn süreç kapanınca çocuk da kapatılır).
+  // Kapatma garantisi: süreç kimlikleri EXTRA_PIDS'te, teardown hepsini kapatır.
+  const log = fs.openSync(path.join(dataRoot, logName), 'a');
+  const child = spawn(process.execPath, ['--import', 'tsx', 'src/index.ts'], {
+    cwd: root,
+    env,
+    stdio: ['ignore', log, log],
+    detached: true,
+    windowsHide: true,
+  });
+  child.unref();
+  fs.closeSync(log);
+  if (child.pid) fs.appendFileSync(EXTRA_PIDS, `${child.pid}\n`);
   return child;
 }
 
-export async function setup() {
+export async function setup(project?: TestProject) {
   cleanupStale();
   fs.mkdirSync(dataRoot, { recursive: true });
 
@@ -83,10 +104,21 @@ export async function setup() {
 
   server = spawnServer(TEST_PORT, 'server.log');
   await waitForHealth(60_000);
+  project?.provide('databaseUrl', testEnv.DATABASE_URL);
 }
 
 export async function teardown() {
   server?.kill();
+  // Testlerin başlattığı ek sunucular
+  if (fs.existsSync(EXTRA_PIDS)) {
+    for (const pid of fs.readFileSync(EXTRA_PIDS, 'utf8').split('\n').filter(Boolean)) {
+      try {
+        process.kill(Number(pid));
+      } catch {
+        // zaten kapanmış
+      }
+    }
+  }
   // Son denetim: testler boyunca yapılan tüm para hareketlerinden sonra her cüzdan defterle eşleşmeli
   let ledgerError: unknown;
   try {

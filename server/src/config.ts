@@ -107,6 +107,13 @@ export const callTiming = {
   disconnectGraceSeconds: Number(process.env.CALL_DISCONNECT_GRACE_SECONDS ?? 20),
 };
 
+// Zamanlayıcı (scheduler.ts): tur aralığı, liderlik deneme aralığı, bağlantı taraması aralığı
+export const scheduler = {
+  tickMs: Number(process.env.SCHEDULER_TICK_MS ?? 1000),
+  leaderRetryMs: Number(process.env.LEADER_RETRY_MS ?? 5000),
+  presenceSweepMs: Number(process.env.PRESENCE_SWEEP_MS ?? 10_000),
+};
+
 // Sesli/görüntülü istekler eskiden istek üzerinden fiyatlanıyordu; yeni istek sadece MESSAGE.
 // Eski kayıtlar (VOICE/VIDEO) okunabilir kalır.
 export const REQUEST_KINDS = ['MESSAGE'] as const;
