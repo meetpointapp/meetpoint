@@ -251,8 +251,15 @@ class Api {
   Future<List<Conversation>> conversations() async =>
       [for (final c in (await _get('/conversations') as List)) Conversation.fromJson(c)];
 
-  Future<List<ChatMessage>> messages(String conversationId) async =>
-      [for (final m in (await _get('/conversations/$conversationId/messages') as List)) ChatMessage.fromJson(m)];
+  // En yeni [pageSize] mesaj; beforeId verilirse o mesajdan daha eskiler (eskiden yeniye sıralı)
+  static const messagePageSize = 50;
+  Future<List<ChatMessage>> messages(String conversationId, {String? beforeId}) async => [
+        for (final m in (await _get('/conversations/$conversationId/messages', {
+          'limit': messagePageSize,
+          'beforeId': ?beforeId,
+        }) as List))
+          ChatMessage.fromJson(m),
+      ];
 
   Future<ChatMessage> sendMessage(String conversationId, String body) async =>
       ChatMessage.fromJson(await _post('/conversations/$conversationId/messages', {'body': body}));

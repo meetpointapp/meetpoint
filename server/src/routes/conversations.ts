@@ -83,11 +83,24 @@ conversationsRouter.get('/conversations', async (req, res) => {
 conversationsRouter.get('/conversations/:id/messages', async (req, res) => {
   const me = uid(req);
   await getOwnConversation(req.params.id, me);
-  const { before } = z.object({ before: z.coerce.date().optional() }).parse(req.query);
+  // Sayfalama: "beforeId" mesajından daha eski olanlar. İmleç (zaman, kimlik) çiftidir: aynı
+  // milisaniyede yazılmış mesajlar sayfa sınırında kaybolmaz ya da tekrarlanmaz.
+  const { beforeId, limit } = z
+    .object({ beforeId: z.string().optional(), limit: z.coerce.number().int().min(1).max(100).default(50) })
+    .parse(req.query);
+  const cursor = beforeId
+    ? await prisma.message.findFirst({ where: { id: beforeId, conversationId: req.params.id } })
+    : null;
+  if (beforeId && !cursor) throw new HttpError(404, 'not_found');
   const messages = await prisma.message.findMany({
-    where: { conversationId: req.params.id, ...(before ? { createdAt: { lt: before } } : {}) },
-    orderBy: { createdAt: 'desc' },
-    take: 50,
+    where: {
+      conversationId: req.params.id,
+      ...(cursor
+        ? { OR: [{ createdAt: { lt: cursor.createdAt } }, { createdAt: cursor.createdAt, id: { lt: cursor.id } }] }
+        : {}),
+    },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: limit,
   });
   res.json(messages.reverse().map(messageDto));
 });

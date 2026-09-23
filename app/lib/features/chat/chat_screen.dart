@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/api.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -29,6 +30,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   StreamSubscription<RealtimeEvent>? _sub;
   bool _sending = false;
   bool _otherTyping = false;
+  bool _hasOlder = false; // daha eski mesaj var mı (sayfa dolu geldiyse)
+  bool _loadingOlder = false;
   Timer? _typingTimer;
   DateTime _lastTypingSent = DateTime(2000);
 
@@ -75,10 +78,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> _load() async {
     try {
       final list = await ref.read(apiProvider).messages(_id);
-      if (mounted) setState(() => _messages = list);
+      if (mounted) {
+        setState(() {
+          _messages = list;
+          _hasOlder = list.length == Api.messagePageSize;
+        });
+      }
       _markRead();
     } catch (e) {
       if (mounted) setState(() => _error = e);
+    }
+  }
+
+  // Yukarı kaydırınca daha eski mesajlar
+  Future<void> _loadOlder() async {
+    final current = _messages;
+    if (_loadingOlder || !_hasOlder || current == null || current.isEmpty) return;
+    setState(() => _loadingOlder = true);
+    try {
+      final older = await ref.read(apiProvider).messages(_id, beforeId: current.first.id);
+      if (!mounted) return;
+      final known = current.map((m) => m.id).toSet();
+      setState(() {
+        _messages = [...older.where((m) => !known.contains(m.id)), ..._messages!];
+        _hasOlder = older.length == Api.messagePageSize;
+      });
+    } catch (_) {
+      // sessizce: bir sonraki kaydırmada tekrar denenir
+    } finally {
+      if (mounted) setState(() => _loadingOlder = false);
     }
   }
 
@@ -190,8 +218,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   : ListView.builder(
                       reverse: true,
                       padding: const EdgeInsets.all(12),
-                      itemCount: messages.length,
+                      // Liste ters: en üstteki (en eski) öğeye gelince önceki sayfa istenir
+                      itemCount: messages.length + (_hasOlder ? 1 : 0),
                       itemBuilder: (_, i) {
+                        if (i == messages.length) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) => _loadOlder());
+                          return const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+                          );
+                        }
                         final m = messages[messages.length - 1 - i];
                         return _Bubble(
                           message: m,
