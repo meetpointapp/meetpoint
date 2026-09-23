@@ -324,5 +324,9 @@
   "errInvalidIban": "That IBAN looks invalid. Please check it.",
   "errAccountNameRequired": "Enter the account holder's name.",
   "errPayoutPending": "You already have a request under review.",
-  "txCashoutRefund": "Cash-out returned"
+  "txCashoutRefund": "Cash-out returned",
+  "errInvalidImage": "This photo format isn't supported. Choose a JPG, PNG, WEBP or HEIC.",
+  "errAlreadyRated": "You've already rated this call.",
+  "errPayoutProcessed": "This request has already been processed.",
+  "errNotFound": "We couldn't find that. It may have been removed or is no longer available."
 }

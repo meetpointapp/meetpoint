@@ -13,7 +13,7 @@ const base = {
 const byUser = (req: Request) => (req as AuthedRequest).user?.id ?? ipKeyGenerator(req.ip ?? '');
 
 // Lokal testler hep aynı IP'den geldiği için IP bazlı sınırlar geliştirmede gevşek tutulur
-const ipLimit = (production: number) => (config.isProduction ? production : production * 25);
+const ipLimit = (production: number) => production * config.rateLimitScale;
 
 // Giriş/kayıt/şifre sıfırlama: IP başına 15 dakikada 20 deneme (kaba kuvvet saldırısına karşı)
 export const authLimiter = rateLimit({ ...base, windowMs: 15 * 60_000, limit: ipLimit(20) });

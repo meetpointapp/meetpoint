@@ -7,3 +7,7 @@ prisma/*.db-journal
 private-uploads/
 dev-mails/
 firebase-service-account.json
+test-data/
+prisma/test.db*
+prisma/*.db-wal
+prisma/*.db-shm

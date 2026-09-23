@@ -12,7 +12,6 @@ const transport = config.smtp.host
     })
   : null;
 
-const DEV_DIR = 'dev-mails';
 
 // Lokal geliştirmede e-posta sunucusu yok: mailler dev-mails/ klasörüne yazılır.
 export async function sendMail(to: string, subject: string, text: string) {
@@ -20,8 +19,8 @@ export async function sendMail(to: string, subject: string, text: string) {
     await transport.sendMail({ from: config.smtp.from, to, subject, text });
     return;
   }
-  fs.mkdirSync(DEV_DIR, { recursive: true });
-  const file = path.join(DEV_DIR, `${Date.now()}-${to.replace(/[^a-z0-9@.]/gi, '_')}.txt`);
+  fs.mkdirSync(config.devMailDir, { recursive: true });
+  const file = path.join(config.devMailDir, `${Date.now()}-${to.replace(/[^a-z0-9@.]/gi, '_')}.txt`);
   fs.writeFileSync(file, `To: ${to}\nSubject: ${subject}\n\n${text}\n`);
   console.log(`[dev-mail] ${to} · ${subject} → ${file}`);
 }

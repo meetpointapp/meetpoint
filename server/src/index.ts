@@ -5,7 +5,7 @@ import { ZodError } from 'zod';
 import { requireAdmin, requireAuth, requireVerifiedEmail } from './auth';
 import { assertProductionConfig, config } from './config';
 import { recoverCalls } from './calls';
-import { HttpError } from './db';
+import { HttpError, prepareDatabase } from './db';
 import { recordError } from './errors';
 import { initRealtime } from './realtime';
 import { expireStaleRequests } from './requestService';
@@ -63,7 +63,7 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof ZodError) return res.status(400).json({ error: 'validation', issues: err.issues });
   console.error(err);
   const e = err instanceof Error ? err : new Error(String(err));
-  void recordError({
+  recordError({
     source: 'server',
     platform: 'server',
     message: e.message,
@@ -80,7 +80,9 @@ initRealtime(server);
 setInterval(() => void expireStaleRequests(), 60_000);
 
 // Önce yarım kalan aramaları kapat (zamanlayıcıları bellekteydi), sonra dinlemeye başla
-void recoverCalls().then(() =>
+void prepareDatabase()
+  .then(recoverCalls)
+  .then(() =>
   server.listen(config.port, () => {
     console.log(`MeetPoint server http://localhost:${config.port}`);
   }),

@@ -692,5 +692,9 @@
   "errInvalidIban": "IBAN geçersiz görünüyor, kontrol edip tekrar dene.",
   "errAccountNameRequired": "Hesap sahibinin adını yaz.",
   "errPayoutPending": "Zaten incelenen bir talebin var.",
-  "txCashoutRefund": "Para çekme iadesi"
+  "txCashoutRefund": "Para çekme iadesi",
+  "errInvalidImage": "Bu fotoğraf biçimi desteklenmiyor. JPG, PNG, WEBP veya HEIC seç.",
+  "errAlreadyRated": "Bu görüşmeyi zaten puanladın.",
+  "errPayoutProcessed": "Bu talep zaten işleme alınmış.",
+  "errNotFound": "Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir."
 }

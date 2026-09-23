@@ -7,6 +7,7 @@ import multer from 'multer';
 import { z } from 'zod';
 import { uid } from '../auth';
 import { EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, PROMPTS, ZODIAC } from '../catalog';
+import { ageOf } from '../age';
 import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
@@ -28,14 +29,6 @@ const upload = multer({
   limits: { fileSize: 8 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|heic)$/.test(file.mimetype)),
 });
-
-function ageOf(birthDate: Date) {
-  const now = new Date();
-  let age = now.getFullYear() - birthDate.getFullYear();
-  const m = now.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) age--;
-  return age;
-}
 
 const photoUrl = (p: { path: string }) => `/uploads/${p.path}`;
 

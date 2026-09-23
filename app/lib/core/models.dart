@@ -328,7 +328,7 @@ class WalletInfo {
           for (final e in (j['requestPrices'] as Map<String, dynamic>).entries) requestKindFrom(e.key): e.value as int,
         },
         callRates: {
-          for (final e in ((j['callRates'] ?? {}) as Map<String, dynamic>).entries) callKindFrom(e.key): e.value as int,
+          for (final e in (j['callRates'] as Map<String, dynamic>? ?? const <String, dynamic>{}).entries) callKindFrom(e.key): e.value as int,
         },
         gifts: [for (final g in (j['gifts'] ?? []) as List) GiftOption.fromJson(g)],
         featurePrices: FeaturePrices.fromJson(j['featurePrices']),

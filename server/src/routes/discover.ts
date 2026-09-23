@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { birthdayForAge } from '../age';
 import { uid } from '../auth';
 import { economy } from '../config';
 import { HttpError, isBlockedEitherWay, orderedPair, prisma } from '../db';
@@ -12,11 +13,6 @@ import { publicProfile } from './profile';
 
 export const discoverRouter = Router();
 
-const yearsAgo = (years: number) => {
-  const d = new Date();
-  d.setFullYear(d.getFullYear() - years);
-  return d;
-};
 
 // Kaydırma kartları: daha önce kaydırılmamış, engel olmayan, cinsiyet tercihi karşılıklı uyan,
 // yaş/mesafe filtresine giren kullanıcılar.
@@ -35,7 +31,7 @@ discoverRouter.get('/discover', async (req, res) => {
       profile: {
         ...(my.interestedIn === 'everyone' ? {} : { gender: my.interestedIn }),
         interestedIn: { in: ['everyone', my.gender] },
-        birthDate: { lte: yearsAgo(my.filterMinAge), gt: yearsAgo(my.filterMaxAge + 1) },
+        birthDate: { lte: birthdayForAge(my.filterMinAge), gt: birthdayForAge(my.filterMaxAge + 1) },
       },
       swipesReceived: { none: { fromId: me.id } },
       blocksGiven: { none: { toId: me.id } },

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/formatters.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -13,12 +14,6 @@ import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import 'call_media.dart';
 import 'start_call.dart';
-
-String formatCallTime(Duration d) {
-  final m = d.inMinutes.toString().padLeft(2, '0');
-  final s = (d.inSeconds % 60).toString().padLeft(2, '0');
-  return d.inHours > 0 ? '${d.inHours}:$m:$s' : '$m:$s';
-}
 
 // Tam ekran arama: çalıyor (giden/gelen) → görüşme → bitti (özet + puan)
 class CallScreen extends ConsumerStatefulWidget {

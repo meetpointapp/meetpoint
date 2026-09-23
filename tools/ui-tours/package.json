@@ -1,0 +1,12 @@
+{
+  "name": "meetpoint-ui-tours",
+  "private": true,
+  "type": "module",
+  "description": "Ekran görüntülü arayüz turları ve faz önizleme kolajları (headless Edge)",
+  "scripts": {
+    "serve": "node serve.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}

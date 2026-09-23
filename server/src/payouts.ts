@@ -1,6 +1,7 @@
 import type { Payout } from '@prisma/client';
 import { economy } from './config';
 import { HttpError, prisma } from './db';
+import { maskAccount, normalizeIban } from './iban';
 import { notify } from './notify';
 import { emitToUser } from './realtime';
 import { addEntry, getCashable } from './wallet';
@@ -11,26 +12,13 @@ import { addEntry, getCashable } from './wallet';
 
 export type PayoutMethod = 'iban' | 'paypal';
 
-// IBAN: ülke kodu + 2 kontrol hanesi + hesap; mod-97 kontrolü (ISO 13616)
-export function normalizeIban(raw: string): string | null {
-  const iban = raw.replace(/\s+/g, '').toUpperCase();
-  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(iban)) return null;
-  if (iban.startsWith('TR') && iban.length !== 26) return null;
-  const rearranged = iban.slice(4) + iban.slice(0, 4);
-  const digits = rearranged.replace(/[A-Z]/g, (c) => String(c.charCodeAt(0) - 55));
-  let rem = 0;
-  for (const d of digits) rem = (rem * 10 + Number(d)) % 97;
-  return rem === 1 ? iban : null;
-}
-
 export const payoutDto = (p: Payout) => ({
   id: p.id,
   coins: p.coins,
   usd: p.usd,
   method: p.method,
   accountName: p.accountName,
-  // Kullanıcıya hesabın sadece sonu gösterilir
-  accountHint: p.method === 'iban' ? `•••• ${p.accountValue.slice(-4)}` : p.accountValue.replace(/^(.).*(@.*)$/, '$1•••$2'),
+  accountHint: maskAccount(p.method, p.accountValue),
   status: p.status,
   reference: p.reference,
   adminNote: p.adminNote,

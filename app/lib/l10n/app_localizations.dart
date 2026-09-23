@@ -2047,6 +2047,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Para çekme iadesi'**
   String get txCashoutRefund;
+
+  /// No description provided for @errInvalidImage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu fotoğraf biçimi desteklenmiyor. JPG, PNG, WEBP veya HEIC seç.'**
+  String get errInvalidImage;
+
+  /// No description provided for @errAlreadyRated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu görüşmeyi zaten puanladın.'**
+  String get errAlreadyRated;
+
+  /// No description provided for @errPayoutProcessed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu talep zaten işleme alınmış.'**
+  String get errPayoutProcessed;
+
+  /// No description provided for @errNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir.'**
+  String get errNotFound;
 }
 
 class _AppLocalizationsDelegate

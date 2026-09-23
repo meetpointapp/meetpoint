@@ -41,6 +41,31 @@ flutter run -d edge
 - Android emülatörü: `flutter run` (sunucuya `10.0.2.2:4000` üzerinden bağlanır)
 - Gerçek telefon (aynı Wi-Fi): `flutter run --dart-define=API_URL=http://<bilgisayar-ip>:4000`
 
+## Testler
+
+**Sunucu** (`server/` klasöründe). Testler ayrı bir test veritabanı ve test sunucusu açar; geliştirme verisine dokunmaz.
+
+```bash
+npm test
+```
+
+- `npm run test:unit`: saf fonksiyonlar (yaş, IBAN, mesafe, hata gruplama, ekonomi kuralları), 1 saniyenin altında
+- `npm run test:api`: uçtan uca senaryolar (kayıt, eşleşme, istekler, güvenlik, ödemeler, aramalar, para çekme, hata takibi)
+- `npm run test:load`: yük ve eşzamanlılık testi (200 kullanıcı, 40 eşzamanlı arama; çift harcama ve ücret tutarlılığı denetimi). Rapor `test-data/load-report.json`
+- `npm run typecheck:test`: test kodunun tip kontrolü
+
+**Uygulama** (`app/` klasöründe):
+
+```bash
+flutter test
+```
+
+Uygulama testlerinden biri sunucu kaynaklarını da okur: sunucunun döndürebileceği her hata kodunun uygulamada Türkçe/İngilizce bir mesajı olmalıdır.
+
+**Sürekli entegrasyon:** GitHub'a her gönderimde `.github/workflows/ci.yml` sunucu ve uygulama testlerini ve bağımlılık güvenlik taramasını çalıştırır. Dependabot haftalık güncelleme önerir.
+
+**Arayüz turları:** ekran görüntülü görsel kontroller `tools/ui-tours/` klasöründe ([nasıl çalıştırılır](tools/ui-tours/README.md)).
+
 ## Jeton ekonomisi
 
 Ayarlar `server/src/config.ts` dosyasında.
@@ -158,7 +183,7 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 
 Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
-- [ ] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
+- [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
 - [ ] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
 - [ ] **Faz 10 · Güvenlik sertleştirme:** EXIF temizleme, oturum yönetimi, yönetimde 2FA + roller + işlem kaydı, hassas veri şifreleme, ASVS denetimi
 - [ ] **Faz 11 · KVKK uyumu:** veri envanteri, ayrı açık rızalar, yeniden onay, md. 11 hakları, otomatik imha, ihlal altyapısı

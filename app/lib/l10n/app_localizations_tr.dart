@@ -1206,4 +1206,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get txCashoutRefund => 'Para çekme iadesi';
+
+  @override
+  String get errInvalidImage =>
+      'Bu fotoğraf biçimi desteklenmiyor. JPG, PNG, WEBP veya HEIC seç.';
+
+  @override
+  String get errAlreadyRated => 'Bu görüşmeyi zaten puanladın.';
+
+  @override
+  String get errPayoutProcessed => 'Bu talep zaten işleme alınmış.';
+
+  @override
+  String get errNotFound =>
+      'Aradığın içerik bulunamadı. Silinmiş veya artık erişilemiyor olabilir.';
 }

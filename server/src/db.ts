@@ -2,6 +2,14 @@ import { PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient();
 
+// SQLite (geliştirme): WAL kipi okuyucuların yazıcıyı beklemesini önler (dosyada kalıcı).
+// PostgreSQL'e geçişte (Faz 9) bu adım kalkar.
+export async function prepareDatabase() {
+  if (process.env.DATABASE_URL?.startsWith('file:')) {
+    await prisma.$queryRawUnsafe('PRAGMA journal_mode = WAL;');
+  }
+}
+
 export class HttpError extends Error {
   constructor(
     public status: number,

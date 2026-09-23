@@ -1,0 +1,14 @@
+{
+  // Testlerin tip kontrolü (npm run typecheck:test). Senaryo testleri serbest JSON ile çalıştığı için
+  // örtük any'ye izin verilir; kaynak kod (src) ana tsconfig ile sıkı modda kontrol edilir.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "noEmit": true,
+    "noImplicitAny": false,
+    // Vitest paketleyici gibi çözümler: uzantısız göreli importlar
+    "module": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["./**/*.ts", "../src/**/*.ts", "../vitest.config.ts"]
+}

@@ -22,7 +22,7 @@ Her fazda en az 5 adım var. İşaretler:
 
 | # | Açık | Risk | Faz |
 |---|---|---|---|
-| 1 | Sunucu testleri repoda değil, bilgisayarın geçici klasöründe | Klasör temizlenirse tüm testler kaybolur | 8 |
+| 1 | ~~Sunucu testleri repoda değil~~ | ✅ Faz 8'de çözüldü | 8 |
 | 2 | Bakiye kontrolü kilitsiz | PostgreSQL'de eşzamanlı iki harcama aynı jetonu iki kez harcayabilir | 9 |
 | 3 | Arama ücretlendirme zamanlayıcıları bellekte | Sunucu yeniden başlarsa aramalar kesilir; birden fazla sunucuya büyünemez | 9 |
 | 4 | Yüklenen fotoğraflar olduğu gibi saklanıyor (EXIF silinmiyor) | Fotoğraftaki GPS konumu diğer kullanıcılara sızabilir | 10 |
@@ -35,9 +35,32 @@ Her fazda en az 5 adım var. İşaretler:
 | 11 | Agora jetonu 1 saat geçerli, yenilenmiyor | 1 saatten uzun aramalar kopar | 15 |
 | 12 | Uygulama kapalıyken gelen arama sadece bildirim olarak düşüyor | Aramaların çoğu kaçırılır | 15 |
 
+### Faz 8'de bulunanlar
+
+Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ kontrol), uygulamada 25 test, yük testi ve CI hazır. Testler şu sorunları yakaladı:
+
+**Faz 8'de düzeltilenler:**
+- Eşzamanlı yazmada SQLite kilitlenmesi: 20 eşzamanlı eşleşmede isteklerin %75'i 5–12 sn sonra hata veriyordu. Tek bağlantıyla hata sıfır, gecikme 0,2 sn.
+- Hata takibi veritabanı yavaşlayınca yükü katlıyordu. Artık toplu yazılıyor.
+- Yaş hesabı sunucunun saat dilimine bağlıydı: 18 yaş sınırı bir gün erken açılabiliyordu. Artık UTC.
+- Sunucu cüzdan yanıtında bir alanı göndermezse cüzdan ekranı çöküyordu.
+- Her "bulunamadı" hatası "Bu arama artık geçerli değil" gösteriyordu.
+- 5 hata koduna mesaj eklendi. Örneğin desteklenmeyen fotoğraf biçiminde artık "Bir şeyler ters gitti" yerine açıklayıcı mesaj çıkıyor.
+- 1 saati aşan aramada süre "1:62:03" gibi yanlış görünüyordu.
+
+**Sonraki fazlara eklenenler:**
+
+| Bulgu | Faz |
+|---|---|
+| Şifre özeti (bcryptjs) saf JavaScript: toplu kayıtlarda sunucuyu bloke ediyor (20 eşzamanlı kayıtta p50 2,6 sn) | 10 |
+| Keşfet tüm adayları belleğe alıp süzüyor (200 kullanıcıda p50 0,7 sn) | 9 |
+| Prisma CLI → deepmerge-ts (yüksek) ve firebase-admin → uuid (orta) güvenlik bildirimi; çalışan sunucuda kullanılmıyor | 10 |
+| **Fiyat kararı:** "En popüler" 1000'lik paket jeton başına 500'lükten biraz pahalı | 13 |
+| **Ekonomi kararı:** %50 ilk alım bonusu ve kayıt hediyesi, harcanınca başkasının bozdurulabilir kazancına dönüşüyor. KDV ve mağaza payından sonra jeton başı gelir bozdurma kurunun altına inebiliyor (zarar). %30 mağaza payında 6000'lik paket bonussuz da zararda. | 13 |
+
 ---
 
-## Faz 8 · Test altyapısı ve sürekli entegrasyon
+## Faz 8 · Test altyapısı ve sürekli entegrasyon ✅
 
 **Amaç:** Bundan sonraki büyük değişiklikler güvenle yapılabilsin. Her değişiklik otomatik test edilsin.
 
@@ -59,7 +82,7 @@ Her fazda en az 5 adım var. İşaretler:
 4. 🛠 **Çift işlem önleme (idempotency).** Satın alma, hediye, mesaj ve para çekme tekrar gönderilse de bir kez işlenir.
 5. 🛠 **Çok sunuculu çalışma.** Redis ile anlık bağlantılar ve hız sınırları ortak tutulur.
 6. 🛠 **Fotoğraf depolama.** Otomatik küçük ve orta boy üretimi, süreli imzalı bağlantılar, S3 uyumlu depolamaya hazır katman.
-7. 🛠 **Sorgu disiplini.** İndeksler, sayfalama (keşfet, sohbet, geçmiş, panel listeleri), sorgu performans ölçümü.
+7. 🛠 **Sorgu disiplini.** İndeksler, sayfalama (keşfet, sohbet, geçmiş, panel listeleri), sorgu performans ölçümü. Keşfet filtrelemesi veritabanında yapılır; yük testi hedefi p95 < 300 ms.
 
 ## Faz 10 · Güvenlik sertleştirme
 
@@ -69,9 +92,10 @@ Her fazda en az 5 adım var. İşaretler:
 2. 🛠 **Oturumlar.** Kısa ömürlü erişim jetonu ve yenileme; aktif cihazlar listesi; tek tek oturum kapatma; yeni cihaz girişinde e-posta uyarısı.
 3. 🛠 **Yönetim paneli.** İki adımlı doğrulama (TOTP), roller (moderatör / finans / süper yönetici), silinemez işlem kaydı.
 4. 🛠 **Hassas veri şifreleme.** IBAN, PayPal ve kimlik bilgileri alan düzeyinde şifreli; anahtar veritabanı dışında.
-5. 🛠 **Kötüye kullanım.** Bot koruması, cihaz başına hesap sınırı, sızdırılmış şifre kontrolü, şifre politikası.
+5. 🛠 **Kötüye kullanım ve şifreler.** Bot koruması, cihaz başına hesap sınırı, sızdırılmış şifre kontrolü, şifre politikası. Şifre özeti yerel (native) Argon2id'ye geçer; mevcut şifreler girişte otomatik yükseltilir.
 6. 🛠 **Sunucu yapılandırması.** CORS kısıtı, güvenlik başlıkları, istek boyutu sınırları, hata mesajlarında iç bilgi sızmaması.
 7. 🛠 **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 17'de.
+8. 🛠 **Bağımlılık güvenliği.** Prisma ve firebase-admin sürüm yükseltmeleriyle açık bildirimlerinin kapatılması.
 
 ## Faz 11 · KVKK uyumu (uygulama içi)
 
@@ -113,6 +137,7 @@ Her fazda en az 5 adım var. İşaretler:
 5. 🛠 **Vergi alanları.** Ayarlanabilir stopaj oranı, ödeme belgesi taslağı, kullanıcıya yıllık kazanç dökümü.
 6. 🛠 **Finans raporları.** Satış–jeton mutabakatı, dolaşımdaki jeton yükümlülüğü, ödenen ve bekleyen ödemeler, iadeler; muhasebeye aylık dışa aktarım.
 7. 🛠 **TL fiyat yönetimi.** Mağaza fiyatlarının KDV dahil gösterimi; paket ve fiyatların panelden yönetimi.
+8. 👤🛠 **Fiyat ve bonus kararları.** Paketlerin jeton başı fiyat sırası; bonus ve hediye jetonlarının kazanca dönüşme kuralı (ör. bonus jetondan gelen kazanç bozdurulamaz ya da bozdurma kuru/bonus oranı ayarlanır). Birim testlerindeki bekleyen kurallar yeşile döner.
 
 ## Faz 14 · Tüketici hakları, destek ve mağaza uyumu (uygulama içi)
 

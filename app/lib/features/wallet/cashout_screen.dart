@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/formatters.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -295,7 +295,7 @@ class _CashoutFormState extends ConsumerState<_CashoutForm> {
         TextField(
           controller: _account,
           textCapitalization: TextCapitalization.characters,
-          inputFormatters: [_IbanFormatter()],
+          inputFormatters: [IbanInputFormatter()],
           decoration: const InputDecoration(labelText: 'IBAN', hintText: 'TR00 0000 0000 0000 0000 0000 00'),
           onChanged: (_) => setState(() {}),
         ),
@@ -316,17 +316,6 @@ class _CashoutFormState extends ConsumerState<_CashoutForm> {
         onPressed: _valid && !_busy ? _submit : null,
       ),
     ]);
-  }
-}
-
-// IBAN'ı 4'erli gruplar halinde ve büyük harfle gösterir
-class _IbanFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final raw = newValue.text.replaceAll(RegExp(r'[^A-Za-z0-9]'), '').toUpperCase();
-    final clipped = raw.length > 34 ? raw.substring(0, 34) : raw;
-    final grouped = RegExp(r'.{1,4}').allMatches(clipped).map((m) => m.group(0)).join(' ');
-    return TextEditingValue(text: grouped, selection: TextSelection.collapsed(offset: grouped.length));
   }
 }
 

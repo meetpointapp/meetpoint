@@ -1,0 +1,68 @@
+# Her gönderimde ve PR'da: sunucu tip kontrolü + testler, uygulama analizi + testler, bağımlılık taraması.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server:
+    name: Sunucu (tip kontrolü ve testler)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run typecheck
+      - run: npm run typecheck:test
+      # Birim testleri + ayrı test veritabanıyla çalışan API senaryo testleri
+      - run: npm test
+      - name: Test sunucusu kaydı (hata olursa)
+        if: failure()
+        run: cat test-data/server.log || true
+
+  app:
+    name: Uygulama (analiz ve testler)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      # Testlerden biri sunucu kaynaklarını da okur (hata kodu ↔ mesaj tutarlılığı)
+      - run: flutter test
+
+  audit:
+    name: Bağımlılık güvenlik taraması
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Kritik açık derlemeyi durdurur; diğerleri raporlanır (Dependabot güncelleme önerir)
+      - run: npm audit --omit=dev --audit-level=critical
+      - run: npm audit --omit=dev || true

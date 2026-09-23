@@ -34,7 +34,8 @@ String errorText(AppLocalizations l, Object error) {
     'already_viewed' => l.errAlreadyViewed,
     'busy' => l.errBusy,
     'already_in_call' => l.errAlreadyInCall,
-    'call_not_ringing' || 'call_not_active' || 'not_found' => l.errCallGone,
+    'call_not_ringing' || 'call_not_active' => l.errCallGone,
+    'not_found' => l.errNotFound,
     'caller_insufficient_balance' => l.errCallerBalance,
     'verification_required' => l.errVerificationRequired,
     'below_minimum' => l.errBelowMinimum,
@@ -42,6 +43,11 @@ String errorText(AppLocalizations l, Object error) {
     'invalid_iban' => l.errInvalidIban,
     'account_name_required' => l.errAccountNameRequired,
     'payout_pending' => l.errPayoutPending,
+    'payout_not_pending' => l.errPayoutProcessed,
+    'invalid_image' => l.errInvalidImage,
+    'already_rated' => l.errAlreadyRated,
+    'store_unavailable' => l.errStoreUnavailable,
+    'call_not_ended' || 'invalid_gift' => l.errCallGone,
     _ => l.errGeneric,
   };
 }

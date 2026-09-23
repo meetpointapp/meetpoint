@@ -20,6 +20,6 @@ clientErrorsRouter.post('/', errorReportLimiter, async (req, res) => {
     .parse(req.body);
   const token = req.headers.authorization?.replace(/^Bearer /, '');
   const userId = token ? await authenticate(token).then((u) => u.id, () => undefined) : undefined;
-  await recordError({ source: 'app', ...body, userId });
+  recordError({ source: 'app', ...body, userId });
   res.status(204).end();
 });

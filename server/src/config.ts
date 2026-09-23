@@ -7,6 +7,10 @@ export const config = {
   uploadDir: process.env.UPLOAD_DIR ?? 'uploads',
   // Herkese açık olmayan dosyalar (doğrulama selfie'leri): statik olarak sunulmaz
   privateUploadDir: process.env.PRIVATE_UPLOAD_DIR ?? 'private-uploads',
+  // SMTP yokken e-postaların yazıldığı klasör (testler ayrı klasör kullanır)
+  devMailDir: process.env.DEV_MAIL_DIR ?? 'dev-mails',
+  // IP bazlı hız sınırlarının çarpanı: yayında 1; lokalde testler tek IP'den geldiği için gevşek
+  rateLimitScale: Number(process.env.RATE_LIMIT_SCALE ?? (process.env.NODE_ENV === 'production' ? 1 : 25)),
   maxPhotos: 6,
   minAge: 18,
 

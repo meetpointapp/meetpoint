@@ -1216,4 +1216,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get txCashoutRefund => 'Cash-out returned';
+
+  @override
+  String get errInvalidImage =>
+      'This photo format isn\'t supported. Choose a JPG, PNG, WEBP or HEIC.';
+
+  @override
+  String get errAlreadyRated => 'You\'ve already rated this call.';
+
+  @override
+  String get errPayoutProcessed => 'This request has already been processed.';
+
+  @override
+  String get errNotFound =>
+      'We couldn\'t find that. It may have been removed or is no longer available.';
 }
