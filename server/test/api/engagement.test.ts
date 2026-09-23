@@ -145,7 +145,8 @@ describe('Etkileşim (Faz 4)', () => {
     const outsiderView = await fetch(`${B}/messages/${sent.id}/photo`, { headers: { authorization: `Bearer ${noloc.t}` } });
     check('outsider cannot open', outsiderView.status === 404);
     await new Promise((r) => setTimeout(r, 300));
-    const leftovers = fs.readdirSync(PRIVATE_DIR).filter((f) => f.startsWith('chat-'));
+    const chatDir = `${PRIVATE_DIR}/chat`;
+    const leftovers = fs.existsSync(chatDir) ? fs.readdirSync(chatDir) : [];
     check('photo file deleted after view', leftovers.length === 0, `left=${leftovers.length}`);
 
     // --- 8. Push cihaz kaydı

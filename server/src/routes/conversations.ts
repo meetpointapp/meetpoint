@@ -1,12 +1,10 @@
-import crypto from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
 import type { Message } from '@prisma/client';
 import { Router } from 'express';
 import multer from 'multer';
+import { sanitizePrivatePhoto } from '../images';
+import { privateStore, randomKey } from '../storage';
 import { z } from 'zod';
 import { uid } from '../auth';
-import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { messageLimiter } from '../limits';
 import { notify } from '../notify';
@@ -17,17 +15,12 @@ export const conversationsRouter = Router();
 
 const userInclude = { include: { profile: true, photos: true } } as const;
 
-// Tek seferlik fotoğraflar özel klasörde durur, herkese açık değildir
+// Tek seferlik fotoğraflar özel depoda durur, herkese açık değildir
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: config.privateUploadDir,
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
-      cb(null, `chat-${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`);
-    },
-  }),
-  limits: { fileSize: 8 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|heic)$/.test(file.mimetype)),
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024, files: 1 },
+  // Tür ön süzgeci; asıl kontrol images.ts'te dosyanın içeriğine bakılarak yapılır
+  fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|heic|heif)$/.test(file.mimetype)),
 });
 
 // İstemciye giden mesaj: dosya yolu asla dışarı verilmez
@@ -132,12 +125,15 @@ conversationsRouter.post('/conversations/:id/messages', messageLimiter, async (r
 conversationsRouter.post('/conversations/:id/photos', messageLimiter, upload.single('photo'), async (req, res) => {
   if (!req.file) throw new HttpError(400, 'invalid_image');
   const me = uid(req);
+  const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
+  if (await isBlockedEitherWay(me, otherId)) throw new HttpError(403, 'blocked');
+  // Üst verisi temizlenmiş kopya saklanır (konum bilgisi karşı tarafa gitmez)
+  const key = randomKey('chat', 'webp');
+  await privateStore.put(key, await sanitizePrivatePhoto(req.file.buffer));
   try {
-    const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
-    if (await isBlockedEitherWay(me, otherId)) throw new HttpError(403, 'blocked');
-    res.status(201).json(await deliver(conv.id, me, otherId, { kind: 'photo', body: '', photoPath: req.file.filename }));
+    res.status(201).json(await deliver(conv.id, me, otherId, { kind: 'photo', body: '', photoPath: key }));
   } catch (e) {
-    fs.rmSync(req.file.path, { force: true });
+    await privateStore.remove(key);
     throw e;
   }
 });
@@ -158,8 +154,10 @@ conversationsRouter.get('/messages/:id/photo', async (req, res) => {
   });
   if (count !== 1) throw new HttpError(410, 'already_viewed');
 
-  const file = path.resolve(config.privateUploadDir, msg.photoPath);
+  const data = await privateStore.read(msg.photoPath);
+  await privateStore.remove(msg.photoPath);
+  if (!data) throw new HttpError(410, 'already_viewed');
   res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(file, () => fs.rmSync(file, { force: true }));
+  res.type(msg.photoPath.endsWith('.webp') ? 'image/webp' : 'image/jpeg').send(data);
   emitToUser(msg.senderId, 'message:viewed', { id: msg.id, conversationId: msg.conversationId });
 });

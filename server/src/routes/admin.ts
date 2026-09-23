@@ -1,18 +1,16 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { Router } from 'express';
 import { z } from 'zod';
-import { config } from '../config';
 import { HttpError, prisma } from '../db';
 import { disconnectUser } from '../realtime';
+import { photoUrls, removeProfilePhoto } from '../images';
 import { closePayout, markPayoutPaid } from '../payouts';
+import { privateStore } from '../storage';
 import { closeAllPendingFor } from '../requestService';
 import { getCashable } from '../wallet';
 
 // Yönetim paneli API'si (/admin/api). requireAuth + requireAdmin ile korunur.
 export const adminRouter = Router();
 
-const photoUrl = (p: { path: string }) => `/uploads/${p.path}`;
 
 const userSummary = {
   select: {
@@ -44,7 +42,7 @@ function shapeUser(u: NonNullable<SummaryUser>) {
     displayName: u.profile?.displayName ?? '',
     city: u.profile?.city ?? '',
     bio: u.profile?.bio ?? '',
-    photos: u.photos.map((p) => ({ id: p.id, url: photoUrl(p) })),
+    photos: u.photos.map((p) => ({ id: p.id, url: photoUrls(p.path).url })),
     reportCount: u._count.reportsAgainst,
   };
 }
@@ -261,7 +259,7 @@ adminRouter.delete('/photos/:id', async (req, res) => {
   const photo = await prisma.photo.findUnique({ where: { id: req.params.id } });
   if (!photo) throw new HttpError(404, 'not_found');
   await prisma.photo.delete({ where: { id: photo.id } });
-  fs.rmSync(path.join(config.uploadDir, photo.path), { force: true });
+  await removeProfilePhoto(photo.path);
   if (reportId) {
     await prisma.report.updateMany({
       where: { id: reportId, status: 'OPEN' },
@@ -286,7 +284,10 @@ adminRouter.get('/verifications', async (req, res) => {
 adminRouter.get('/verifications/:id/selfie', async (req, res) => {
   const v = await prisma.verificationRequest.findUnique({ where: { id: req.params.id } });
   if (!v) throw new HttpError(404, 'not_found');
-  res.sendFile(path.resolve(config.privateUploadDir, v.selfiePath));
+  const data = await privateStore.read(v.selfiePath);
+  if (!data) throw new HttpError(404, 'not_found');
+  res.setHeader('Cache-Control', 'no-store');
+  res.type(v.selfiePath.endsWith('.webp') ? 'image/webp' : 'image/jpeg').send(data);
 });
 
 adminRouter.post('/verifications/:id/:decision', async (req, res) => {

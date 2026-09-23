@@ -77,11 +77,13 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     check('status is pending', secMe.verificationStatus === 'pending');
     // Gerçek selfie dosyası herkese açık adreslerden erişilemez olmalı
     const fs = await import('node:fs');
-    const privDir = PRIVATE_DIR;
-    const newest = fs.readdirSync(privDir).map((f) => ({ f, t: fs.statSync(`${privDir}/${f}`).mtimeMs })).sort((x, y) => y.t - x.t)[0].f;
-    const viaUploads = await fetch(`${B}/uploads/${newest}`).then((r) => r.status);
-    const viaPrivate = await fetch(`${B}/private-uploads/${newest}`).then((r) => r.status);
-    check('selfie not served publicly', viaUploads !== 200 && viaPrivate !== 200, `uploads=${viaUploads} private=${viaPrivate}`);
+    const selfieDir = `${PRIVATE_DIR}/selfie`;
+    const newest = fs.readdirSync(selfieDir).map((f) => ({ f, t: fs.statSync(`${selfieDir}/${f}`).mtimeMs })).sort((x, y) => y.t - x.t)[0].f;
+    const key = `selfie/${newest}`;
+    const viaUploads = await fetch(`${B}/uploads/${key}`).then((r) => r.status);
+    const viaPrivate = await fetch(`${B}/private-uploads/${key}`).then((r) => r.status);
+    const viaMedia = await fetch(`${B}/media/${key}`).then((r) => r.status);
+    check('selfie not served publicly', viaUploads !== 200 && viaPrivate !== 200 && viaMedia !== 200, `uploads=${viaUploads} private=${viaPrivate} media=${viaMedia}`);
     const queue = await call(admin, 'GET', '/admin/api/verifications');
     const mine = queue._arr?.find((v) => v.user.id === secMe.id);
     check('verification in admin queue', !!mine);

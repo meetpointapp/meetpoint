@@ -73,6 +73,13 @@ void main() {
       expect(p.coverUrl, '/uploads/a.png');
       expect(p.location, 'İstanbul');
     });
+
+    test('fotoğraf boyları; eski yanıtta tek adres her boya düşer', () {
+      final sized = Photo.fromJson({'id': 'p', 'url': '/m-md', 'thumbUrl': '/m-sm', 'fullUrl': '/m-lg'});
+      expect([sized.thumbUrl, sized.url, sized.fullUrl], ['/m-sm', '/m-md', '/m-lg']);
+      final legacy = Photo.fromJson({'id': 'p', 'url': '/old.png'});
+      expect([legacy.thumbUrl, legacy.fullUrl], ['/old.png', '/old.png']);
+    });
   });
 
   group('CallInfo', () {

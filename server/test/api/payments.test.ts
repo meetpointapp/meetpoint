@@ -3,7 +3,7 @@
 import { describe, it } from 'vitest';
 import http from 'node:http';
 import { FAKE_REVENUECAT_PORT } from '../env';
-import { B, call, check, registerVerified, listen } from '../helpers';
+import { B, call, check, registerVerified } from '../helpers';
 
 describe('Ödemeler (Faz 5)', () => {
   it('senaryo', async () => {

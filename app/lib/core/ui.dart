@@ -139,7 +139,7 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipOval(
-        child: SizedBox.square(dimension: radius * 2, child: NetPhoto(profile?.coverUrl)),
+        child: SizedBox.square(dimension: radius * 2, child: NetPhoto(profile?.coverThumbUrl)),
       );
 }
 

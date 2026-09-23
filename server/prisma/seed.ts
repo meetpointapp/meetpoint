@@ -1,65 +1,35 @@
 // Lokal test verisi: npm run db:seed
 // Giriş: test@meetpoint.dev / password123 (1000 jeton, gelen istekler, seni beğenmiş profiller)
-import fs from 'node:fs';
-import path from 'node:path';
-import zlib from 'node:zlib';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import sharp from 'sharp';
+import { removeProfilePhoto, sanitizePrivatePhoto, storeProfilePhoto } from '../src/images';
+import { privateStore, randomKey } from '../src/storage';
 import { credit, debit } from '../src/wallet';
 
 const prisma = new PrismaClient();
-const uploadDir = process.env.UPLOAD_DIR ?? 'uploads';
 
 // Demo hesaplara satın alınmış sayılan jeton (DEV_CREDIT → "paid" kovası): harcadıklarında karşı taraf
 // bozdurulabilir kazanç elde eder, para çekme akışı demo edilebilir
 const devCredit = (userId: string, coins: number) =>
   prisma.$transaction((tx) => credit(tx, userId, { paid: coins }, 'DEV_CREDIT', { note: 'seed' }));
 
-// Bağımlılıksız basit PNG üretici: iki renk arası dikey gradyan (yer tutucu fotoğraf)
-function gradientPng(file: string, top: [number, number, number], bottom: [number, number, number], dir = uploadDir) {
+// Yer tutucu fotoğraf: iki renk arası dikey gradyan. Gerçek yüklemelerle aynı işlemden geçer
+// (images.ts): 3 boy, WebP, üst veri yok.
+function gradient(top: [number, number, number], bottom: [number, number, number]) {
   const w = 480;
   const h = 640;
-  const raw = Buffer.alloc((w * 3 + 1) * h);
+  const raw = Buffer.alloc(w * h * 3);
   for (let y = 0; y < h; y++) {
     const t = y / (h - 1);
-    const row = y * (w * 3 + 1);
     for (let x = 0; x < w; x++) {
-      const i = row + 1 + x * 3;
+      const i = (y * w + x) * 3;
       raw[i] = Math.round(top[0] + (bottom[0] - top[0]) * t);
       raw[i + 1] = Math.round(top[1] + (bottom[1] - top[1]) * t);
       raw[i + 2] = Math.round(top[2] + (bottom[2] - top[2]) * t);
     }
   }
-  const crcTable = Array.from({ length: 256 }, (_, n) => {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    return c >>> 0;
-  });
-  const crc = (buf: Buffer) => {
-    let c = 0xffffffff;
-    for (const b of buf) c = crcTable[(c ^ b) & 0xff] ^ (c >>> 8);
-    return (c ^ 0xffffffff) >>> 0;
-  };
-  const chunk = (type: string, data: Buffer) => {
-    const len = Buffer.alloc(4);
-    len.writeUInt32BE(data.length);
-    const td = Buffer.concat([Buffer.from(type), data]);
-    const c = Buffer.alloc(4);
-    c.writeUInt32BE(crc(td));
-    return Buffer.concat([len, td, c]);
-  };
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(w, 0);
-  ihdr.writeUInt32BE(h, 4);
-  ihdr[8] = 8; // bit derinliği
-  ihdr[9] = 2; // RGB
-  const png = Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', zlib.deflateSync(raw)),
-    chunk('IEND', Buffer.alloc(0)),
-  ]);
-  fs.writeFileSync(path.join(dir, file), png);
+  return sharp(raw, { raw: { width: w, height: h, channels: 3 } }).png().toBuffer();
 }
 
 type Rgb = [number, number, number];
@@ -151,10 +121,12 @@ const demoUsers = [
 ];
 
 async function main() {
-  fs.mkdirSync(uploadDir, { recursive: true });
   const passwordHash = await bcrypt.hash('password123', 10);
 
-  // Önceki demo ve otomatik test verisini temizle (@meetpoint.dev ve @test.com hesapları)
+  // Önceki demo ve otomatik test verisini temizle (@meetpoint.dev ve @test.com hesapları), dosyaları dahil
+  const demo = { OR: [{ email: { endsWith: '@meetpoint.dev' } }, { email: { endsWith: '@test.com' } }] };
+  for (const p of await prisma.photo.findMany({ where: { user: demo } })) await removeProfilePhoto(p.path);
+  for (const v of await prisma.verificationRequest.findMany({ where: { user: demo } })) await privateStore.remove(v.selfiePath);
   await prisma.user.deleteMany({
     where: { OR: [{ email: { endsWith: '@meetpoint.dev' } }, { email: { endsWith: '@test.com' } }] },
   });
@@ -187,8 +159,8 @@ async function main() {
       },
     },
   });
-  gradientPng(`seed-${test.id}.png`, [52, 58, 64], [134, 142, 150]);
-  await prisma.photo.create({ data: { userId: test.id, path: `seed-${test.id}.png`, position: 0 } });
+  const testPhoto = await storeProfilePhoto(await gradient([52, 58, 64], [134, 142, 150]));
+  await prisma.photo.create({ data: { userId: test.id, path: testPhoto, position: 0 } });
   await devCredit(test.id, 1000);
 
   const created: { id: string; name: string }[] = [];
@@ -220,9 +192,8 @@ async function main() {
     });
     for (let p = 0; p < 2; p++) {
       const [a, b] = palettes[(i + p * 3) % palettes.length];
-      const file = `seed-${user.id}-${p}.png`;
-      gradientPng(file, p === 0 ? a : b, p === 0 ? b : a);
-      await prisma.photo.create({ data: { userId: user.id, path: file, position: p } });
+      const base = await storeProfilePhoto(await gradient(p === 0 ? a : b, p === 0 ? b : a));
+      await prisma.photo.create({ data: { userId: user.id, path: base, position: p } });
     }
     await devCredit(user.id, 2000);
     if (u.likesTest) {
@@ -268,11 +239,9 @@ async function main() {
   });
 
   // Panel demosu: Zeynep'in bekleyen mavi tik başvurusu (selfie özel klasörde)
-  const privateDir = process.env.PRIVATE_UPLOAD_DIR ?? 'private-uploads';
-  fs.mkdirSync(privateDir, { recursive: true });
   const zeynep = created.find((c) => c.name === 'Zeynep')!;
-  const selfie = `seed-selfie-${zeynep.id}.png`;
-  gradientPng(selfie, [127, 90, 240], [44, 182, 125], privateDir);
+  const selfie = randomKey('selfie', 'webp');
+  await privateStore.put(selfie, await sanitizePrivatePhoto(await gradient([127, 90, 240], [44, 182, 125])));
   await prisma.verificationRequest.create({ data: { userId: zeynep.id, pose: 'peace_sign', selfiePath: selfie } });
   await prisma.user.update({ where: { id: zeynep.id }, data: { verificationStatus: 'pending' } });
 

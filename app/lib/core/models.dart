@@ -1,10 +1,16 @@
 DateTime _date(dynamic v) => DateTime.parse(v as String).toLocal();
 
+// Sunucu her fotoğrafın 3 boyunu üretir: küçük (liste, ~240px), orta (kart, ~720px), büyük (tam ekran, ~1440px)
 class Photo {
   final String id;
-  final String url;
-  const Photo({required this.id, required this.url});
-  factory Photo.fromJson(Map<String, dynamic> j) => Photo(id: j['id'], url: j['url']);
+  final String url; // orta boy
+  final String thumbUrl;
+  final String fullUrl;
+  const Photo({required this.id, required this.url, String? thumbUrl, String? fullUrl})
+      : thumbUrl = thumbUrl ?? url,
+        fullUrl = fullUrl ?? url;
+  factory Photo.fromJson(Map<String, dynamic> j) =>
+      Photo(id: j['id'], url: j['url'], thumbUrl: j['thumbUrl'], fullUrl: j['fullUrl']);
 }
 
 class ProfilePrompt {
@@ -61,6 +67,7 @@ class PublicProfile {
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
+  String? get coverThumbUrl => photos.isEmpty ? null : photos.first.thumbUrl;
   String get location => [city, country].where((s) => s.isNotEmpty).join(', ');
 
   factory PublicProfile.fromJson(Map<String, dynamic> j) => PublicProfile(

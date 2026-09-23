@@ -19,6 +19,7 @@ import { payoutsRouter } from './routes/payouts';
 import { conversationsRouter } from './routes/conversations';
 import { discoverRouter } from './routes/discover';
 import { legalRouter } from './routes/legal';
+import { mediaRouter } from './routes/media';
 import { profileRouter } from './routes/profile';
 import { requestsRouter } from './routes/requests';
 import { revenueCatRouter } from './routes/revenuecat';
@@ -33,7 +34,6 @@ const app = express();
 app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '100kb' }));
-app.use('/uploads', express.static(config.uploadDir));
 app.use('/admin', express.static('admin'));
 
 app.get('/health', (_req, res) => {
@@ -41,6 +41,7 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, scheduler: isLeader() ? 'leader' : 'follower', ...(config.isProduction ? {} : { pid: process.pid }) });
 });
 app.use('/legal', legalRouter);
+app.use('/media', mediaRouter);
 app.use('/webhooks/revenuecat', revenueCatRouter);
 app.use('/client-errors', clientErrorsRouter);
 app.use('/auth', authRouter);

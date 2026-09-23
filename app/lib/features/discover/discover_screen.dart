@@ -342,7 +342,7 @@ class _ProfileCardState extends State<_ProfileCard> {
                 // Varsayılan düzen çocuğu ortalar; fotoğraf kartı tamamen doldurmalı
                 layoutBuilder: (current, previous) =>
                     Stack(fit: StackFit.expand, children: [...previous, ?current]),
-                child: NetPhoto(photos.isEmpty ? null : photos[_photo].url, key: ValueKey(_photo)),
+                child: NetPhoto(photos.isEmpty ? null : photos[_photo].fullUrl, key: ValueKey(_photo)),
               ),
               const DecoratedBox(
                 decoration: BoxDecoration(

@@ -54,7 +54,7 @@ class _ProfileBody extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 12),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(Brand.radius),
-            child: AspectRatio(aspectRatio: 4 / 5, child: NetPhoto(ph.url)),
+            child: AspectRatio(aspectRatio: 4 / 5, child: NetPhoto(ph.fullUrl)),
           ),
         );
     Widget gap(Widget w) => Padding(padding: const EdgeInsets.only(bottom: 12), child: w);

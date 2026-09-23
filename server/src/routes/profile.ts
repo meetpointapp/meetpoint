@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import type { Profile } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { Router } from 'express';
@@ -8,6 +6,8 @@ import { z } from 'zod';
 import { uid } from '../auth';
 import { EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, PROMPTS, ZODIAC } from '../catalog';
 import { ageOf } from '../age';
+import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
+import { privateStore } from '../storage';
 import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
@@ -16,21 +16,13 @@ import { closeAllPendingFor } from '../requestService';
 
 export const profileRouter = Router();
 
-fs.mkdirSync(config.uploadDir, { recursive: true });
-
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: config.uploadDir,
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
-      cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`);
-    },
-  }),
-  limits: { fileSize: 8 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|heic)$/.test(file.mimetype)),
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024, files: 1 },
+  // Tür ön süzgeci; asıl kontrol images.ts'te dosyanın içeriğine bakılarak yapılır
+  fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|heic|heif)$/.test(file.mimetype)),
 });
 
-const photoUrl = (p: { path: string }) => `/uploads/${p.path}`;
 
 // viewer verilirse kullanıcıya olan yaklaşık mesafe (km) de eklenir; tam konum asla dönmez
 export function publicProfile(
@@ -63,7 +55,7 @@ export function publicProfile(
     zodiac: p.zodiac,
     smoking: p.smoking,
     drinking: p.drinking,
-    photos: [...user.photos].sort((a, b) => a.position - b.position).map((ph) => ({ id: ph.id, url: photoUrl(ph) })),
+    photos: [...user.photos].sort((a, b) => a.position - b.position).map((ph) => ({ id: ph.id, ...photoUrls(ph.path) })),
   };
 }
 
@@ -152,8 +144,8 @@ profileRouter.delete('/me', async (req, res) => {
   await closeAllPendingFor(userId);
 
   await prisma.user.delete({ where: { id: userId } });
-  for (const p of user.photos) fs.rmSync(path.join(config.uploadDir, p.path), { force: true });
-  for (const v of user.verifications) fs.rmSync(path.join(config.privateUploadDir, v.selfiePath), { force: true });
+  for (const p of user.photos) await removeProfilePhoto(p.path);
+  for (const v of user.verifications) await privateStore.remove(v.selfiePath);
   res.json({ ok: true });
 });
 
@@ -202,15 +194,14 @@ profileRouter.post('/me/photos', upload.single('photo'), async (req, res) => {
   if (!req.file) throw new HttpError(400, 'invalid_image');
   const userId = uid(req);
   const count = await prisma.photo.count({ where: { userId } });
-  if (count >= config.maxPhotos) {
-    fs.rmSync(req.file.path, { force: true });
-    throw new HttpError(400, 'too_many_photos');
-  }
+  if (count >= config.maxPhotos) throw new HttpError(400, 'too_many_photos');
+  // Yeniden kodlanır: konum/cihaz üst verisi silinir, 3 boy üretilir
+  const base = await storeProfilePhoto(req.file.buffer);
   const last = await prisma.photo.findFirst({ where: { userId }, orderBy: { position: 'desc' } });
   const photo = await prisma.photo.create({
-    data: { userId, path: req.file.filename, position: (last?.position ?? -1) + 1 },
+    data: { userId, path: base, position: (last?.position ?? -1) + 1 },
   });
-  res.status(201).json({ id: photo.id, url: photoUrl(photo) });
+  res.status(201).json({ id: photo.id, ...photoUrls(photo.path) });
 });
 
 // Fotoğraf sırası: ilk sıradaki kapak fotoğrafı olur
@@ -228,7 +219,7 @@ profileRouter.delete('/me/photos/:id', async (req, res) => {
   const photo = await prisma.photo.findFirst({ where: { id: req.params.id, userId: uid(req) } });
   if (!photo) throw new HttpError(404, 'not_found');
   await prisma.photo.delete({ where: { id: photo.id } });
-  fs.rmSync(path.join(config.uploadDir, photo.path), { force: true });
+  await removeProfilePhoto(photo.path);
   res.json({ ok: true });
 });
 

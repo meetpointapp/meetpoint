@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "nodenext",
     "strict": true,
+    "noUnusedLocals": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "dist",

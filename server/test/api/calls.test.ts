@@ -1,7 +1,7 @@
 // Faz 6: dakika başı sesli/görüntülü arama, hediyeler, puanlama, geçmiş.
 // Test sunucusu kısa arama zamanlamalarıyla çalışır (test/env.ts).
 import { describe, it } from 'vitest';
-import { B, call, check, listen, registerVerified, upload, waitFor } from '../helpers';
+import { call, check, listen, registerVerified, upload, waitFor } from '../helpers';
 
 describe('Aramalar (Faz 6)', () => {
   it('senaryo', async () => {
