@@ -705,5 +705,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "errRequestInProgress": "İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene."
 }

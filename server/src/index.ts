@@ -6,6 +6,7 @@ import { requireAdmin, requireAuth, requireVerifiedEmail } from './auth';
 import { assertProductionConfig, config } from './config';
 import { HttpError, prisma } from './db';
 import { recordError } from './errors';
+import { idempotency } from './idempotency';
 import { pool } from './pgPool';
 import { closeRealtime, initRealtime } from './realtime';
 import { isLeader, startScheduler, stopScheduler } from './scheduler';
@@ -47,6 +48,7 @@ app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,
   requireVerifiedEmail,
+  idempotency,
   profileRouter,
   verificationRouter,
   discoverRouter,

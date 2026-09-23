@@ -1229,4 +1229,8 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get promoEarningsInfo =>
       'Bonus ve hediye jetonlarıyla yapılan ödemelerden gelir. Uygulamada harcayabilirsin, paraya çevrilemez.';
+
+  @override
+  String get errRequestInProgress =>
+      'İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene.';
 }

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -16,40 +17,77 @@ class ApiException implements Exception {
 }
 
 class Api {
-  // onSessionInvalid: oturum geçersizleşince (şifre değişti, hesap yasaklandı) çağrılır
-  Api(String? token, {this.onSessionInvalid})
+  // onSessionInvalid: oturum geçersizleşince (şifre değişti, hesap yasaklandı) çağrılır.
+  // adapter/retryDelay sadece testler için (sahte ağ, beklemesiz tekrar).
+  Api(String? token, {this.onSessionInvalid, HttpClientAdapter? adapter, this.retryDelay = const Duration(milliseconds: 600)})
       : _hasToken = token != null,
         _dio = Dio(BaseOptions(
           baseUrl: apiBaseUrl,
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 20),
           headers: {if (token != null) 'Authorization': 'Bearer $token'},
-        ));
+        )) {
+    if (adapter != null) _dio.httpClientAdapter = adapter;
+  }
 
   final Dio _dio;
   final bool _hasToken;
   final void Function(String code)? onSessionInvalid;
+  final Duration retryDelay;
 
-  Future<dynamic> _send(Future<Response<dynamic>> Function() call) async {
-    try {
-      return (await call()).data;
-    } on DioException catch (e) {
-      final data = e.response?.data;
-      if (data is Map && data['error'] is String) {
-        final code = data['error'] as String;
-        if (_hasToken && (code == 'banned' || code == 'invalid_token')) onSessionInvalid?.call(code);
-        throw ApiException(code, e.response?.statusCode);
+  static final _random = Random.secure();
+  static String newIdempotencyKey() => List.generate(16, (_) => _random.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+
+  // Yanıt hiç gelmediyse (bağlantı koptu, zaman aşımı) istek sunucuda işlenmiş olabilir de olmayabilir de
+  static bool _noResponse(DioException e) =>
+      e.response == null &&
+      const {
+        DioExceptionType.connectionError,
+        DioExceptionType.connectionTimeout,
+        DioExceptionType.sendTimeout,
+        DioExceptionType.receiveTimeout,
+        DioExceptionType.unknown,
+      }.contains(e.type);
+
+  // Yazma istekleri (oturum açıkken): her eyleme benzersiz Idempotency-Key eklenir. Ağ koparsa aynı
+  // anahtarla en fazla 2 kez tekrar denenir; sunucu isteği zaten işlediyse işlemi tekrarlamaz, ilk
+  // yanıtı döndürür. Böylece zayıf bağlantıda hediye/mesaj/ödeme iki kez işlenmez, kaybolmaz da.
+  // Kimlik uçları (/auth) bu korumayı desteklemez: tekrar denenmez.
+  Future<dynamic> _send(Future<Response<dynamic>> Function(Options options) call, {bool write = false, String? path}) async {
+    final idempotent = write && _hasToken && !(path?.startsWith('/auth/') ?? false);
+    final options = Options(headers: {if (idempotent) 'Idempotency-Key': newIdempotencyKey()});
+    for (var attempt = 0;; attempt++) {
+      try {
+        return (await call(options)).data;
+      } on DioException catch (e) {
+        final data = e.response?.data;
+        final inProgress = data is Map && data['error'] == 'request_in_progress';
+        if (idempotent && attempt < 2 && (_noResponse(e) || inProgress)) {
+          await Future<void>.delayed(retryDelay * (attempt + 1));
+          continue;
+        }
+        if (data is Map && data['error'] is String) {
+          final code = data['error'] as String;
+          if (_hasToken && (code == 'banned' || code == 'invalid_token')) onSessionInvalid?.call(code);
+          throw ApiException(code, e.response?.statusCode);
+        }
+        if (e.response == null) throw const ApiException('network');
+        throw ApiException('http_${e.response!.statusCode}', e.response!.statusCode);
       }
-      if (e.response == null) throw const ApiException('network');
-      throw ApiException('http_${e.response!.statusCode}', e.response!.statusCode);
     }
   }
 
+  // Dosya yüklemelerinde gövde her denemede yeniden oluşturulur (FormData bir kez okunabilir)
+  static Object? _body(Object? body) => body is FormData ? body.clone() : body;
+
   Future<dynamic> _get(String path, [Map<String, dynamic>? query]) =>
-      _send(() => _dio.get(path, queryParameters: query));
-  Future<dynamic> _post(String path, [Object? body]) => _send(() => _dio.post(path, data: body));
-  Future<dynamic> _put(String path, [Object? body]) => _send(() => _dio.put(path, data: body));
-  Future<dynamic> _delete(String path, [Object? body]) => _send(() => _dio.delete(path, data: body));
+      _send((o) => _dio.get(path, queryParameters: query, options: o));
+  Future<dynamic> _post(String path, [Object? body]) =>
+      _send((o) => _dio.post(path, data: _body(body), options: o), write: true, path: path);
+  Future<dynamic> _put(String path, [Object? body]) =>
+      _send((o) => _dio.put(path, data: _body(body), options: o), write: true, path: path);
+  Future<dynamic> _delete(String path, [Object? body]) =>
+      _send((o) => _dio.delete(path, data: _body(body), options: o), write: true, path: path);
 
   // Kimlik
   ({String token, String userId}) _tokenOf(dynamic r) => (token: r['token'] as String, userId: r['userId'] as String);
@@ -233,8 +271,8 @@ class Api {
 
   // Fotoğrafı aç (sadece bir kez); baytlar bellekte gösterilir, cihaza kaydedilmez
   Future<Uint8List> openPhoto(String messageId) async {
-    final data = await _send(() => _dio.get<List<int>>('/messages/$messageId/photo',
-        options: Options(responseType: ResponseType.bytes)));
+    final data = await _send((o) => _dio.get<List<int>>('/messages/$messageId/photo',
+        options: o.copyWith(responseType: ResponseType.bytes)));
     return Uint8List.fromList(data as List<int>);
   }
 

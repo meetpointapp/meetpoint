@@ -22,6 +22,8 @@ const internalCodes = {
   'store_not_configured': 'sadece geliştirme ortamı',
   'verification_not_started': 'selfie ekranı önce doğrulamayı başlatır',
   'view_once_sender': 'gönderen kendi fotoğrafını açma seçeneği görmez',
+  'invalid_idempotency_key': 'anahtarı uygulama doğru biçimde üretir (Api.newIdempotencyKey)',
+  'idempotency_key_reused': 'her yeni eylem yeni anahtar alır; aynı anahtar sadece aynı isteğin tekrarında kullanılır',
 };
 
 Set<String> _serverCodes() {

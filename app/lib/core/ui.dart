@@ -43,6 +43,7 @@ String errorText(AppLocalizations l, Object error) {
     'invalid_iban' => l.errInvalidIban,
     'account_name_required' => l.errAccountNameRequired,
     'payout_pending' => l.errPayoutPending,
+    'request_in_progress' => l.errRequestInProgress,
     'payout_not_pending' => l.errPayoutProcessed,
     'invalid_image' => l.errInvalidImage,
     'already_rated' => l.errAlreadyRated,

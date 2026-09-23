@@ -1239,4 +1239,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get promoEarningsInfo =>
       'Comes from payments made with bonus and gift coins. You can spend it in the app, but it can\'t be cashed out.';
+
+  @override
+  String get errRequestInProgress =>
+      'Your request is still being processed. Try again in a few seconds.';
 }

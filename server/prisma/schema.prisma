@@ -324,6 +324,23 @@ model ErrorLog {
   @@index([resolvedAt, lastSeen])
 }
 
+// Tekrar gönderilen istek koruması: uygulama her yazma isteğine benzersiz bir anahtar ekler
+// (Idempotency-Key). Aynı anahtar tekrar gelirse işlem yeniden yapılmaz, ilk yanıt döner.
+model IdempotencyKey {
+  id             String   @id @default(cuid())
+  userId         String
+  key            String
+  route          String // "POST /calls/:id/gifts" (gerçek yol)
+  requestHash    String // aynı anahtar farklı istekle kullanılamaz
+  status         String   @default("IN_PROGRESS") // IN_PROGRESS | DONE
+  responseStatus Int?
+  responseBody   Json?
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, key])
+  @@index([createdAt])
+}
+
 // Hız sınırlama sayaçları: birden fazla sunucu aynı sayacı paylaşır
 model RateLimitHit {
   key     String   @id // sınırlayıcı:anahtar (IP veya kullanıcı)

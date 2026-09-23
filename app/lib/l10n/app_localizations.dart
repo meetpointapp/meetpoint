@@ -2083,6 +2083,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bonus ve hediye jetonlarıyla yapılan ödemelerden gelir. Uygulamada harcayabilirsin, paraya çevrilemez.'**
   String get promoEarningsInfo;
+
+  /// No description provided for @errRequestInProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene.'**
+  String get errRequestInProgress;
 }
 
 class _AppLocalizationsDelegate
