@@ -156,19 +156,18 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 - [x] **Faz 6 · Sesli ve görüntülü arama:** dakika başı ücret (sesli 15, görüntülü 30 jeton/dk), Agora altyapısı ve test modu, gelen/giden/görüşme ekranları, bulanık başlayan görüntü, arama içi hediyeler, arama sonrası puan ve sorun bildirimi, arama geçmişi, yönetimde arama istatistikleri
 - [x] **Faz 7 · Para çekme ve yayın hazırlığı:** manuel onaylı para çekme (IBAN/PayPal, min. $20, mavi tik şartı), yönetimde Ödemeler ve Hatalar sekmeleri, uygulama ve sunucu hata takibi, yayında eksik ayarla açılmayan sunucu, `.env.example`, yayın rehberi, mağaza metinleri (TR/EN), yasal taslak güncellemeleri, GitHub özel depo
 
-Yayın öncesi seri (ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)):
+Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
-- [ ] **Faz 8 · Hukuki temel ve iş modeli doğrulaması:** jeton→nakit (6493), TCK 226/227 riski, 5651/6563/BTK/VERBİS, vergi, şirket ve marka
-- [ ] **Faz 9 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim/Flutter/uçtan uca testler, GitHub Actions, yük testi
-- [ ] **Faz 10 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, idempotency, Redis, nesne depolama
-- [ ] **Faz 11 · Güvenlik sertleştirme:** EXIF temizleme, oturum yönetimi, yönetimde 2FA + roller + işlem kaydı, şifreleme, pentest
-- [ ] **Faz 12 · KVKK uyumu:** veri envanteri, ayrı açık rızalar, yeniden onay, md. 11 hakları, otomatik imha, yurt dışı aktarım, ihlal planı
-- [ ] **Faz 13 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, otomatik görsel moderasyon, arama ve sohbet güvenliği, kaldırma süreçleri
-- [ ] **Faz 14 · Para akışı güvenliği, KYC ve muhasebe:** kazanç olgunlaşma süresi, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi, finans raporları
-- [ ] **Faz 15 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye/ETBİS, Apple/Google politika kontrolü
-- [ ] **Faz 16 · Gerçek zamanlı iletişimde üretim kalitesi:** CallKit/tam ekran arama, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [ ] **Faz 17 · Üretim ortamı, izleme ve kapalı beta:** staging/prod, otomatik dağıtım, alarmlar, yedek tatbikatı, 50–100 kişilik beta
-- [ ] **Faz 18 · Yayın**
+- [ ] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
+- [ ] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
+- [ ] **Faz 10 · Güvenlik sertleştirme:** EXIF temizleme, oturum yönetimi, yönetimde 2FA + roller + işlem kaydı, hassas veri şifreleme, ASVS denetimi
+- [ ] **Faz 11 · KVKK uyumu:** veri envanteri, ayrı açık rızalar, yeniden onay, md. 11 hakları, otomatik imha, ihlal altyapısı
+- [ ] **Faz 12 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, görsel moderasyon katmanı, arama ve sohbet güvenliği, kaldırma süreçleri
+- [ ] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
+- [ ] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
+- [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
+- [ ] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
+- [ ] **Faz 17 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar
 
