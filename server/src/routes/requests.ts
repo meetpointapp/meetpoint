@@ -89,7 +89,7 @@ requestsRouter.post('/requests/:id/accept', async (req, res) => {
     // Kesinti yok: bloke edilen jetonun tamamı alıcıya geçer (promosyon jetonu kısmı bozdurulamaz kazanç olur)
     const hold = await tx.walletEntry.findFirst({ where: { requestId: id, type: 'HOLD', userId: r.fromId } });
     const held = hold ? heldBuckets(hold) : { paid: r.price, promo: 0, earned: 0, earnedPromo: 0 };
-    await credit(tx, me, earningsFrom(held), 'EARN', { requestId: id });
+    await credit(tx, me, earningsFrom(held), 'EARN', { requestId: id, counterpartyId: r.fromId });
 
     let conversationId: string | null = null;
     if (r.kind === 'MESSAGE') {

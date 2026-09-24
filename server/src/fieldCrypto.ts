@@ -33,6 +33,24 @@ export function encryptField(plain: string) {
 
 export const isEncrypted = (value: string) => value.startsWith(PREFIX);
 
+// İkili veri (ör. kimlik belgesi görüntüsü): iv(12) | etiket(16) | veri
+export function encryptBuffer(plain: Buffer) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', key(), iv);
+  const data = Buffer.concat([cipher.update(plain), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), data]);
+}
+
+export function decryptBuffer(blob: Buffer) {
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key(), blob.subarray(0, 12));
+  decipher.setAuthTag(blob.subarray(12, 28));
+  return Buffer.concat([decipher.update(blob.subarray(28)), decipher.final()]);
+}
+
+// Anahtarlı özet (HMAC): aranabilir ama tersine çevrilemez (ör. TC kimlik no tekilliği). Anahtarsız
+// SHA-256 olsaydı 11 haneli TC'ler kaba kuvvetle çözülebilirdi.
+export const keyedHash = (value: string) => crypto.createHmac('sha256', key()).update(`hash:${value}`).digest('hex');
+
 // Şifresiz eski değerler (şifreleme öncesi kayıtlar) olduğu gibi döner
 export function decryptField(value: string) {
   if (!value || !isEncrypted(value)) return value;

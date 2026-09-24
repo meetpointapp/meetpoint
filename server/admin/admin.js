@@ -36,6 +36,8 @@ const ERRORS = {
   already_resolved: 'Bu kayıt zaten kapatılmış.',
   already_answered: 'Bu kayıt zaten yanıtlanmış.',
   validation: 'Eksik veya hatalı bilgi.',
+  rate_required: 'USD/TL kurunu gir (veya Finans → Ekonomi\'de varsayılan kur tanımla).',
+  tc_in_use: 'Bu TC ile başka bir hesap doğrulanmış.',
   banned: 'Bu hesap yasaklı.',
 };
 const errText = (err) => ERRORS[err.message] || `Hata: ${err.message}`;
@@ -240,6 +242,7 @@ const loaders = {
   overview: loadStats,
   reports: () => loadReports(),
   legal: loadLegal,
+  finance: () => loadFinance(),
   verifications: loadVerifications,
   users: loadUsers,
   purchases: loadPurchases,
@@ -718,7 +721,11 @@ async function loadPayouts() {
         </div>
         <div><div class="item-title">${esc(u?.displayName || '')} ${pills}</div><div class="muted">${esc(p.email)}</div></div>
         <div class="detail"><b>${p.method === 'iban' ? 'IBAN' : 'PayPal'}:</b> <code>${esc(p.accountValue)}</code>
-          ${p.accountName ? `<br><b>Hesap sahibi:</b> ${esc(p.accountName)}` : ''}</div>
+          ${p.accountName ? `<br><b>Hesap sahibi:</b> ${esc(p.accountName)}` : ''}
+          ${p.withholdingUsd ? `<br><b>Stopaj:</b> $${esc(p.withholdingUsd.toFixed(2))} · <b>Net ödenecek:</b> $${esc(p.netUsd.toFixed(2))}` : ''}
+          ${p.exportedAt ? `<br><span class="pill blue">EFT dosyasında · ${fmtDate(p.exportedAt)}</span>` : ''}</div>
+        ${(p.riskFlags || []).length ? `<div>${p.riskFlags.map((f) => `<span class="pill red">${esc(RISK[f] || f)}</span>`).join(' ')}</div>` : ''}
+        ${p.status === 'PAID' ? `<div class="actions"><button class="btn ghost" data-receipt="${esc(p.id)}">Ödeme belgesi</button></div>` : ''}
         ${p.reference ? `<div class="muted">İşlem no: ${esc(p.reference)} · ${fmtDate(p.processedAt)}</div>` : ''}
         ${p.adminNote ? `<div class="muted">Red sebebi: ${esc(p.adminNote)}</div>` : ''}
         ${
@@ -754,6 +761,211 @@ $('#payouts').addEventListener('click', async (e) => {
   } catch (err) {
     toast(errText(err));
   }
+});
+
+// ---------- EFT ve ödeme belgesi ----------
+const RISK = {
+  monthly_cap: 'Aylık tavan aşıldı',
+  new_account: 'Yeni hesap (<30 gün)',
+  same_device: 'Ödeyenle aynı cihaz',
+  same_ip: 'Ödeyenle aynı IP',
+  single_payer: 'Kazancın tamamı tek kişiden',
+};
+let lastEftIds = [];
+
+$('#eft-export').addEventListener('click', async () => {
+  const rate = $('#eft-rate').value;
+  const res = await send('GET', `/admin/api/finance/eft${rate ? `?rate=${encodeURIComponent(rate)}` : ''}`);
+  if (!res.ok) return toast(errText(new Error((await res.json().catch(() => ({}))).error || `http_${res.status}`)));
+  const text = await res.text();
+  lastEftIds = text.split(/\r?\n/).slice(1).map((l) => l.split(';').at(-1)).filter(Boolean);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+  a.download = `eft-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`${lastEftIds.length} ödeme dosyaya eklendi`);
+  loadPayouts();
+});
+
+$('#eft-paid').addEventListener('click', async () => {
+  if (!lastEftIds.length) return toast('Önce EFT dosyasını indir');
+  const reference = prompt(`${lastEftIds.length} ödeme için banka dekont / toplu işlem numarası:`);
+  if (!reference) return;
+  try {
+    const r = await api('POST', '/admin/api/finance/payouts/bulk-paid', { ids: lastEftIds, reference });
+    toast(`${r.done} ödeme işaretlendi${r.failed.length ? `, ${r.failed.length} başarısız` : ''}`);
+    lastEftIds = [];
+    loadPayouts();
+    loadStats();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#payouts').addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-receipt]');
+  if (!t) return;
+  const res = await send('GET', `/admin/api/finance/payouts/${t.dataset.receipt}/receipt`);
+  if (!res.ok) return toast('Belge açılamadı');
+  const w = window.open(URL.createObjectURL(new Blob([await res.text()], { type: 'text/html' })), '_blank');
+  if (!w) toast('Açılır pencere engellendi');
+});
+
+// ---------- Finans ----------
+let finView = 'kyc';
+document.querySelectorAll('#tab-finance .seg-btn').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tab-finance .seg-btn').forEach((b) => b.classList.toggle('active', b === btn));
+    finView = btn.dataset.fin;
+    loadFinance();
+  }),
+);
+
+function loadFinance() {
+  ['kyc', 'economy', 'report'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
+  return { kyc: loadKyc, economy: loadEconomy, report: loadReport }[finView]();
+}
+
+async function loadKyc() {
+  const list = await api('GET', '/admin/api/finance/kyc');
+  $('#count-kyc').textContent = list.length || '';
+  $('#kyc').innerHTML = list.length
+    ? list
+        .map(
+          (k) => `<div class="card item"><div class="item-head">
+        <div><span class="item-title">${esc(k.fullName)}</span> <span class="muted">· TC ${esc(k.tcMasked)} · ${esc(k.email)}</span>
+          ${k.blueCheck ? '<span class="pill blue">Mavi tik</span>' : '<span class="pill red">Mavi tik yok</span>'}</div>
+        <div class="muted">${fmtDate(k.createdAt)}</div></div>
+        ${k.hasDocument ? `<div><button class="btn soft" data-doc="${esc(k.id)}">Belgeyi göster</button><div data-doc-box="${esc(k.id)}"></div></div>` : ''}
+        <div class="actions"><button class="btn green" data-kyc="${esc(k.id)}" data-approve="1">Onayla</button>
+          <button class="btn red" data-kyc="${esc(k.id)}" data-approve="0">Reddet</button></div></div>`,
+        )
+        .join('')
+    : '<div class="card empty">Bekleyen kimlik doğrulama yok 🎉</div>';
+}
+
+$('#kyc').addEventListener('click', async (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.doc) {
+    const res = await send('GET', `/admin/api/finance/kyc/${t.dataset.doc}/document`);
+    if (!res.ok) return toast('Belge açılamadı');
+    document.querySelector(`[data-doc-box="${t.dataset.doc}"]`).innerHTML = `<img class="doc" src="${URL.createObjectURL(await res.blob())}" alt="Kimlik belgesi">`;
+    return;
+  }
+  if (!t.dataset.kyc) return;
+  const approve = t.dataset.approve === '1';
+  const note = approve ? '' : prompt('Red sebebi (kullanıcıya gider):', 'Belge okunmuyor / bilgiler eşleşmiyor');
+  if (!approve && !note) return;
+  try {
+    await api('POST', `/admin/api/finance/kyc/${t.dataset.kyc}/decide`, { approve, note });
+    toast(approve ? 'Kimlik onaylandı' : 'Başvuru reddedildi');
+    loadKyc();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+const SETTINGS = [
+  ['storeFeeRate', 'Mağaza payı (0.15 = %15)'],
+  ['vatRate', 'KDV (0.20 = %20)'],
+  ['cashoutUsdPerCoin', 'Bozdurma kuru (USD / jeton)'],
+  ['cashoutMinCoins', 'En az çekim (jeton)'],
+  ['withholdingRate', 'Stopaj (0 = yok)'],
+  ['maturityDays', 'Kazanç olgunlaşma (gün)'],
+  ['monthlyPayoutCapUsd', 'Aylık çekim tavanı (USD)'],
+  ['usdTryRate', 'Varsayılan USD/TL kuru (EFT)'],
+];
+
+function renderEconomy({ settings, packs }) {
+  const readOnly = role !== 'super';
+  $('#settings-fields').innerHTML = SETTINGS.map(
+    ([k, label]) => `<label>${esc(label)}<input type="number" step="any" min="0" data-setting="${k}" value="${esc(settings[k])}" ${readOnly ? 'disabled' : ''}></label>`,
+  ).join('');
+  $('#settings-save').classList.toggle('hidden', readOnly);
+  const pct = (x) => `%${x.marginPct}`;
+  $('#packs').innerHTML = `<div class="card item"><table class="data"><thead><tr><th>Paket</th><th>Jeton</th><th>USD</th><th>TL (KDV dahil)</th><th>Net / jeton</th><th>Kâr (şimdi)</th><th>Kâr (%30 payda)</th><th></th></tr></thead><tbody>${packs
+    .map(
+      (p) => `<tr class="${p.now.profitable ? '' : 'loss'}"><td>${esc(p.id)} ${p.popular ? '⭐' : ''} ${p.active ? '' : '<span class="pill">pasif</span>'}</td>
+      <td>${esc(p.coins)}</td><td>$${esc(p.usd)}</td><td>${p.tryPrice ? `₺${esc(p.tryPrice)}` : '—'}</td><td>$${esc(p.now.netPerCoin)}</td>
+      <td>${p.now.profitable ? '' : '⚠️ '}${pct(p.now)}</td><td class="${p.at30.profitable ? '' : 'loss'}">${p.at30.profitable ? '' : '⚠️ '}${pct(p.at30)}</td>
+      <td>${readOnly ? '' : `<button class="btn ghost" data-pack="${esc(p.id)}">Düzenle</button>`}</td></tr>`,
+    )
+    .join('')}</tbody></table>${readOnly ? '' : '<div class="actions"><button class="btn soft" data-pack="">Paket ekle</button></div>'}</div>`;
+  $('#packs').dataset.packs = JSON.stringify(packs);
+}
+
+async function loadEconomy() {
+  renderEconomy(await api('GET', '/admin/api/finance/settings'));
+}
+
+$('#settings-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const body = Object.fromEntries([...document.querySelectorAll('[data-setting]')].map((i) => [i.dataset.setting, Number(i.value)]));
+  try {
+    renderEconomy(await api('PUT', '/admin/api/finance/settings', body));
+    toast('Ayarlar kaydedildi');
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#packs').addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-pack]');
+  if (!t) return;
+  const packs = JSON.parse($('#packs').dataset.packs || '[]');
+  const cur = packs.find((p) => p.id === t.dataset.pack) || { coins: 0, usd: 0, tryPrice: 0, popular: false, active: true, sortOrder: packs.length + 1 };
+  const id = t.dataset.pack || prompt('Mağazadaki ürün kimliği (ör. coins_12000):');
+  if (!id) return;
+  const coins = Number(prompt('Jeton:', cur.coins));
+  const usd = Number(prompt('USD referans fiyat:', cur.usd));
+  const tryPrice = Number(prompt('Mağazadaki TL fiyatı (KDV dahil, 0 = bilinmiyor):', cur.tryPrice));
+  const active = confirm('Paket satışta olsun mu? (İptal = pasif)');
+  const popular = confirm('"En popüler" rozeti bu pakette mi?');
+  if (!coins || !usd) return;
+  try {
+    const r = await api('PUT', `/admin/api/finance/packs/${encodeURIComponent(id)}`, { coins, usd, tryPrice, active, popular, sortOrder: cur.sortOrder });
+    renderEconomy({ settings: (await api('GET', '/admin/api/finance/settings')).settings, packs: r.packs });
+    toast('Paket kaydedildi');
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+async function loadReport() {
+  if (!$('#report-month').value) $('#report-month').value = new Date().toISOString().slice(0, 7);
+  const r = await api('GET', `/admin/api/finance/report?month=${$('#report-month').value}`);
+  const usd = (n) => `$${Number(n).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`;
+  const cards = [
+    ['Satış', r.sales.count],
+    ['Brüt satış', usd(r.sales.grossUsd)],
+    ['KDV (tahmini)', usd(r.sales.vatUsd)],
+    ['Mağaza payı (tahmini)', usd(r.sales.storeFeeUsd)],
+    ['Net gelir (tahmini)', usd(r.sales.netUsd)],
+    ['İade', `${r.refunds.count} · ${usd(r.refunds.grossUsd)}`, r.refunds.count > 0],
+    ['Ödenen (net)', usd(r.payouts.netUsd)],
+    ['Stopaj', usd(r.payouts.withholdingUsd)],
+    ['Bekleyen ödeme', `${r.payouts.pendingCount} · ${usd(r.payouts.pendingUsd)}`],
+    ['Bozdurulabilir jeton yükümlülüğü', usd(r.liability.maxCashUsd)],
+    ['Dolaşımdaki satın alınmış jeton', r.liability.paidCoins.toLocaleString('tr-TR')],
+    ['Mutabakat', r.reconciliation.matches && !r.reconciliation.inconsistentWallets ? '✓ tutarlı' : '⚠️ FARK VAR', !r.reconciliation.matches || r.reconciliation.inconsistentWallets > 0],
+  ];
+  $('#report').innerHTML = `<div class="stats">${cards
+    .map(([l, v, a]) => `<div class="card stat ${a ? 'alert' : ''}"><div class="value">${esc(v)}</div><div class="label">${esc(l)}</div></div>`)
+    .join('')}</div><p class="muted small">Satış tutarları mağazanın bildirdiği USD karşılığıdır; KDV ve mağaza payı ayarlardaki oranlarla tahmin edilir, kesin tutar mağaza ödeme raporundan alınır.</p>`;
+}
+
+$('#report-load').addEventListener('click', () => loadReport().catch((e) => toast(errText(e))));
+$('#report-csv').addEventListener('click', async () => {
+  const month = $('#report-month').value || new Date().toISOString().slice(0, 7);
+  const res = await send('GET', `/admin/api/finance/report?month=${month}&format=csv`);
+  if (!res.ok) return toast('Rapor indirilemedi');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(await res.blob());
+  a.download = `finans-${month}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 });
 
 // ---------- Hatalar ----------
@@ -1104,6 +1316,15 @@ const ACTIONS = {
   'legal_request.rejected': 'Resmi talebi reddetti',
   'traffic.export': 'Trafik kaydı dışa aktardı',
   'traffic.verify': 'Trafik zincirini doğruladı',
+  'finance.settings': 'Ekonomi ayarlarını değiştirdi',
+  'finance.pack': 'Paketi değiştirdi',
+  'finance.report_export': 'Finans raporu indirdi',
+  'kyc.view_document': 'Kimlik belgesini görüntüledi',
+  'kyc.approve': 'Kimliği onayladı',
+  'kyc.reject': 'Kimliği reddetti',
+  'payout.eft_export': 'EFT dosyası indirdi',
+  'payout.bulk_paid': 'Toplu ödendi işaretledi',
+  'payout.receipt': 'Ödeme belgesi açtı',
 };
 let auditCursor = null;
 let auditTimer;

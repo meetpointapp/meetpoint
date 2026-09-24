@@ -1,7 +1,7 @@
 // Faz 7: para çekme talebi (IBAN/PayPal), manuel onay, red/iptal iadesi, yönetim paneli
 // Test sunucusu kısa arama zamanlamalarıyla çalışır (test/env.ts).
 import { describe, it } from 'vitest';
-import { call, check, registerVerified, upload, makeAdmin, TEST_PASSWORD, testDb } from '../helpers';
+import { ageEarnings, call, check, registerVerified, upload, makeAdmin, TEST_PASSWORD, testDb, verifyIdentity } from '../helpers';
 
 describe('Para çekme (Faz 7)', () => {
   it('senaryo', async () => {
@@ -34,9 +34,13 @@ describe('Para çekme (Faz 7)', () => {
     const cashable0 = spent - PROMO;
     let w = await wallet(earner);
     check('earnings from bonus coins are not cashable', w.promoEarnings === PROMO, `promoEarnings=${w.promoEarnings}`);
-    check('earnings from purchased coins are cashable', w.cashable === cashable0 && cashable0 >= 2200, `cashable=${w.cashable} expected=${cashable0}`);
+    // Faz 13: yeni kazanç 14 gün olgunlaşır (iade süresi)
+    check('fresh earnings are maturing, not cashable yet', w.cashable === 0 && w.maturingEarnings === cashable0 && !!w.nextMatureAt, `cashable=${w.cashable} maturing=${w.maturingEarnings}`);
+    await ageEarnings(earner.id);
+    w = await wallet(earner);
+    check('earnings from purchased coins are cashable after maturity', w.cashable === cashable0 && cashable0 >= 2200 && w.maturingEarnings === 0, `cashable=${w.cashable} expected=${cashable0}`);
     check('balance includes both', w.balance === spent + 50, `bal=${w.balance}`);
-    check('wallet exposes cashout rules', w.cashout?.minCoins === 2000 && w.cashout?.usdPerCoin === 0.01 && w.cashout?.pending === null);
+    check('wallet exposes cashout rules', w.cashout?.minCoins === 2000 && w.cashout?.usdPerCoin === 0.01 && w.cashout?.pending === null && w.cashout?.maturityDays === 14 && w.cashout?.kycStatus === 'none');
 
     const base = { coins: 2000, method: 'iban', accountName: 'Ece Yılmaz', accountValue: TR_IBAN };
 
@@ -49,6 +53,13 @@ describe('Para çekme (Faz 7)', () => {
     const q = await call(admin, 'GET', '/admin/api/verifications');
     await call(admin, 'POST', `/admin/api/verifications/${q._arr.find((v) => v.user?.id === earner.id || v.userId === earner.id)?.id}/approve`, {});
     check('earner verified', (await call(earner.t, 'GET', '/me')).verificationStatus === 'approved');
+
+    // Faz 13: kimlik doğrulaması şart; IBAN sahibi kimlikteki kişi olmalı
+    const noKyc = await call(earner.t, 'POST', '/payouts', base);
+    check('identity verification required', noKyc.http === 403 && noKyc.error === 'kyc_required');
+    await verifyIdentity(earner, 'ECE YILMAZ');
+    const wrongName = await call(earner.t, 'POST', '/payouts', { ...base, accountName: 'Ahmet Kaya' });
+    check('IBAN must belong to verified person', wrongName.http === 400 && wrongName.error === 'account_name_mismatch');
 
     // Doğrulamalar
     const below = await call(earner.t, 'POST', '/payouts', { ...base, coins: 1999 });

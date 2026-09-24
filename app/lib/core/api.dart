@@ -331,6 +331,21 @@ class Api {
         'accountValue': accountValue,
       }));
 
+  // Kimlik doğrulama (para çekme için): ad-soyad, TC, belge fotoğrafı
+  Future<Map<String, dynamic>> kyc() async => Map<String, dynamic>.from(await _get('/me/kyc'));
+
+  Future<void> submitKyc({required String fullName, required String tcNo, required XFile document}) async {
+    final name = document.name.isEmpty ? 'kimlik.jpg' : document.name;
+    final subtype = name.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+    await _post('/me/kyc', FormData.fromMap({
+      'fullName': fullName,
+      'tcNo': tcNo,
+      'document': MultipartFile.fromBytes(await document.readAsBytes(), filename: name, contentType: DioMediaType('image', subtype)),
+    }));
+  }
+
+  Future<EarningsStatement> earnings(int year) async => EarningsStatement.fromJson(await _get('/me/earnings', {'year': year}));
+
   Future<void> cancelPayout(String id) => _post('/payouts/$id/cancel');
 
   // Aramalar

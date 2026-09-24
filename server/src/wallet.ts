@@ -1,5 +1,6 @@
 import type { Prisma, WalletEntry } from '@prisma/client';
 import { HttpError, prisma } from './db';
+import { getFinance } from './finance/settings';
 
 // Cüzdan: her kullanıcının bakiyesi 4 kovada tutulur. Her para hareketi cüzdan satırını kilitler
 // (SELECT … FOR UPDATE): aynı kullanıcıya eşzamanlı gelen harcamalar sırayla işlenir, çift harcama
@@ -13,6 +14,9 @@ import { HttpError, prisma } from './db';
 // Harcama sırası: promo → earnedPromo → paid → earned (bozdurulabilir kazanç en son harcanır).
 // Transferde (arama, hediye, istek) karşı tarafa: gönderenin paid+earned kısmı "earned",
 // promo+earnedPromo kısmı "earnedPromo" olarak geçer. Böylece bonus jetonlar asla nakde dönüşmez.
+//
+// Olgunlaşma (Faz 13): başkasından gelen kazanç, iade süresi boyunca (varsayılan 14 gün) bozdurulamaz.
+// Bu sürede ödeyen taraf mağazadan iade alırsa, o satın almayla gelen kazanç alıcıdan geri alınır.
 
 type Tx = Prisma.TransactionClient;
 
@@ -25,7 +29,7 @@ export const total = (b: Buckets) => b.paid + b.promo + b.earned + b.earnedPromo
 // Bozdurulabilir: kazanç, ama bakiye borçluysa (ör. iade sonrası eksi) en fazla toplam bakiye kadar
 export const cashableOf = (b: Buckets) => Math.max(0, Math.min(b.earned, total(b)));
 
-type Meta = { requestId?: string; note?: string };
+type Meta = { requestId?: string; note?: string; counterpartyId?: string };
 
 // Cüzdan satırını kilitle (yoksa oluştur). Sadece bir işlem (transaction) içinde çağrılır.
 export async function lockWallet(tx: Tx, userId: string): Promise<Buckets> {
@@ -46,7 +50,7 @@ async function apply(tx: Tx, userId: string, delta: Buckets, type: string, meta:
     },
   });
   return tx.walletEntry.create({
-    data: { userId, amount: total(delta), type, ...delta, requestId: meta.requestId, note: meta.note ?? '' },
+    data: { userId, amount: total(delta), type, ...delta, requestId: meta.requestId, note: meta.note ?? '', counterpartyId: meta.counterpartyId },
   });
 }
 
@@ -81,8 +85,8 @@ export async function transfer(
   meta: Meta = {},
 ) {
   for (const id of [fromId, toId].sort()) await lockWallet(tx, id);
-  const { taken } = await debit(tx, fromId, amount, types.debit, meta);
-  await credit(tx, toId, earningsFrom(taken), types.credit, meta);
+  const { taken } = await debit(tx, fromId, amount, types.debit, { ...meta, counterpartyId: toId });
+  await credit(tx, toId, earningsFrom(taken), types.credit, { ...meta, counterpartyId: fromId });
   return taken;
 }
 
@@ -92,11 +96,57 @@ export const earningsFrom = (taken: Buckets): Partial<Buckets> => ({
   earnedPromo: taken.promo + taken.earnedPromo,
 });
 
-// Bozdurma: sadece "earned" kovasından
+// Olgunlaşmamış kazanç: son N günde başkasından gelen (iadeyle geri alınmamış) bozdurulabilir kazanç
+export async function immatureEarned(tx: Tx, userId: string, days: number) {
+  const since = new Date(Date.now() - days * 86_400_000);
+  const rows = await tx.$queryRaw<{ sum: bigint | null; oldest: Date | null }[]>`
+    SELECT SUM("earned" - "reclaimedCoins") AS "sum", MIN("createdAt") AS "oldest" FROM "WalletEntry"
+    WHERE "userId" = ${userId} AND "counterpartyId" IS NOT NULL AND "earned" > 0 AND "createdAt" > ${since}`;
+  const oldest = rows[0]?.oldest ?? null;
+  return { coins: Number(rows[0]?.sum ?? 0), nextMatureAt: oldest ? new Date(oldest.getTime() + days * 86_400_000) : null };
+}
+
+// Şu an bozdurulabilir: kazanç − olgunlaşmamış kısım (bakiye borçluysa en fazla toplam bakiye kadar)
+export async function cashableNow(tx: Tx, userId: string, b?: Buckets) {
+  const buckets = b ?? (await getBuckets(userId, tx));
+  const { maturityDays } = await getFinance();
+  const pending = await immatureEarned(tx, userId, maturityDays);
+  const all = cashableOf(buckets);
+  return { cashable: Math.max(0, all - pending.coins), pending: Math.min(all, pending.coins), nextMatureAt: pending.nextMatureAt };
+}
+
+// Bozdurma: sadece "earned" kovasının olgunlaşmış kısmından
 export async function debitCashable(tx: Tx, userId: string, amount: number, type: string, meta: Meta = {}) {
   const b = await lockWallet(tx, userId);
-  if (cashableOf(b) < amount) throw new HttpError(402, 'insufficient_cashable');
+  if ((await cashableNow(tx, userId, b)).cashable < amount) throw new HttpError(402, 'insufficient_cashable');
   return apply(tx, userId, { ...ZERO, earned: -amount }, type, meta);
+}
+
+// Mağaza iadesi: alıcının bu satın almadan sonra başkalarına geçirdiği ve henüz olgunlaşmamış kazançlar
+// en yeniden başlayarak geri alınır (en fazla iade edilen jeton kadar). Olgunlaşıp bozdurulmuş kazanç
+// geri alınamaz; olgunlaşma süresi bu riski sınırlamak için var. Geri alınan miktarı döndürür.
+export async function reclaimEarnings(tx: Tx, buyerId: string, coins: number, since: Date, note: string) {
+  const { maturityDays } = await getFinance();
+  const after = new Date(Math.max(since.getTime(), Date.now() - maturityDays * 86_400_000));
+  const entries = await tx.walletEntry.findMany({
+    where: { counterpartyId: buyerId, earned: { gt: 0 }, createdAt: { gte: after } },
+    orderBy: { createdAt: 'desc' },
+  });
+  // Kilitlenme olmasın: tüm cüzdanlar her zaman aynı sırayla kilitlenir
+  for (const id of [...new Set([buyerId, ...entries.map((e) => e.userId)])].sort()) await lockWallet(tx, id);
+  let left = coins;
+  const touched = new Set<string>();
+  for (const e of entries) {
+    if (left <= 0) break;
+    const w = await getBuckets(e.userId, tx);
+    const take = Math.min(left, e.earned - e.reclaimedCoins, Math.max(0, w.earned));
+    if (take <= 0) continue;
+    await apply(tx, e.userId, { ...ZERO, earned: -take }, 'REFUND_CLAWBACK', { note, counterpartyId: buyerId });
+    await tx.walletEntry.update({ where: { id: e.id }, data: { reclaimedCoins: { increment: take } } });
+    touched.add(e.userId);
+    left -= take;
+  }
+  return { reclaimed: coins - left, users: [...touched] };
 }
 
 // Bloke edilen (HOLD) kaydın kova dağılımı. Kova sütunlarından önceki eski kayıtlar tamamen "paid" sayılır.
@@ -115,7 +165,7 @@ export async function getBuckets(userId: string, tx: Tx = prisma): Promise<Bucke
 }
 
 export const getBalance = async (userId: string, tx: Tx = prisma) => total(await getBuckets(userId, tx));
-export const getCashable = async (userId: string, tx: Tx = prisma) => cashableOf(await getBuckets(userId, tx));
+export const getCashable = async (userId: string, tx: Tx = prisma) => (await cashableNow(tx, userId)).cashable;
 
 // Tutarlılık denetimi: her cüzdanın kovaları, hareketlerin kova toplamına eşit olmalı
 export async function verifyLedger() {

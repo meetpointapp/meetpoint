@@ -50,6 +50,7 @@ async function collect(userId: string) {
       verifications: { select: { pose: true, status: true, createdAt: true, reviewedAt: true, selfiePath: true } },
       dsrRequests: true,
       sanctions: { orderBy: { createdAt: 'asc' }, include: { appeal: true } },
+      kycSubmissions: { orderBy: { createdAt: 'asc' } },
     },
   });
   const [wallet, conversations, messages, calls, gifts, blocks, reports, devices] = await Promise.all([
@@ -144,6 +145,15 @@ async function collect(userId: string) {
       endsAt: s.endsAt,
       revoked: s.revokedAt !== null,
       appeal: s.appeal && { message: s.appeal.message, status: s.appeal.status, answer: s.appeal.answer, createdAt: s.appeal.createdAt },
+    })),
+    // Kimlik doğrulama: ad-soyad ve TC'nin son 4 hanesi (belge görüntüsü güvenlik gereği dosyaya eklenmez)
+    identityVerification: u.kycSubmissions.map((k) => ({
+      fullName: decryptField(k.fullName),
+      tcNo: `•••••••${decryptField(k.tcNo).slice(-4)}`,
+      status: k.status,
+      note: k.note,
+      createdAt: k.createdAt,
+      reviewedAt: k.reviewedAt,
     })),
     kvkkRequests: u.dsrRequests.map(({ kind, message, status, answer, createdAt, answeredAt }) => ({ kind, message, status, answer, createdAt, answeredAt })),
   };

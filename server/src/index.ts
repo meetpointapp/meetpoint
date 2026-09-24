@@ -14,6 +14,7 @@ import { closeRealtime, initRealtime } from './realtime';
 import { isLeader, startScheduler, stopScheduler } from './scheduler';
 import { adminRouter } from './routes/admin';
 import { adminAuthRouter } from './routes/adminAuth';
+import { adminFinanceRouter } from './routes/adminFinance';
 import { adminModerationRouter } from './routes/adminModeration';
 import { adminPrivacyRouter } from './routes/adminPrivacy';
 import { authRouter } from './routes/auth';
@@ -84,6 +85,7 @@ app.use('/auth', authRouter);
 app.use('/admin/api/mfa', requireAuth, adminAuthRouter);
 app.use('/admin/api/privacy', requireAuth, requireAdmin, adminPrivacyRouter);
 app.use('/admin/api/moderation', requireAuth, requireAdmin, adminModerationRouter);
+app.use('/admin/api/finance', requireAuth, requireAdmin, adminFinanceRouter);
 app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,

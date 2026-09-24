@@ -1578,4 +1578,94 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reasonOther => 'Diğer';
+
+  @override
+  String maturingEarnings(int coins, String date) {
+    return '$coins jeton olgunlaşıyor · ilki $date tarihinde bozdurulabilir';
+  }
+
+  @override
+  String maturingInfo(int days) {
+    return 'Yeni kazançlar iade süresi nedeniyle $days gün sonra bozdurulabilir.';
+  }
+
+  @override
+  String get accountHolderMustMatch => 'Kimliğinde yazan adla aynı olmalı';
+
+  @override
+  String cashoutNetAfterTax(String net, String rate) {
+    return 'Stopaj (%$rate) sonrası net: $net';
+  }
+
+  @override
+  String get earningsStatement => 'Yıllık kazanç dökümü';
+
+  @override
+  String earningsStatementBody(
+    int year,
+    int coins,
+    int count,
+    String gross,
+    String tax,
+    String net,
+  ) {
+    return '$year yılı\nKazanılan jeton: $coins\nÖdeme sayısı: $count\nBrüt: $gross\nStopaj: $tax\nNet ödenen: $net';
+  }
+
+  @override
+  String get kycTitle => 'Kimlik doğrulama';
+
+  @override
+  String get kycInfo =>
+      'Kazancını doğru kişiye ödeyebilmemiz için bir kez kimliğini doğruluyoruz. Bilgilerin şifreli saklanır ve sadece yetkili finans ekibimiz görür.';
+
+  @override
+  String get kycFullName => 'Ad soyad (kimlikteki gibi)';
+
+  @override
+  String get kycTcNo => 'TC kimlik numarası';
+
+  @override
+  String get kycDocument => 'Kimlik kartının ön yüzü';
+
+  @override
+  String get kycPickDocument => 'Fotoğraf seç';
+
+  @override
+  String get kycSubmit => 'Doğrulamaya gönder';
+
+  @override
+  String get kycSent => 'Kimlik bilgilerin incelemeye gönderildi.';
+
+  @override
+  String get kycPending =>
+      'Kimlik bilgilerin inceleniyor. Sonuç e-postayla gelecek.';
+
+  @override
+  String get kycRejected =>
+      'Kimlik doğrulaman onaylanmadı. Bilgilerini kontrol edip tekrar gönderebilirsin.';
+
+  @override
+  String get errKycRequired =>
+      'Para çekmek için önce kimliğini doğrulamalısın.';
+
+  @override
+  String get errKycPending => 'Kimlik doğrulaman zaten inceleniyor.';
+
+  @override
+  String get errKycApproved => 'Kimliğin zaten doğrulanmış.';
+
+  @override
+  String get errInvalidTc => 'TC kimlik numarası geçersiz.';
+
+  @override
+  String get errTcInUse =>
+      'Bu TC kimlik numarasıyla başka bir hesap doğrulanmış.';
+
+  @override
+  String get errFullNameRequired => 'Adını ve soyadını kimliğindeki gibi yaz.';
+
+  @override
+  String get errAccountNameMismatch =>
+      'IBAN sahibi, kimliği doğrulanan kişiyle aynı olmalı.';
 }

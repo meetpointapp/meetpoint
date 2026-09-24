@@ -97,6 +97,16 @@ Yeni hesap açarken `password123` gibi yaygın şifreler artık kabul edilmez; `
 - [ ] Profil → Şifre değiştir: yanlış mevcut şifre reddediliyor; `qwerty123` reddediliyor; güçlü şifre kabul, diğer cihazlar çıkış yapıyor
 - [ ] 10 kez yanlış şifreyle giriş → "Çok fazla hatalı deneme" (15 dk)
 
+### 7e. Para çekme ve finans (Faz 13)
+- [ ] Cüzdan: yeni kazanç "olgunlaşıyor" olarak görünüyor (14 gün)
+- [ ] Para çek: mavi tik sonrası "Kimlik doğrulama" kartı; geçersiz TC reddediliyor (algoritmaya uyan deneme numarası: 10000000146)
+- [ ] Panel → Finans → Kimlik doğrulama: belgeyi göster, onayla / reddet (red sebebi e-postayla gidiyor)
+- [ ] IBAN sahibi kimlikteki addan farklıysa talep reddediliyor
+- [ ] Panel → Finans → Ekonomi: 6000'lik paket %30 sütununda ⚠️ kırmızı
+- [ ] Panel → Ödemeler: kur girip "EFT dosyası indir", "Dosyadakileri ödendi işaretle", ödenen talepte "Ödeme belgesi"
+- [ ] Uygulama → Para çek → "Yıllık kazanç dökümü"
+- [ ] Panel → Finans → Aylık rapor ve CSV
+
 ### 7d. Güvenlik ve moderasyon (Faz 12)
 - [ ] Sohbette telefon numarası yaz (ör. 0532 123 45 67) → gönderen uyarı görür, karşı taraf mesajın altında güvenlik ipucu görür
 - [ ] Aynı kişi 3 kez iletişim bilgisi paylaşınca panel → Moderasyon kuyruğunda görünür

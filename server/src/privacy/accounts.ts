@@ -43,7 +43,7 @@ export async function restoreIfPendingDeletion(user: { id: string; deletionReque
 export async function hardDeleteUser(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { photos: true, verifications: true, dataExports: true },
+    include: { photos: true, verifications: true, dataExports: true, kycSubmissions: true },
   });
   if (!user) return false;
   await closeAllPendingFor(userId);
@@ -52,5 +52,6 @@ export async function hardDeleteUser(userId: string) {
   for (const p of user.photos) await removeProfilePhoto(p.path).catch(() => {});
   for (const v of user.verifications) if (v.selfiePath) await privateStore.remove(v.selfiePath).catch(() => {});
   for (const x of user.dataExports) if (x.path) await privateStore.remove(x.path).catch(() => {});
+  for (const k of user.kycSubmissions) if (k.documentPath) await privateStore.remove(k.documentPath).catch(() => {});
   return true;
 }

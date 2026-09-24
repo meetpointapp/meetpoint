@@ -63,6 +63,7 @@
         <button data-tab="users" data-roles="moderator finance" class="tab">Kullanıcılar</button>
         <button data-tab="purchases" data-roles="finance" class="tab">Satışlar</button>
         <button data-tab="payouts" data-roles="finance" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
+        <button data-tab="finance" data-roles="finance" class="tab">Finans <span id="count-kyc" class="count"></span></button>
         <button data-tab="errors" data-roles="" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
         <button data-tab="kvkk" data-roles="" class="tab">KVKK <span id="count-dsr" class="count"></span></button>
         <button data-tab="legal" data-roles="" class="tab">Resmi talepler <span id="count-legal" class="count"></span></button>
@@ -141,8 +142,37 @@
             <button data-pstatus="CANCELLED" class="seg-btn">İptal</button>
           </div>
         </div>
-        <p class="muted">Ödemeyi bankadan veya PayPal'dan elle yap, sonra havale/işlem numarasıyla "Ödendi" işaretle. Reddedilen talepte jetonlar kullanıcıya geri döner. Şikayeti çok olan veya yeni hesaplara dikkat.</p>
+        <p class="muted">IBAN ödemeleri için: "EFT dosyası" ile bekleyenleri bankanın toplu ödeme ekranına yükle, dekont numarasıyla "Hepsini ödendi işaretle". PayPal ve tekil ödemeler için kartın üstündeki düğmeler. Kırmızı işaretli taleplere dikkat (aynı cihaz, tek ödeyen, aylık tavan, yeni hesap). Reddedilen talepte jetonlar kullanıcıya geri döner.</p>
+        <div class="toolbar" id="eft-bar">
+          <input id="eft-rate" type="number" step="0.01" min="0" placeholder="USD/TL kuru">
+          <button id="eft-export" class="btn soft">EFT dosyası indir</button>
+          <button id="eft-paid" class="btn green">Dosyadakileri ödendi işaretle</button>
+        </div>
         <div id="payouts" class="list"></div>
+      </div>
+
+      <div id="tab-finance" class="panel hidden">
+        <div class="toolbar">
+          <div class="seg">
+            <button data-fin="kyc" class="seg-btn active">Kimlik doğrulama</button>
+            <button data-fin="economy" class="seg-btn">Ekonomi</button>
+            <button data-fin="report" class="seg-btn">Aylık rapor</button>
+          </div>
+        </div>
+        <div id="fin-kyc">
+          <p class="muted">Belgedeki ad-soyad ve TC son 4 hanesi başvuruyla aynı mı, belge okunaklı ve geçerli mi? Belge görüntüleme işlem kaydına yazılır. Reddedilen başvurunun belgesi silinir.</p>
+          <div id="kyc" class="list"></div>
+        </div>
+        <div id="fin-economy" class="hidden">
+          <p class="muted">Oranlar ondalık (0.15 = %15). Değiştirmeyi sadece süper yönetici yapabilir; her değişiklik işlem kaydına yazılır. Kırmızı paket: o mağaza payında zarar ediyor (satılan her jeton bozdurulursa).</p>
+          <form id="settings-form" class="card item"><div id="settings-fields" class="settings-grid"></div>
+            <div class="actions"><button type="submit" class="btn primary" id="settings-save">Kaydet</button></div></form>
+          <div id="packs" class="list"></div>
+        </div>
+        <div id="fin-report" class="hidden">
+          <div class="toolbar"><input id="report-month" type="month"><button id="report-load" class="btn soft">Göster</button><button id="report-csv" class="btn soft">CSV indir</button></div>
+          <div id="report" class="list"></div>
+        </div>
       </div>
 
       <div id="tab-errors" class="panel hidden">

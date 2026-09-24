@@ -848,5 +848,77 @@
   "reasonUnderage": "18 yaş altı",
   "reasonSpam": "Toplu / istenmeyen mesaj",
   "reasonReportBurst": "Kısa sürede birden çok şikayet",
-  "reasonOther": "Diğer"
+  "reasonOther": "Diğer",
+  "maturingEarnings": "{coins} jeton olgunlaşıyor · ilki {date} tarihinde bozdurulabilir",
+  "@maturingEarnings": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "maturingInfo": "Yeni kazançlar iade süresi nedeniyle {days} gün sonra bozdurulabilir.",
+  "@maturingInfo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "accountHolderMustMatch": "Kimliğinde yazan adla aynı olmalı",
+  "cashoutNetAfterTax": "Stopaj (%{rate}) sonrası net: {net}",
+  "@cashoutNetAfterTax": {
+    "placeholders": {
+      "net": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsStatement": "Yıllık kazanç dökümü",
+  "earningsStatementBody": "{year} yılı\nKazanılan jeton: {coins}\nÖdeme sayısı: {count}\nBrüt: {gross}\nStopaj: {tax}\nNet ödenen: {net}",
+  "@earningsStatementBody": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "coins": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "gross": {
+        "type": "String"
+      },
+      "tax": {
+        "type": "String"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "kycTitle": "Kimlik doğrulama",
+  "kycInfo": "Kazancını doğru kişiye ödeyebilmemiz için bir kez kimliğini doğruluyoruz. Bilgilerin şifreli saklanır ve sadece yetkili finans ekibimiz görür.",
+  "kycFullName": "Ad soyad (kimlikteki gibi)",
+  "kycTcNo": "TC kimlik numarası",
+  "kycDocument": "Kimlik kartının ön yüzü",
+  "kycPickDocument": "Fotoğraf seç",
+  "kycSubmit": "Doğrulamaya gönder",
+  "kycSent": "Kimlik bilgilerin incelemeye gönderildi.",
+  "kycPending": "Kimlik bilgilerin inceleniyor. Sonuç e-postayla gelecek.",
+  "kycRejected": "Kimlik doğrulaman onaylanmadı. Bilgilerini kontrol edip tekrar gönderebilirsin.",
+  "errKycRequired": "Para çekmek için önce kimliğini doğrulamalısın.",
+  "errKycPending": "Kimlik doğrulaman zaten inceleniyor.",
+  "errKycApproved": "Kimliğin zaten doğrulanmış.",
+  "errInvalidTc": "TC kimlik numarası geçersiz.",
+  "errTcInUse": "Bu TC kimlik numarasıyla başka bir hesap doğrulanmış.",
+  "errFullNameRequired": "Adını ve soyadını kimliğindeki gibi yaz.",
+  "errAccountNameMismatch": "IBAN sahibi, kimliği doğrulanan kişiyle aynı olmalı."
 }

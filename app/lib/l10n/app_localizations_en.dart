@@ -1591,4 +1591,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reasonOther => 'Other';
+
+  @override
+  String maturingEarnings(int coins, String date) {
+    return '$coins coins maturing · first ones cashable on $date';
+  }
+
+  @override
+  String maturingInfo(int days) {
+    return 'New earnings can be cashed out after $days days (refund period).';
+  }
+
+  @override
+  String get accountHolderMustMatch => 'Must match the name on your ID';
+
+  @override
+  String cashoutNetAfterTax(String net, String rate) {
+    return 'Net after withholding tax ($rate%): $net';
+  }
+
+  @override
+  String get earningsStatement => 'Annual earnings statement';
+
+  @override
+  String earningsStatementBody(
+    int year,
+    int coins,
+    int count,
+    String gross,
+    String tax,
+    String net,
+  ) {
+    return 'Year $year\nCoins earned: $coins\nPayouts: $count\nGross: $gross\nWithholding: $tax\nNet paid: $net';
+  }
+
+  @override
+  String get kycTitle => 'Identity verification';
+
+  @override
+  String get kycInfo =>
+      'We verify your identity once so we can pay the right person. Your details are stored encrypted and only our finance team can see them.';
+
+  @override
+  String get kycFullName => 'Full name (as on your ID)';
+
+  @override
+  String get kycTcNo => 'Turkish ID number';
+
+  @override
+  String get kycDocument => 'Front of your ID card';
+
+  @override
+  String get kycPickDocument => 'Choose photo';
+
+  @override
+  String get kycSubmit => 'Submit for verification';
+
+  @override
+  String get kycSent => 'Your details were sent for review.';
+
+  @override
+  String get kycPending =>
+      'Your identity is being reviewed. We\'ll email you the result.';
+
+  @override
+  String get kycRejected =>
+      'Your verification was not approved. Please check your details and try again.';
+
+  @override
+  String get errKycRequired =>
+      'Please verify your identity before cashing out.';
+
+  @override
+  String get errKycPending => 'Your verification is already under review.';
+
+  @override
+  String get errKycApproved => 'Your identity is already verified.';
+
+  @override
+  String get errInvalidTc => 'Invalid ID number.';
+
+  @override
+  String get errTcInUse =>
+      'Another account has been verified with this ID number.';
+
+  @override
+  String get errFullNameRequired =>
+      'Enter your first and last name as on your ID.';
+
+  @override
+  String get errAccountNameMismatch =>
+      'The IBAN holder must be the verified person.';
 }

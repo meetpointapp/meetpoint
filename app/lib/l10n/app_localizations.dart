@@ -2689,6 +2689,151 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Diğer'**
   String get reasonOther;
+
+  /// No description provided for @maturingEarnings.
+  ///
+  /// In tr, this message translates to:
+  /// **'{coins} jeton olgunlaşıyor · ilki {date} tarihinde bozdurulabilir'**
+  String maturingEarnings(int coins, String date);
+
+  /// No description provided for @maturingInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni kazançlar iade süresi nedeniyle {days} gün sonra bozdurulabilir.'**
+  String maturingInfo(int days);
+
+  /// No description provided for @accountHolderMustMatch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimliğinde yazan adla aynı olmalı'**
+  String get accountHolderMustMatch;
+
+  /// No description provided for @cashoutNetAfterTax.
+  ///
+  /// In tr, this message translates to:
+  /// **'Stopaj (%{rate}) sonrası net: {net}'**
+  String cashoutNetAfterTax(String net, String rate);
+
+  /// No description provided for @earningsStatement.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllık kazanç dökümü'**
+  String get earningsStatement;
+
+  /// No description provided for @earningsStatementBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{year} yılı\nKazanılan jeton: {coins}\nÖdeme sayısı: {count}\nBrüt: {gross}\nStopaj: {tax}\nNet ödenen: {net}'**
+  String earningsStatementBody(
+    int year,
+    int coins,
+    int count,
+    String gross,
+    String tax,
+    String net,
+  );
+
+  /// No description provided for @kycTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik doğrulama'**
+  String get kycTitle;
+
+  /// No description provided for @kycInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazancını doğru kişiye ödeyebilmemiz için bir kez kimliğini doğruluyoruz. Bilgilerin şifreli saklanır ve sadece yetkili finans ekibimiz görür.'**
+  String get kycInfo;
+
+  /// No description provided for @kycFullName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad soyad (kimlikteki gibi)'**
+  String get kycFullName;
+
+  /// No description provided for @kycTcNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'TC kimlik numarası'**
+  String get kycTcNo;
+
+  /// No description provided for @kycDocument.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik kartının ön yüzü'**
+  String get kycDocument;
+
+  /// No description provided for @kycPickDocument.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf seç'**
+  String get kycPickDocument;
+
+  /// No description provided for @kycSubmit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrulamaya gönder'**
+  String get kycSubmit;
+
+  /// No description provided for @kycSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik bilgilerin incelemeye gönderildi.'**
+  String get kycSent;
+
+  /// No description provided for @kycPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik bilgilerin inceleniyor. Sonuç e-postayla gelecek.'**
+  String get kycPending;
+
+  /// No description provided for @kycRejected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik doğrulaman onaylanmadı. Bilgilerini kontrol edip tekrar gönderebilirsin.'**
+  String get kycRejected;
+
+  /// No description provided for @errKycRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Para çekmek için önce kimliğini doğrulamalısın.'**
+  String get errKycRequired;
+
+  /// No description provided for @errKycPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik doğrulaman zaten inceleniyor.'**
+  String get errKycPending;
+
+  /// No description provided for @errKycApproved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimliğin zaten doğrulanmış.'**
+  String get errKycApproved;
+
+  /// No description provided for @errInvalidTc.
+  ///
+  /// In tr, this message translates to:
+  /// **'TC kimlik numarası geçersiz.'**
+  String get errInvalidTc;
+
+  /// No description provided for @errTcInUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu TC kimlik numarasıyla başka bir hesap doğrulanmış.'**
+  String get errTcInUse;
+
+  /// No description provided for @errFullNameRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adını ve soyadını kimliğindeki gibi yaz.'**
+  String get errFullNameRequired;
+
+  /// No description provided for @errAccountNameMismatch.
+  ///
+  /// In tr, this message translates to:
+  /// **'IBAN sahibi, kimliği doğrulanan kişiyle aynı olmalı.'**
+  String get errAccountNameMismatch;
 }
 
 class _AppLocalizationsDelegate

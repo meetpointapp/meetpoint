@@ -1,32 +1,35 @@
 import { describe, expect, it } from 'vitest';
 import { economy } from '../../src/config';
+import { packEconomics } from '../../src/finance/settings';
 
 // İş kuralı değişmezleri: fiyat veya kur değiştiğinde platformun zarar etmediğini garanti eder.
 // Kötü senaryo varsayımı: satılan her jeton sonunda birinin kazancına dönüşüp paraya çevrilir.
-const KDV = 0.2; // Türkiye'de dijital hizmet KDV'si (mağaza fiyatına dahil)
-const STORE_FEE_SMALL = 0.15; // Apple/Google küçük işletme programı
-
-// Mağaza ve KDV düşüldükten sonra jeton başına kalan net USD
-const netPerCoin = (usd: number, coins: number, storeFee: number) => (usd / (1 + KDV)) * (1 - storeFee) / coins;
+// Paketler ve kurlar veritabanında (panelden değişir); burada ilk kurulum değerleri denetlenir
+// (prisma/migrations/*_finance). Panel aynı packEconomics hesabıyla zarar eden paketi kırmızı gösterir.
+const DEFAULT_PACKS = [
+  { id: 'coins_500', coins: 500, usd: 9.99, popular: false },
+  { id: 'coins_1000', coins: 1000, usd: 18.99, popular: true },
+  { id: 'coins_2500', coins: 2500, usd: 44.99, popular: false },
+  { id: 'coins_6000', coins: 6000, usd: 99.99, popular: false },
+];
+const DEFAULTS = { storeFeeRate: 0.15, vatRate: 0.2, cashoutUsdPerCoin: 0.01, cashoutMinCoins: 2000 };
 
 describe('jeton ekonomisi', () => {
   it('her paket, KDV ve %15 mağaza payından sonra bozdurma kurunun üstünde kalır', () => {
-    for (const p of economy.coinPacks) {
-      expect(netPerCoin(p.usd, p.coins, STORE_FEE_SMALL), p.id).toBeGreaterThan(economy.cashoutUsdPerCoin);
-    }
+    for (const p of DEFAULT_PACKS) expect(packEconomics(p, DEFAULTS).profitable, p.id).toBe(true);
   });
 
   it('büyük paket hiçbir zaman küçükten jeton başına pahalı değil', () => {
-    const perCoin = economy.coinPacks.map((p) => p.usd / p.coins);
+    const perCoin = DEFAULT_PACKS.map((p) => p.usd / p.coins);
     for (let i = 1; i < perCoin.length; i++) expect(perCoin[i]).toBeLessThan(perCoin[i - 1]);
   });
 
   it('tam olarak bir "en popüler" paket', () => {
-    expect(economy.coinPacks.filter((p) => p.popular)).toHaveLength(1);
+    expect(DEFAULT_PACKS.filter((p) => p.popular)).toHaveLength(1);
   });
 
   it('en düşük para çekme tutarı en az 1 paket satışına denk (küçük ödemelerle masraf şişmesin)', () => {
-    expect(economy.cashoutMinCoins * economy.cashoutUsdPerCoin).toBeGreaterThanOrEqual(10);
+    expect(DEFAULTS.cashoutMinCoins * DEFAULTS.cashoutUsdPerCoin).toBeGreaterThanOrEqual(10);
   });
 
   it('arama ücretleri ve hediyeler pozitif, hediyeler artan sırada', () => {
@@ -37,18 +40,17 @@ describe('jeton ekonomisi', () => {
     expect(new Set(economy.gifts.map((g) => g.id)).size).toBe(economy.gifts.length);
   });
 
-  // Bonus ve kayıt hediyesi "promo" kovasına girer; harcandığında karşı tarafta bozdurulamaz kazanç olur
-  // (src/wallet.ts earningsFrom, test/unit/wallet.test.ts). Bu yüzden bozdurmaya dönüşebilecek her jeton
-  // gerçek parayla satılmış jetondur ve yukarıdaki paket testi yeterlidir.
-  it('promosyon jetonları kârlılık hesabına girmez: bonus hiçbir paketi zarara sokmaz', () => {
-    expect(economy.firstPurchaseBonusPct).toBeGreaterThan(0); // teşvik duruyor
-    for (const p of economy.coinPacks) {
-      // Bozdurulabilecek en fazla jeton = satın alınan jeton (bonus hariç)
-      expect(netPerCoin(p.usd, p.coins, STORE_FEE_SMALL), p.id).toBeGreaterThan(economy.cashoutUsdPerCoin);
-    }
+  // Mağazaların küçük işletme programı (%15) yıllık 1 milyon $ gelire kadar geçerli; üstünde %30.
+  // Karar (Faz 13): paketler panelden ayarlanır, %30'da zarara geçen paket panelde uyarıyla gösterilir.
+  it('%30 mağaza payında 6000\'lik paket zarar olarak işaretlenir, diğerleri kârlı', () => {
+    const at30 = DEFAULT_PACKS.map((p) => [p.id, packEconomics(p, DEFAULTS, 0.3).profitable]);
+    expect(Object.fromEntries(at30)).toEqual({ coins_500: true, coins_1000: true, coins_2500: true, coins_6000: false });
   });
 
-  // Mağazaların küçük işletme programı (%15) yıllık 1 milyon $ gelire kadar geçerli; üstünde %30.
-  // %30'da 6000'lik paket zarara geçiyor: fiyat/kur o eşiğe yaklaşınca yeniden ayarlanmalı (Faz 13).
-  it.todo('%30 mağaza payında da tüm paketler kârlı kalır');
+  it('kâr hesabı: KDV dahil fiyattan KDV ve mağaza payı düşülür', () => {
+    const e = packEconomics({ coins: 1000, usd: 12 }, { storeFeeRate: 0.15, vatRate: 0.2, cashoutUsdPerCoin: 0.005 });
+    expect(e.netUsd).toBe(8.5); // 12 / 1.2 × 0.85
+    expect(e.netPerCoin).toBe(0.0085);
+    expect(e.marginPct).toBeCloseTo(41.2, 1);
+  });
 });

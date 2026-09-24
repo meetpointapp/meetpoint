@@ -55,8 +55,8 @@ Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ 
 | ~~Şifre özeti (bcryptjs) saf JavaScript: toplu kayıtlarda sunucuyu bloke ediyor (20 eşzamanlı kayıtta p50 2,6 sn)~~ ✅ Argon2id | 10 |
 | Keşfet tüm adayları belleğe alıp süzüyor (200 kullanıcıda p50 0,7 sn) | 9 |
 | ~~Prisma CLI → deepmerge-ts (yüksek) ve firebase-admin → uuid (orta) güvenlik bildirimi~~ ✅ kapatıldı | 10 |
-| **Fiyat kararı:** "En popüler" 1000'lik paket jeton başına 500'lükten biraz pahalı | 13 |
-| **Ekonomi kararı:** %50 ilk alım bonusu ve kayıt hediyesi, harcanınca başkasının bozdurulabilir kazancına dönüşüyor. KDV ve mağaza payından sonra jeton başı gelir bozdurma kurunun altına inebiliyor (zarar). %30 mağaza payında 6000'lik paket bonussuz da zararda. | 13 |
+| ~~**Fiyat kararı:** "En popüler" 1000'lik paket jeton başına 500'lükten biraz pahalı~~ ✅ 18.99 $ | 13 |
+| ~~**Ekonomi kararı:** bonus kazancı bozdurulabiliyordu; %30 mağaza payında 6000'lik paket zararda~~ ✅ bonus kazancı bozdurulamaz (Faz 9); oranlar panelden, zarar eden paket uyarılı (Faz 13) | 13 |
 
 ### Faz 9'da bulunanlar
 
@@ -97,6 +97,25 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
 **Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
+
+### Faz 13'te bulunanlar
+
+Faz 13 tamamlandı. Sunucuda 116 test (27 dosya), uygulamada 42 test; tam takım iki kez üst üste temiz. Birim testlerindeki bekleyen ekonomi kuralı ("%30 mağaza payı") gerçek teste dönüştü.
+
+**Kullanıcı kararları:** kazanç 14 gün olgunlaşır; para çekmek için ad-soyad + TC + kimlik fotoğrafı; zarar riski için ayarlar panelden, zarar eden paket kırmızı; aylık çekim tavanı 1.000 $ (aşan talep engellenmez, işaretlenir). Stopaj ayarlanabilir, şimdilik %0 (muhasebeci belirleyecek).
+
+**Yapılanlar:**
+- **Olgunlaşma ve iadede geri alma:** her transfer karşı tarafı kaydeder. Mağaza iadesi gelince, o jetonlarla karşı tarafa geçen ve henüz olgunlaşmamış kazanç alıcıdan geri alınır; kalanı ödeyenden. Olgunlaşmış kazanca dokunulmaz (risk 14 günle sınırlı).
+- **Kimlik doğrulama:** ad-soyad, TC, belge şifreli; belge görüntüleme işlem kaydında; reddedilenin belgesi silinir; aynı TC ikinci hesapta doğrulanamaz; IBAN sahibi kimlikteki adla aynı olmalı (Türkçe harf/büyük-küçük farkı yok sayılır).
+- **Risk işaretleri:** aylık tavan, yeni hesap, ödeyenle aynı cihaz/IP, kazancın tamamı tek kişiden.
+- **Ödeme:** stopaj (brüt/stopaj/net), toplu EFT dosyası (TL kuru ile), toplu "ödendi", ödeme belgesi taslağı, kullanıcıya yıllık kazanç dökümü.
+- **Finans:** ekonomi ayarları ve paketler veritabanında (panelden), paket kârlılık tablosu (şimdiki ve %30 payda), aylık rapor (satış, tahmini KDV/mağaza payı, iade, jeton akışı, yükümlülük, ödemeler, mutabakat) ve CSV.
+
+**Bulunan hata:** mutabakat, kalıcı silinen hesapların satışlarını (satış kaydı kalıyor, cüzdan hareketleri siliniyor) fark olarak gösteriyordu; artık mevcut hesaplarla karşılaştırılıyor, silinen hesapların satışları ayrı satırda.
+
+**Geliştirme veritabanında bilinen fark:** test@gmail.com hesabının Faz 5 öncesi (satış kaydı yokken) yapılmış 6000 jetonluk test yüklemesi raporda "fark" olarak görünür; yayında böyle bir kayıt olmaz.
+
+**Açık sorular (Faz 17, muhasebeci/avukat):** stopaj oranı ve ödeme belgesi biçimi; ödeme yapılan kişinin TC'si hesap silindikten sonra saklanmalı mı; bankanın toplu EFT dosya biçimi.
 
 ### Faz 12'de bulunanlar
 
@@ -201,18 +220,18 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. ✅ **Kaldırma ve resmi talepler.** Kaldırma kararı ve kolluk talebi kaydı, süre takibi, işlem geçmişi.
 7. ✅ **Güvenlik merkezi.** Güvenli tanışma ipuçları, topluluk kuralları, yardım hatları.
 
-## Faz 13 · Para akışı güvenliği ve finans kayıtları
+## Faz 13 · Para akışı güvenliği ve finans kayıtları ✅
 
 **Amaç:** Tek kuruş kaybetmeden para alıp ödemek; muhasebenin ihtiyaç duyacağı her kaydın hazır olması.
 
-1. 🛠 **Kazanç olgunlaşma süresi.** Kazanç, iade süresi boyunca bekler (süre ayarlanabilir). Olgunlaşmadan iade gelirse kazanç kendiliğinden düşer.
-2. 🛠 **Kimlik doğrulama katmanı.** Ad-soyad ve TC kimlik alanları, IBAN sahibi eşleşmesi. Doğrulama sağlayıcısı sonradan takılır; şimdilik panelden manuel belge inceleme.
-3. 🛠 **Dolandırıcılık kuralları.** Aynı cihaz, IP veya ödeme kaynağından hesaplar arası para döngüsü tespiti; günlük/aylık limitler; şüpheli talebin incelemeye düşmesi.
-4. 🛠 **Ödeme kanalı katmanı.** Bugünkü manuel akışa banka toplu EFT dosyası eklenir; lisanslı ödeme kuruluşu API'si sonradan aynı yere takılır.
-5. 🛠 **Vergi alanları.** Ayarlanabilir stopaj oranı, ödeme belgesi taslağı, kullanıcıya yıllık kazanç dökümü.
-6. 🛠 **Finans raporları.** Satış–jeton mutabakatı, dolaşımdaki jeton yükümlülüğü, ödenen ve bekleyen ödemeler, iadeler; muhasebeye aylık dışa aktarım.
-7. 🛠 **TL fiyat yönetimi.** Mağaza fiyatlarının KDV dahil gösterimi; paket ve fiyatların panelden yönetimi.
-8. 👤🛠 **Fiyat ve bonus kararları.** Paketlerin jeton başı fiyat sırası; bonus ve hediye jetonlarının kazanca dönüşme kuralı (ör. bonus jetondan gelen kazanç bozdurulamaz ya da bozdurma kuru/bonus oranı ayarlanır). Birim testlerindeki bekleyen kurallar yeşile döner.
+1. ✅ **Kazanç olgunlaşma süresi.** Kazanç, iade süresi boyunca bekler (süre ayarlanabilir). Olgunlaşmadan iade gelirse kazanç kendiliğinden düşer.
+2. ✅ **Kimlik doğrulama katmanı.** Ad-soyad, TC (algoritma kontrolü, tekil), kimlik belgesi fotoğrafı (şifreli), IBAN sahibi eşleşmesi; panelden elle inceleme. ⏭ Doğrulama sağlayıcısı (e-Devlet/NFC) sonradan takılır.
+3. ✅ **Dolandırıcılık kuralları.** Aynı cihaz, IP veya ödeme kaynağından hesaplar arası para döngüsü tespiti; günlük/aylık limitler; şüpheli talebin incelemeye düşmesi.
+4. ✅ **Ödeme kanalı katmanı.** Bugünkü manuel akışa banka toplu EFT dosyası eklendi (genel CSV; bankanın kendi biçimi Faz 17'de hesap açılınca uyarlanır). ⏭ Lisanslı ödeme kuruluşu API'si sonradan takılır.
+5. ✅ **Vergi alanları.** Ayarlanabilir stopaj oranı, ödeme belgesi taslağı, kullanıcıya yıllık kazanç dökümü.
+6. ✅ **Finans raporları.** Satış–jeton mutabakatı, dolaşımdaki jeton yükümlülüğü, ödenen ve bekleyen ödemeler, iadeler; muhasebeye aylık dışa aktarım.
+7. ✅ **TL fiyat yönetimi.** Mağaza fiyatlarının KDV dahil gösterimi; paket ve fiyatların panelden yönetimi.
+8. ✅ **Fiyat ve bonus kararları.** Paketlerin jeton başı fiyat sırası; bonus ve hediye jetonlarının kazanca dönüşme kuralı (ör. bonus jetondan gelen kazanç bozdurulamaz ya da bozdurma kuru/bonus oranı ayarlanır). Birim testlerindeki bekleyen kurallar yeşile döner.
 
 ## Faz 14 · Tüketici hakları, destek ve mağaza uyumu (uygulama içi)
 

@@ -39,6 +39,7 @@ const internalCodes = {
   'already_answered': 'sadece yönetim paneli',
   'already_resolved': 'sadece yönetim paneli',
   'cannot_sanction_staff': 'sadece yönetim paneli',
+  'rate_required': 'sadece yönetim paneli (EFT kuru)',
 };
 
 Set<String> _serverCodes() {

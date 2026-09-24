@@ -149,6 +149,12 @@ class _BalanceCard extends StatelessWidget {
                 style: theme.textTheme.titleMedium?.copyWith(color: onCard, fontWeight: FontWeight.w700),
               ),
               Text(l.cashableInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+              // Olgunlaşan kazanç: iade süresi dolunca bozdurulabilir
+              if (wallet.maturingEarnings > 0 && wallet.nextMatureAt != null) ...[
+                const SizedBox(height: 6),
+                Text(l.maturingEarnings(wallet.maturingEarnings, DateFormat.MMMd(l.localeName).format(wallet.nextMatureAt!)),
+                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+              ],
               if (wallet.promoEarnings > 0) ...[
                 const SizedBox(height: 6),
                 Tooltip(

@@ -2,7 +2,8 @@ import { Prisma } from '@prisma/client';
 import { economy } from './config';
 import { prisma } from './db';
 import { emitToUser } from './realtime';
-import { credit, lockWallet } from './wallet';
+import { packById } from './finance/settings';
+import { credit, lockWallet, reclaimEarnings } from './wallet';
 
 export type Store = 'app_store' | 'play_store' | 'dev';
 
@@ -16,8 +17,6 @@ export interface PurchaseInput {
   sandbox?: boolean;
 }
 
-export const packById = (productId: string) => economy.coinPacks.find((p) => p.id === productId);
-
 // İlk alım bonusu: kullanıcının daha önce hiç satın alımı yoksa (iade edilmiş olsa bile)
 export async function firstPurchaseBonusFor(userId: string, coins: number, tx: Prisma.TransactionClient = prisma) {
   const previous = await tx.purchase.count({ where: { userId } });
@@ -27,7 +26,7 @@ export async function firstPurchaseBonusFor(userId: string, coins: number, tx: P
 // Satın almayı jetona çevirir. Tüm kaynaklar (webhook, senkronizasyon, test) buradan geçer.
 // Aynı mağaza işlemi (transactionId) ikinci kez gelirse hiçbir şey yapmaz.
 export async function creditPurchase(input: PurchaseInput): Promise<{ credited: boolean; coins: number; bonus: number }> {
-  const pack = packById(input.productId);
+  const pack = await packById(input.productId);
   if (!pack) return { credited: false, coins: 0, bonus: 0 };
 
   try {
@@ -79,10 +78,12 @@ export async function refundPurchase(transactionId: string): Promise<boolean> {
     if (count !== 1) return null;
     // Hesap silinmişse geri alınacak bakiye yok: sadece kayıt iade olarak işaretlenir
     if (!p.userId) return null;
-    await credit(tx, p.userId, { paid: -p.coins, promo: -p.bonusCoins }, 'CLAWBACK', { note: `refund:${p.id}` });
-    return p.userId;
+    // Önce bu jetonlarla karşı tarafa geçen, henüz olgunlaşmamış kazançlar geri alınır; kalanı alıcıdan
+    const back = await reclaimEarnings(tx, p.userId, p.coins, p.createdAt, `refund:${p.id}`);
+    await credit(tx, p.userId, { paid: -(p.coins - back.reclaimed), promo: -p.bonusCoins }, 'CLAWBACK', { note: `refund:${p.id}` });
+    return [p.userId, ...back.users];
   });
-  if (refunded) emitToUser(refunded, 'wallet:updated', {});
+  for (const id of refunded ?? []) emitToUser(id, 'wallet:updated', {});
   return refunded !== null;
 }
 

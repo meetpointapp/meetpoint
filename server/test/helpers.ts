@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import * as OTPAuth from 'otpauth';
 import { expect, inject } from 'vitest';
-import { call, registerVerified, uniqueTag } from './client';
+import { B, call, png, registerVerified, uniqueTag, type TestUser } from './client';
 
 // API testleri için ortak yardımcılar
 export * from './client';
@@ -39,4 +39,37 @@ export async function makeAdmin(role: 'super' | 'moderator' | 'finance' = 'super
   const enable = await call(u.t, 'POST', '/admin/api/mfa/enable', { code: totpCode(setup.secret) });
   if (enable.http !== 200) throw new Error(`mfa enable ${enable.http} ${enable.error}`);
   return { ...u, secret: setup.secret, backupCodes: enable.backupCodes };
+}
+
+// Geçerli (algoritmaya uyan) rastgele TC kimlik numarası
+export function validTc() {
+  const d = [1 + Math.floor(Math.random() * 9), ...Array.from({ length: 8 }, () => Math.floor(Math.random() * 10))];
+  const odd = d[0] + d[2] + d[4] + d[6] + d[8];
+  const even = d[1] + d[3] + d[5] + d[7];
+  d.push((((odd * 7 - even) % 10) + 10) % 10);
+  d.push(d.reduce((a, b) => a + b, 0) % 10);
+  return d.join('');
+}
+
+// Kimlik doğrulama: başvuru (ad-soyad, TC, belge) + finans ekibinden onay
+export async function verifyIdentity(u: TestUser, fullName: string, approver?: TestAdmin) {
+  const fd = new FormData();
+  fd.append('fullName', fullName);
+  fd.append('tcNo', validTc());
+  fd.append('document', new Blob([new Uint8Array(png)], { type: 'image/png' }), 'kimlik.png');
+  const res = await fetch(`${B}/me/kyc`, { method: 'POST', headers: { authorization: `Bearer ${u.t}` }, body: fd });
+  const sub = await res.json();
+  if (res.status !== 201) throw new Error(`kyc submit ${res.status} ${sub.error}`);
+  const fin = approver ?? (await makeAdmin('finance'));
+  const ok = await call(fin.t, 'POST', `/admin/api/finance/kyc/${sub.id}/decide`, { approve: true });
+  if (ok.http !== 200) throw new Error(`kyc decide ${ok.http} ${ok.error}`);
+  return sub.id as string;
+}
+
+// Kazancı olgunlaştır: başkasından gelen kazançları N gün öncesine taşı (14 günlük bekleme testte beklenmez)
+export async function ageEarnings(userId: string, days = 15) {
+  await (await testDb()).walletEntry.updateMany({
+    where: { userId, counterpartyId: { not: null } },
+    data: { createdAt: new Date(Date.now() - days * 86_400_000) },
+  });
 }

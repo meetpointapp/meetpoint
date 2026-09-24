@@ -5,34 +5,45 @@ import { uid } from '../auth';
 import { config, economy, revenueCat } from '../config';
 import { HttpError, prisma } from '../db';
 import { payoutDto } from '../payouts';
-import { creditPurchase, packById, type Store } from '../purchases';
-import { cashableOf, getBalance, getBuckets, total } from '../wallet';
+import { getFinance, getPacks, packById } from '../finance/settings';
+import { creditPurchase, type Store } from '../purchases';
+import { cashableNow, getBalance, getBuckets, total } from '../wallet';
 
 export const walletRouter = Router();
 
 walletRouter.get('/wallet', async (req, res) => {
   const userId = uid(req);
-  const [buckets, entries, purchaseCount, pendingPayout] = await Promise.all([
+  const [buckets, entries, purchaseCount, pendingPayout, s, packs, user] = await Promise.all([
     getBuckets(userId),
     prisma.walletEntry.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take: 50 }),
     prisma.purchase.count({ where: { userId } }),
     prisma.payout.findFirst({ where: { userId, status: 'PENDING' } }),
+    getFinance(),
+    getPacks(),
+    prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { kycStatus: true } }),
   ]);
   const balance = total(buckets);
-  const cashable = cashableOf(buckets);
+  const { cashable, pending, nextMatureAt } = await cashableNow(prisma, userId, buckets);
   res.json({
     balance,
     cashable,
+    // Olgunlaşmayı bekleyen kazanç (iade süresi dolunca bozdurulabilir olur)
+    maturingEarnings: pending,
+    nextMatureAt,
     // Bonus/hediye jetonlarından gelen kazanç: harcanabilir ama paraya çevrilemez
     promoEarnings: buckets.earnedPromo,
-    cashableUsd: +(cashable * economy.cashoutUsdPerCoin).toFixed(2),
+    cashableUsd: +(cashable * s.cashoutUsdPerCoin).toFixed(2),
     cashout: {
-      minCoins: economy.cashoutMinCoins,
-      usdPerCoin: economy.cashoutUsdPerCoin,
+      minCoins: s.cashoutMinCoins,
+      usdPerCoin: s.cashoutUsdPerCoin,
+      withholdingRate: s.withholdingRate,
+      maturityDays: s.maturityDays,
+      monthlyCapUsd: s.monthlyPayoutCapUsd,
+      kycStatus: user.kycStatus,
       pending: pendingPayout ? payoutDto(pendingPayout) : null,
     },
     entries,
-    packs: economy.coinPacks,
+    packs: packs.map(({ id, coins, usd, tryPrice, popular }) => ({ id, coins, usd, tryPrice, popular })),
     // İlk alım bonusu hâlâ geçerliyse yüzdesi, değilse 0
     firstPurchaseBonusPct: purchaseCount === 0 ? economy.firstPurchaseBonusPct : 0,
     requestPrices: economy.requestPrices,
@@ -83,7 +94,7 @@ walletRouter.post('/wallet/sync', async (req, res) => {
 walletRouter.post('/wallet/dev-topup', async (req, res) => {
   if (config.isProduction) throw new HttpError(404, 'not_found');
   const { packId } = z.object({ packId: z.string() }).parse(req.body);
-  if (!packById(packId)) throw new HttpError(400, 'invalid_pack');
+  if (!(await packById(packId))) throw new HttpError(400, 'invalid_pack');
   const userId = uid(req);
   const result = await creditPurchase({
     userId,

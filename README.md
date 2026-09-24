@@ -95,6 +95,14 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## Para akışı ve finans (Faz 13)
+
+- **Ekonomi ayarları ve paketler veritabanında** (`src/finance/settings.ts`): mağaza payı, KDV, bozdurma kuru, en az çekim, stopaj, olgunlaşma süresi, aylık tavan. Panel → Finans → Ekonomi (değiştirmek süper yöneticide); zarar eden paket kırmızı.
+- **Olgunlaşma** (`src/wallet.ts`): başkasından gelen kazanç 14 gün sonra bozdurulabilir; iade gelirse olgunlaşmamış kazanç alıcıdan geri alınır (`reclaimEarnings`).
+- **Kimlik doğrulama** (`src/finance/kyc.ts`): ad-soyad + TC (algoritma, tekil) + belge (şifreli). Panel → Finans → Kimlik doğrulama.
+- **Para çekme** (`src/payouts.ts`): IBAN sahibi = kimlikteki ad; brüt/stopaj/net; risk işaretleri. Panel → Ödemeler: toplu EFT dosyası, toplu "ödendi", ödeme belgesi.
+- **Aylık rapor** (`src/finance/report.ts`): Panel → Finans → Aylık rapor, CSV.
+
 ## Moderasyon ve 5651 (Faz 12)
 
 - **Trafik kaydı** (`src/moderation/traffic.ts`): içerik oluşturan istekler + anlık bağlantılar; hash zincirli partiler, değiştirilemez, 2 yıl (`TRAFFIC_LOG_DAYS`). Panel → Resmi talepler → CSV / "Bütünlüğü doğrula". nginx `X-Real-Port` başlığı gerekir.

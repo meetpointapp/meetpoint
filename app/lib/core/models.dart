@@ -318,6 +318,9 @@ class WalletInfo {
   final int balance;
   final int cashable;
   final int promoEarnings; // bonus/hediye jetonlarından kazanç: harcanabilir, paraya çevrilemez
+  // Olgunlaşmayı bekleyen kazanç (iade süresi dolunca bozdurulabilir) ve ilk olgunlaşma zamanı
+  final int maturingEarnings;
+  final DateTime? nextMatureAt;
   final double cashableUsd;
   final List<WalletEntry> entries;
   final List<CoinPack> packs;
@@ -332,6 +335,8 @@ class WalletInfo {
     required this.balance,
     required this.cashable,
     this.promoEarnings = 0,
+    this.maturingEarnings = 0,
+    this.nextMatureAt,
     required this.cashableUsd,
     required this.entries,
     required this.packs,
@@ -347,6 +352,8 @@ class WalletInfo {
         balance: j['balance'],
         cashable: j['cashable'],
         promoEarnings: j['promoEarnings'] ?? 0,
+        maturingEarnings: j['maturingEarnings'] ?? 0,
+        nextMatureAt: j['nextMatureAt'] == null ? null : _date(j['nextMatureAt']),
         cashableUsd: (j['cashableUsd'] as num).toDouble(),
         entries: [for (final e in (j['entries'] as List)) WalletEntry.fromJson(e)],
         packs: [for (final p in (j['packs'] as List)) CoinPack.fromJson(p)],
@@ -626,15 +633,65 @@ class CallInfo {
 class CashoutRules {
   final int minCoins;
   final double usdPerCoin;
+  final double withholdingRate; // stopaj (0 = yok)
+  final int maturityDays; // kazancın bozdurulabilir olması için bekleme
+  final double monthlyCapUsd;
+  final String kycStatus; // none | pending | approved | rejected
   final Payout? pending; // incelenen talep (en fazla bir tane)
-  const CashoutRules({this.minCoins = 2000, this.usdPerCoin = 0.01, this.pending});
+  const CashoutRules({
+    this.minCoins = 2000,
+    this.usdPerCoin = 0.01,
+    this.withholdingRate = 0,
+    this.maturityDays = 14,
+    this.monthlyCapUsd = 1000,
+    this.kycStatus = 'none',
+    this.pending,
+  });
   factory CashoutRules.fromJson(Map<String, dynamic> j) => CashoutRules(
         minCoins: j['minCoins'],
         usdPerCoin: (j['usdPerCoin'] as num).toDouble(),
+        withholdingRate: (j['withholdingRate'] as num? ?? 0).toDouble(),
+        maturityDays: j['maturityDays'] ?? 14,
+        monthlyCapUsd: (j['monthlyCapUsd'] as num? ?? 1000).toDouble(),
+        kycStatus: j['kycStatus'] ?? 'none',
         pending: j['pending'] == null ? null : Payout.fromJson(j['pending']),
       );
 
   String usdOf(int coins) => '\$${(coins * usdPerCoin).toStringAsFixed(2)}';
+  // Stopaj sonrası net
+  String netUsdOf(int coins) {
+    final gross = double.parse((coins * usdPerCoin).toStringAsFixed(2));
+    return '\$${(gross - double.parse((gross * withholdingRate).toStringAsFixed(2))).toStringAsFixed(2)}';
+  }
+}
+
+// Yıllık kazanç dökümü
+class EarningsStatement {
+  final int year;
+  final int earnedCoins;
+  final int payoutCount;
+  final double grossUsd;
+  final double withholdingUsd;
+  final double netUsd;
+  const EarningsStatement({
+    required this.year,
+    required this.earnedCoins,
+    required this.payoutCount,
+    required this.grossUsd,
+    required this.withholdingUsd,
+    required this.netUsd,
+  });
+  factory EarningsStatement.fromJson(Map<String, dynamic> j) {
+    final t = j['totals'] as Map<String, dynamic>;
+    return EarningsStatement(
+      year: j['year'],
+      earnedCoins: j['earnedCoins'],
+      payoutCount: t['count'],
+      grossUsd: (t['grossUsd'] as num).toDouble(),
+      withholdingUsd: (t['withholdingUsd'] as num).toDouble(),
+      netUsd: (t['netUsd'] as num).toDouble(),
+    );
+  }
 }
 
 enum PayoutMethod { iban, paypal }
@@ -644,7 +701,8 @@ enum PayoutStatus { pending, paid, rejected, cancelled }
 class Payout {
   final String id;
   final int coins;
-  final double usd;
+  final double usd; // brüt
+  final double netUsd; // stopaj sonrası ödenen
   final PayoutMethod method;
   final String accountHint; // hesabın sadece sonu (•••• 1326)
   final PayoutStatus status;
@@ -657,6 +715,7 @@ class Payout {
     required this.id,
     required this.coins,
     required this.usd,
+    double? netUsd,
     required this.method,
     required this.accountHint,
     required this.status,
@@ -664,12 +723,13 @@ class Payout {
     this.adminNote = '',
     required this.createdAt,
     this.processedAt,
-  });
+  }) : netUsd = netUsd ?? usd;
 
   factory Payout.fromJson(Map<String, dynamic> j) => Payout(
         id: j['id'],
         coins: j['coins'],
         usd: (j['usd'] as num).toDouble(),
+        netUsd: (j['netUsd'] as num?)?.toDouble(),
         method: PayoutMethod.values.byName(j['method']),
         accountHint: j['accountHint'] ?? '',
         status: PayoutStatus.values.byName((j['status'] as String).toLowerCase()),

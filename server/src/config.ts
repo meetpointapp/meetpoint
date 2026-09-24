@@ -58,25 +58,13 @@ export const economy = {
   // Cevaplanmayan istek bu süre sonunda düşer ve jeton iade edilir
   requestTtlHours: 24,
 
-  // Satış paketleri. id = mağazadaki ürün kimliği (App Store / Google Play / RevenueCat).
-  // usd yalnızca referans: kullanıcı mağazanın yerel fiyatını görür.
-  coinPacks: [
-    { id: 'coins_500', coins: 500, usd: 9.99, popular: false },
-    { id: 'coins_1000', coins: 1000, usd: 18.99, popular: true },
-    { id: 'coins_2500', coins: 2500, usd: 44.99, popular: false },
-    { id: 'coins_6000', coins: 6000, usd: 99.99, popular: false },
-  ],
+  // Satış paketleri, bozdurma kuru, en düşük çekim, stopaj, olgunlaşma süresi ve aylık tavan veritabanında
+  // (FinanceSettings, CoinPack): panelden değişir. Bkz. src/finance/settings.ts.
 
   // Teşvikler: e-posta doğrulanınca hediye, ilk satın almada ek jeton. İkisi de "promo" kovasına girer:
   // harcanabilir ama karşı tarafta bozdurulamaz kazanca dönüşür (platform zarar edemez).
   signupBonus: 50,
   firstPurchaseBonusPct: 50,
-
-  // Bozdurma kuru: kazanılan 1 jeton = 0.01 USD (satış ~0.02 USD).
-  // Mağaza %15-30 kestiği için bu fark kârlılık için zorunlu.
-  cashoutUsdPerCoin: 0.01,
-  // En az bu kadar kazanılmış jeton birikince para çekilebilir (2000 jeton = $20)
-  cashoutMinCoins: 2000,
 
   // Jetonla alınan özellikler (jeton kimseye geçmez: tamamı gelir)
   superLikePrice: 30,

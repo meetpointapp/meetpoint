@@ -50,6 +50,12 @@ model User {
   // Moderasyon (Faz 12): kısıt süresince mesaj, istek, beğeni, arama ve fotoğraf yükleme kapalı
   restrictedUntil DateTime?
 
+  // Kimlik doğrulama (para çekme için): none | pending | approved | rejected
+  kycStatus     String    @default("none")
+  kycName       String    @default("") // doğrulanmış ad-soyad (şifreli)
+  kycTcHash     String?   @unique // aynı TC ile ikinci hesap para çekemez (özet, TC'nin kendisi değil)
+  kycVerifiedAt DateTime?
+
   // Selfie ile profil doğrulama (mavi tik): none | pending | approved | rejected
   verificationStatus String    @default("none")
   verificationPose   String    @default("") // doğrulama başlatılınca atanan poz
@@ -59,22 +65,23 @@ model User {
   boostedUntil       DateTime? // öne çıkarma bitişi
   likesUnlockedUntil DateTime? // "seni beğenenler" erişimi bitişi
 
-  emailCodes    EmailCode[]
-  verifications VerificationRequest[]
-  devices       Device[]
-  purchases     Purchase[]
-  callsMade     Call[]                @relation("CallCaller")
-  callsReceived Call[]                @relation("CallCallee")
-  giftsSent     CallGift[]            @relation("GiftFrom")
-  giftsReceived CallGift[]            @relation("GiftTo")
-  payouts       Payout[]
-  sessions      Session[]
-  consents      Consent[]
-  dataExports   DataExport[]
-  dsrRequests   DsrRequest[]
-  sanctions     Sanction[]
-  appeals       Appeal[]
-  modFlags      ModerationFlag[]
+  emailCodes     EmailCode[]
+  verifications  VerificationRequest[]
+  devices        Device[]
+  purchases      Purchase[]
+  callsMade      Call[]                @relation("CallCaller")
+  callsReceived  Call[]                @relation("CallCallee")
+  giftsSent      CallGift[]            @relation("GiftFrom")
+  giftsReceived  CallGift[]            @relation("GiftTo")
+  payouts        Payout[]
+  sessions       Session[]
+  consents       Consent[]
+  dataExports    DataExport[]
+  dsrRequests    DsrRequest[]
+  sanctions      Sanction[]
+  kycSubmissions KycSubmission[]
+  appeals        Appeal[]
+  modFlags       ModerationFlag[]
 
   profile Profile?
   photos  Photo[]
@@ -181,22 +188,27 @@ model Wallet {
 
 // Her para hareketi ayrı satır (denetim izi). amount = kova değişimlerinin toplamı.
 model WalletEntry {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount      Int // pozitif = giriş, negatif = çıkış
-  type        String // PURCHASE | BONUS | GRANT | DEV_CREDIT | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | CLAWBACK | OPENING
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount         Int // pozitif = giriş, negatif = çıkış
+  type           String // PURCHASE | BONUS | GRANT | DEV_CREDIT | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | CLAWBACK | OPENING
   // Kova değişimleri
-  paid        Int      @default(0)
-  promo       Int      @default(0)
-  earned      Int      @default(0)
-  earnedPromo Int      @default(0)
-  requestId   String?
-  note        String   @default("")
-  createdAt   DateTime @default(now())
+  paid           Int      @default(0)
+  promo          Int      @default(0)
+  earned         Int      @default(0)
+  earnedPromo    Int      @default(0)
+  requestId      String?
+  note           String   @default("")
+  // Transferde karşı taraf: kazancın kimden geldiği (iade olunca kazancın geri alınabilmesi için)
+  counterpartyId String?
+  // Bu kazançtan iade nedeniyle geri alınan jeton
+  reclaimedCoins Int      @default(0)
+  createdAt      DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([requestId])
+  @@index([counterpartyId, createdAt])
 }
 
 // Ücretli iletişim isteği: gönderenden jeton bloke edilir,
@@ -331,21 +343,27 @@ model CallGift {
 // Para çekme talebi. Talep anında jeton CASHOUT ile düşülür; red/iptalde CASHOUT_REFUND ile geri verilir.
 // Ödeme yönetimden elle yapılır (şirket kurulana kadar). Hesap silinse de kayıt muhasebe için kalır.
 model Payout {
-  id           String    @id @default(cuid())
-  userId       String?
-  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  email        String // talep anındaki e-posta (hesap silinirse de görünsün)
-  coins        Int
-  usd          Float
-  method       String // iban | paypal
-  accountName  String    @default("") // hesap sahibi (şifreli)
-  accountHint  String    @default("") // kullanıcıya gösterilen maskeli hâli (•••• 1326)
-  accountValue String // IBAN veya PayPal e-postası
-  status       String    @default("PENDING") // PENDING | PAID | REJECTED | CANCELLED
-  reference    String    @default("") // yönetimin girdiği havale/işlem numarası
-  adminNote    String    @default("") // red sebebi
-  createdAt    DateTime  @default(now())
-  processedAt  DateTime?
+  id             String    @id @default(cuid())
+  userId         String?
+  user           User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email          String // talep anındaki e-posta (hesap silinirse de görünsün)
+  coins          Int
+  usd            Float
+  method         String // iban | paypal
+  accountName    String    @default("") // hesap sahibi (şifreli)
+  accountHint    String    @default("") // kullanıcıya gösterilen maskeli hâli (•••• 1326)
+  accountValue   String // IBAN veya PayPal e-postası
+  status         String    @default("PENDING") // PENDING | PAID | REJECTED | CANCELLED
+  reference      String    @default("") // yönetimin girdiği havale/işlem numarası
+  adminNote      String    @default("") // red sebebi
+  // Vergi: brüt (usd) − stopaj = net ödenen
+  withholdingUsd Float     @default(0)
+  netUsd         Float     @default(0)
+  // Dolandırıcılık/limit işaretleri (ör. monthly_cap, same_device, new_account): yönetim dikkatle inceler
+  riskFlags      Json      @default("[]")
+  exportedAt     DateTime? // toplu EFT dosyasına eklendi
+  createdAt      DateTime  @default(now())
+  processedAt    DateTime?
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -702,4 +720,50 @@ model LegalRequest {
   createdAt    DateTime  @default(now())
 
   @@index([status, dueAt])
+}
+
+// Para çekme için kimlik doğrulama başvurusu. Ad-soyad, TC ve belge fotoğrafı şifreli saklanır.
+model KycSubmission {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String // şifreli
+  tcNo         String // şifreli
+  tcHash       String
+  documentPath String // özel depoda şifreli görüntü
+  status       String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  note         String    @default("")
+  reviewedBy   String    @default("")
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+}
+
+// Ekonomi ayarları (tek satır): panelden değiştirilir, sunucular birkaç saniyede güncel değeri okur
+model FinanceSettings {
+  id                  Int      @id @default(1)
+  storeFeeRate        Float    @default(0.15) // mağaza payı (ilk 1M$ için Apple/Google %15)
+  vatRate             Float    @default(0.20) // KDV (fiyatlara dahil)
+  cashoutUsdPerCoin   Float    @default(0.01) // bozdurma kuru
+  cashoutMinCoins     Int      @default(2000)
+  withholdingRate     Float    @default(0) // stopaj (muhasebeci belirleyecek)
+  maturityDays        Int      @default(14) // kazancın bozdurulabilir olması için bekleme
+  monthlyPayoutCapUsd Float    @default(1000) // aylık tavan: aşan talep incelemeye düşer
+  usdTryRate          Float    @default(0) // EFT dosyası için varsayılan kur (0 = her seferinde sorulur)
+  updatedBy           String   @default("")
+  updatedAt           DateTime @updatedAt
+}
+
+// Satış paketleri. id = mağazadaki ürün kimliği. usd referans fiyat; tryPrice mağazadaki KDV dahil TL fiyatı (gösterim/rapor).
+model CoinPack {
+  id        String   @id
+  coins     Int
+  usd       Float
+  tryPrice  Float    @default(0)
+  popular   Boolean  @default(false)
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  updatedAt DateTime @updatedAt
 }

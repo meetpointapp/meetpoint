@@ -97,6 +97,25 @@ export const INVENTORY: InventoryEntry[] = [
     recipients: 'App Store / Google Play ve RevenueCat (yurt dışı, ödeme); banka / PayPal (para çekme)',
   },
   {
+    category: 'Kimlik doğrulama (para çekme)',
+    tables: ['KycSubmission'],
+    data: 'Ad-soyad, TC kimlik no, kimlik belgesi fotoğrafı (hepsi şifreli); TC tekilliği için anahtarlı özet',
+    purpose: 'Kazanç ödemesinin doğru kişiye yapılması, dolandırıcılık ve kara paranın önlenmesi, vergi yükümlülükleri',
+    basis: ['sözleşme', 'yasal'],
+    // Açık soru (Faz 17, muhasebeci/avukat): ödeme yapılan kişinin TC'si hesap silindikten sonra da saklanmalı mı?
+    retention: 'Reddedilen başvurunun belgesi hemen silinir; onaylanan başvuru hesap süresince. Hesap silinince silinir; ödenmiş ödemelerde alıcı adı ödeme kaydında kalır',
+    recipients: 'Yetkili makamlar (yasal talep hâlinde)',
+  },
+  {
+    category: 'Ekonomi ayarları (kişisel veri değil)',
+    tables: ['FinanceSettings', 'CoinPack'],
+    data: 'Paket fiyatları, kurlar, oranlar, son değiştiren yönetici',
+    purpose: 'Fiyatlandırma ve ödeme hesapları',
+    basis: ['meşru'],
+    retention: 'Süresiz (değişiklikler işlem kaydında)',
+    recipients: 'Aktarılmaz',
+  },
+  {
     category: 'Profil doğrulama (selfie)',
     tables: ['VerificationRequest'],
     data: 'Belirli pozla çekilen selfie, inceleme sonucu',

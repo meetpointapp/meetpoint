@@ -10,6 +10,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import 'kyc_card.dart';
 
 // Kazanılan jetonları paraya çevirme: talep oluştur (IBAN/PayPal), incelenen talebi iptal et,
 // geçmiş talepleri gör. Ödeme yönetim panelinden elle yapılır.
@@ -66,10 +67,24 @@ class _CashoutScreenState extends ConsumerState<CashoutScreen> {
                   text: l.cashoutNeedVerify,
                   action: FilledButton(onPressed: () => context.push('/verify-profile'), child: Text(l.verifyProfile)),
                 )
+              else if (rules.kycStatus != 'approved')
+                // Kimlik doğrulaması: para çekmek için zorunlu (ad-soyad, TC, belge)
+                const KycCard()
               else if (w.cashable < rules.minCoins)
-                _Notice(icon: Icons.savings_outlined, text: l.cashoutNotEnough(rules.minCoins))
+                _Notice(
+                  icon: Icons.savings_outlined,
+                  text: w.maturingEarnings > 0 ? '${l.cashoutNotEnough(rules.minCoins)}\n${l.maturingInfo(rules.maturityDays)}' : l.cashoutNotEnough(rules.minCoins),
+                )
               else
                 _CashoutForm(wallet: w),
+              const SizedBox(height: 12),
+              Center(
+                child: TextButton.icon(
+                  icon: const Icon(Icons.receipt_long_outlined),
+                  label: Text(l.earningsStatement),
+                  onPressed: () => showEarningsStatement(context, ref),
+                ),
+              ),
               if (payouts.any((p) => p.status != PayoutStatus.pending)) ...[
                 const SizedBox(height: 24),
                 Text(l.payoutHistory, style: Theme.of(context).textTheme.titleMedium),
@@ -294,7 +309,7 @@ class _CashoutFormState extends ConsumerState<_CashoutForm> {
         TextField(
           controller: _name,
           textCapitalization: TextCapitalization.words,
-          decoration: InputDecoration(labelText: l.accountHolder),
+          decoration: InputDecoration(labelText: l.accountHolder, helperText: l.accountHolderMustMatch),
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 12),
@@ -312,6 +327,11 @@ class _CashoutFormState extends ConsumerState<_CashoutForm> {
           decoration: InputDecoration(labelText: l.paypalEmail),
           onChanged: (_) => setState(() {}),
         ),
+      if (rules.withholdingRate > 0) ...[
+        const SizedBox(height: 12),
+        Text(l.cashoutNetAfterTax(rules.netUsdOf(_coins), (rules.withholdingRate * 100).toStringAsFixed(0)),
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+      ],
       const SizedBox(height: 12),
       Text(l.cashoutProcessingInfo,
           style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
