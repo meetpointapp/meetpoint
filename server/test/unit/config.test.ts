@@ -24,7 +24,7 @@ describe('yayın ayar kontrolü', () => {
       SMTP_HOST: '',
       REVENUECAT_WEBHOOK_AUTH: '',
     });
-    expect(() => assertProductionConfig()).toThrow(/JWT_SECRET[\s\S]*SMTP_HOST[\s\S]*REVENUECAT_WEBHOOK_AUTH/);
+    expect(() => assertProductionConfig()).toThrow(/JWT_SECRET[\s\S]*SMTP_HOST[\s\S]*REVENUECAT_WEBHOOK_AUTH[\s\S]*FIELD_ENCRYPTION_KEY/);
   });
 
   it('yayında tüm zorunlu ayarlar varsa açılır', async () => {
@@ -34,6 +34,9 @@ describe('yayın ayar kontrolü', () => {
       JWT_SECRET: 'x'.repeat(40),
       SMTP_HOST: 'smtp.example.com',
       REVENUECAT_WEBHOOK_AUTH: 'Bearer secret',
+      FIELD_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64'),
+      MEDIA_URL_SECRET: 'm'.repeat(40),
+      CORS_ORIGINS: 'https://admin.meetpoint.app',
     });
     expect(() => assertProductionConfig()).not.toThrow();
     warn.mockRestore();

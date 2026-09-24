@@ -2,6 +2,8 @@
 // Zamanlamalar kısaltılmıştır (1 "dakika" = 3 sn) ki arama testleri hızlı çalışsın.
 export const TEST_PORT = 4010;
 export const FAKE_REVENUECAT_PORT = 4100;
+// Sahte şifre sızıntısı (HIBP) ve bot doğrulama (Turnstile) servisi: auth testi açar
+export const FAKE_SECURITY_PORT = 4101;
 // Testlerin kendi geçici PostgreSQL'i (geliştirme veritabanından ayrı, test bitince silinir)
 export const TEST_PG_PORT = 5434;
 
@@ -26,7 +28,10 @@ export const testEnv: Record<string, string> = {
   SCHEDULER_TICK_MS: '100',
   LEADER_RETRY_MS: '500',
   PRESENCE_SWEEP_MS: '1000',
+  // Şifre sızıntı kontrolü sahte servise gider (kapalıysa kontrol atlanır, kayıt engellenmez)
+  PWNED_API_BASE: `http://localhost:${FAKE_SECURITY_PORT}`,
   // Testte bu servisler kapalı (varsa geliştiricinin .env değerleri devralınmasın)
+  TURNSTILE_SECRET: '',
   SMTP_HOST: '',
   FIREBASE_SERVICE_ACCOUNT: '',
   AGORA_APP_ID: '',

@@ -16,7 +16,8 @@
     "typecheck:test": "tsc -p test",
     "test:load": "tsx test/load/load.ts",
     "db": "tsx scripts/db.ts",
-    "verify:ledger": "tsx scripts/verify-ledger.ts"
+    "verify:ledger": "tsx scripts/verify-ledger.ts",
+    "encrypt:payouts": "tsx scripts/encrypt-payouts.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,16 +27,20 @@
     "@prisma/client": "^6.19.3",
     "@socket.io/postgres-adapter": "^0.5.0",
     "agora-token": "^2.0.6",
+    "argon2": "^0.45.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
     "firebase-admin": "^14.4.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.4.0",
     "nodemailer": "^10.0.10",
+    "otpauth": "^9.5.2",
     "pg": "^8.23.0",
+    "qrcode": "^1.5.4",
     "sharp": "^0.35.4",
     "socket.io": "^4.8.3",
     "zod": "^4.6.5"
@@ -49,11 +54,16 @@
     "@types/node": "^26.6.2",
     "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
     "embedded-postgres": "^18.4.0-beta.17",
     "prisma": "^6.19.3",
     "socket.io-client": "^4.8.3",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "uuid": "^11.1.1"
   }
 }

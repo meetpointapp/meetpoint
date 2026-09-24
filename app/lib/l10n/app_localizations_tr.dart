@@ -1233,4 +1233,71 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errRequestInProgress =>
       'İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene.';
+
+  @override
+  String get errPasswordTooCommon =>
+      'Bu şifre çok yaygın ve kolay tahmin edilir. Daha güçlü bir şifre seç.';
+
+  @override
+  String get errPasswordBreached =>
+      'Bu şifre bilinen bir veri sızıntısında yer alıyor. Güvenliğin için başka bir şifre seç.';
+
+  @override
+  String get errPasswordSame => 'Yeni şifre mevcut şifrenle aynı olamaz.';
+
+  @override
+  String get errAccountLocked =>
+      'Çok fazla hatalı deneme yapıldı. Güvenliğin için 15 dakika sonra tekrar dene.';
+
+  @override
+  String get errTooManyAccounts =>
+      'Bu cihazdan kısa sürede çok fazla hesap açıldı.';
+
+  @override
+  String get errCaptcha => 'Güvenlik doğrulaması tamamlanamadı. Tekrar dene.';
+
+  @override
+  String get devicesTitle => 'Cihazlarım';
+
+  @override
+  String get devicesSubtitle =>
+      'Hesabının açık olduğu cihazlar. Tanımadığın bir cihaz görürsen oturumunu kapat ve şifreni değiştir.';
+
+  @override
+  String get thisDevice => 'Bu cihaz';
+
+  @override
+  String lastActive(String time) {
+    return 'Son etkinlik: $time';
+  }
+
+  @override
+  String get signOutDevice => 'Çıkış yaptır';
+
+  @override
+  String get signOutOthers => 'Diğer tüm cihazlardan çıkış yap';
+
+  @override
+  String get signOutOthersConfirm =>
+      'Bu cihaz dışındaki tüm oturumların kapatılacak.';
+
+  @override
+  String get deviceSignedOut => 'Cihazın oturumu kapatıldı';
+
+  @override
+  String get othersSignedOut => 'Diğer cihazlardan çıkış yapıldı';
+
+  @override
+  String get changePassword => 'Şifre değiştir';
+
+  @override
+  String get currentPassword => 'Mevcut şifre';
+
+  @override
+  String get changePasswordNote =>
+      'Şifren değişince bu cihaz dışındaki tüm oturumların kapanır.';
+
+  @override
+  String get passwordChanged =>
+      'Şifren değiştirildi, diğer cihazlardan çıkış yapıldı.';
 }

@@ -68,8 +68,8 @@ declare module 'vitest' {
 export const EXTRA_PIDS = path.join(dataRoot, 'extra-pids.txt');
 
 // Aynı test veritabanına ek sunucu örneği (çok sunuculu senaryolar için)
-export function spawnServer(port: number, logName: string, databaseUrl = testEnv.DATABASE_URL) {
-  const env = { ...process.env, ...testEnv, DATABASE_URL: databaseUrl, PORT: String(port) };
+export function spawnServer(port: number, logName: string, databaseUrl = testEnv.DATABASE_URL, extraEnv: Record<string, string> = {}) {
+  const env = { ...process.env, ...testEnv, DATABASE_URL: databaseUrl, PORT: String(port), ...extraEnv };
   // Sunucuyu başlatan test süreci bitince sunucu yaşamaya devam etmeli: çıktı doğrudan dosyaya (boru
   // değil) ve "detached" (Windows'ta aksi halde ebeveyn süreç kapanınca çocuk da kapatılır).
   // Kapatma garantisi: süreç kimlikleri EXTRA_PIDS'te, teardown hepsini kapatır.

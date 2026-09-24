@@ -107,11 +107,37 @@ export const callTiming = {
   disconnectGraceSeconds: Number(process.env.CALL_DISCONNECT_GRACE_SECONDS ?? 20),
 };
 
+// Şifre kuralı: yaygın şifre listesi her zaman; sızıntı veritabanı kontrolü (Have I Been Pwned) açıkken
+export const passwordPolicy = {
+  breachCheck: process.env.PASSWORD_BREACH_CHECK !== 'off',
+  pwnedApiBase: process.env.PWNED_API_BASE ?? 'https://api.pwnedpasswords.com',
+};
+
+// Oturumlar: erişim jetonu ömrü ve hareketsizlikte oturumun düşme süresi
+export const sessionPolicy = {
+  accessTokenSeconds: Number(process.env.ACCESS_TOKEN_SECONDS ?? 15 * 60),
+  idleDays: Number(process.env.SESSION_IDLE_DAYS ?? 60),
+};
+
+// Kayıtta bot koruması (Cloudflare Turnstile). Gizli anahtar yoksa kapalı.
+export const turnstile = {
+  secret: process.env.TURNSTILE_SECRET ?? '',
+  verifyUrl: process.env.TURNSTILE_VERIFY_URL ?? 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+};
+
+// Cihaz başına hesap sınırı: bir cihazdan son 30 günde en fazla bu kadar hesap açılabilir
+export const accountsPerDevice = Number(process.env.ACCOUNTS_PER_DEVICE ?? 3);
+
+// Tarayıcıdan erişime izin verilen adresler (yayında web uygulaması ve panel). Boşsa geliştirmede herkes.
+export const corsOrigins = (process.env.CORS_ORIGINS ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+
 // Zamanlayıcı (scheduler.ts): tur aralığı, liderlik deneme aralığı, bağlantı taraması aralığı
 export const scheduler = {
   tickMs: Number(process.env.SCHEDULER_TICK_MS ?? 1000),
   leaderRetryMs: Number(process.env.LEADER_RETRY_MS ?? 5000),
   presenceSweepMs: Number(process.env.PRESENCE_SWEEP_MS ?? 10_000),
+  // "off": bu sunucu liderliğe hiç aday olmaz (ör. sadece API hizmeti veren ek sunucu)
+  enabled: process.env.SCHEDULER !== 'off',
 };
 
 // Sesli/görüntülü istekler eskiden istek üzerinden fiyatlanıyordu; yeni istek sadece MESSAGE.
@@ -129,9 +155,13 @@ export function assertProductionConfig() {
   if (!process.env.JWT_SECRET || config.jwtSecret.length < 32) problems.push('JWT_SECRET en az 32 karakter olmalı');
   if (!config.smtp.host) problems.push('SMTP_HOST yok: doğrulama kodları e-postayla gidemez');
   if (!revenueCat.webhookAuth) problems.push('REVENUECAT_WEBHOOK_AUTH yok: satın alımlar jetona dönüşmez');
+  if (!process.env.FIELD_ENCRYPTION_KEY) problems.push('FIELD_ENCRYPTION_KEY yok: IBAN ve 2FA anahtarları şifrelenemez');
+  if (!process.env.MEDIA_URL_SECRET) problems.push('MEDIA_URL_SECRET yok: fotoğraf adresleri imzalanamaz');
+  if (corsOrigins.length === 0) problems.push('CORS_ORIGINS yok: hangi web adreslerine izin verileceği belirtilmeli');
   if (problems.length) {
     throw new Error(`Yayın ayarları eksik:\n- ${problems.join('\n- ')}`);
   }
   if (!agora.appId) console.warn('UYARI: AGORA_APP_ID yok, aramalar test modunda (ses/görüntü yok)');
   if (!firebaseServiceAccount) console.warn('UYARI: FIREBASE_SERVICE_ACCOUNT yok, push bildirimleri kapalı');
+  if (!turnstile.secret) console.warn('UYARI: TURNSTILE_SECRET yok, kayıtta bot koruması kapalı');
 }

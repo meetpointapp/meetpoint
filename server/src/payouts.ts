@@ -1,5 +1,6 @@
 import type { Payout } from '@prisma/client';
 import { economy } from './config';
+import { decryptField, encryptField } from './fieldCrypto';
 import { HttpError, prisma } from './db';
 import { maskAccount, normalizeIban } from './iban';
 import { notify } from './notify';
@@ -17,8 +18,8 @@ export const payoutDto = (p: Payout) => ({
   coins: p.coins,
   usd: p.usd,
   method: p.method,
-  accountName: p.accountName,
-  accountHint: maskAccount(p.method, p.accountValue),
+  accountName: decryptField(p.accountName),
+  accountHint: p.accountHint || maskAccount(p.method, decryptField(p.accountValue)),
   status: p.status,
   reference: p.reference,
   adminNote: p.adminNote,
@@ -56,8 +57,10 @@ export async function requestPayout(
         coins: input.coins,
         usd: +(input.coins * economy.cashoutUsdPerCoin).toFixed(2),
         method: input.method,
-        accountName: input.accountName.trim(),
-        accountValue,
+        // IBAN/PayPal adresi ve hesap sahibi veritabanında şifreli; kullanıcıya maskeli hâli gösterilir
+        accountName: encryptField(input.accountName.trim()),
+        accountValue: encryptField(accountValue),
+        accountHint: maskAccount(input.method, accountValue),
       },
     });
     await debitCashable(tx, userId, input.coins, 'CASHOUT', { note: `payout:${p.id}` });

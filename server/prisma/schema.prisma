@@ -18,13 +18,21 @@ model User {
   createdAt    DateTime @default(now())
 
   // Güvenlik
-  emailVerifiedAt DateTime?
-  tokenVersion    Int       @default(0) // şifre değişince eski oturumlar geçersiz olur
-  isAdmin         Boolean   @default(false)
-  bannedAt        DateTime?
-  banReason       String    @default("")
-  termsAcceptedAt DateTime?
-  termsVersion    String    @default("")
+  emailVerifiedAt    DateTime?
+  tokenVersion       Int       @default(0) // şifre değişince eski oturumlar geçersiz olur
+  isAdmin            Boolean   @default(false) // yönetim ekibinden mi (yetkisi adminRole'de)
+  adminRole          String    @default("") // super | moderator | finance
+  // Yönetim paneli iki adımlı doğrulama (TOTP). Gizli anahtarlar alan düzeyinde şifreli (fieldCrypto)
+  mfaSecret          String    @default("")
+  mfaPendingSecret   String    @default("") // kurulum sürerken, ilk kod doğrulanınca mfaSecret olur
+  mfaEnabledAt       DateTime?
+  mfaLastCounter     Int       @default(0) // aynı kodun ikinci kez kullanılmasını engeller
+  mfaBackupCodes     Json      @default("[]") // tek kullanımlık yedek kodların özetleri
+  registeredDeviceId String    @default("") // cihaz başına hesap sınırı için
+  bannedAt           DateTime?
+  banReason          String    @default("")
+  termsAcceptedAt    DateTime?
+  termsVersion       String    @default("")
 
   // Selfie ile profil doğrulama (mavi tik): none | pending | approved | rejected
   verificationStatus String    @default("none")
@@ -39,11 +47,12 @@ model User {
   verifications VerificationRequest[]
   devices       Device[]
   purchases     Purchase[]
-  callsMade     Call[]     @relation("CallCaller")
-  callsReceived Call[]     @relation("CallCallee")
-  giftsSent     CallGift[] @relation("GiftFrom")
-  giftsReceived CallGift[] @relation("GiftTo")
+  callsMade     Call[]                @relation("CallCaller")
+  callsReceived Call[]                @relation("CallCallee")
+  giftsSent     CallGift[]            @relation("GiftFrom")
+  giftsReceived CallGift[]            @relation("GiftTo")
   payouts       Payout[]
+  sessions      Session[]
 
   profile Profile?
   photos  Photo[]
@@ -65,29 +74,31 @@ model User {
   blocksReceived Block[]  @relation("BlockTo")
   reportsGiven   Report[] @relation("ReportFrom")
   reportsAgainst Report[] @relation("ReportTo")
+
+  @@index([registeredDeviceId, createdAt])
 }
 
 model Profile {
-  userId      String   @id
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName String
-  birthDate   DateTime
-  gender      String // "male" | "female" | "other"
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName  String
+  birthDate    DateTime
+  gender       String // "male" | "female" | "other"
   interestedIn String // "male" | "female" | "everyone"
-  bio         String   @default("")
-  city        String   @default("")
-  country     String   @default("")
+  bio          String   @default("")
+  city         String   @default("")
+  country      String   @default("")
   // Katalog kimlikleri: src/catalog.ts
-  interests   Json     @default("[]") // ["coffee", "travel", ...] en fazla 5
-  prompts     Json     @default("[]") // [{ id: "perfect_sunday", answer: "..." }] en fazla 3
+  interests    Json     @default("[]") // ["coffee", "travel", ...] en fazla 5
+  prompts      Json     @default("[]") // [{ id: "perfect_sunday", answer: "..." }] en fazla 3
   // Temel bilgiler (boş = belirtilmemiş)
-  lookingFor  String   @default("") // relationship | casual | friendship | chat | unsure
-  heightCm    Int?
-  job         String   @default("")
-  education   String   @default("") // high_school | bachelor | master | phd
-  zodiac      String   @default("")
-  smoking     String   @default("") // no | sometimes | yes
-  drinking    String   @default("") // no | sometimes | yes
+  lookingFor   String   @default("") // relationship | casual | friendship | chat | unsure
+  heightCm     Int?
+  job          String   @default("")
+  education    String   @default("") // high_school | bachelor | master | phd
+  zodiac       String   @default("")
+  smoking      String   @default("") // no | sometimes | yes
+  drinking     String   @default("") // no | sometimes | yes
 
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
@@ -99,7 +110,7 @@ model Profile {
   filterMaxAge Int @default(80)
   filterMaxKm  Int @default(0) // 0 = mesafe sınırı yok
 
-  updatedAt   DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   // Keşfet sorgusu: cinsiyet + yaş aralığı, mesafe kutusu
   @@index([gender, birthDate])
@@ -297,7 +308,8 @@ model Payout {
   coins        Int
   usd          Float
   method       String // iban | paypal
-  accountName  String    @default("") // hesap sahibi
+  accountName  String    @default("") // hesap sahibi (şifreli)
+  accountHint  String    @default("") // kullanıcıya gösterilen maskeli hâli (•••• 1326)
   accountValue String // IBAN veya PayPal e-postası
   status       String    @default("PENDING") // PENDING | PAID | REJECTED | CANCELLED
   reference    String    @default("") // yönetimin girdiği havale/işlem numarası
@@ -363,6 +375,48 @@ model SocketIoAttachment {
   payload   Bytes?
 
   @@map("socket_io_attachments")
+}
+
+// Oturum: her cihaz girişi bir oturumdur. Uygulama 15 dakikalık erişim jetonu + yenileme jetonu
+// kullanır; yenileme jetonu her kullanımda değişir, eskisinin tekrar kullanılması çalınma sayılır
+// ve oturum kapatılır. 60 gün kullanılmayan oturum kendiliğinden düşer.
+model Session {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshHash     String    @unique // yenileme jetonunun SHA-256 özeti (jetonun kendisi saklanmaz)
+  prevRefreshHash String?   @unique
+  rotatedAt       DateTime?
+  deviceId        String    @default("")
+  deviceName      String    @default("")
+  platform        String    @default("")
+  ip              String    @default("")
+  mfa             Boolean   @default(false) // yönetim 2FA'sı bu oturumda doğrulandı
+  createdAt       DateTime  @default(now())
+  lastUsedAt      DateTime  @default(now())
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  revokeReason    String    @default("")
+
+  @@index([userId, revokedAt])
+  @@index([deviceId])
+}
+
+// Yönetim işlem kaydı: kim, ne zaman, neyi yaptı. Veritabanı tetikleyicisi değiştirme ve silmeyi
+// engeller. Yönetici hesabı silinse de kayıt kalır (bu yüzden kullanıcıya bağlı değil).
+model AdminAudit {
+  id         String   @id @default(cuid())
+  adminId    String
+  adminEmail String
+  action     String // ör. user.ban, report.resolve, payout.pay, staff.role
+  targetType String   @default("")
+  targetId   String   @default("")
+  details    Json     @default("{}")
+  ip         String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([targetType, targetId])
 }
 
 // Push bildirim cihaz jetonları (FCM)

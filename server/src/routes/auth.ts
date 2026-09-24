@@ -1,12 +1,14 @@
-import bcrypt from 'bcryptjs';
 import { Router } from 'express';
 import { z } from 'zod';
-import { requireAuth, signToken, uid } from '../auth';
+import { currentSession, requireAuth, uid } from '../auth';
 import { consumeCode, issueCode } from '../codes';
 import { config } from '../config';
 import { HttpError, prisma } from '../db';
-import { authLimiter, codeLimiter } from '../limits';
+import { authLimiter, codeLimiter, refreshLimiter } from '../limits';
+import { assertNotLocked, assertPasswordAllowed, clearLoginFailures, hashPassword, recordLoginFailure, verifyPassword } from '../passwords';
 import { grantSignupBonus } from '../purchases';
+import { createSession, refreshSession, revokeAllSessions, revokeSession } from '../sessions';
+import { assertDeviceQuota, verifyCaptcha } from '../signupGuard';
 
 export const authRouter = Router();
 
@@ -22,32 +24,67 @@ authRouter.post('/register', authLimiter, async (req, res) => {
       locale: z.enum(['tr', 'en']).optional(),
       // Kullanım koşulları + gizlilik politikası + 18 yaş beyanı zorunlu
       acceptTerms: z.literal(true),
+      captchaToken: z.string().max(4096).optional(),
     })
     .parse(req.body);
+  await verifyCaptcha(data.captchaToken, req.ip);
   const exists = await prisma.user.findUnique({ where: { email: data.email } });
   if (exists) throw new HttpError(409, 'email_taken');
+  await assertPasswordAllowed(data.password, data.email);
+  const deviceId = String(req.header('x-device-id') ?? '').slice(0, 64);
+  await assertDeviceQuota(deviceId);
 
   const user = await prisma.user.create({
     data: {
       email: data.email,
-      passwordHash: await bcrypt.hash(data.password, 10),
+      passwordHash: await hashPassword(data.password),
       locale: data.locale ?? 'tr',
       termsAcceptedAt: new Date(),
       termsVersion: config.termsVersion,
+      registeredDeviceId: deviceId,
     },
   });
   await issueCode(user, 'verify');
-  res.status(201).json({ token: signToken(user), userId: user.id });
+  res.status(201).json(await createSession(user, req));
 });
 
 authRouter.post('/login', authLimiter, async (req, res) => {
-  const data = z.object({ email, password }).parse(req.body);
+  // Girişte uzunluk sınırı yok (eski kurallarla açılmış hesaplar da girebilsin), sadece üst sınır
+  const data = z.object({ email, password: z.string().min(1).max(128) }).parse(req.body);
+  await assertNotLocked(data.email);
   const user = await prisma.user.findUnique({ where: { email: data.email } });
-  if (!user || !(await bcrypt.compare(data.password, user.passwordHash))) {
+  const check = await verifyPassword(user?.passwordHash ?? null, data.password);
+  if (!user || !check.ok) {
+    await recordLoginFailure(data.email);
     throw new HttpError(401, 'invalid_credentials');
   }
+  await clearLoginFailures(data.email);
+  if (check.upgraded) await prisma.user.update({ where: { id: user.id }, data: { passwordHash: check.upgraded } });
   if (user.bannedAt) throw new HttpError(403, 'banned');
-  res.json({ token: signToken(user), userId: user.id });
+  res.json(await createSession(user, req, { notifyNewDevice: true }));
+});
+
+// Erişim jetonu yenileme: yenileme jetonu her kullanımda değişir
+authRouter.post('/refresh', refreshLimiter, async (req, res) => {
+  const data = z.object({ refreshToken: z.string().min(1).max(200) }).parse(req.body);
+  res.json(await refreshSession(data.refreshToken));
+});
+
+authRouter.post('/logout', requireAuth, async (req, res) => {
+  await revokeSession(currentSession(req), 'logout');
+  res.json({ ok: true });
+});
+
+// Şifre değiştirme: mevcut şifre gerekir, bu cihaz dışındaki oturumlar kapanır
+authRouter.post('/change-password', authLimiter, requireAuth, async (req, res) => {
+  const data = z.object({ currentPassword: z.string().min(1).max(128), newPassword: password }).parse(req.body);
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) } });
+  if (!(await verifyPassword(user.passwordHash, data.currentPassword)).ok) throw new HttpError(401, 'invalid_credentials');
+  if (data.currentPassword === data.newPassword) throw new HttpError(400, 'password_same');
+  await assertPasswordAllowed(data.newPassword, user.email);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(data.newPassword) } });
+  await revokeAllSessions(user.id, 'password_changed', currentSession(req));
+  res.json({ ok: true });
 });
 
 authRouter.post('/verify-email', codeLimiter, requireAuth, async (req, res) => {
@@ -84,15 +121,18 @@ authRouter.post('/reset-password', codeLimiter, async (req, res) => {
   const user = await prisma.user.findUnique({ where: { email: data.email } });
   if (!user) throw new HttpError(400, 'code_invalid');
   await consumeCode(user.id, 'reset', data.code);
-  // tokenVersion artışı: diğer cihazlardaki oturumlar kapanır
+  await assertPasswordAllowed(data.password, data.email);
   const updated = await prisma.user.update({
     where: { id: user.id },
     data: {
-      passwordHash: await bcrypt.hash(data.password, 10),
-      tokenVersion: { increment: 1 },
+      passwordHash: await hashPassword(data.password),
       // Kodu e-postasına alabildiği için adres de doğrulanmış olur
       emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
     },
   });
-  res.json({ token: signToken(updated), userId: updated.id });
+  // Tüm oturumlar kapanır (hesap ele geçirilmiş olabilir), kilit kalkar
+  await revokeAllSessions(user.id, 'password_reset');
+  await clearLoginFailures(user.email);
+  if (updated.bannedAt) throw new HttpError(403, 'banned');
+  res.json(await createSession(updated, req));
 });

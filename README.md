@@ -95,10 +95,24 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## Güvenlik sertleştirme (Faz 10)
+
+Madde madde denetim: [docs/guvenlik-denetimi.md](docs/guvenlik-denetimi.md).
+
+- **Oturumlar** (`src/sessions.ts`): 15 dakikalık erişim jetonu + her kullanımda değişen yenileme jetonu; 60 gün kullanılmayan oturum düşer. Profil → Cihazlarım'dan oturum kapatılır; yeni cihazdan girişte e-posta gider.
+- **Şifreler** (`src/passwords.ts`): Argon2id; yaygın ve sızdırılmış şifreler reddedilir; 15 dakikada 10 hatalı girişte hesap kilitlenir.
+- **Yönetim paneli:** İlk girişte doğrulayıcı uygulamayla 2FA kurulur, sonra her girişte kod sorulur. Roller: süper yönetici, moderatör, finans (Ekip sekmesi). Her işlem silinemez İşlem kaydı'na yazılır.
+- **Şifreli alanlar** (`src/fieldCrypto.ts`): IBAN/PayPal, hesap sahibi adı, 2FA anahtarları. Eski kayıtlar için: `npm run encrypt:payouts`.
+- **Kayıt koruması:** Cihaz başına 30 günde 3 hesap; Cloudflare Turnstile `TURNSTILE_SECRET` girilince açılır.
+- **Ek API sunucusu:** `SCHEDULER=off` ile zamanlayıcı liderliğine aday olmaz.
+
 **Yayından önce yapılacaklar:**
 
 - `NODE_ENV=production` ayarlanmalı.
 - Güçlü bir `JWT_SECRET` belirlenmeli.
+- `FIELD_ENCRYPTION_KEY` (32 bayt, base64): `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`. Kaybedilirse şifreli IBAN'lar okunamaz: yedeğini ayrı bir yerde tut.
+- `MEDIA_URL_SECRET` ve `CORS_ORIGINS` (virgülle ayrılmış web adresleri) tanımlanmalı.
+- Bot koruması için `TURNSTILE_SECRET` (Cloudflare panelinden).
 - E-posta için `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` ve `MAIL_FROM` tanımlanmalı.
 - `server/legal/` metinleri bir hukukçuya inceletilmeli ve köşeli parantezli şirket bilgileri doldurulmalı.
 

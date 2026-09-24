@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import 'auth_tokens.dart';
 import 'config.dart';
 
 // Yakalanmamış hataları sunucuya bildirir (yönetim paneli → Hatalar).
@@ -8,7 +9,7 @@ import 'config.dart';
 class ErrorReporter {
   ErrorReporter._();
 
-  static String? token; // oturum açıksa hata kullanıcıyla eşleşir
+  static AuthTokens? auth; // oturum açıksa hata kullanıcıyla eşleşir
   static String Function()? currentRoute;
 
   static final _dio = Dio(BaseOptions(baseUrl: apiBaseUrl, connectTimeout: const Duration(seconds: 5)));
@@ -58,7 +59,7 @@ class ErrorReporter {
           'appVersion': appVersion,
           'context': route,
         },
-        options: Options(headers: {if (token != null) 'Authorization': 'Bearer $token'}),
+        options: Options(headers: {if (auth != null) 'Authorization': 'Bearer ${auth!.access}'}),
       );
     } catch (_) {
       // Bildirim başarısız olursa sessizce geç: hata raporu uygulamayı bozmamalı

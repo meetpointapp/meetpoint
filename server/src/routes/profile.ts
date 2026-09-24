@@ -1,11 +1,11 @@
 import type { Profile } from '@prisma/client';
-import bcrypt from 'bcryptjs';
 import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
-import { uid } from '../auth';
+import { currentSession, uid } from '../auth';
 import { EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, PROMPTS, ZODIAC } from '../catalog';
 import { ageOf } from '../age';
+import { verifyPassword } from '../passwords';
 import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
 import { privateStore } from '../storage';
 import { config } from '../config';
@@ -13,6 +13,7 @@ import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
 import { getBalance, getCashable } from '../wallet';
 import { closeAllPendingFor } from '../requestService';
+import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
 
 export const profileRouter = Router();
 
@@ -127,6 +128,23 @@ profileRouter.delete('/me/devices', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Cihazlarım: açık oturumlar. Kullanıcı tanımadığı bir cihazı buradan çıkarabilir.
+profileRouter.get('/me/sessions', async (req, res) => {
+  res.json(await listSessions(uid(req), currentSession(req)));
+});
+
+profileRouter.delete('/me/sessions/:id', async (req, res) => {
+  const session = await prisma.session.findFirst({ where: { id: req.params.id, userId: uid(req), revokedAt: null } });
+  if (!session) throw new HttpError(404, 'not_found');
+  await revokeSession(session.id, session.id === currentSession(req) ? 'logout' : 'user_revoked');
+  res.json({ ok: true });
+});
+
+profileRouter.post('/me/sessions/revoke-others', async (req, res) => {
+  await revokeAllSessions(uid(req), 'user_revoked', currentSession(req));
+  res.json({ ok: true });
+});
+
 // Hesap silme (App Store zorunluluğu). Şifre ile onaylanır; geri alınamaz.
 // Dahil olduğu bekleyen istekler kapatılır, bloke jetonlar gönderenlere iade edilir.
 profileRouter.delete('/me', async (req, res) => {
@@ -136,12 +154,14 @@ profileRouter.delete('/me', async (req, res) => {
     where: { id: userId },
     include: { photos: true, verifications: true },
   });
-  if (!(await bcrypt.compare(password, user.passwordHash))) throw new HttpError(401, 'invalid_credentials');
+  if (!(await verifyPassword(user.passwordHash, password)).ok) throw new HttpError(401, 'invalid_credentials');
 
   // Bekleyen para çekme talebi varken hesap silinemez (önce iptal edilmeli ya da sonuçlanmalı)
   if (await prisma.payout.count({ where: { userId, status: 'PENDING' } })) throw new HttpError(409, 'payout_pending');
 
   await closeAllPendingFor(userId);
+  // Açık bağlantılar da kapansın (oturum kayıtları hesapla birlikte silinir)
+  await revokeAllSessions(userId, 'account_deleted');
 
   await prisma.user.delete({ where: { id: userId } });
   for (const p of user.photos) await removeProfilePhoto(p.path);

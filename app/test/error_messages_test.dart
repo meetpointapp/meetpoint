@@ -24,6 +24,17 @@ const internalCodes = {
   'view_once_sender': 'gönderen kendi fotoğrafını açma seçeneği görmez',
   'invalid_idempotency_key': 'anahtarı uygulama doğru biçimde üretir (Api.newIdempotencyKey)',
   'idempotency_key_reused': 'her yeni eylem yeni anahtar alır; aynı anahtar sadece aynı isteğin tekrarında kullanılır',
+  'token_expired': 'Api jetonu yenileyip isteği kendiliğinden tekrarlar',
+  'invalid_refresh': 'oturum kapanmış: giriş ekranına dönülür',
+  'mfa_setup_required': 'sadece yönetim paneli',
+  'mfa_required': 'sadece yönetim paneli',
+  'mfa_already_enabled': 'sadece yönetim paneli',
+  'mfa_setup_not_started': 'sadece yönetim paneli',
+  'mfa_invalid': 'sadece yönetim paneli',
+  'mfa_code_used': 'sadece yönetim paneli',
+  'cannot_ban_self': 'sadece yönetim paneli',
+  'cannot_change_own_role': 'sadece yönetim paneli',
+  'cannot_reset_own_mfa': 'sadece yönetim paneli',
 };
 
 Set<String> _serverCodes() {

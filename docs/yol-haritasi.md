@@ -52,9 +52,9 @@ Faz 8 tamamlandı. Testler repoda: sunucuda 39 test (7 uçtan uca senaryo, 250+ 
 
 | Bulgu | Faz |
 |---|---|
-| Şifre özeti (bcryptjs) saf JavaScript: toplu kayıtlarda sunucuyu bloke ediyor (20 eşzamanlı kayıtta p50 2,6 sn) | 10 |
+| ~~Şifre özeti (bcryptjs) saf JavaScript: toplu kayıtlarda sunucuyu bloke ediyor (20 eşzamanlı kayıtta p50 2,6 sn)~~ ✅ Argon2id | 10 |
 | Keşfet tüm adayları belleğe alıp süzüyor (200 kullanıcıda p50 0,7 sn) | 9 |
-| Prisma CLI → deepmerge-ts (yüksek) ve firebase-admin → uuid (orta) güvenlik bildirimi; çalışan sunucuda kullanılmıyor | 10 |
+| ~~Prisma CLI → deepmerge-ts (yüksek) ve firebase-admin → uuid (orta) güvenlik bildirimi~~ ✅ kapatıldı | 10 |
 | **Fiyat kararı:** "En popüler" 1000'lik paket jeton başına 500'lükten biraz pahalı | 13 |
 | **Ekonomi kararı:** %50 ilk alım bonusu ve kayıt hediyesi, harcanınca başkasının bozdurulabilir kazancına dönüşüyor. KDV ve mağaza payından sonra jeton başı gelir bozdurma kurunun altına inebiliyor (zarar). %30 mağaza payında 6000'lik paket bonussuz da zararda. | 13 |
 
@@ -82,6 +82,21 @@ Faz 9 tamamlandı. Sunucuda 51 test (13 uçtan uca senaryo), uygulamada 35 test;
 | Mesaj gönderme | 84 ms |
 | Mesajın karşıya ulaşması | 125 ms |
 
+### Faz 10'da bulunanlar
+
+Faz 10 tamamlandı. Sunucuda 72 test (22 dosya), uygulamada 39 test; tam takım üç kez üst üste temiz.
+Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
+
+**Düzeltilenler:**
+- **Oturum 30 gün geçerli tek jetondu:** çalınırsa kapatılamıyordu. Artık 15 dakikalık erişim + her kullanımda değişen yenileme jetonu; çalınan jeton tekrar kullanılırsa oturum kapanıyor.
+- **Çıkış sadece cihazdaydı:** sunucuda oturum açık kalıyordu. Artık sunucuda da kapanıyor, anlık bağlantı da kesiliyor.
+- **Yönetim paneli tek şifreyle açılıyordu:** şimdi 2FA zorunlu, roller ayrı, her işlem silinemez kayıtta.
+- **IBAN ve PayPal adresleri düz metindi:** veritabanı yedeği sızsa okunabilirdi. Şimdi şifreli.
+- **"password123" gibi şifreler kabul ediliyordu;** kaba kuvvete karşı sadece IP sınırı vardı.
+- **Ek sunucu örneği zamanlayıcı liderliğine karışabiliyordu:** `SCHEDULER=off` ile sadece API sunucusu çalıştırılabiliyor.
+
+**Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
+
 ---
 
 ## Faz 8 · Test altyapısı ve sürekli entegrasyon ✅
@@ -108,18 +123,18 @@ Faz 9 tamamlandı. Sunucuda 51 test (13 uçtan uca senaryo), uygulamada 35 test;
 6. 🛠 **Fotoğraf depolama.** Otomatik küçük ve orta boy üretimi, süreli imzalı bağlantılar, S3 uyumlu depolamaya hazır katman.
 7. 🛠 **Sorgu disiplini.** İndeksler, sayfalama (keşfet, sohbet, geçmiş, panel listeleri), sorgu performans ölçümü. Keşfet filtrelemesi veritabanında yapılır; yük testi hedefi p95 < 300 ms.
 
-## Faz 10 · Güvenlik sertleştirme
+## Faz 10 · Güvenlik sertleştirme ✅
 
 **Amaç:** OWASP ASVS Seviye 2 düzeyine uygunluk.
 
 1. ~~🛠 **Fotoğraf güvenliği.**~~ ✅ Faz 9'da yapıldı (yeniden kodlama, EXIF/GPS silme, gerçek tür kontrolü, imzalı adresler).
-2. 🛠 **Oturumlar.** Kısa ömürlü erişim jetonu ve yenileme; aktif cihazlar listesi; tek tek oturum kapatma; yeni cihaz girişinde e-posta uyarısı.
-3. 🛠 **Yönetim paneli.** İki adımlı doğrulama (TOTP), roller (moderatör / finans / süper yönetici), silinemez işlem kaydı.
-4. 🛠 **Hassas veri şifreleme.** IBAN, PayPal ve kimlik bilgileri alan düzeyinde şifreli; anahtar veritabanı dışında.
-5. 🛠 **Kötüye kullanım ve şifreler.** Bot koruması, cihaz başına hesap sınırı, sızdırılmış şifre kontrolü, şifre politikası. Şifre özeti yerel (native) Argon2id'ye geçer; mevcut şifreler girişte otomatik yükseltilir.
-6. 🛠 **Sunucu yapılandırması.** CORS kısıtı, güvenlik başlıkları, istek boyutu sınırları, hata mesajlarında iç bilgi sızmaması.
-7. 🛠 **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 17'de.
-8. 🛠 **Bağımlılık güvenliği.** Prisma ve firebase-admin sürüm yükseltmeleriyle açık bildirimlerinin kapatılması.
+2. ✅ **Oturumlar.** Kısa ömürlü erişim jetonu ve yenileme; aktif cihazlar listesi; tek tek oturum kapatma; yeni cihaz girişinde e-posta uyarısı.
+3. ✅ **Yönetim paneli.** İki adımlı doğrulama (TOTP), roller (moderatör / finans / süper yönetici), silinemez işlem kaydı.
+4. ✅ **Hassas veri şifreleme.** IBAN, PayPal ve kimlik bilgileri alan düzeyinde şifreli; anahtar veritabanı dışında.
+5. ✅ **Kötüye kullanım ve şifreler.** Bot koruması, cihaz başına hesap sınırı, sızdırılmış şifre kontrolü, şifre politikası. Şifre özeti yerel (native) Argon2id'ye geçer; mevcut şifreler girişte otomatik yükseltilir.
+6. ✅ **Sunucu yapılandırması.** CORS kısıtı, güvenlik başlıkları, istek boyutu sınırları, hata mesajlarında iç bilgi sızmaması.
+7. ✅ **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 17'de.
+8. ✅ **Bağımlılık güvenliği.** Prisma ve firebase-admin sürüm yükseltmeleriyle açık bildirimlerinin kapatılması.
 
 ## Faz 11 · KVKK uyumu (uygulama içi)
 

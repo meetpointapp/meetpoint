@@ -50,6 +50,20 @@ const templates: Record<string, Record<Purpose, (code: string) => { subject: str
   },
 };
 
+// Yeni cihazdan giriş uyarısı
+export function newDeviceMail(locale: string, device: string, ip: string) {
+  const when = new Date().toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-GB', { timeZone: 'Europe/Istanbul' });
+  return locale === 'tr'
+    ? {
+        subject: 'MeetPoint: yeni bir cihazdan giriş yapıldı',
+        text: `Merhaba,\n\nHesabına yeni bir cihazdan giriş yapıldı:\n\nCihaz: ${device}\nZaman: ${when}\nIP: ${ip}\n\nBu sen değilsen hemen şifreni değiştir ve uygulamada Profil > Cihazlarım bölümünden bu oturumu kapat.`,
+      }
+    : {
+        subject: 'MeetPoint: new sign-in to your account',
+        text: `Hi,\n\nYour account was signed in from a new device:\n\nDevice: ${device}\nTime: ${when}\nIP: ${ip}\n\nIf this wasn't you, change your password now and sign that session out under Profile > My devices.`,
+      };
+}
+
 export function codeMail(locale: string, purpose: Purpose, code: string) {
   return (templates[locale] ?? templates.en)[purpose](code);
 }

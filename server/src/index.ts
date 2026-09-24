@@ -1,9 +1,10 @@
 import http from 'node:http';
 import cors from 'cors';
+import helmet from 'helmet';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { ZodError } from 'zod';
 import { requireAdmin, requireAuth, requireVerifiedEmail } from './auth';
-import { assertProductionConfig, config } from './config';
+import { assertProductionConfig, config, corsOrigins, scheduler as schedulerConfig } from './config';
 import { HttpError, prisma } from './db';
 import { recordError } from './errors';
 import { idempotency } from './idempotency';
@@ -11,6 +12,7 @@ import { pool } from './pgPool';
 import { closeRealtime, initRealtime } from './realtime';
 import { isLeader, startScheduler, stopScheduler } from './scheduler';
 import { adminRouter } from './routes/admin';
+import { adminAuthRouter } from './routes/adminAuth';
 import { authRouter } from './routes/auth';
 import { boostsRouter } from './routes/boosts';
 import { callsRouter } from './routes/calls';
@@ -32,9 +34,34 @@ assertProductionConfig();
 const app = express();
 // Hız sınırlayıcı IP'yi doğru görsün (VPS'te nginx arkasında çalışırken)
 app.set('trust proxy', 1);
-app.use(cors());
+app.disable('x-powered-by');
+// Güvenlik başlıkları. Yönetim paneli sadece kendi dosyalarını çalıştırabilir (XSS'e karşı CSP).
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'blob:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'none'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    // Fotoğraflar uygulamanın web sürümünden (farklı adres) yüklenebilsin
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    strictTransportSecurity: config.isProduction ? { maxAge: 31_536_000, includeSubDomains: true } : false,
+  }),
+);
+// Yayında sadece izin verilen web adresleri; mobil uygulama tarayıcı olmadığı için CORS'tan etkilenmez
+app.use(cors(config.isProduction ? { origin: corsOrigins } : {}));
 app.use(express.json({ limit: '100kb' }));
-app.use('/admin', express.static('admin'));
+app.use('/admin', express.static('admin', { setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
 
 app.get('/health', (_req, res) => {
   // Geliştirmede süreç kimliği de döner (çok sunuculu testler için)
@@ -45,6 +72,7 @@ app.use('/media', mediaRouter);
 app.use('/webhooks/revenuecat', revenueCatRouter);
 app.use('/client-errors', clientErrorsRouter);
 app.use('/auth', authRouter);
+app.use('/admin/api/mfa', requireAuth, adminAuthRouter);
 app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,
@@ -83,7 +111,7 @@ initRealtime(server);
 
 server.listen(config.port, () => {
   console.log(`MeetPoint server http://localhost:${config.port}`);
-  startScheduler();
+  if (schedulerConfig.enabled) startScheduler();
 });
 
 // Düzgün kapanma: liderlik kilidini bırak (başka sunucu hemen devralsın), bağlantıları kapat

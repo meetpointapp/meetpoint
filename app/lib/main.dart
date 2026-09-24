@@ -21,7 +21,7 @@ class MeetPointApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(incomingCallsProvider);
-    ErrorReporter.token = ref.watch(sessionProvider.select((s) => s.value?.token));
+    ErrorReporter.auth = ref.watch(sessionProvider.select((s) => s.value?.auth));
     final router = ref.watch(routerProvider);
     ErrorReporter.currentRoute = () => router.routerDelegate.currentConfiguration.uri.path;
     return MaterialApp.router(

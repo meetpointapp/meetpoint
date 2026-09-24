@@ -1,6 +1,6 @@
 // Faz 3: güven ve güvenlik testleri
 import { describe, it } from 'vitest';
-import { B, call, check, registerVerified, upload, latestCode, PRIVATE_DIR } from '../helpers';
+import { B, call, check, makeAdmin, registerVerified, upload, latestCode, PRIVATE_DIR, TEST_PASSWORD } from '../helpers';
 
 describe('Güvenlik ve güven (Faz 3)', () => {
   it('senaryo', async () => {
@@ -8,11 +8,11 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     const profile = (name, gender, interestedIn) => ({ displayName: name, birthDate: '1995-03-03', gender, interestedIn });
 
     // --- 1. Kayıt: koşul onayı zorunlu, e-posta doğrulanmadan uygulama kullanılamaz
-    const noTerms = await call(null, 'POST', '/auth/register', { email: `x${tag}@test.com`, password: 'password123' });
+    const noTerms = await call(null, 'POST', '/auth/register', { email: `x${tag}@test.com`, password: TEST_PASSWORD });
     check('register without terms rejected', noTerms.http === 400);
 
     const email = `sec${tag}@test.com`;
-    const reg = await call(null, 'POST', '/auth/register', { email, password: 'password123', acceptTerms: true });
+    const reg = await call(null, 'POST', '/auth/register', { email, password: TEST_PASSWORD, acceptTerms: true });
     check('register ok', reg.http === 201);
     const meUnverified = await call(reg.token, 'GET', '/me');
     check('GET /me allowed before verification', meUnverified.http === 200 && meUnverified.emailVerified === false);
@@ -35,7 +35,7 @@ describe('Güvenlik ve güven (Faz 3)', () => {
 
     // Kod deneme sınırı: 5 yanlış denemeden sonra doğru kod da geçersiz
     const email2 = `brute${tag}@test.com`;
-    const reg2 = await call(null, 'POST', '/auth/register', { email: email2, password: 'password123', acceptTerms: true });
+    const reg2 = await call(null, 'POST', '/auth/register', { email: email2, password: TEST_PASSWORD, acceptTerms: true });
     const code2 = await latestCode(email2);
     const wrong2 = String((Number(code2) + 7) % 1_000_000).padStart(6, '0');
     for (let i = 0; i < 5; i++) await call(reg2.token, 'POST', '/auth/verify-email', { code: wrong2 });
@@ -52,7 +52,7 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     check('password reset ok', reset.http === 200 && !!reset.token);
     const oldToken = await call(reg.token, 'GET', '/me');
     check('old session invalidated after reset', oldToken.http === 401);
-    const oldPw = await call(null, 'POST', '/auth/login', { email, password: 'password123' });
+    const oldPw = await call(null, 'POST', '/auth/login', { email, password: TEST_PASSWORD });
     check('old password rejected', oldPw.http === 401);
     const newPw = await call(null, 'POST', '/auth/login', { email, password: 'newpassword456' });
     check('new password works', newPw.http === 200);
@@ -61,8 +61,7 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     // --- 3. Yönetim paneli yetkisi
     const notAdmin = await call(secToken, 'GET', '/admin/api/stats');
     check('non-admin blocked from admin api', notAdmin.http === 403);
-    const adminLogin = await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' });
-    const admin = adminLogin.token;
+    const admin = (await makeAdmin('moderator')).t;
     const stats = await call(admin, 'GET', '/admin/api/stats');
     check('admin sees stats', stats.http === 200 && typeof stats.users === 'number');
 
@@ -113,7 +112,7 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     await call(admin, 'POST', `/admin/api/reports/${myReport.id}/resolve`, { action: 'ban', reason: 'harassment' });
     const bannedCall = await call(bad1.t, 'GET', '/me');
     check('banned user session rejected', bannedCall.http === 403 && bannedCall.error === 'banned');
-    const bannedLogin = await call(null, 'POST', '/auth/login', { email: `troll${tag}@test.com`, password: 'password123' });
+    const bannedLogin = await call(null, 'POST', '/auth/login', { email: `troll${tag}@test.com`, password: TEST_PASSWORD });
     check('banned user cannot log in', bannedLogin.http === 403);
     const hidden = await call(secToken, 'GET', `/users/${bad1.id}`);
     check('banned profile hidden', hidden.http === 404);
@@ -132,12 +131,12 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     check('payer request created', pr.http === 201);
     const wrongPw = await call(victim.t, 'DELETE', '/me', { password: 'wrongpassword' });
     check('delete requires correct password', wrongPw.http === 401);
-    const del = await call(victim.t, 'DELETE', '/me', { password: 'password123' });
+    const del = await call(victim.t, 'DELETE', '/me', { password: TEST_PASSWORD });
     check('account deleted', del.http === 200);
     const payerWallet = await call(payer.t, 'GET', '/wallet');
     // 50 hediye + 500 + 250 ilk alım bonusu; 50'lik istek iade edildi
     check('pending request refunded on delete', payerWallet.balance === 800, `balance=${payerWallet.balance}`);
-    const deletedLogin = await call(null, 'POST', '/auth/login', { email: `victim${tag}@test.com`, password: 'password123' });
+    const deletedLogin = await call(null, 'POST', '/auth/login', { email: `victim${tag}@test.com`, password: TEST_PASSWORD });
     check('deleted account cannot log in', deletedLogin.http === 401);
 
     // --- 7. Yasal sayfalar

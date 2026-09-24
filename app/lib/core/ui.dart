@@ -49,6 +49,13 @@ String errorText(AppLocalizations l, Object error) {
     'already_rated' => l.errAlreadyRated,
     'store_unavailable' => l.errStoreUnavailable,
     'call_not_ended' || 'invalid_gift' => l.errCallGone,
+    'password_too_common' => l.errPasswordTooCommon,
+    'password_breached' => l.errPasswordBreached,
+    'password_same' => l.errPasswordSame,
+    'account_locked' => l.errAccountLocked,
+    'too_many_accounts' => l.errTooManyAccounts,
+    'captcha_required' || 'captcha_failed' || 'captcha_unavailable' => l.errCaptcha,
+    'refresh_race' => l.errRequestInProgress,
     _ => l.errGeneric,
   };
 }

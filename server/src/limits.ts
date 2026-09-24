@@ -51,6 +51,12 @@ const ipLimit = (production: number) => production * config.rateLimitScale;
 // Giriş/kayıt/şifre sıfırlama: IP başına 15 dakikada 20 deneme (kaba kuvvet saldırısına karşı)
 export const authLimiter = rateLimit({ ...base, ...store('auth'), windowMs: 15 * 60_000, limit: ipLimit(20) });
 
+// Jeton yenileme: IP başına 15 dakikada 300 (jetonlar tahmin edilemez; bu sınır sadece yükü keser)
+export const refreshLimiter = rateLimit({ ...base, ...store('refresh'), windowMs: 15 * 60_000, limit: ipLimit(300) });
+
+// Yönetim 2FA kodu: kullanıcı başına 15 dakikada 10 deneme (6 haneli kod tahminine karşı)
+export const mfaLimiter = rateLimit({ ...base, ...store('mfa'), windowMs: 15 * 60_000, limit: 10, keyGenerator: byUser });
+
 // Kod doğrulama: IP başına 15 dakikada 30 deneme (ayrıca her kodun kendi deneme sınırı var)
 export const codeLimiter = rateLimit({ ...base, ...store('code'), windowMs: 15 * 60_000, limit: ipLimit(30) });
 

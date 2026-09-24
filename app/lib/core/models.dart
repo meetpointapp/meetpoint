@@ -654,3 +654,34 @@ class Payout {
         processedAt: j['processedAt'] == null ? null : _date(j['processedAt']),
       );
 }
+
+// Açık oturum (Profil > Cihazlarım)
+class DeviceSession {
+  final String id;
+  final String deviceName;
+  final String platform;
+  final String ip; // son bölümü gizli
+  final DateTime createdAt;
+  final DateTime lastUsedAt;
+  final bool current;
+
+  const DeviceSession({
+    required this.id,
+    required this.deviceName,
+    required this.platform,
+    required this.ip,
+    required this.createdAt,
+    required this.lastUsedAt,
+    required this.current,
+  });
+
+  factory DeviceSession.fromJson(Map<String, dynamic> j) => DeviceSession(
+        id: j['id'],
+        deviceName: j['deviceName'] ?? '',
+        platform: j['platform'] ?? '',
+        ip: j['ip'] ?? '',
+        createdAt: DateTime.parse(j['createdAt']).toLocal(),
+        lastUsedAt: DateTime.parse(j['lastUsedAt']).toLocal(),
+        current: j['current'] == true,
+      );
+}

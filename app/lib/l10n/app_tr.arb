@@ -706,5 +706,31 @@
       }
     }
   },
-  "errRequestInProgress": "İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene."
+  "errRequestInProgress": "İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene.",
+  "errPasswordTooCommon": "Bu şifre çok yaygın ve kolay tahmin edilir. Daha güçlü bir şifre seç.",
+  "errPasswordBreached": "Bu şifre bilinen bir veri sızıntısında yer alıyor. Güvenliğin için başka bir şifre seç.",
+  "errPasswordSame": "Yeni şifre mevcut şifrenle aynı olamaz.",
+  "errAccountLocked": "Çok fazla hatalı deneme yapıldı. Güvenliğin için 15 dakika sonra tekrar dene.",
+  "errTooManyAccounts": "Bu cihazdan kısa sürede çok fazla hesap açıldı.",
+  "errCaptcha": "Güvenlik doğrulaması tamamlanamadı. Tekrar dene.",
+  "devicesTitle": "Cihazlarım",
+  "devicesSubtitle": "Hesabının açık olduğu cihazlar. Tanımadığın bir cihaz görürsen oturumunu kapat ve şifreni değiştir.",
+  "thisDevice": "Bu cihaz",
+  "lastActive": "Son etkinlik: {time}",
+  "@lastActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "signOutDevice": "Çıkış yaptır",
+  "signOutOthers": "Diğer tüm cihazlardan çıkış yap",
+  "signOutOthersConfirm": "Bu cihaz dışındaki tüm oturumların kapatılacak.",
+  "deviceSignedOut": "Cihazın oturumu kapatıldı",
+  "othersSignedOut": "Diğer cihazlardan çıkış yapıldı",
+  "changePassword": "Şifre değiştir",
+  "currentPassword": "Mevcut şifre",
+  "changePasswordNote": "Şifren değişince bu cihaz dışındaki tüm oturumların kapanır.",
+  "passwordChanged": "Şifren değiştirildi, diğer cihazlardan çıkış yapıldı."
 }

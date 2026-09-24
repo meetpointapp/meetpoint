@@ -2,6 +2,7 @@ import type { Server as HttpServer } from 'node:http';
 import { createAdapter } from '@socket.io/postgres-adapter';
 import { Server } from 'socket.io';
 import { authenticate } from './auth';
+import { config, corsOrigins } from './config';
 import { prisma } from './db';
 import { pool } from './pgPool';
 
@@ -34,13 +35,14 @@ export async function isOnline(userId: string) {
 // Her kullanıcı kendi odasına ("user:<id>") katılır; sunucu olayları oraya yollar.
 // PostgreSQL adaptörü sayesinde bir sunucudan gönderilen olay, kullanıcı hangi sunucuya bağlıysa ona ulaşır.
 export function initRealtime(server: HttpServer) {
-  io = new Server(server, { cors: { origin: '*' } });
+  io = new Server(server, { cors: { origin: config.isProduction ? corsOrigins : '*' } });
   io.adapter(createAdapter(pool, { channelPrefix: 'meetpoint' }));
 
   io.use(async (socket, next) => {
     try {
       const user = await authenticate(String(socket.handshake.auth?.token ?? ''));
       socket.data.userId = user.id;
+      socket.data.sessionId = user.sessionId;
       next();
     } catch {
       next(new Error('unauthorized'));
@@ -50,6 +52,7 @@ export function initRealtime(server: HttpServer) {
   io.on('connection', (socket) => {
     const me: string = socket.data.userId;
     socket.join(`user:${me}`);
+    socket.join(`session:${socket.data.sessionId}`);
     for (const hook of onlineHooks) void Promise.resolve(hook(me)).catch((e) => console.error('online hook', e));
 
     socket.on('disconnect', async () => {
@@ -77,6 +80,11 @@ export function initRealtime(server: HttpServer) {
 
 export function emitToUser(userId: string, event: string, payload: unknown) {
   io?.to(`user:${userId}`).emit(event, payload);
+}
+
+// Kapatılan oturumun anlık bağlantılarını kes (tüm sunucularda)
+export function disconnectSession(sessionId: string) {
+  io?.in(`session:${sessionId}`).disconnectSockets(true);
 }
 
 // Yasaklanan kullanıcının açık bağlantılarını kapat (tüm sunucularda)

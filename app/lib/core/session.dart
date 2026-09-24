@@ -4,23 +4,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'api.dart';
+import 'auth_tokens.dart';
 
 const _storage = FlutterSecureStorage();
 
+// Kalıcı depodaki anahtarlar
+const _accessKey = 'token';
+const _refreshKey = 'refresh_token';
+const _deviceKey = 'device_id';
+
 class Session {
-  final String? token;
+  // Oturum boyunca aynı nesne: jeton yenilemesi oturumu (ve ona bağlı bağlantıları) baştan kurmaz
+  final AuthTokens? auth;
   final String? userId;
   final bool emailVerified;
   final bool hasProfile;
   // Oturum kapandıysa sebebi (ör. "banned"): giriş ekranında gösterilir
   final String? notice;
 
-  const Session({this.token, this.userId, this.emailVerified = false, this.hasProfile = false, this.notice});
+  const Session({this.auth, this.userId, this.emailVerified = false, this.hasProfile = false, this.notice});
 
-  bool get isLoggedIn => token != null;
+  bool get isLoggedIn => auth != null;
 
   Session copyWith({bool? emailVerified, bool? hasProfile}) => Session(
-        token: token,
+        auth: auth,
         userId: userId,
         emailVerified: emailVerified ?? this.emailVerified,
         hasProfile: hasProfile ?? this.hasProfile,
@@ -30,23 +37,50 @@ class Session {
 class SessionNotifier extends AsyncNotifier<Session> {
   @override
   Future<Session> build() async {
-    final token = await _storage.read(key: 'token');
-    if (token == null) return const Session();
+    await _initDevice();
+    final access = await _storage.read(key: _accessKey);
+    final refresh = await _storage.read(key: _refreshKey);
+    // Eski sürümden kalan tek jeton (yenileme jetonu yok): yeniden giriş gerekir
+    if (access == null || refresh == null) {
+      if (access != null) await _clearTokens();
+      return const Session();
+    }
     try {
-      return await _load(token);
+      return await _load(_tokens(access, refresh));
     } on ApiException catch (e) {
-      // Süresi dolmuş/geçersiz oturum veya yasaklı hesap: çıkış yap. Ağ hatası ise hatayı göster.
+      // Kapatılmış/geçersiz oturum veya yasaklı hesap: çıkış yap. Ağ hatası ise hatayı göster.
       if (e.status == 401 || e.code == 'banned') {
-        await _storage.delete(key: 'token');
+        await _clearTokens();
         return Session(notice: e.code == 'banned' ? 'banned' : null);
       }
       rethrow;
     }
   }
 
-  Future<Session> _load(String token) async {
-    final me = await Api(token).me();
-    return Session(token: token, userId: me.id, emailVerified: me.emailVerified, hasProfile: me.profile != null);
+  // Kurulum kimliği ve cihaz adı her istekte gönderilir (Cihazlarım, yeni cihaz uyarısı)
+  static Future<void> _initDevice() async {
+    if (Api.deviceHeaders.isNotEmpty) return;
+    var id = await _storage.read(key: _deviceKey);
+    if (id == null) {
+      id = newDeviceId();
+      await _storage.write(key: _deviceKey, value: id);
+    }
+    Api.deviceHeaders = {'X-Device-Id': id, 'X-Device-Name': deviceLabel, 'X-Platform': platformName};
+  }
+
+  static AuthTokens _tokens(String access, String refresh) => AuthTokens(access, refresh, onChanged: (t) async {
+        await _storage.write(key: _accessKey, value: t.access);
+        await _storage.write(key: _refreshKey, value: t.refreshToken);
+      });
+
+  static Future<void> _clearTokens() async {
+    await _storage.delete(key: _accessKey);
+    await _storage.delete(key: _refreshKey);
+  }
+
+  Future<Session> _load(AuthTokens auth) async {
+    final me = await Api(auth).me();
+    return Session(auth: auth, userId: me.id, emailVerified: me.emailVerified, hasProfile: me.profile != null);
   }
 
   Future<void> login(String email, String password) => _signIn(() => Api(null).login(email, password));
@@ -57,10 +91,12 @@ class SessionNotifier extends AsyncNotifier<Session> {
   Future<void> resetPassword(String email, String code, String password) =>
       _signIn(() => Api(null).resetPassword(email, code, password));
 
-  Future<void> _signIn(Future<({String token, String userId})> Function() call) async {
+  Future<void> _signIn(Future<IssuedTokens> Function() call) async {
+    await _initDevice();
     final r = await call();
-    await _storage.write(key: 'token', value: r.token);
-    state = AsyncData(await _load(r.token));
+    final auth = _tokens(r.token, r.refreshToken);
+    await auth.onChanged!(auth);
+    state = AsyncData(await _load(auth));
   }
 
   void emailVerified() => _update((s) => s.copyWith(emailVerified: true));
@@ -75,12 +111,15 @@ class SessionNotifier extends AsyncNotifier<Session> {
   // Sunucu oturumu reddetti (yasaklandı / şifre başka cihazda değişti)
   Future<void> expire(String code) async {
     if (!(state.value?.isLoggedIn ?? false)) return;
-    await _storage.delete(key: 'token');
+    await _clearTokens();
     state = AsyncData(Session(notice: code == 'banned' ? 'banned' : null));
   }
 
+  // Sunucudaki oturum da kapatılır (ağ yoksa sadece bu cihazda; oturum 60 gün sonra kendiliğinden düşer)
   Future<void> logout() async {
-    await _storage.delete(key: 'token');
+    final auth = state.value?.auth;
+    if (auth != null) await Api(auth).logout().timeout(const Duration(seconds: 5)).catchError((_) {});
+    await _clearTokens();
     state = const AsyncData(Session());
   }
 }
@@ -88,7 +127,7 @@ class SessionNotifier extends AsyncNotifier<Session> {
 final sessionProvider = AsyncNotifierProvider<SessionNotifier, Session>(SessionNotifier.new);
 
 final apiProvider = Provider<Api>((ref) => Api(
-      ref.watch(sessionProvider.select((s) => s.value?.token)),
+      ref.watch(sessionProvider.select((s) => s.value?.auth)),
       onSessionInvalid: (code) => ref.read(sessionProvider.notifier).expire(code),
     ));
 

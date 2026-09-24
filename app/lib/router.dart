@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/session.dart';
+import 'features/me/security_screens.dart';
 import 'core/ui.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/auth/forgot_password_screen.dart';
@@ -54,6 +55,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/likes', builder: (_, _) => const LikesScreen()),
       GoRoute(path: '/setup', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/me/edit', builder: (_, _) => const ProfileEditScreen()),
+      GoRoute(path: '/me/devices', builder: (_, _) => const DevicesScreen()),
+      GoRoute(path: '/me/password', builder: (_, _) => const ChangePasswordScreen()),
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
       GoRoute(
         path: '/call/:id',

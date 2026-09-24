@@ -9,8 +9,8 @@ import '../../router.dart';
 // Uygulama bir arama bildirimiyle açıldıysa hâlâ çalan aramayı da gösterir.
 final incomingCallsProvider = Provider<void>((ref) {
   final router = ref.watch(routerProvider);
-  final token = ref.watch(sessionProvider.select((s) => s.value?.token));
-  if (token == null) return;
+  final auth = ref.watch(sessionProvider.select((s) => s.value?.auth));
+  if (auth == null) return;
 
   void open(CallInfo call) {
     if (router.routerDelegate.currentConfiguration.uri.path.startsWith('/call/')) return;

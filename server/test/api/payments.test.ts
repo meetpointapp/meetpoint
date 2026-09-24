@@ -3,7 +3,7 @@
 import { describe, it } from 'vitest';
 import http from 'node:http';
 import { FAKE_REVENUECAT_PORT } from '../env';
-import { B, call, check, registerVerified } from '../helpers';
+import { B, call, check, registerVerified, makeAdmin } from '../helpers';
 
 describe('Ödemeler (Faz 5)', () => {
   it('senaryo', async () => {
@@ -112,7 +112,7 @@ describe('Ödemeler (Faz 5)', () => {
     check('dev top-up also gets first-purchase bonus', dev1.bonus === 500 && dev1.balance === 1550);
 
     // --- 7. Yönetim paneli istatistikleri
-    const admin = (await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' })).token;
+    const admin = (await makeAdmin()).t;
     await hook(purchaseEvent(u.id, 'coins_500', `sb-${tag}`, { environment: 'SANDBOX', price: 9.99 }));
     const stats = await call(admin, 'GET', '/admin/api/stats');
     check('admin sees sales & refunds', typeof stats.revenueUsd === 'number' && stats.refunds >= 2, `rev=${stats.revenueUsd} refunds=${stats.refunds}`);

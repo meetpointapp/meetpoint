@@ -59,16 +59,21 @@ export async function latestCode(email: string) {
   throw new Error(`no mail for ${email}`);
 }
 
-export type TestUser = { t: string; id: string; email: string };
+// Testlerde açılan hesapların şifresi (yaygın şifreler kayıtta reddedilir).
+// Seed hesapları (test@, aye0@, admin@meetpoint.dev) eski demo şifresiyle girer: SEED_PASSWORD.
+export const TEST_PASSWORD = 'Meet-Point-Test-2026!';
+export const SEED_PASSWORD = 'password123';
+
+export type TestUser = { t: string; id: string; email: string; refresh: string };
 
 // Kayıt + e-posta doğrulama
-export async function registerVerified(email: string, password = 'password123'): Promise<TestUser> {
+export async function registerVerified(email: string, password = TEST_PASSWORD): Promise<TestUser> {
   const r = await call(null, 'POST', '/auth/register', { email, password, acceptTerms: true });
   if (r.http !== 201) throw new Error(`register failed ${r.http} ${r.error}`);
   const code = await latestCode(email);
   const v = await call(r.token, 'POST', '/auth/verify-email', { code });
   if (v.http !== 200) throw new Error(`verify failed ${v.http} ${v.error}`);
-  return { t: r.token, id: r.userId, email };
+  return { t: r.token, id: r.userId, email, refresh: r.refreshToken };
 }
 
 // Profili ve fotoğrafı olan, doğrulanmış kullanıcı
@@ -84,10 +89,19 @@ export async function makeUser(
   return u;
 }
 
-export const login = async (email: string, password = 'password123') =>
+export const login = async (email: string, password = TEST_PASSWORD) =>
   (await call(null, 'POST', '/auth/login', { email, password })).token as string;
 
-export const adminToken = () => login('admin@meetpoint.dev');
+// Bu adrese gelen tüm e-postalar (en yenisi sonda)
+export function mailsFor(email: string) {
+  const key = email.replace(/[^a-z0-9@.]/gi, '_');
+  if (!fs.existsSync(MAIL_DIR)) return [];
+  return fs
+    .readdirSync(MAIL_DIR)
+    .filter((f) => f.includes(key))
+    .sort()
+    .map((f) => fs.readFileSync(path.join(MAIL_DIR, f), 'utf8'));
+}
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

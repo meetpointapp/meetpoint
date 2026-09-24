@@ -2,9 +2,39 @@
 'use strict';
 
 const $ = (sel) => document.querySelector(sel);
+// Oturum sekme kapanınca biter (sessionStorage). Erişim jetonu kısa ömürlü; süresi dolunca yenileme jetonuyla yenilenir.
 const TOKEN_KEY = 'mp_admin_token';
+const REFRESH_KEY = 'mp_admin_refresh';
 let token = sessionStorage.getItem(TOKEN_KEY);
+let refreshToken = sessionStorage.getItem(REFRESH_KEY);
+let role = '';
 let reportStatus = 'OPEN';
+
+// Cihaz kimliği: aynı tarayıcıdan her girişte "yeni cihaz" e-postası gitmesin
+const DEVICE_KEY = 'mp_admin_device';
+let deviceId = '';
+try {
+  deviceId = localStorage.getItem(DEVICE_KEY) || '';
+  if (!deviceId) localStorage.setItem(DEVICE_KEY, (deviceId = crypto.randomUUID()));
+} catch {
+  deviceId = '';
+}
+const deviceHeaders = { 'x-device-id': deviceId, 'x-device-name': 'Yönetim paneli', 'x-platform': 'web' };
+
+const ERRORS = {
+  invalid_credentials: 'E-posta veya şifre hatalı.',
+  account_locked: 'Çok fazla hatalı deneme. 15 dakika sonra tekrar dene.',
+  rate_limited: 'Çok fazla deneme. Biraz bekle.',
+  mfa_invalid: 'Kod hatalı. Telefonunun saatinin doğru olduğundan emin ol.',
+  mfa_code_used: 'Bu kod az önce kullanıldı. Yeni kodu bekle.',
+  forbidden: 'Bu işlem için yetkin yok.',
+  not_found: 'Kayıt bulunamadı.',
+  cannot_change_own_role: 'Kendi rolünü değiştiremezsin.',
+  cannot_ban_self: 'Kendini yasaklayamazsın.',
+  cannot_reset_own_mfa: 'Kendi doğrulamanı sıfırlayamazsın.',
+  banned: 'Bu hesap yasaklı.',
+};
+const errText = (err) => ERRORS[err.message] || `Hata: ${err.message}`;
 
 const REASONS = {
   fake_profile: 'Sahte profil',
@@ -37,60 +67,169 @@ function toast(text) {
 
 const fmtDate = (d) => new Date(d).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' });
 
-async function api(method, path, body) {
+function saveTokens(r) {
+  token = r.token;
+  refreshToken = r.refreshToken;
+  sessionStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem(REFRESH_KEY, refreshToken);
+}
+
+// Aynı anda süresi dolan birden fazla istek tek yenileme yapar
+let refreshing = null;
+function refresh() {
+  refreshing ??= (async () => {
+    const res = await fetch('/auth/refresh', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) throw new Error('refresh_failed');
+    saveTokens(await res.json());
+  })().finally(() => (refreshing = null));
+  return refreshing;
+}
+
+async function send(method, path, body, retried = false) {
   const res = await fetch(path, {
     method,
-    headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+    headers: { 'content-type': 'application/json', ...deviceHeaders, ...(token ? { authorization: `Bearer ${token}` } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (res.status === 401 || res.status === 403) {
-    if (path !== '/auth/login') logout();
+  if (res.status === 401 && !retried && refreshToken && !path.startsWith('/auth/')) {
+    const data = await res.clone().json().catch(() => ({}));
+    if (data.error === 'token_expired') {
+      try {
+        await refresh();
+        return send(method, path, body, true);
+      } catch {
+        /* aşağıda oturum kapanır */
+      }
+    }
   }
+  return res;
+}
+
+async function api(method, path, body) {
+  const res = await send(method, path, body);
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(data.error || `http_${res.status}`), { status: res.status });
+  if (!res.ok) {
+    if (res.status === 401 && !path.startsWith('/auth/')) logout(false);
+    else if (res.status === 403 && data.error === 'mfa_required') showMfaVerify();
+    else if (res.status === 403 && data.error === 'mfa_setup_required') showMfaSetup();
+    throw Object.assign(new Error(data.error || `http_${res.status}`), { status: res.status });
+  }
   return data;
 }
 
 // Selfie yetkili istekle alınıp blob URL'ye çevrilir (img etiketi header gönderemez)
 async function loadSelfie(img, id) {
-  const res = await fetch(`/admin/api/verifications/${encodeURIComponent(id)}/selfie`, {
-    headers: { authorization: `Bearer ${token}` },
-  });
+  const res = await send('GET', `/admin/api/verifications/${encodeURIComponent(id)}/selfie`);
   if (res.ok) img.src = URL.createObjectURL(await res.blob());
 }
 
 // ---------- Oturum ----------
-function showLogin() {
+const LOGIN_CARDS = ['#login-form', '#mfa-setup', '#mfa-backup', '#mfa-verify'];
+function showCard(id) {
   $('#app').classList.add('hidden');
   $('#login').classList.remove('hidden');
+  LOGIN_CARDS.forEach((c) => $(c).classList.toggle('hidden', c !== id));
+  $(id).querySelector('input')?.focus();
+}
+const showLogin = () => showCard('#login-form');
+
+async function showMfaSetup() {
+  showCard('#mfa-setup');
+  $('#mfa-setup-error').textContent = '';
+  const r = await api('POST', '/admin/api/mfa/setup');
+  // QR bir resim olarak gösterilir (SVG sayfaya işlenmez)
+  $('#mfa-qr').src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(r.qrSvg)}`;
+  $('#mfa-secret').textContent = r.secret.replace(/(.{4})/g, '$1 ').trim();
 }
 
-function logout() {
-  token = null;
+function showMfaVerify() {
+  $('#mfa-error').textContent = '';
+  $('#mfa-code').value = '';
+  showCard('#mfa-verify');
+}
+
+// Oturum kapatma: sunucuda da kapatılır (jeton çalınmışsa işe yaramaz hâle gelir)
+function logout(notifyServer = true) {
+  if (notifyServer && token) fetch('/auth/logout', { method: 'POST', headers: { authorization: `Bearer ${token}` } }).catch(() => {});
+  token = refreshToken = null;
+  role = '';
   sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(REFRESH_KEY);
   showLogin();
+}
+
+// Giriş sonrası: yönetici mi, 2FA kurulu mu, bu oturumda doğrulandı mı?
+async function afterLogin() {
+  let s;
+  try {
+    s = await api('GET', '/admin/api/mfa/status');
+  } catch (err) {
+    if (err.status === 403) {
+      logout();
+      $('#login-error').textContent = 'Bu hesabın yönetim yetkisi yok.';
+    }
+    return;
+  }
+  if (!s.enabled) return showMfaSetup();
+  if (!s.verified) return showMfaVerify();
+  role = s.role;
+  $('#whoami').textContent = `${s.email} · ${{ super: 'Süper yönetici', moderator: 'Moderatör', finance: 'Finans' }[s.role] || s.role}`;
+  if (s.backupCodesLeft <= 2) toast(`Sadece ${s.backupCodesLeft} yedek kodun kaldı`);
+  start();
 }
 
 $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   $('#login-error').textContent = '';
   try {
-    const r = await api('POST', '/auth/login', {
-      email: $('#login-email').value,
-      password: $('#login-password').value,
-    });
-    token = r.token;
-    await api('GET', '/admin/api/me');
-    sessionStorage.setItem(TOKEN_KEY, token);
-    start();
+    saveTokens(
+      await api('POST', '/auth/login', {
+        email: $('#login-email').value,
+        password: $('#login-password').value,
+      }),
+    );
+    $('#login-password').value = '';
+    await afterLogin();
   } catch (err) {
-    token = null;
-    $('#login-error').textContent = err.status === 403 ? 'Bu hesabın yönetim yetkisi yok.' : 'E-posta veya şifre hatalı.';
-    showLogin();
+    $('#login-error').textContent = errText(err);
   }
 });
 
-$('#logout').addEventListener('click', logout);
+$('#mfa-setup').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('#mfa-setup-error').textContent = '';
+  try {
+    const r = await api('POST', '/admin/api/mfa/enable', { code: $('#mfa-setup-code').value.trim() });
+    $('#mfa-backup-codes').innerHTML = r.backupCodes.map((c) => `<code>${esc(c)}</code>`).join('');
+    $('#mfa-backup-copy').onclick = () => navigator.clipboard.writeText(r.backupCodes.join('\n')).then(() => toast('Kopyalandı'));
+    showCard('#mfa-backup');
+  } catch (err) {
+    $('#mfa-setup-error').textContent = errText(err);
+  }
+});
+
+$('#mfa-backup-done').addEventListener('click', () => {
+  $('#mfa-backup-codes').innerHTML = '';
+  afterLogin();
+});
+
+$('#mfa-verify').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('#mfa-error').textContent = '';
+  try {
+    await api('POST', '/admin/api/mfa/verify', { code: $('#mfa-code').value.trim() });
+    await afterLogin();
+  } catch (err) {
+    $('#mfa-error').textContent = errText(err);
+  }
+});
+
+$('#mfa-cancel').addEventListener('click', () => logout());
+$('#logout').addEventListener('click', () => logout());
 
 // ---------- Sekmeler ----------
 const loaders = {
@@ -101,6 +240,8 @@ const loaders = {
   purchases: loadPurchases,
   payouts: loadPayouts,
   errors: loadErrors,
+  staff: loadStaff,
+  audit: () => loadAudit(),
 };
 let errorsResolved = '0';
 let payoutStatus = 'PENDING';
@@ -249,7 +390,7 @@ $('#reports').addEventListener('click', async (e) => {
     loadReports();
     loadStats();
   } catch (err) {
-    toast(`Hata: ${err.message}`);
+    toast(errText(err));
   }
 });
 
@@ -269,7 +410,7 @@ async function loadVerifications() {
         <div class="selfie"><img data-selfie="${esc(v.id)}" alt="Selfie">
           <div class="pose">İstenen poz: ${esc(POSES[v.pose] || v.pose)}</div>
           <div class="muted">${fmtDate(v.createdAt)}</div></div>
-        <div><div class="muted" style="margin-bottom:8px">Profil fotoğrafları</div>${photoStrip(v.user)}</div>
+        <div><div class="muted mb-8">Profil fotoğrafları</div>${photoStrip(v.user)}</div>
       </div>
       <div class="actions">
         <button class="btn green" data-approve="${esc(v.id)}">Onayla</button>
@@ -297,7 +438,7 @@ $('#verifications').addEventListener('click', async (e) => {
     loadVerifications();
     loadStats();
   } catch (err) {
-    toast(`Hata: ${err.message}`);
+    toast(errText(err));
   }
 });
 
@@ -349,7 +490,7 @@ $('#users').addEventListener('click', async (e) => {
     loadUsers();
     loadStats();
   } catch (err) {
-    toast(`Hata: ${err.message}`);
+    toast(errText(err));
   }
 });
 
@@ -442,7 +583,7 @@ $('#payouts').addEventListener('click', async (e) => {
     loadPayouts();
     loadStats();
   } catch (err) {
-    toast(`Hata: ${err.message}`);
+    toast(errText(err));
   }
 });
 
@@ -482,19 +623,121 @@ $('#errors').addEventListener('click', async (e) => {
     loadErrors();
     loadStats();
   } catch (err) {
-    toast(`Hata: ${err.message}`);
+    toast(errText(err));
   }
 });
 
+// ---------- Ekip ----------
+const ROLES = { super: 'Süper yönetici', moderator: 'Moderatör', finance: 'Finans' };
+
+async function loadStaff() {
+  const list = await api('GET', '/admin/api/staff');
+  $('#staff').innerHTML = list
+    .map(
+      (s) => `<div class="card item"><div class="item-head">
+        <div><span class="item-title">${esc(s.email)}</span> <span class="pill">${esc(ROLES[s.role] || s.role)}</span>
+          ${s.mfaEnabled ? '<span class="pill green">2FA açık</span>' : '<span class="pill red">2FA kurulmadı</span>'}</div>
+        ${s.mfaEnabled ? `<button class="btn soft" data-reset-mfa="${esc(s.id)}" data-email="${esc(s.email)}">2FA sıfırla</button>` : ''}
+      </div></div>`,
+    )
+    .join('');
+}
+
+$('#staff-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = $('#staff-email').value.trim();
+  const newRole = $('#staff-role').value;
+  if (newRole === 'none' && !confirm(`${email} yönetim ekibinden çıkarılsın mı? Oturumları kapanır.`)) return;
+  try {
+    await api('POST', '/admin/api/staff', { email, role: newRole });
+    $('#staff-email').value = '';
+    toast('Kaydedildi');
+    loadStaff();
+  } catch (err) {
+    toast(err.message === 'not_found' ? 'Bu e-postayla bir hesap yok' : errText(err));
+  }
+});
+
+$('#staff').addEventListener('click', async (e) => {
+  const t = e.target.closest('button');
+  if (!t?.dataset.resetMfa) return;
+  if (!confirm(`${t.dataset.email} için 2FA sıfırlansın mı? Bir sonraki girişte yeniden kurması gerekir.`)) return;
+  try {
+    await api('POST', `/admin/api/staff/${t.dataset.resetMfa}/reset-mfa`);
+    toast('2FA sıfırlandı');
+    loadStaff();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+// ---------- İşlem kaydı ----------
+const ACTIONS = {
+  'user.ban': 'Kullanıcı yasakladı',
+  'user.unban': 'Yasağı kaldırdı',
+  'report.ban': 'Şikayetle yasakladı',
+  'report.dismiss': 'Şikayeti yoksaydı',
+  'photo.remove': 'Fotoğraf kaldırdı',
+  'verification.approve': 'Mavi tik verdi',
+  'verification.reject': 'Mavi tik reddetti',
+  'verification.view_selfie': 'Selfie görüntüledi',
+  'payout.view_list': 'Ödeme listesini görüntüledi',
+  'payout.pay': 'Ödeme yaptı',
+  'payout.reject': 'Ödeme reddetti',
+  'error.resolve': 'Hatayı çözdü',
+  'staff.role': 'Rol değiştirdi',
+  'staff.reset_mfa': '2FA sıfırladı',
+  'mfa.enable': '2FA kurdu',
+  'mfa.backup_code_used': 'Yedek kodla girdi',
+};
+let auditCursor = null;
+let auditTimer;
+$('#audit-filter').addEventListener('input', () => {
+  clearTimeout(auditTimer);
+  auditTimer = setTimeout(() => loadAudit(), 300);
+});
+$('#audit-more').addEventListener('click', () => loadAudit(true));
+
+async function loadAudit(more = false) {
+  const params = new URLSearchParams({ action: $('#audit-filter').value.trim() });
+  if (more && auditCursor) params.set('before', auditCursor);
+  const list = await api('GET', `/admin/api/audit?${params}`);
+  const html = list
+    .map((a) => {
+      const details = Object.keys(a.details || {}).length ? JSON.stringify(a.details) : '';
+      return `<div class="card audit-row">
+        <div class="item-head"><div><span class="item-title">${esc(ACTIONS[a.action] || a.action)}</span>
+          <span class="muted">· ${esc(a.adminEmail)}</span></div>
+          <div class="muted">${fmtDate(a.createdAt)}</div></div>
+        ${a.targetId ? `<div class="muted small">${esc(a.targetType)}: ${esc(a.targetId)}</div>` : ''}
+        ${details ? `<div class="details">${esc(details)}</div>` : ''}
+      </div>`;
+    })
+    .join('');
+  if (more) $('#audit').insertAdjacentHTML('beforeend', html);
+  else $('#audit').innerHTML = html || '<div class="card empty">Kayıt yok</div>';
+  auditCursor = list.length ? list[list.length - 1].createdAt : auditCursor;
+  $('#audit-more').classList.toggle('hidden', list.length < 100);
+}
+
 // ---------- Başlat ----------
+// Sekmeler role göre: data-roles boşsa sadece süper yönetici görür
+function applyRole() {
+  document.querySelectorAll('.tab[data-roles]').forEach((btn) => {
+    const allowed = role === 'super' || btn.dataset.roles.split(' ').includes(role);
+    btn.classList.toggle('hidden', !allowed);
+  });
+}
+
 async function start() {
   $('#login').classList.add('hidden');
   $('#app').classList.remove('hidden');
-  await loadStats();
+  applyRole();
+  document.querySelector('.tab[data-tab="overview"]').click();
 }
 
 if (token) {
-  api('GET', '/admin/api/me').then(start, showLogin);
+  afterLogin().catch(showLogin);
 } else {
   showLogin();
 }

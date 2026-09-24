@@ -1243,4 +1243,72 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errRequestInProgress =>
       'Your request is still being processed. Try again in a few seconds.';
+
+  @override
+  String get errPasswordTooCommon =>
+      'This password is too common and easy to guess. Choose a stronger one.';
+
+  @override
+  String get errPasswordBreached =>
+      'This password appeared in a known data breach. For your safety, choose a different one.';
+
+  @override
+  String get errPasswordSame =>
+      'Your new password can\'t be the same as your current one.';
+
+  @override
+  String get errAccountLocked =>
+      'Too many failed attempts. For your security, try again in 15 minutes.';
+
+  @override
+  String get errTooManyAccounts =>
+      'Too many accounts were created from this device recently.';
+
+  @override
+  String get errCaptcha => 'Security check failed. Please try again.';
+
+  @override
+  String get devicesTitle => 'My devices';
+
+  @override
+  String get devicesSubtitle =>
+      'Devices signed in to your account. If you see one you don\'t recognise, sign it out and change your password.';
+
+  @override
+  String get thisDevice => 'This device';
+
+  @override
+  String lastActive(String time) {
+    return 'Last active: $time';
+  }
+
+  @override
+  String get signOutDevice => 'Sign out';
+
+  @override
+  String get signOutOthers => 'Sign out of all other devices';
+
+  @override
+  String get signOutOthersConfirm =>
+      'All sessions except this device will be signed out.';
+
+  @override
+  String get deviceSignedOut => 'Device signed out';
+
+  @override
+  String get othersSignedOut => 'Signed out of other devices';
+
+  @override
+  String get changePassword => 'Change password';
+
+  @override
+  String get currentPassword => 'Current password';
+
+  @override
+  String get changePasswordNote =>
+      'Changing your password signs you out on every other device.';
+
+  @override
+  String get passwordChanged =>
+      'Password changed. Other devices were signed out.';
 }

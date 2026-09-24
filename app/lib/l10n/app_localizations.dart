@@ -2089,6 +2089,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'İsteğin hâlâ işleniyor, birkaç saniye sonra tekrar dene.'**
   String get errRequestInProgress;
+
+  /// No description provided for @errPasswordTooCommon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu şifre çok yaygın ve kolay tahmin edilir. Daha güçlü bir şifre seç.'**
+  String get errPasswordTooCommon;
+
+  /// No description provided for @errPasswordBreached.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu şifre bilinen bir veri sızıntısında yer alıyor. Güvenliğin için başka bir şifre seç.'**
+  String get errPasswordBreached;
+
+  /// No description provided for @errPasswordSame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifre mevcut şifrenle aynı olamaz.'**
+  String get errPasswordSame;
+
+  /// No description provided for @errAccountLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla hatalı deneme yapıldı. Güvenliğin için 15 dakika sonra tekrar dene.'**
+  String get errAccountLocked;
+
+  /// No description provided for @errTooManyAccounts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihazdan kısa sürede çok fazla hesap açıldı.'**
+  String get errTooManyAccounts;
+
+  /// No description provided for @errCaptcha.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenlik doğrulaması tamamlanamadı. Tekrar dene.'**
+  String get errCaptcha;
+
+  /// No description provided for @devicesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihazlarım'**
+  String get devicesTitle;
+
+  /// No description provided for @devicesSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabının açık olduğu cihazlar. Tanımadığın bir cihaz görürsen oturumunu kapat ve şifreni değiştir.'**
+  String get devicesSubtitle;
+
+  /// No description provided for @thisDevice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihaz'**
+  String get thisDevice;
+
+  /// No description provided for @lastActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son etkinlik: {time}'**
+  String lastActive(String time);
+
+  /// No description provided for @signOutDevice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış yaptır'**
+  String get signOutDevice;
+
+  /// No description provided for @signOutOthers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer tüm cihazlardan çıkış yap'**
+  String get signOutOthers;
+
+  /// No description provided for @signOutOthersConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihaz dışındaki tüm oturumların kapatılacak.'**
+  String get signOutOthersConfirm;
+
+  /// No description provided for @deviceSignedOut.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihazın oturumu kapatıldı'**
+  String get deviceSignedOut;
+
+  /// No description provided for @othersSignedOut.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer cihazlardan çıkış yapıldı'**
+  String get othersSignedOut;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre değiştir'**
+  String get changePassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut şifre'**
+  String get currentPassword;
+
+  /// No description provided for @changePasswordNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifren değişince bu cihaz dışındaki tüm oturumların kapanır.'**
+  String get changePasswordNote;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifren değiştirildi, diğer cihazlardan çıkış yapıldı.'**
+  String get passwordChanged;
 }
 
 class _AppLocalizationsDelegate

@@ -1,8 +1,8 @@
 // Lokal test verisi: npm run db:seed
 // Giriş: test@meetpoint.dev / password123 (1000 jeton, gelen istekler, seni beğenmiş profiller)
-import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
+import { hashPassword } from '../src/passwords';
 import { removeProfilePhoto, sanitizePrivatePhoto, storeProfilePhoto } from '../src/images';
 import { privateStore, randomKey } from '../src/storage';
 import { credit, debit } from '../src/wallet';
@@ -121,7 +121,8 @@ const demoUsers = [
 ];
 
 async function main() {
-  const passwordHash = await bcrypt.hash('password123', 10);
+  // Demo hesap şifresi yaygın bir şifre: sadece lokal demo için, kayıt kuralı burada uygulanmaz
+  const passwordHash = await hashPassword('password123');
 
   // Önceki demo ve otomatik test verisini temizle (@meetpoint.dev ve @test.com hesapları), dosyaları dahil
   const demo = { OR: [{ email: { endsWith: '@meetpoint.dev' } }, { email: { endsWith: '@test.com' } }] };
@@ -235,7 +236,7 @@ async function main() {
 
   // Yönetim paneli hesabı (profili yok, uygulamada görünmez)
   await prisma.user.create({
-    data: { email: 'admin@meetpoint.dev', passwordHash, isAdmin: true, emailVerifiedAt: new Date(), termsAcceptedAt: new Date() },
+    data: { email: 'admin@meetpoint.dev', passwordHash, isAdmin: true, adminRole: 'super', emailVerifiedAt: new Date(), termsAcceptedAt: new Date() },
   });
 
   // Panel demosu: Zeynep'in bekleyen mavi tik başvurusu (selfie özel klasörde)
@@ -252,7 +253,7 @@ async function main() {
     data: { fromId: selin.id, toId: can.id, reason: 'fake_profile', details: 'Fotoğraflar internetten alınmış gibi görünüyor.' },
   });
 
-  console.log(`Seed tamam: ${created.length + 1} kullanıcı. Giriş: test@meetpoint.dev / password123 · Panel: admin@meetpoint.dev / password123`);
+  console.log(`Seed tamam: ${created.length + 1} kullanıcı. Giriş: test@meetpoint.dev / password123 · Panel: admin@meetpoint.dev / password123 (ilk girişte 2FA kurulur)`);
 }
 
 main().finally(() => prisma.$disconnect());

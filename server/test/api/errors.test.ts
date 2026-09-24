@@ -1,11 +1,11 @@
 // Faz 7: hata takibi (uygulama hataları gruplanır, yönetimde listelenir, çözülünce kapanır)
 import { describe, it } from 'vitest';
-import { B, call, check, registerVerified, sleep } from '../helpers';
+import { B, call, check, registerVerified, sleep, makeAdmin } from '../helpers';
 
 describe('Hata takibi (Faz 7)', () => {
   it('senaryo', async () => {
     const tag = Date.now();
-    const admin = (await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' })).token;
+    const admin = (await makeAdmin()).t;
     // Hata kayıtları toplu yazılır (testte 100 ms aralıkla): okumadan önce kısa bekleme
     const adminGet = async (p: string) => {
       await sleep(300);

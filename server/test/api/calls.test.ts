@@ -1,7 +1,7 @@
 // Faz 6: dakika başı sesli/görüntülü arama, hediyeler, puanlama, geçmiş.
 // Test sunucusu kısa arama zamanlamalarıyla çalışır (test/env.ts).
 import { describe, it } from 'vitest';
-import { call, check, listen, registerVerified, upload, waitFor } from '../helpers';
+import { call, check, listen, makeAdmin, registerVerified, upload, waitFor } from '../helpers';
 
 describe('Aramalar (Faz 6)', () => {
   it('senaryo', async () => {
@@ -112,8 +112,8 @@ describe('Aramalar (Faz 6)', () => {
     check('rating out of range -> 400', r2bad.http === 400);
     const r2 = await call(callee.t, 'POST', `/calls/${callId}/rate`, { rating: 1, reportReason: 'harassment' });
     check('callee rated with report', r2.http === 200);
-    const adminLogin = await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' });
-    const reports = await call(adminLogin.token, 'GET', '/admin/api/reports');
+    const moderator = await makeAdmin('moderator');
+    const reports = await call(moderator.t, 'GET', '/admin/api/reports');
     check('call report reaches admin', reports._arr?.some((r) => r.to.id === caller.id && r.reason === 'harassment'));
 
     // --- Cevapsız / ret / iptal

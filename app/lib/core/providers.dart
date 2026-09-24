@@ -68,16 +68,37 @@ const _events = [
 ];
 
 // Oturum değişince bağlantı yenilenir
+// Erişim jetonu kısa ömürlü: bağlantı reddedilirse jeton yenilenip tekrar bağlanılır
 final realtimeProvider = Provider<Realtime>((ref) {
-  final token = ref.watch(sessionProvider.select((s) => s.value?.token));
+  final auth = ref.watch(sessionProvider.select((s) => s.value?.auth));
   final controller = StreamController<RealtimeEvent>.broadcast();
   ref.onDispose(controller.close);
-  if (token == null) return Realtime._(null, controller);
+  if (auth == null) return Realtime._(null, controller);
 
   final socket = io.io(
     apiBaseUrl,
-    io.OptionBuilder().setTransports(['websocket']).setAuth({'token': token}).enableForceNew().build(),
+    io.OptionBuilder().setTransports(['websocket']).setAuth({'token': auth.access}).enableForceNew().build(),
   );
+  var disposed = false;
+  ref.onDispose(() => disposed = true);
+  // Her yeniden bağlanma denemesinde güncel jeton
+  socket.io.on('reconnect_attempt', (_) => socket.auth = {'token': auth.access});
+  var retrying = false;
+  socket.onConnectError((_) async {
+    if (retrying || disposed) return;
+    retrying = true;
+    try {
+      final token = await ref.read(apiProvider).freshAccessToken();
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (disposed || token == null || socket.connected) return;
+      socket.auth = {'token': token};
+      socket.connect();
+    } catch (_) {
+      // Oturum kapandıysa apiProvider çıkış yaptırır; ağ yoksa bir sonraki denemede tekrar
+    } finally {
+      retrying = false;
+    }
+  });
   for (final name in _events) {
     socket.on(name, (data) {
       if (!controller.isClosed) controller.add(RealtimeEvent(name, data));

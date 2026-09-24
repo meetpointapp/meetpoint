@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'auth_tokens.dart';
 import 'config.dart';
 import 'models.dart';
 
@@ -16,22 +17,28 @@ class ApiException implements Exception {
   String toString() => 'ApiException($code)';
 }
 
+// Tek oturum çifti (giriş/kayıt/yenileme yanıtı)
+typedef IssuedTokens = ({String token, String refreshToken, String userId});
+
 class Api {
-  // onSessionInvalid: oturum geçersizleşince (şifre değişti, hesap yasaklandı) çağrılır.
+  // onSessionInvalid: oturum geçersizleşince (çıkış yapıldı, şifre değişti, hesap yasaklandı) çağrılır.
   // adapter/retryDelay sadece testler için (sahte ağ, beklemesiz tekrar).
-  Api(String? token, {this.onSessionInvalid, HttpClientAdapter? adapter, this.retryDelay = const Duration(milliseconds: 600)})
-      : _hasToken = token != null,
-        _dio = Dio(BaseOptions(
+  Api(this._auth, {this.onSessionInvalid, HttpClientAdapter? adapter, this.retryDelay = const Duration(milliseconds: 600)})
+      : _dio = Dio(BaseOptions(
           baseUrl: apiBaseUrl,
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 20),
-          headers: {if (token != null) 'Authorization': 'Bearer $token'},
+          headers: deviceHeaders,
         )) {
     if (adapter != null) _dio.httpClientAdapter = adapter;
   }
 
+  // Cihaz bilgisi (açılışta bir kez doldurulur): sunucu "Cihazlarım" listesi ve yeni cihaz uyarısı için kullanır
+  static Map<String, String> deviceHeaders = {};
+
   final Dio _dio;
-  final bool _hasToken;
+  final AuthTokens? _auth;
+  bool get _hasToken => _auth != null;
   final void Function(String code)? onSessionInvalid;
   final Duration retryDelay;
 
@@ -53,21 +60,38 @@ class Api {
   // anahtarla en fazla 2 kez tekrar denenir; sunucu isteği zaten işlediyse işlemi tekrarlamaz, ilk
   // yanıtı döndürür. Böylece zayıf bağlantıda hediye/mesaj/ödeme iki kez işlenmez, kaybolmaz da.
   // Kimlik uçları (/auth) bu korumayı desteklemez: tekrar denenmez.
+  //
+  // Erişim jetonu kısa ömürlü: bitmek üzereyse istekten önce, sunucu "token_expired" derse istekten
+  // sonra bir kez yenilenip aynı istek tekrarlanır. Kullanıcı bunu hiç fark etmez.
   Future<dynamic> _send(Future<Response<dynamic>> Function(Options options) call, {bool write = false, String? path}) async {
     final idempotent = write && _hasToken && !(path?.startsWith('/auth/') ?? false);
-    final options = Options(headers: {if (idempotent) 'Idempotency-Key': newIdempotencyKey()});
+    final key = idempotent ? newIdempotencyKey() : null;
+    var refreshed = false;
+    if (_auth?.expiresSoon ?? false) {
+      await _refreshTokens();
+      refreshed = true;
+    }
     for (var attempt = 0;; attempt++) {
+      final options = Options(headers: {
+        if (_auth != null) 'Authorization': 'Bearer ${_auth.access}',
+        'Idempotency-Key': ?key,
+      });
       try {
         return (await call(options)).data;
       } on DioException catch (e) {
         final data = e.response?.data;
-        final inProgress = data is Map && data['error'] == 'request_in_progress';
-        if (idempotent && attempt < 2 && (_noResponse(e) || inProgress)) {
+        final code = data is Map && data['error'] is String ? data['error'] as String : null;
+        if (code == 'token_expired' && _hasToken && !refreshed) {
+          await _refreshTokens();
+          refreshed = true;
+          attempt--;
+          continue;
+        }
+        if (idempotent && attempt < 2 && (_noResponse(e) || code == 'request_in_progress')) {
           await Future<void>.delayed(retryDelay * (attempt + 1));
           continue;
         }
-        if (data is Map && data['error'] is String) {
-          final code = data['error'] as String;
+        if (code != null) {
           if (_hasToken && (code == 'banned' || code == 'invalid_token')) onSessionInvalid?.call(code);
           throw ApiException(code, e.response?.statusCode);
         }
@@ -75,6 +99,34 @@ class Api {
         throw ApiException('http_${e.response!.statusCode}', e.response!.statusCode);
       }
     }
+  }
+
+  // Yenileme jetonuyla yeni çift alır. Yenileme reddedilirse (oturum kapatılmış, jeton çalınmış olabilir)
+  // oturum sonlanır.
+  Future<void> _refreshTokens() async {
+    final auth = _auth!;
+    try {
+      await auth.refresh((refreshToken) async {
+        final r = await _dio.post('/auth/refresh', data: {'refreshToken': refreshToken});
+        return (token: r.data['token'] as String, refreshToken: r.data['refreshToken'] as String);
+      });
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map && data['error'] is String ? data['error'] as String : null;
+      if (code == 'invalid_refresh' || code == 'banned') {
+        onSessionInvalid?.call(code == 'banned' ? 'banned' : 'invalid_token');
+        throw ApiException(code!, e.response?.statusCode);
+      }
+      if (e.response == null) throw const ApiException('network');
+      throw ApiException(code ?? 'http_${e.response!.statusCode}', e.response!.statusCode);
+    }
+  }
+
+  // Anlık bağlantı için geçerli erişim jetonu (gerekirse önce yenilenir)
+  Future<String?> freshAccessToken() async {
+    if (_auth == null) return null;
+    if (_auth.expiresSoon) await _refreshTokens();
+    return _auth.access;
   }
 
   // Dosya yüklemelerinde gövde her denemede yeniden oluşturulur (FormData bir kez okunabilir)
@@ -90,12 +142,13 @@ class Api {
       _send((o) => _dio.delete(path, data: _body(body), options: o), write: true, path: path);
 
   // Kimlik
-  ({String token, String userId}) _tokenOf(dynamic r) => (token: r['token'] as String, userId: r['userId'] as String);
+  IssuedTokens _tokenOf(dynamic r) =>
+      (token: r['token'] as String, refreshToken: r['refreshToken'] as String, userId: r['userId'] as String);
 
-  Future<({String token, String userId})> login(String email, String password) async =>
+  Future<IssuedTokens> login(String email, String password) async =>
       _tokenOf(await _post('/auth/login', {'email': email, 'password': password}));
 
-  Future<({String token, String userId})> register(String email, String password, String locale) async =>
+  Future<IssuedTokens> register(String email, String password, String locale) async =>
       _tokenOf(await _post('/auth/register', {
         'email': email,
         'password': password,
@@ -109,8 +162,22 @@ class Api {
 
   Future<void> forgotPassword(String email) => _post('/auth/forgot-password', {'email': email});
 
-  Future<({String token, String userId})> resetPassword(String email, String code, String password) async =>
+  Future<IssuedTokens> resetPassword(String email, String code, String password) async =>
       _tokenOf(await _post('/auth/reset-password', {'email': email, 'code': code, 'password': password}));
+
+  // Bu cihazdaki oturumu sunucuda da kapatır
+  Future<void> logout() => _post('/auth/logout');
+
+  Future<void> changePassword(String current, String next) =>
+      _post('/auth/change-password', {'currentPassword': current, 'newPassword': next});
+
+  // Cihazlarım: açık oturumlar
+  Future<List<DeviceSession>> sessions() async =>
+      [for (final s in (await _get('/me/sessions') as List)) DeviceSession.fromJson(s)];
+
+  Future<void> revokeSession(String id) => _delete('/me/sessions/$id');
+
+  Future<void> revokeOtherSessions() => _post('/me/sessions/revoke-others');
 
   Future<void> deleteAccount(String password) => _delete('/me', {'password': password});
 

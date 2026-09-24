@@ -17,6 +17,39 @@
       <button type="submit" class="btn primary">Giriş yap</button>
       <p id="login-error" class="error"></p>
     </form>
+
+    <!-- 2FA kurulumu (ilk giriş) -->
+    <form id="mfa-setup" class="card login-card hidden">
+      <div class="logo">meetpoint</div>
+      <p class="item-title">İki adımlı doğrulamayı kur</p>
+      <p class="muted small">Google Authenticator, Microsoft Authenticator veya Authy ile bu kodu tara. Tarayamıyorsan anahtarı elle gir.</p>
+      <img id="mfa-qr" class="qr" alt="QR kod">
+      <code id="mfa-secret" class="secret"></code>
+      <input id="mfa-setup-code" inputmode="numeric" autocomplete="one-time-code" placeholder="Uygulamadaki 6 haneli kod" maxlength="6" required>
+      <button type="submit" class="btn primary">Doğrula ve aç</button>
+      <p id="mfa-setup-error" class="error"></p>
+    </form>
+
+    <!-- Yedek kodlar (bir kez gösterilir) -->
+    <div id="mfa-backup" class="card login-card hidden">
+      <div class="logo">meetpoint</div>
+      <p class="item-title">Yedek kodların</p>
+      <p class="muted small">Telefonunu kaybedersen bu kodlarla girebilirsin. Her biri bir kez kullanılır. Güvenli bir yere kaydet; bir daha gösterilmeyecek.</p>
+      <div id="mfa-backup-codes" class="codes"></div>
+      <button id="mfa-backup-copy" type="button" class="btn soft">Kopyala</button>
+      <button id="mfa-backup-done" type="button" class="btn primary">Kaydettim, devam et</button>
+    </div>
+
+    <!-- 2FA kodu (her girişte) -->
+    <form id="mfa-verify" class="card login-card hidden">
+      <div class="logo">meetpoint</div>
+      <p class="item-title">Doğrulama kodu</p>
+      <p class="muted small">Doğrulayıcı uygulamadaki 6 haneli kodu gir. Telefonun yanında değilse yedek kodlarından birini kullanabilirsin.</p>
+      <input id="mfa-code" autocomplete="one-time-code" placeholder="123456 veya yedek kod" maxlength="20" required>
+      <button type="submit" class="btn primary">Devam</button>
+      <button id="mfa-cancel" type="button" class="btn ghost">Başka hesapla gir</button>
+      <p id="mfa-error" class="error"></p>
+    </form>
   </section>
 
   <!-- Panel -->
@@ -25,13 +58,16 @@
       <div class="logo">meetpoint <span class="badge-admin">yönetim</span></div>
       <nav id="tabs">
         <button data-tab="overview" class="tab active">Özet</button>
-        <button data-tab="reports" class="tab">Şikayetler <span id="count-reports" class="count"></span></button>
-        <button data-tab="verifications" class="tab">Mavi tik <span id="count-verifications" class="count"></span></button>
-        <button data-tab="users" class="tab">Kullanıcılar</button>
-        <button data-tab="purchases" class="tab">Satışlar</button>
-        <button data-tab="payouts" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
-        <button data-tab="errors" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
+        <button data-tab="reports" data-roles="moderator" class="tab">Şikayetler <span id="count-reports" class="count"></span></button>
+        <button data-tab="verifications" data-roles="moderator" class="tab">Mavi tik <span id="count-verifications" class="count"></span></button>
+        <button data-tab="users" data-roles="moderator finance" class="tab">Kullanıcılar</button>
+        <button data-tab="purchases" data-roles="finance" class="tab">Satışlar</button>
+        <button data-tab="payouts" data-roles="finance" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
+        <button data-tab="errors" data-roles="" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
+        <button data-tab="staff" data-roles="" class="tab">Ekip</button>
+        <button data-tab="audit" data-roles="" class="tab">İşlem kaydı</button>
       </nav>
+      <span id="whoami" class="muted small"></span>
       <button id="logout" class="btn ghost">Çıkış</button>
     </header>
 
@@ -82,6 +118,30 @@
         </div>
         <p class="muted">Uygulamada ve sunucuda oluşan beklenmeyen hatalar. Aynı hata tek satırda toplanır. Düzelttikten sonra "Çözüldü" de; tekrar olursa yeniden açılır.</p>
         <div id="errors" class="list"></div>
+      </div>
+
+      <div id="tab-staff" class="panel hidden">
+        <form id="staff-form" class="toolbar">
+          <input id="staff-email" type="email" placeholder="Ekip üyesinin e-postası (uygulamada hesabı olmalı)" required>
+          <select id="staff-role">
+            <option value="moderator">Moderatör</option>
+            <option value="finance">Finans</option>
+            <option value="super">Süper yönetici</option>
+            <option value="none">Yetkiyi kaldır</option>
+          </select>
+          <button type="submit" class="btn primary">Kaydet</button>
+        </form>
+        <p class="muted">Moderatör: şikayet, mavi tik, kullanıcı. Finans: ödeme, satış. Süper yönetici: her şey + ekip ve işlem kaydı. Herkes ilk girişte iki adımlı doğrulama kurar.</p>
+        <div id="staff" class="list"></div>
+      </div>
+
+      <div id="tab-audit" class="panel hidden">
+        <div class="toolbar">
+          <input id="audit-filter" type="search" placeholder="İşleme göre süz (ör. payout, user.ban)">
+        </div>
+        <p class="muted">Yönetim ekibinin yaptığı her işlem ve hassas veri görüntülemesi (IBAN, selfie). Kayıtlar değiştirilemez ve silinemez.</p>
+        <div id="audit" class="list"></div>
+        <div class="actions center"><button id="audit-more" class="btn soft hidden">Daha eski kayıtlar</button></div>
       </div>
 
       <div id="tab-users" class="panel hidden">

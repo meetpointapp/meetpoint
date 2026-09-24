@@ -1,7 +1,7 @@
 // Faz 7: para çekme talebi (IBAN/PayPal), manuel onay, red/iptal iadesi, yönetim paneli
 // Test sunucusu kısa arama zamanlamalarıyla çalışır (test/env.ts).
 import { describe, it } from 'vitest';
-import { call, check, registerVerified, upload } from '../helpers';
+import { call, check, registerVerified, upload, makeAdmin, TEST_PASSWORD, testDb } from '../helpers';
 
 describe('Para çekme (Faz 7)', () => {
   it('senaryo', async () => {
@@ -12,7 +12,8 @@ describe('Para çekme (Faz 7)', () => {
       await upload(u.t, '/me/photos', 'photo');
       return u;
     }
-    const admin = (await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' })).token;
+    const adminUser = await makeAdmin();
+    const admin = adminUser.t;
     const wallet = (u) => call(u.t, 'GET', '/wallet');
     const TR_IBAN = 'TR33 0006 1005 1978 6457 8413 26'; // geçerli örnek IBAN
 
@@ -69,7 +70,7 @@ describe('Para çekme (Faz 7)', () => {
     check('coins deducted on request', w.cashable === cashable0 - 2000 && w.cashout.pending?.id === p1.id, `cashable=${w.cashable}`);
     const dup = await call(earner.t, 'POST', '/payouts', { ...base, coins: 2000 });
     check('only one pending payout', dup.http === 409 || dup.http === 402);
-    const del = await call(earner.t, 'DELETE', '/me', { password: 'password123' });
+    const del = await call(earner.t, 'DELETE', '/me', { password: TEST_PASSWORD });
     check('cannot delete account with pending payout', del.http === 409 && del.error === 'payout_pending');
     const otherCancel = await call(payer.t, 'POST', `/payouts/${p1.id}/cancel`);
     check('others cannot cancel', otherCancel.http === 404);
@@ -86,6 +87,13 @@ describe('Para çekme (Faz 7)', () => {
     const pend = await call(admin, 'GET', '/admin/api/payouts');
     const adminRow = pend._arr?.find((p) => p.id === p2.id);
     check('admin sees full account + user info', adminRow?.accountValue === 'ece@example.com' && adminRow?.user?.verified === true && adminRow?.user?.cashableLeft === cashable0 - 2000);
+    // Hesap bilgisi veritabanında şifreli; yönetim görüntülemesi işlem kaydına yazılır
+    const db = await testDb();
+    const raw = await db.payout.findUniqueOrThrow({ where: { id: p2.id } });
+    check('account value encrypted at rest', raw.accountValue.startsWith('v1:') && !raw.accountValue.includes('ece@'), raw.accountValue.slice(0, 12));
+    check('masked hint stored for the user', raw.accountHint === 'e•••@example.com');
+    const viewed = await db.adminAudit.count({ where: { action: 'payout.view_list', adminId: adminUser.id } });
+    check('payout list view audited', viewed >= 1);
     const noAuth = await call(earner.t, 'GET', '/admin/api/payouts');
     check('payout admin API needs admin', noAuth.http === 403);
     const rejectNoNote = await call(admin, 'POST', `/admin/api/payouts/${p2.id}/reject`, { note: '' });
@@ -110,7 +118,7 @@ describe('Para çekme (Faz 7)', () => {
     check('stats include payouts', stats.payoutsPaidUsd >= 22 && typeof stats.payoutsPending === 'number');
 
     // Hesap silinse de ödenmiş kayıt yönetimde kalır
-    const delOk = await call(earner.t, 'DELETE', '/me', { password: 'password123' });
+    const delOk = await call(earner.t, 'DELETE', '/me', { password: TEST_PASSWORD });
     check('account deletable after payouts settle', delOk.http === 200);
     const paidList = await call(admin, 'GET', '/admin/api/payouts?status=PAID');
     const kept = paidList._arr?.find((p) => p.id === p3.id);
