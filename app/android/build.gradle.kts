@@ -5,6 +5,10 @@ allprojects {
     }
 }
 
+// Eski usul eklentiler (ör. agora_rtc_engine) derleme SDK'sını buradan okur; yoksa Android 31'e düşer
+// ve AndroidX bağımlılıkları (en az 34 ister) derlenmez.
+extra["compileSdkVersion"] = 37
+
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
         .dir("../../build")

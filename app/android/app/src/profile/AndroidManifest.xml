@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Sadece test (profile) derlemesi: telefon, bilgisayardaki geliştirme sunucusuna düz http ile
+         bağlanabilsin. Yayın derlemesinde bu yok; sunucu https arkasında olacak. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>

@@ -6,7 +6,9 @@ plugins {
 
 android {
     namespace = "com.meetpoint.meetpoint"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler_android Android 37 ile derleniyor: uygulama en az onunla derlenmeli (geriye uyumlu,
+    // hangi telefonlara kurulabileceğini minSdk belirler)
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

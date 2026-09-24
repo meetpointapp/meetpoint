@@ -4,7 +4,7 @@ import path from 'node:path';
 import { REPO } from './lib.mjs';
 
 const root = `${REPO}/app/build/web`;
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.wasm': 'application/wasm', '.png': 'image/png', '.otf': 'font/otf', '.ttf': 'font/ttf', '.css': 'text/css', '.ico': 'image/x-icon' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.wasm': 'application/wasm', '.png': 'image/png', '.otf': 'font/otf', '.ttf': 'font/ttf', '.css': 'text/css', '.ico': 'image/x-icon', '.apk': 'application/vnd.android.package-archive' };
 http.createServer((req, res) => {
   let p = path.join(root, decodeURIComponent(req.url.split('?')[0]));
   if (!p.startsWith(path.normalize(root)) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) p = path.join(root, 'index.html');
