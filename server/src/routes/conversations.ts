@@ -56,6 +56,9 @@ conversationsRouter.get('/conversations', async (req, res) => {
           { userB: { blocksReceived: { some: { fromId: me } } } },
           { userA: { bannedAt: { not: null } } },
           { userB: { bannedAt: { not: null } } },
+          // Silinmeyi bekleyen hesaplar da görünmez (geri gelirse sohbet yeniden görünür)
+          { userA: { deletionRequestedAt: { not: null } } },
+          { userB: { deletionRequestedAt: { not: null } } },
         ],
       },
     },

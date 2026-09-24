@@ -3,12 +3,13 @@ import { PrismaClient } from '@prisma/client';
 export const prisma = new PrismaClient();
 
 export class HttpError extends Error {
+  // details: yanıta eklenen ek bilgi (ör. hangi rızanın eksik olduğu, bekleme bitişi)
   constructor(
     public status: number,
     public code: string,
-    message?: string,
+    public details?: Record<string, unknown>,
   ) {
-    super(message ?? code);
+    super(code);
   }
 }
 

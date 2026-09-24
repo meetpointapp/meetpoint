@@ -30,6 +30,9 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     check('correct code verifies', good.http === 200);
     const reuse = await call(reg.token, 'POST', '/auth/verify-email', { code });
     check('code cannot be reused', reuse.http === 400);
+    const noConsent = await call(reg.token, 'PUT', '/me/profile', profile('Sec', 'male', 'female'));
+    check('profile needs orientation consent', noConsent.http === 403 && noConsent.error === 'consent_required' && noConsent.kind === 'special_category');
+    await call(reg.token, 'PUT', '/me/consents', { kind: 'special_category', granted: true, source: 'onboarding' });
     const after = await call(reg.token, 'PUT', '/me/profile', profile('Sec', 'male', 'female'));
     check('app allowed after verification', after.http === 200);
 
@@ -68,6 +71,9 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     // --- 4. Mavi tik: poz ata, selfie yükle, panelden onayla
     const noStart = await upload(secToken, '/me/verification', 'selfie');
     check('selfie without start rejected', noStart.http === 409);
+    const noSelfieConsent = await call(secToken, 'POST', '/me/verification/start');
+    check('verification needs selfie consent', noSelfieConsent.http === 403 && noSelfieConsent.kind === 'selfie');
+    await call(secToken, 'PUT', '/me/consents', { kind: 'selfie', granted: true, source: 'verification' });
     const start = await call(secToken, 'POST', '/me/verification/start');
     check('verification start returns pose', start.http === 200 && !!start.pose, start.pose);
     const selfie = await upload(secToken, '/me/verification', 'selfie');
@@ -136,8 +142,13 @@ describe('Güvenlik ve güven (Faz 3)', () => {
     const payerWallet = await call(payer.t, 'GET', '/wallet');
     // 50 hediye + 500 + 250 ilk alım bonusu; 50'lik istek iade edildi
     check('pending request refunded on delete', payerWallet.balance === 800, `balance=${payerWallet.balance}`);
-    const deletedLogin = await call(null, 'POST', '/auth/login', { email: `victim${tag}@test.com`, password: TEST_PASSWORD });
-    check('deleted account cannot log in', deletedLogin.http === 401);
+    check('deleted account session closed', (await call(victim.t, 'GET', '/me')).http === 401);
+    const hiddenVictim = await call(payer.t, 'GET', `/users/${victim.id}`);
+    check('account hidden during grace period', hiddenVictim.http === 404);
+    // Bekleme süresinde giriş: hesap geri gelir
+    const restoredLogin = await call(null, 'POST', '/auth/login', { email: `victim${tag}@test.com`, password: TEST_PASSWORD });
+    check('login during grace period restores account', restoredLogin.http === 200 && restoredLogin.restored === true);
+    check('restored account visible again', (await call(payer.t, 'GET', `/users/${victim.id}`)).http === 200);
 
     // --- 7. Yasal sayfalar
     for (const doc of ['terms', 'privacy']) {

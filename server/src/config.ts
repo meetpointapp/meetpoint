@@ -14,8 +14,12 @@ export const config = {
   maxPhotos: 6,
   minAge: 18,
 
-  // Kullanım koşulları sürümü: metin değişince artırılır, kullanıcıdan yeniden onay istenebilir
-  termsVersion: '2026-09-22',
+  // Yasal metin sürümleri: değişince uygulama kullanıcıdan yeniden onay ister (Faz 11)
+  termsVersion: '2026-09-24',
+  privacyVersion: '2026-09-24',
+
+  // Sunucunun dışarıdan görünen adresi (e-postadaki indirme bağlantıları için)
+  publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${process.env.PORT ?? 4000}`,
 
   // E-posta kodları
   codeTtlMinutes: 10,
@@ -131,6 +135,33 @@ export const accountsPerDevice = Number(process.env.ACCOUNTS_PER_DEVICE ?? 3);
 // Tarayıcıdan erişime izin verilen adresler (yayında web uygulaması ve panel). Boşsa geliştirmede herkes.
 export const corsOrigins = (process.env.CORS_ORIGINS ?? '').split(',').map((s) => s.trim()).filter(Boolean);
 
+// KVKK (Faz 11): açık rıza metinlerinin sürümleri ve saklama süreleri. Avukat görüşüne göre buradan değiştirilir.
+export const privacy = {
+  consentVersions: {
+    special_category: '2026-09-24',
+    overseas_transfer: '2026-09-24',
+    selfie: '2026-09-24',
+    marketing: '2026-09-24',
+  },
+  // Yurt dışı aktarım için ayrı rıza iste ("off": standart sözleşme yeterli görülürse kapatılır, herkes izinli sayılır)
+  overseasConsentRequired: process.env.OVERSEAS_CONSENT !== 'off',
+  // İlgili kişi başvurusu yanıt süresi (KVKK md. 13: en geç 30 gün)
+  dsrResponseDays: 30,
+};
+
+export const retention = {
+  deletionGraceDays: Number(process.env.DELETION_GRACE_DAYS ?? 30), // silme talebinden kalıcı silmeye
+  inactiveDays: Number(process.env.INACTIVE_DAYS ?? 730), // bu kadar gün girilmeyen hesap silinir
+  inactiveWarnDays: 30, // silmeden bu kadar gün önce e-posta uyarısı
+  exportTtlDays: 7, // indirme bağlantısının geçerliliği
+  exportCooldownDays: 30, // "verilerimi indir" ayda bir
+  closedSessionDays: 30, // kapanmış/süresi dolmuş oturum kayıtları
+  emailCodeDays: 1, // kullanılmış/süresi dolmuş e-posta kodları
+  unopenedViewOnceDays: 30, // açılmamış tek seferlik fotoğraflar
+  resolvedErrorDays: 180, // çözülmüş hata kayıtları
+  intervalMs: Number(process.env.RETENTION_INTERVAL_MS ?? 60 * 60_000), // imha işi ne sıklıkla çalışır
+};
+
 // Zamanlayıcı (scheduler.ts): tur aralığı, liderlik deneme aralığı, bağlantı taraması aralığı
 export const scheduler = {
   tickMs: Number(process.env.SCHEDULER_TICK_MS ?? 1000),
@@ -157,6 +188,7 @@ export function assertProductionConfig() {
   if (!revenueCat.webhookAuth) problems.push('REVENUECAT_WEBHOOK_AUTH yok: satın alımlar jetona dönüşmez');
   if (!process.env.FIELD_ENCRYPTION_KEY) problems.push('FIELD_ENCRYPTION_KEY yok: IBAN ve 2FA anahtarları şifrelenemez');
   if (!process.env.MEDIA_URL_SECRET) problems.push('MEDIA_URL_SECRET yok: fotoğraf adresleri imzalanamaz');
+  if (!process.env.PUBLIC_URL) problems.push('PUBLIC_URL yok: e-postadaki veri indirme bağlantıları çalışmaz');
   if (corsOrigins.length === 0) problems.push('CORS_ORIGINS yok: hangi web adreslerine izin verileceği belirtilmeli');
   if (problems.length) {
     throw new Error(`Yayın ayarları eksik:\n- ${problems.join('\n- ')}`);

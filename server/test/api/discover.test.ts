@@ -33,6 +33,7 @@ async function candidate(tag: string, o: { createdAt?: Date; age?: number; loc?:
       email: `${tag}-${Math.random().toString(36).slice(2)}@test.com`,
       passwordHash: 'x',
       emailVerifiedAt: new Date(),
+      consentSpecialAt: new Date(), // eşleştirme rızası (KVKK)
       createdAt: o.createdAt ?? new Date(),
       profile: {
         create: {

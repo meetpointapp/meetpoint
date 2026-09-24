@@ -19,18 +19,21 @@ class Session {
   final String? userId;
   final bool emailVerified;
   final bool hasProfile;
+  // Kullanım koşulları / aydınlatma metni değişti: yeniden onay ekranı gösterilir
+  final bool needsLegal;
   // Oturum kapandıysa sebebi (ör. "banned"): giriş ekranında gösterilir
   final String? notice;
 
-  const Session({this.auth, this.userId, this.emailVerified = false, this.hasProfile = false, this.notice});
+  const Session({this.auth, this.userId, this.emailVerified = false, this.hasProfile = false, this.needsLegal = false, this.notice});
 
   bool get isLoggedIn => auth != null;
 
-  Session copyWith({bool? emailVerified, bool? hasProfile}) => Session(
+  Session copyWith({bool? emailVerified, bool? hasProfile, bool? needsLegal}) => Session(
         auth: auth,
         userId: userId,
         emailVerified: emailVerified ?? this.emailVerified,
         hasProfile: hasProfile ?? this.hasProfile,
+        needsLegal: needsLegal ?? this.needsLegal,
       );
 }
 
@@ -80,13 +83,28 @@ class SessionNotifier extends AsyncNotifier<Session> {
 
   Future<Session> _load(AuthTokens auth) async {
     final me = await Api(auth).me();
-    return Session(auth: auth, userId: me.id, emailVerified: me.emailVerified, hasProfile: me.profile != null);
+    return Session(
+      auth: auth,
+      userId: me.id,
+      emailVerified: me.emailVerified,
+      hasProfile: me.profile != null,
+      needsLegal: me.legalUpdates.isNotEmpty,
+    );
   }
 
-  Future<void> login(String email, String password) => _signIn(() => Api(null).login(email, password));
+  // true: hesap silinmeyi bekliyordu ve geri yüklendi
+  Future<bool> login(String email, String password) async {
+    var restored = false;
+    await _signIn(() async {
+      final (tokens, wasRestored) = await Api(null).loginWithStatus(email, password);
+      restored = wasRestored;
+      return tokens;
+    });
+    return restored;
+  }
 
-  Future<void> register(String email, String password, String locale) =>
-      _signIn(() => Api(null).register(email, password, locale));
+  Future<void> register(String email, String password, String locale, {bool overseas = false, bool marketing = false}) =>
+      _signIn(() => Api(null).register(email, password, locale, overseas: overseas, marketing: marketing));
 
   Future<void> resetPassword(String email, String code, String password) =>
       _signIn(() => Api(null).resetPassword(email, code, password));
@@ -103,6 +121,8 @@ class SessionNotifier extends AsyncNotifier<Session> {
 
   void profileCompleted() => _update((s) => s.copyWith(hasProfile: true));
 
+  void legalAccepted() => _update((s) => s.copyWith(needsLegal: false));
+
   void _update(Session Function(Session) f) {
     final s = state.value;
     if (s != null) state = AsyncData(f(s));
@@ -111,6 +131,7 @@ class SessionNotifier extends AsyncNotifier<Session> {
   // Sunucu oturumu reddetti (yasaklandı / şifre başka cihazda değişti)
   Future<void> expire(String code) async {
     if (!(state.value?.isLoggedIn ?? false)) return;
+    if (code == 'reconsent_required') return _update((s) => s.copyWith(needsLegal: true));
     await _clearTokens();
     state = AsyncData(Session(notice: code == 'banned' ? 'banned' : null));
   }

@@ -37,6 +37,7 @@ describe('yayın ayar kontrolü', () => {
       FIELD_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64'),
       MEDIA_URL_SECRET: 'm'.repeat(40),
       CORS_ORIGINS: 'https://admin.meetpoint.app',
+      PUBLIC_URL: 'https://api.meetpoint.app',
     });
     expect(() => assertProductionConfig()).not.toThrow();
     warn.mockRestore();

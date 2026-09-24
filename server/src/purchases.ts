@@ -34,13 +34,14 @@ export async function creditPurchase(input: PurchaseInput): Promise<{ credited: 
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.purchase.findUnique({ where: { transactionId: input.transactionId } });
       if (existing) return { credited: false, coins: 0, bonus: 0 };
-      const user = await tx.user.findUnique({ where: { id: input.userId }, select: { id: true } });
+      const user = await tx.user.findUnique({ where: { id: input.userId }, select: { id: true, email: true } });
       if (!user) return { credited: false, coins: 0, bonus: 0 };
 
       const bonus = await firstPurchaseBonusFor(input.userId, pack.coins, tx);
       const purchase = await tx.purchase.create({
         data: {
           userId: input.userId,
+          email: user.email,
           store: input.store,
           productId: pack.id,
           transactionId: input.transactionId,
@@ -76,6 +77,8 @@ export async function refundPurchase(transactionId: string): Promise<boolean> {
       data: { status: 'REFUNDED', refundedAt: new Date() },
     });
     if (count !== 1) return null;
+    // Hesap silinmişse geri alınacak bakiye yok: sadece kayıt iade olarak işaretlenir
+    if (!p.userId) return null;
     await credit(tx, p.userId, { paid: -p.coins, promo: -p.bonusCoins }, 'CLAWBACK', { note: `refund:${p.id}` });
     return p.userId;
   });

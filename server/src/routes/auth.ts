@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { currentSession, requireAuth, uid } from '../auth';
 import { consumeCode, issueCode } from '../codes';
-import { config } from '../config';
 import { HttpError, prisma } from '../db';
 import { authLimiter, codeLimiter, refreshLimiter } from '../limits';
 import { assertNotLocked, assertPasswordAllowed, clearLoginFailures, hashPassword, recordLoginFailure, verifyPassword } from '../passwords';
 import { grantSignupBonus } from '../purchases';
+import { restoreIfPendingDeletion } from '../privacy/accounts';
+import { acceptLegal, recordConsent } from '../privacy/consents';
 import { createSession, refreshSession, revokeAllSessions, revokeSession } from '../sessions';
 import { assertDeviceQuota, verifyCaptcha } from '../signupGuard';
 
@@ -22,8 +23,10 @@ authRouter.post('/register', authLimiter, async (req, res) => {
       email,
       password,
       locale: z.enum(['tr', 'en']).optional(),
-      // Kullanım koşulları + gizlilik politikası + 18 yaş beyanı zorunlu
+      // Kullanım koşulları + aydınlatma metni + 18 yaş beyanı zorunlu
       acceptTerms: z.literal(true),
+      // İsteğe bağlı açık rızalar (ayrı kutucuklar, varsayılan kapalı)
+      consents: z.object({ overseas: z.boolean().default(false), marketing: z.boolean().default(false) }).default({ overseas: false, marketing: false }),
       captchaToken: z.string().max(4096).optional(),
     })
     .parse(req.body);
@@ -34,15 +37,16 @@ authRouter.post('/register', authLimiter, async (req, res) => {
   const deviceId = String(req.header('x-device-id') ?? '').slice(0, 64);
   await assertDeviceQuota(deviceId);
 
-  const user = await prisma.user.create({
-    data: {
-      email: data.email,
-      passwordHash: await hashPassword(data.password),
-      locale: data.locale ?? 'tr',
-      termsAcceptedAt: new Date(),
-      termsVersion: config.termsVersion,
-      registeredDeviceId: deviceId,
-    },
+  const passwordHash = await hashPassword(data.password);
+  const user = await prisma.$transaction(async (tx) => {
+    const u = await tx.user.create({
+      data: { email: data.email, passwordHash, locale: data.locale ?? 'tr', registeredDeviceId: deviceId },
+    });
+    const ip = String(req.ip ?? '');
+    await acceptLegal(tx, u.id, 'register', ip);
+    if (data.consents.overseas) await recordConsent(tx, u.id, 'overseas_transfer', true, 'register', ip);
+    if (data.consents.marketing) await recordConsent(tx, u.id, 'marketing', true, 'register', ip);
+    return tx.user.findUniqueOrThrow({ where: { id: u.id } });
   });
   await issueCode(user, 'verify');
   res.status(201).json(await createSession(user, req));
@@ -61,7 +65,9 @@ authRouter.post('/login', authLimiter, async (req, res) => {
   await clearLoginFailures(data.email);
   if (check.upgraded) await prisma.user.update({ where: { id: user.id }, data: { passwordHash: check.upgraded } });
   if (user.bannedAt) throw new HttpError(403, 'banned');
-  res.json(await createSession(user, req, { notifyNewDevice: true }));
+  // Silme talebinden sonraki bekleme süresinde giriş: hesap geri gelir
+  const restored = await restoreIfPendingDeletion(user);
+  res.json({ ...(await createSession(user, req, { notifyNewDevice: true })), ...(restored ? { restored: true } : {}) });
 });
 
 // Erişim jetonu yenileme: yenileme jetonu her kullanımda değişir
@@ -134,5 +140,6 @@ authRouter.post('/reset-password', codeLimiter, async (req, res) => {
   await revokeAllSessions(user.id, 'password_reset');
   await clearLoginFailures(user.email);
   if (updated.bannedAt) throw new HttpError(403, 'banned');
-  res.json(await createSession(updated, req));
+  const restored = await restoreIfPendingDeletion(updated);
+  res.json({ ...(await createSession(updated, req)), ...(restored ? { restored: true } : {}) });
 });

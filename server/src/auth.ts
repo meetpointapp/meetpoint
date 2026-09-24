@@ -13,6 +13,7 @@ export interface AuthedUser {
   mfaEnabled: boolean;
   mfa: boolean; // bu oturumda yönetim 2FA'sı doğrulandı
   emailVerified: boolean;
+  legalCurrent: boolean; // kullanım koşulları ve aydınlatma metninin güncel sürümü onaylı mı
 }
 
 export interface AuthedRequest extends Request {
@@ -40,7 +41,17 @@ export async function authenticate(token: string): Promise<AuthedUser> {
     where: { id: decoded.sid },
     include: {
       user: {
-        select: { id: true, tokenVersion: true, bannedAt: true, isAdmin: true, adminRole: true, mfaEnabledAt: true, emailVerifiedAt: true },
+        select: {
+          id: true,
+          tokenVersion: true,
+          bannedAt: true,
+          isAdmin: true,
+          adminRole: true,
+          mfaEnabledAt: true,
+          emailVerifiedAt: true,
+          termsVersion: true,
+          privacyVersion: true,
+        },
       },
     },
   });
@@ -59,6 +70,7 @@ export async function authenticate(token: string): Promise<AuthedUser> {
     mfaEnabled: user.mfaEnabledAt !== null,
     mfa: session.mfa,
     emailVerified: user.emailVerifiedAt !== null,
+    legalCurrent: user.termsVersion === config.termsVersion && user.privacyVersion === config.privacyVersion,
   };
 }
 
@@ -78,6 +90,25 @@ export function requireVerifiedEmail(req: Request, _res: Response, next: NextFun
   if (!user.emailVerified && !UNVERIFIED_ALLOWED.some((r) => r.test(req.path))) {
     throw new HttpError(403, 'email_not_verified');
   }
+  next();
+}
+
+// Yasal metinler değiştiyse: kullanıcı yeni sürümü onaylayana kadar sadece hesap, gizlilik ve
+// veri hakları uçları açık (verilerini indirebilir, hesabını silebilir, onay vermeyebilir)
+const LEGAL_PENDING_ALLOWED = [
+  /^\/me$/,
+  /^\/me\/locale$/,
+  /^\/me\/sessions/,
+  /^\/me\/consents/,
+  /^\/me\/data-export/,
+  /^\/me\/kvkk-requests/,
+  /^\/me\/devices$/,
+  /^\/auth\//,
+];
+
+export function requireCurrentLegal(req: Request, _res: Response, next: NextFunction) {
+  const user = (req as AuthedRequest).user;
+  if (!user.legalCurrent && !LEGAL_PENDING_ALLOWED.some((r) => r.test(req.path))) throw new HttpError(403, 'reconsent_required');
   next();
 }
 

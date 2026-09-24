@@ -56,6 +56,11 @@ String errorText(AppLocalizations l, Object error) {
     'too_many_accounts' => l.errTooManyAccounts,
     'captcha_required' || 'captcha_failed' || 'captcha_unavailable' => l.errCaptcha,
     'refresh_race' => l.errRequestInProgress,
+    'consent_required' => l.errConsentRequired,
+    'peer_calls_disabled' => l.errPeerCallsDisabled,
+    'export_cooldown' => l.errExportCooldown,
+    'export_unavailable' => l.errNotFound,
+    'already_answered' => l.errGeneric,
     _ => l.errGeneric,
   };
 }

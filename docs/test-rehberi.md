@@ -97,6 +97,17 @@ Yeni hesap açarken `password123` gibi yaygın şifreler artık kabul edilmez; `
 - [ ] Profil → Şifre değiştir: yanlış mevcut şifre reddediliyor; `qwerty123` reddediliyor; güçlü şifre kabul, diğer cihazlar çıkış yapıyor
 - [ ] 10 kez yanlış şifreyle giriş → "Çok fazla hatalı deneme" (15 dk)
 
+### 7c. Gizlilik ve verilerim (Faz 11)
+- [ ] Kayıtta iki isteğe bağlı kutucuk var (arama/bildirim, kampanya); işaretsiz geliyor
+- [ ] Onboarding'de "kimi görmek istiyorsun" adımında yönelim rızası işaretlenmeden devam edilemiyor
+- [ ] Profil → Gizlilik ve verilerim: rızaları aç/kapat; eşleştirme rızasını kapatınca keşfet "rıza gerekli" diyor
+- [ ] Arama rızası kapalıyken arama başlat → rıza penceresi; "Rıza veriyorum" deyince arama başlıyor
+- [ ] Mavi tik: selfie rızası sorulmadan kamera açılmıyor
+- [ ] "Verilerimi indir" → birkaç saniye sonra `server/dev-mails/` klasörüne bağlantılı e-posta; bağlantı ZIP indiriyor, ikinci kez açılmıyor
+- [ ] KVKK başvurusu gönder → panelde KVKK sekmesinde görün, yanıtla → e-posta + uygulamada yanıt
+- [ ] Hesabı sil → çıkış; aynı hesapla tekrar gir → "Hesabın geri yüklendi"
+- [ ] Panel → KVKK → İmha kaydı: "İmha işini şimdi çalıştır"
+
 ### 8. Yönetim paneli
 - [ ] İlk girişte 2FA kurulumu: telefonda Google Authenticator / Microsoft Authenticator ile QR'ı tara, 6 haneli kodu gir, yedek kodları kaydet
 - [ ] Çıkış yapıp tekrar gir: kod soruluyor; bir yedek kodla da girilebiliyor

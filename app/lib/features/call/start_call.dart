@@ -9,6 +9,8 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../privacy/consent_widgets.dart';
+import '../privacy/privacy_screen.dart';
 
 String callKindLabel(AppLocalizations l, CallKind k) => k == CallKind.video ? l.videoCall : l.voiceCall;
 
@@ -55,6 +57,13 @@ Future<void> startCallFlow(BuildContext context, WidgetRef ref, PublicProfile pr
     if (context.mounted) context.push('/call/${call.id}', extra: call);
   } catch (e) {
     if (!context.mounted) return;
+    // Aramalar yurt dışındaki sunuculardan geçer: rıza yoksa sor, verirse aramayı tekrar başlat
+    if (missingConsent(e) == ConsentKind.overseasTransfer) {
+      if (await askConsent(context, ref, ConsentKind.overseasTransfer, source: 'call') && context.mounted) {
+        return startCallFlow(context, ref, profile, kind);
+      }
+      return;
+    }
     final lowBalance = e is ApiException && e.code == 'insufficient_balance';
     showSnack(
       context,

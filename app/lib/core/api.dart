@@ -12,7 +12,9 @@ import 'models.dart';
 class ApiException implements Exception {
   final String code;
   final int? status;
-  const ApiException(this.code, [this.status]);
+  // Sunucunun hata ile birlikte döndürdüğü ek bilgi (ör. {'kind': 'overseas_transfer'}, {'nextAt': ...})
+  final Map<String, dynamic> data;
+  const ApiException(this.code, [this.status, this.data = const {}]);
   @override
   String toString() => 'ApiException($code)';
 }
@@ -92,8 +94,9 @@ class Api {
           continue;
         }
         if (code != null) {
-          if (_hasToken && (code == 'banned' || code == 'invalid_token')) onSessionInvalid?.call(code);
-          throw ApiException(code, e.response?.statusCode);
+          // banned / invalid_token: oturum biter; reconsent_required: yeniden onay ekranı açılır
+          if (_hasToken && const {'banned', 'invalid_token', 'reconsent_required'}.contains(code)) onSessionInvalid?.call(code);
+          throw ApiException(code, e.response?.statusCode, Map<String, dynamic>.from(data as Map));
         }
         if (e.response == null) throw const ApiException('network');
         throw ApiException('http_${e.response!.statusCode}', e.response!.statusCode);
@@ -148,12 +151,19 @@ class Api {
   Future<IssuedTokens> login(String email, String password) async =>
       _tokenOf(await _post('/auth/login', {'email': email, 'password': password}));
 
-  Future<IssuedTokens> register(String email, String password, String locale) async =>
+  // Girişte hesap silinmeyi bekliyorsa geri gelir: restored = true
+  Future<(IssuedTokens, bool)> loginWithStatus(String email, String password) async {
+    final r = await _post('/auth/login', {'email': email, 'password': password});
+    return (_tokenOf(r), r['restored'] == true);
+  }
+
+  Future<IssuedTokens> register(String email, String password, String locale, {bool overseas = false, bool marketing = false}) async =>
       _tokenOf(await _post('/auth/register', {
         'email': email,
         'password': password,
         'locale': locale,
         'acceptTerms': true,
+        'consents': {'overseas': overseas, 'marketing': marketing},
       }));
 
   Future<void> verifyEmail(String code) => _post('/auth/verify-email', {'code': code});
@@ -178,6 +188,26 @@ class Api {
   Future<void> revokeSession(String id) => _delete('/me/sessions/$id');
 
   Future<void> revokeOtherSessions() => _post('/me/sessions/revoke-others');
+
+  // Gizlilik ve verilerim (KVKK)
+  Future<ConsentState> consents() async => ConsentState.fromJson(await _get('/me/consents'));
+
+  Future<ConsentState> setConsent(ConsentKind kind, bool granted, {String source = 'settings'}) async =>
+      ConsentState.fromJson(await _put('/me/consents', {'kind': kind.api, 'granted': granted, 'source': source}));
+
+  Future<void> acceptLegal() => _post('/me/consents/accept-legal');
+
+  Future<DataExportInfo?> dataExport() async {
+    final latest = (await _get('/me/data-export'))['latest'];
+    return latest == null ? null : DataExportInfo.fromJson(latest);
+  }
+
+  Future<void> requestDataExport() => _post('/me/data-export');
+
+  Future<List<KvkkRequest>> kvkkRequests() async =>
+      [for (final r in (await _get('/me/kvkk-requests') as List)) KvkkRequest.fromJson(r)];
+
+  Future<void> sendKvkkRequest(String kind, String message) => _post('/me/kvkk-requests', {'kind': kind, 'message': message});
 
   Future<void> deleteAccount(String password) => _delete('/me', {'password': password});
 

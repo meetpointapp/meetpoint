@@ -33,6 +33,19 @@ model User {
   banReason          String    @default("")
   termsAcceptedAt    DateTime?
   termsVersion       String    @default("")
+  privacyVersion     String    @default("") // okunduğu onaylanan aydınlatma metni sürümü
+
+  // Açık rızaların güncel durumu (her verme/geri alma Consent tablosunda kayıtlı). null = rıza yok
+  consentSpecialAt   DateTime? // cinsel yönelim (özel nitelikli veri): eşleştirme için zorunlu
+  consentOverseasAt  DateTime? // yurt dışına aktarım: sesli/görüntülü arama ve bildirimler
+  consentSelfieAt    DateTime? // mavi tik selfie'si
+  consentMarketingAt DateTime? // kampanya ve duyuru iletişimi
+
+  // Saklama ve imha
+  lastActiveAt        DateTime  @default(now()) // 2 yıl hareketsiz hesaplar silinir
+  inactivityWarnedAt  DateTime?
+  deletionRequestedAt DateTime? // silme talebi: hesap gizlenir, bekleme süresinde girişle geri gelir
+  deleteAfter         DateTime?
 
   // Selfie ile profil doğrulama (mavi tik): none | pending | approved | rejected
   verificationStatus String    @default("none")
@@ -53,6 +66,9 @@ model User {
   giftsReceived CallGift[]            @relation("GiftTo")
   payouts       Payout[]
   sessions      Session[]
+  consents      Consent[]
+  dataExports   DataExport[]
+  dsrRequests   DsrRequest[]
 
   profile Profile?
   photos  Photo[]
@@ -76,6 +92,8 @@ model User {
   reportsAgainst Report[] @relation("ReportTo")
 
   @@index([registeredDeviceId, createdAt])
+  @@index([deleteAfter])
+  @@index([lastActiveAt])
 }
 
 model Profile {
@@ -230,8 +248,10 @@ model Message {
 // transactionId benzersiz: aynı mağaza işlemi iki kez jetona dönüşemez.
 model Purchase {
   id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Hesap silinse de satış kaydı muhasebe için kalır (kullanıcı bağlantısı boşalır)
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email         String    @default("") // satın alma anındaki e-posta
   store         String // app_store | play_store | dev
   productId     String
   transactionId String    @unique
@@ -484,4 +504,86 @@ model VerificationRequest {
   createdAt  DateTime  @default(now())
 
   @@index([status, createdAt])
+}
+
+// KVKK: açık rıza ve onay geçmişi (kanıt). Her verme/geri alma yeni satırdır; güncel durum User'da.
+model Consent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String // terms | privacy | special_category | overseas_transfer | selfie | marketing
+  version   String
+  granted   Boolean
+  source    String   @default("") // register | onboarding | settings | reconsent | verification | seed
+  ip        String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([userId, kind, createdAt])
+}
+
+// "Verilerimi indir": sunucu ZIP hazırlar, e-postayla tek kullanımlık bağlantı gider
+model DataExport {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       String    @default("PENDING") // PENDING | READY | DOWNLOADED | EXPIRED | FAILED
+  tokenHash    String    @default("")
+  path         String    @default("")
+  size         Int       @default(0)
+  error        String    @default("")
+  createdAt    DateTime  @default(now())
+  readyAt      DateTime?
+  expiresAt    DateTime?
+  downloadedAt DateTime?
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([tokenHash])
+}
+
+// İlgili kişi başvurusu (KVKK md. 11/13): en geç 30 günde yanıtlanmalı
+model DsrRequest {
+  id         String    @id @default(cuid())
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email      String
+  kind       String // info | correction | deletion | objection | other
+  message    String
+  status     String    @default("OPEN") // OPEN | ANSWERED | REJECTED
+  dueAt      DateTime
+  answer     String    @default("")
+  answeredBy String    @default("")
+  answeredAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status, dueAt])
+}
+
+// İmha kaydı: saklama süresi dolan her veri silinişi (değiştirilemez, silinemez)
+model DestructionLog {
+  id        String   @id @default(cuid())
+  kind      String // account_deleted | inactive_account | email_codes | sessions | data_exports | view_once_photos | ...
+  count     Int
+  details   Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Veri ihlali kayıt defteri (KVKK md. 12/5: Kurula ve ilgililere bildirim)
+model BreachRecord {
+  id                  String    @id @default(cuid())
+  title               String
+  description         String
+  dataCategories      Json      @default("[]")
+  detectedAt          DateTime
+  occurredAt          DateTime?
+  affectedCount       Int       @default(0)
+  measures            String    @default("")
+  authorityNotifiedAt DateTime?
+  usersNotifiedAt     DateTime?
+  usersNotifiedCount  Int       @default(0)
+  createdBy           String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }

@@ -57,6 +57,12 @@ export const refreshLimiter = rateLimit({ ...base, ...store('refresh'), windowMs
 // Yönetim 2FA kodu: kullanıcı başına 15 dakikada 10 deneme (6 haneli kod tahminine karşı)
 export const mfaLimiter = rateLimit({ ...base, ...store('mfa'), windowMs: 15 * 60_000, limit: 10, keyGenerator: byUser });
 
+// KVKK başvurusu: kullanıcı başına günde 5
+export const dsrLimiter = rateLimit({ ...base, ...store('dsr'), windowMs: 24 * 3_600_000, limit: 5, keyGenerator: byUser });
+
+// Veri indirme bağlantısı: IP başına 15 dakikada 30 (bağlantı anahtarı tahmin edilemez; yükü keser)
+export const downloadLimiter = rateLimit({ ...base, ...store('download'), windowMs: 15 * 60_000, limit: ipLimit(30) });
+
 // Kod doğrulama: IP başına 15 dakikada 30 deneme (ayrıca her kodun kendi deneme sınırı var)
 export const codeLimiter = rateLimit({ ...base, ...store('code'), windowMs: 15 * 60_000, limit: ipLimit(30) });
 

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import 'core/session.dart';
 import 'features/me/security_screens.dart';
+import 'features/privacy/privacy_screen.dart';
+import 'features/privacy/reconsent_screen.dart';
 import 'core/ui.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/auth/forgot_password_screen.dart';
@@ -42,8 +44,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       final s = session.requireValue;
       if (!s.isLoggedIn) return const {'/auth', '/forgot-password'}.contains(loc) ? null : '/auth';
       if (!s.emailVerified) return loc == '/verify-email' ? null : '/verify-email';
+      // Metinler değiştiyse: onaylanana kadar sadece onay ekranı ve gizlilik/veri hakları ekranı
+      if (s.needsLegal) return const {'/consent', '/me/privacy'}.contains(loc) ? null : '/consent';
       if (!s.hasProfile) return loc == '/setup' ? null : '/setup';
-      if (const {'/splash', '/auth', '/forgot-password', '/verify-email', '/setup'}.contains(loc)) return '/discover';
+      if (const {'/splash', '/auth', '/forgot-password', '/verify-email', '/setup', '/consent'}.contains(loc)) return '/discover';
       return null;
     },
     routes: [
@@ -56,6 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/setup', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/me/edit', builder: (_, _) => const ProfileEditScreen()),
       GoRoute(path: '/me/devices', builder: (_, _) => const DevicesScreen()),
+      GoRoute(path: '/me/privacy', builder: (_, _) => const PrivacyScreen()),
+      GoRoute(path: '/consent', builder: (_, _) => const ReconsentScreen()),
       GoRoute(path: '/me/password', builder: (_, _) => const ChangePasswordScreen()),
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
       GoRoute(

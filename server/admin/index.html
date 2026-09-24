@@ -64,6 +64,7 @@
         <button data-tab="purchases" data-roles="finance" class="tab">Satışlar</button>
         <button data-tab="payouts" data-roles="finance" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
         <button data-tab="errors" data-roles="" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
+        <button data-tab="kvkk" data-roles="" class="tab">KVKK <span id="count-dsr" class="count"></span></button>
         <button data-tab="staff" data-roles="" class="tab">Ekip</button>
         <button data-tab="audit" data-roles="" class="tab">İşlem kaydı</button>
       </nav>
@@ -118,6 +119,38 @@
         </div>
         <p class="muted">Uygulamada ve sunucuda oluşan beklenmeyen hatalar. Aynı hata tek satırda toplanır. Düzelttikten sonra "Çözüldü" de; tekrar olursa yeniden açılır.</p>
         <div id="errors" class="list"></div>
+      </div>
+
+      <div id="tab-kvkk" class="panel hidden">
+        <div class="toolbar">
+          <div class="seg">
+            <button data-kvkk="dsr" class="seg-btn active">Başvurular</button>
+            <button data-kvkk="breaches" class="seg-btn">İhlal kaydı</button>
+            <button data-kvkk="destruction" class="seg-btn">İmha kaydı</button>
+          </div>
+        </div>
+        <div id="kvkk-dsr">
+          <p class="muted">İlgili kişi başvuruları (KVKK md. 11). En geç 30 gün içinde yanıtlanmalı; yanıt kullanıcıya e-postayla gider ve uygulamada görünür.</p>
+          <div id="dsr" class="list"></div>
+        </div>
+        <div id="kvkk-breaches" class="hidden">
+          <p class="muted">Veri ihlali olursa buraya kaydet. Kurul'a en geç 72 saat içinde bildirilmeli; etkilenen kullanıcılara buradan e-posta gönderilebilir.</p>
+          <form id="breach-form" class="card item">
+            <input id="breach-title" placeholder="Başlık" required>
+            <textarea id="breach-desc" rows="3" placeholder="Ne oldu? Hangi veriler, kaç kişi, nasıl fark edildi?" required></textarea>
+            <div class="actions">
+              <input id="breach-detected" type="datetime-local" required>
+              <input id="breach-count" type="number" min="0" placeholder="Etkilenen kişi">
+              <button type="submit" class="btn primary">Kaydet</button>
+            </div>
+          </form>
+          <div id="breaches" class="list"></div>
+        </div>
+        <div id="kvkk-destruction" class="hidden">
+          <div class="toolbar"><button id="retention-run" class="btn soft">İmha işini şimdi çalıştır</button></div>
+          <p class="muted">Saklama süresi dolan veriler saatte bir otomatik silinir. Her silme buraya yazılır; kayıtlar değiştirilemez.</p>
+          <div id="destruction" class="list"></div>
+        </div>
       </div>
 
       <div id="tab-staff" class="panel hidden">

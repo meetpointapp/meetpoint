@@ -241,6 +241,9 @@ class Me {
   final DateTime? likesUnlockedUntil;
   final bool hasLocation;
   final DiscoverFilters filters;
+  final ConsentState consents;
+  // Değişen ve yeniden onay bekleyen yasal metinler (terms, privacy)
+  final List<String> legalUpdates;
 
   const Me({
     required this.id,
@@ -255,6 +258,8 @@ class Me {
     this.likesUnlockedUntil,
     this.hasLocation = false,
     this.filters = const DiscoverFilters(),
+    this.consents = const ConsentState(),
+    this.legalUpdates = const [],
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -270,6 +275,8 @@ class Me {
         likesUnlockedUntil: j['likesUnlockedUntil'] == null ? null : _date(j['likesUnlockedUntil']),
         hasLocation: j['hasLocation'] ?? false,
         filters: DiscoverFilters.fromJson(j['filters']),
+        consents: j['consents'] == null ? const ConsentState() : ConsentState.fromJson(j['consents']),
+        legalUpdates: [for (final d in (j['legalUpdates'] as List? ?? const [])) d as String],
       );
 }
 
@@ -683,5 +690,102 @@ class DeviceSession {
         createdAt: DateTime.parse(j['createdAt']).toLocal(),
         lastUsedAt: DateTime.parse(j['lastUsedAt']).toLocal(),
         current: j['current'] == true,
+      );
+}
+
+// KVKK açık rızaları
+enum ConsentKind {
+  specialCategory('special_category', 'consent-special'),
+  overseasTransfer('overseas_transfer', 'consent-overseas'),
+  selfie('selfie', 'consent-selfie'),
+  marketing('marketing', 'consent-marketing');
+
+  const ConsentKind(this.api, this.doc);
+  final String api; // sunucudaki adı
+  final String doc; // yasal metin adresi (/legal/<doc>)
+
+  static ConsentKind? fromApi(Object? v) => values.where((k) => k.api == v).firstOrNull;
+}
+
+class ConsentState {
+  final bool specialCategory;
+  final bool overseasTransfer;
+  final bool selfie;
+  final bool marketing;
+  // false ise yurt dışı aktarım için ayrı rıza sorulmaz (standart sözleşme yeterli görülmüş)
+  final bool overseasConsentRequired;
+
+  const ConsentState({
+    this.specialCategory = false,
+    this.overseasTransfer = false,
+    this.selfie = false,
+    this.marketing = false,
+    this.overseasConsentRequired = true,
+  });
+
+  bool of(ConsentKind k) => switch (k) {
+        ConsentKind.specialCategory => specialCategory,
+        ConsentKind.overseasTransfer => overseasTransfer,
+        ConsentKind.selfie => selfie,
+        ConsentKind.marketing => marketing,
+      };
+
+  factory ConsentState.fromJson(Map<String, dynamic> j) => ConsentState(
+        specialCategory: j['special_category'] == true,
+        overseasTransfer: j['overseas_transfer'] == true,
+        selfie: j['selfie'] == true,
+        marketing: j['marketing'] == true,
+        overseasConsentRequired: j['overseasConsentRequired'] != false,
+      );
+}
+
+// "Verilerimi indir" son talebi
+class DataExportInfo {
+  final String status; // PENDING | BUILDING | READY | DOWNLOADED | EXPIRED | FAILED
+  final DateTime createdAt;
+  final DateTime? nextAt; // bir sonraki talep tarihi
+  final DateTime? expiresAt;
+
+  const DataExportInfo({required this.status, required this.createdAt, this.nextAt, this.expiresAt});
+
+  bool get preparing => status == 'PENDING' || status == 'BUILDING';
+  bool get canRequest => nextAt == null || DateTime.now().isAfter(nextAt!);
+
+  factory DataExportInfo.fromJson(Map<String, dynamic> j) => DataExportInfo(
+        status: j['status'],
+        createdAt: _date(j['createdAt']),
+        nextAt: j['nextAt'] == null ? null : _date(j['nextAt']),
+        expiresAt: j['expiresAt'] == null ? null : _date(j['expiresAt']),
+      );
+}
+
+// KVKK başvurusu (ilgili kişi hakları)
+class KvkkRequest {
+  final String id;
+  final String kind; // info | correction | deletion | objection | other
+  final String message;
+  final String status; // OPEN | ANSWERED | REJECTED
+  final String answer;
+  final DateTime dueAt;
+  final DateTime createdAt;
+
+  const KvkkRequest({
+    required this.id,
+    required this.kind,
+    required this.message,
+    required this.status,
+    required this.answer,
+    required this.dueAt,
+    required this.createdAt,
+  });
+
+  factory KvkkRequest.fromJson(Map<String, dynamic> j) => KvkkRequest(
+        id: j['id'],
+        kind: j['kind'],
+        message: j['message'],
+        status: j['status'],
+        answer: j['answer'] ?? '',
+        dueAt: _date(j['dueAt']),
+        createdAt: _date(j['createdAt']),
       );
 }

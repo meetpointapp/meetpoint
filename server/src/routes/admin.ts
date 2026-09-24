@@ -26,6 +26,7 @@ const userSummary = {
     createdAt: true,
     bannedAt: true,
     banReason: true,
+    deleteAfter: true,
     emailVerifiedAt: true,
     verificationStatus: true,
     profile: { select: { displayName: true, birthDate: true, city: true, country: true, bio: true } },
@@ -44,6 +45,7 @@ function shapeUser(u: NonNullable<SummaryUser>) {
     createdAt: u.createdAt,
     banned: u.bannedAt !== null,
     banReason: u.banReason,
+    deleteAfter: u.deleteAfter,
     emailVerified: u.emailVerifiedAt !== null,
     verificationStatus: u.verificationStatus,
     displayName: u.profile?.displayName ?? '',
@@ -94,6 +96,10 @@ adminRouter.get('/stats', async (_req, res) => {
       prisma.payout.aggregate({ where: { status: 'PAID' }, _count: true, _sum: { usd: true } }),
       prisma.errorLog.count({ where: { resolvedAt: null } }),
     ]);
+  const [openDsr, overdueDsr] = await Promise.all([
+    prisma.dsrRequest.count({ where: { status: 'OPEN' } }),
+    prisma.dsrRequest.count({ where: { status: 'OPEN', dueAt: { lt: new Date() } } }),
+  ]);
   res.json({
     users,
     verifiedEmail,
@@ -117,6 +123,8 @@ adminRouter.get('/stats', async (_req, res) => {
     payoutsPendingUsd: +(payoutsPending._sum.usd ?? 0).toFixed(2),
     payoutsPaidUsd: +(payoutsPaid._sum.usd ?? 0).toFixed(2),
     openErrors,
+    openDsr,
+    overdueDsr,
   });
 });
 
@@ -220,7 +228,7 @@ adminRouter.get('/purchases', requireRole(...FIN), async (_req, res) => {
       sandbox: p.sandbox,
       status: p.status,
       createdAt: p.createdAt,
-      user: { email: p.user.email, displayName: p.user.profile?.displayName ?? '' },
+      user: { email: p.user?.email ?? p.email, displayName: p.user?.profile?.displayName ?? '(hesap silinmiş)' },
     })),
   );
 });

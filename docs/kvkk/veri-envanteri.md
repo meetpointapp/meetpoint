@@ -1,0 +1,22 @@
+# Kişisel veri envanteri
+
+> Bu belge `server/src/privacy/inventory.ts` dosyasından üretilir (`npm run kvkk:inventory`). Elle düzenleme.
+> Hukuki sebepler ve süreler avukat görüşüyle kesinleşecek (Faz 17).
+
+| Kategori | Veriler | Amaç | Hukuki sebep | Saklama | Aktarım | Tablolar |
+|---|---|---|---|---|---|---|
+| Kimlik ve iletişim | E-posta, dil, kayıt tarihi, onaylanan metin sürümleri, rıza durumları, son etkinlik | Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı | sözleşme, yasal | Hesap süresince; silme talebinden 30 gün sonra veya 2 yıl hareketsizlikte silinir | E-posta sağlayıcısı (SMTP) | User |
+| Profil | Görünen ad, doğum tarihi, cinsiyet, biyografi, şehir, ilgi alanları, sorular, boy, meslek, eğitim, burç, alışkanlıklar, fotoğraflar | Tanışma hizmetinin sunulması | sözleşme | Hesap süresince; kullanıcı istediği an değiştirebilir | Diğer kullanıcılar (profilde görünen kısmı) | Profile, Photo |
+| **Cinsel yönelim** (özel nitelikli) | Kimi görmek istediği (interestedIn) ve cinsiyetle birlikte çıkarılabilen yönelim | Eşleştirme | rıza | Hesap süresince; rıza geri alınınca eşleştirmede kullanılmaz | Aktarılmaz | Profile |
+| Konum | Yaklaşık konum (~1 km yuvarlanmış), mesafe filtresi | Yakındaki kişileri gösterme | sözleşme | Hesap süresince; en son konum saklanır, geçmiş tutulmaz | Diğer kullanıcılar (sadece yuvarlanmış mesafe) | Profile |
+| Etkileşim | Beğeni/geçme, engellemeler, eşleşmeler, mesaj istekleri | Eşleşme ve iletişim hizmeti, güvenlik | sözleşme, meşru | Hesap süresince | Aktarılmaz | Swipe, Block, Conversation, ContactRequest |
+| Mesajlar | Mesaj metni, tek seferlik fotoğraf, okunma zamanı | İletişim hizmeti | sözleşme | Hesap süresince; tek seferlik fotoğraf ilk açılışta, açılmazsa 30 günde silinir | Karşı taraf | Message |
+| Sesli ve görüntülü arama | Arama zamanı, süresi, ücreti, hediyeler, puanlama (ses/görüntü kaydedilmez) | Arama hizmeti ve ücretlendirme | sözleşme, yasal | Hesap süresince (finansal kayıtlar yasal süre boyunca) | Agora (yurt dışı: ses/görüntü aktarımı, sadece rıza verenler) | Call, CallGift |
+| Finans | Jeton bakiyesi ve hareketleri, satın almalar, para çekme talepleri, IBAN/PayPal (şifreli) | Ödeme, muhasebe ve vergi yükümlülükleri, dolandırıcılık önleme | sözleşme, yasal | Hesap süresince; ödenmiş para çekme ve satış kayıtları hesap silinse de 10 yıl (VUK/TTK) | App Store / Google Play ve RevenueCat (yurt dışı, ödeme); banka / PayPal (para çekme) | Wallet, WalletEntry, Purchase, Payout |
+| **Profil doğrulama (selfie)** (özel nitelikli) | Belirli pozla çekilen selfie, inceleme sonucu | Sahte profili önleme (mavi tik) | rıza | İnceleme sonrası kanıt olarak saklanır; rıza geri alınınca silinir | Aktarılmaz (sadece yetkili yönetici görür) | VerificationRequest |
+| Güvenlik ve işlem güvenliği | Oturumlar (cihaz adı, IP), e-posta kodları (özet), deneme sayaçları, bildirim cihaz jetonları | Hesap güvenliği, kötüye kullanımı önleme, bildirim | sözleşme, meşru | Kapanan oturum 30 gün, e-posta kodu 1 gün, sayaçlar ve tekrar koruması 1 güne kadar | Firebase (yurt dışı: bildirim, sadece rıza verenler) | Session, EmailCode, RateLimitHit, IdempotencyKey, Device |
+| Şikayet ve moderasyon | Şikayet eden, şikayet edilen, sebep, açıklama, sonuç | Topluluk güvenliği, hukuki taleplerin karşılanması | meşru, hak, yasal | Hesap süresince | Yetkili kurumlar (resmi talep hâlinde) | Report |
+| Hata kayıtları | Hata mesajı, ekran, uygulama sürümü (kişisel veri içermemeye çalışılır) | Hizmetin çalışır tutulması | meşru | Çözülen kayıtlar 180 gün | Aktarılmaz | ErrorLog |
+| KVKK süreç kayıtları | Rıza verme/geri alma geçmişi, veri indirme talepleri, başvurular ve yanıtları, imha ve ihlal kayıtları | KVKK yükümlülüklerinin yerine getirildiğinin kanıtı | yasal | İndirme dosyası 7 gün veya ilk indirmede silinir; kayıtlar yasal süre boyunca | Kişisel Verileri Koruma Kurulu (talep hâlinde) | Consent, DataExport, DsrRequest, DestructionLog, BreachRecord |
+| Yönetim işlem kaydı | Yönetici e-postası, işlem, hedef kayıt, IP | Yetkisiz erişimin önlenmesi ve denetim | yasal, meşru | Değiştirilemez; yasal süre boyunca | Aktarılmaz | AdminAudit |
+| Teknik (kişisel veri değil) | Sunucular arası anlık olay aktarımı (geçici) | Çok sunuculu çalışma | meşru | Dakikalar içinde silinir | Aktarılmaz | SocketIoAttachment |

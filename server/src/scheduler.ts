@@ -1,8 +1,10 @@
 import type pg from 'pg';
 import { closeLegacyCalls, processCallDeadlines, sweepCallPresence } from './calls';
-import { scheduler as cfg } from './config';
+import { retention, scheduler as cfg } from './config';
 import { prisma } from './db';
 import { pool } from './pgPool';
+import { processPendingExports } from './privacy/dataExport';
+import { runRetention } from './privacy/retention';
 import { cleanupIdempotencyKeys } from './idempotency';
 import { expireStaleRequests } from './requestService';
 
@@ -72,6 +74,9 @@ async function tick() {
     await periodic('rateLimits', 60_000, () =>
       prisma.$executeRaw`DELETE FROM "RateLimitHit" WHERE "resetAt" < (now() AT TIME ZONE 'UTC')`,
     );
+    // KVKK: "verilerimi indir" talepleri ve saklama süresi dolan verilerin imhası
+    await periodic('dataExports', Math.max(cfg.tickMs, 2_000), processPendingExports);
+    await periodic('retention', retention.intervalMs, runRetention);
   } catch (e) {
     console.error('[zamanlayıcı]', e);
     // Lider bağlantısında hata: liderliği bırak (kilit veritabanı tarafında da düşer)

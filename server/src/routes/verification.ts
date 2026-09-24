@@ -20,6 +20,7 @@ const upload = multer({
 
 verificationRouter.post('/me/verification/start', async (req, res) => {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) } });
+  if (user.consentSelfieAt === null) throw new HttpError(403, 'consent_required', { kind: 'selfie' });
   if (user.verificationStatus === 'approved') throw new HttpError(409, 'already_verified');
   if (user.verificationStatus === 'pending') throw new HttpError(409, 'verification_pending');
   const pose = VERIFICATION_POSES[crypto.randomInt(VERIFICATION_POSES.length)];

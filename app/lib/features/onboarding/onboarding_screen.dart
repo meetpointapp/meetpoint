@@ -8,6 +8,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../privacy/consent_widgets.dart';
 import '../profile/profile_fields.dart';
 
 // Kayıt sonrası adım adım profil oluşturma: her ekranda tek soru.
@@ -31,6 +32,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _draft = ProfileDraft();
   int _index = 0;
   bool _saving = false;
+  // Kimi görmek istediğin özel nitelikli veri: bu adımda ayrı açık rıza alınır
+  bool _specialConsent = false;
 
   void _changed() => setState(() {});
 
@@ -58,12 +61,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ),
         _Step(
           title: l.obInterestedTitle,
-          content: ChoiceTiles(
-            options: interestedInOptions(l),
-            selected: _draft.interestedIn,
-            onSelected: (v) => setState(() => _draft.interestedIn = v),
-          ),
-          valid: _draft.interestedIn.isNotEmpty,
+          content: Column(children: [
+            ChoiceTiles(
+              options: interestedInOptions(l),
+              selected: _draft.interestedIn,
+              onSelected: (v) => setState(() => _draft.interestedIn = v),
+            ),
+            const SizedBox(height: 12),
+            ConsentCheckbox(
+              kind: ConsentKind.specialCategory,
+              text: l.consentSpecialOnboarding,
+              value: _specialConsent,
+              onChanged: (v) => setState(() => _specialConsent = v),
+            ),
+          ]),
+          valid: _draft.interestedIn.isNotEmpty && _specialConsent,
         ),
         _Step(
           title: l.obPhotosTitle,
@@ -121,6 +133,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final l = AppLocalizations.of(context);
     setState(() => _saving = true);
     try {
+      await ref.read(apiProvider).setConsent(ConsentKind.specialCategory, true, source: 'onboarding');
       await ref.read(apiProvider).saveProfile(_draft.toJson());
       ref.invalidate(meProvider);
       ref.read(sessionProvider.notifier).profileCompleted();

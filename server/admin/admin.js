@@ -241,6 +241,7 @@ const loaders = {
   payouts: loadPayouts,
   errors: loadErrors,
   staff: loadStaff,
+  kvkk: () => loadKvkk(),
   audit: () => loadAudit(),
 };
 let errorsResolved = '0';
@@ -286,6 +287,7 @@ function userLine(u) {
     u.verificationStatus === 'approved' ? '<span class="pill blue">Mavi tik</span>' : '',
     !u.emailVerified ? '<span class="pill">E-posta doğrulanmadı</span>' : '',
     u.reportCount ? `<span class="pill red">${u.reportCount} şikayet</span>` : '',
+    u.deleteAfter ? `<span class="pill red">Silinecek: ${new Date(u.deleteAfter).toLocaleDateString('tr-TR')}</span>` : '',
   ].join(' ');
   return `<div class="user-line">
     <img class="avatar" src="${esc(u.photos[0]?.url || '')}" alt="">
@@ -312,6 +314,7 @@ async function loadStats() {
   $('#count-verifications').textContent = s.pendingVerifications || '';
   $('#count-payouts').textContent = s.payoutsPending || '';
   $('#count-errors').textContent = s.openErrors || '';
+  $('#count-dsr').textContent = s.openDsr || '';
   const cards = [
     ['Kullanıcı', s.users],
     ['E-postası doğrulanmış', s.verifiedEmail],
@@ -331,6 +334,7 @@ async function loadStats() {
     ['Arama + hediye jetonu', (s.callCoins + s.giftCoins).toLocaleString('tr-TR')],
     ['Bekleyen ödeme', `${s.payoutsPending} · $${s.payoutsPendingUsd.toFixed(2)}`, s.payoutsPending > 0],
     ['Ödenen (USD)', '$' + s.payoutsPaidUsd.toLocaleString('tr-TR', { minimumFractionDigits: 2 })],
+    ['Açık KVKK başvurusu', s.overdueDsr ? `${s.openDsr} · ${s.overdueDsr} gecikmiş` : s.openDsr, s.overdueDsr > 0],
   ];
   $('#stats').innerHTML = cards
     .map(([label, value, alert]) => `<div class="card stat ${alert ? 'alert' : ''}"><div class="value">${esc(value)}</div><div class="label">${esc(label)}</div></div>`)
@@ -627,6 +631,148 @@ $('#errors').addEventListener('click', async (e) => {
   }
 });
 
+// ---------- KVKK ----------
+const DSR_KINDS = { info: 'Bilgi talebi', correction: 'Düzeltme', deletion: 'Silme', objection: 'İtiraz', other: 'Diğer' };
+let kvkkView = 'dsr';
+
+document.querySelectorAll('#tab-kvkk .seg-btn').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tab-kvkk .seg-btn').forEach((b) => b.classList.toggle('active', b === btn));
+    kvkkView = btn.dataset.kvkk;
+    loadKvkk();
+  }),
+);
+
+function loadKvkk() {
+  ['dsr', 'breaches', 'destruction'].forEach((v) => $(`#kvkk-${v}`).classList.toggle('hidden', v !== kvkkView));
+  return { dsr: loadDsr, breaches: loadBreaches, destruction: loadDestruction }[kvkkView]();
+}
+
+async function loadDsr() {
+  const list = await api('GET', '/admin/api/privacy/dsr');
+  $('#dsr').innerHTML = list.length
+    ? list
+        .map(
+          (r) => `<div class="card item">
+        <div class="item-head"><div><span class="pill blue">${esc(DSR_KINDS[r.kind] || r.kind)}</span>
+          <span class="muted">· ${esc(r.email)} · ${fmtDate(r.createdAt)}</span></div>
+          <span class="pill ${r.overdue ? 'red' : ''}">Son gün: ${new Date(r.dueAt).toLocaleDateString('tr-TR')}${r.overdue ? ' (gecikti)' : ''}</span></div>
+        <div class="detail answer">${esc(r.message)}</div>
+        <textarea rows="3" data-answer-for="${esc(r.id)}" placeholder="Yanıt (kullanıcıya e-postayla gider)"></textarea>
+        <div class="actions"><button class="btn green" data-dsr="${esc(r.id)}" data-status="ANSWERED">Yanıtla</button>
+          <button class="btn soft" data-dsr="${esc(r.id)}" data-status="REJECTED">Gerekçeyle reddet</button></div>
+      </div>`,
+        )
+        .join('')
+    : '<div class="card empty">Açık başvuru yok 🎉</div>';
+}
+
+$('#dsr').addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-dsr]');
+  if (!t) return;
+  const answer = document.querySelector(`textarea[data-answer-for="${t.dataset.dsr}"]`).value.trim();
+  if (answer.length < 10) return toast('Yanıt en az 10 karakter olmalı');
+  try {
+    await api('POST', `/admin/api/privacy/dsr/${t.dataset.dsr}/answer`, { status: t.dataset.status, answer });
+    toast('Yanıt gönderildi');
+    loadDsr();
+    loadStats();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+async function loadBreaches() {
+  const list = await api('GET', '/admin/api/privacy/breaches');
+  $('#breaches').innerHTML = list
+    .map(
+      (b) => `<div class="card item">
+      <div class="item-head"><div class="item-title">${esc(b.title)}</div><div class="muted">Tespit: ${fmtDate(b.detectedAt)}</div></div>
+      <div class="detail answer">${esc(b.description)}</div>
+      <div class="muted small">Etkilenen: ${esc(b.affectedCount)} · Kayıt: ${esc(b.createdBy)}</div>
+      <div class="actions">
+        ${b.authorityNotifiedAt ? `<span class="pill green">Kurul'a bildirildi ${fmtDate(b.authorityNotifiedAt)}</span>` : `<button class="btn soft" data-authority="${esc(b.id)}">Kurul'a bildirildi olarak işaretle</button>`}
+        ${b.usersNotifiedAt ? `<span class="pill green">${esc(b.usersNotifiedCount)} kullanıcıya e-posta</span>` : ''}
+        <button class="btn soft" data-notify="${esc(b.id)}">Tüm kullanıcılara e-posta</button>
+      </div></div>`,
+    )
+    .join('');
+}
+
+$('#breach-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await api('POST', '/admin/api/privacy/breaches', {
+      title: $('#breach-title').value,
+      description: $('#breach-desc').value,
+      detectedAt: new Date($('#breach-detected').value).toISOString(),
+      affectedCount: Number($('#breach-count').value || 0),
+    });
+    e.target.reset();
+    toast('İhlal kaydedildi');
+    loadBreaches();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#breaches').addEventListener('click', async (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  try {
+    if (t.dataset.authority) {
+      await api('PATCH', `/admin/api/privacy/breaches/${t.dataset.authority}`, { authorityNotified: true });
+    } else if (t.dataset.notify) {
+      const subject = prompt('E-posta konusu:', 'MeetPoint: güvenlik bildirimi');
+      if (!subject) return;
+      const message = prompt('E-posta metni (ne oldu, hangi veriler, ne yapmalı):');
+      if (!message) return;
+      const body = { scope: 'all', subject, message };
+      const dry = await api('POST', `/admin/api/privacy/breaches/${t.dataset.notify}/notify`, { ...body, dryRun: true });
+      if (!confirm(`${dry.recipients} kullanıcıya e-posta gidecek. Gönderilsin mi?`)) return;
+      const r = await api('POST', `/admin/api/privacy/breaches/${t.dataset.notify}/notify`, { ...body, dryRun: false });
+      toast(`${r.sent} e-posta gönderildi`);
+    } else return;
+    loadBreaches();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+const DESTRUCTION = {
+  account_deleted: 'Hesap silindi',
+  inactive_warning_sent: 'Hareketsizlik uyarısı',
+  email_codes: 'E-posta kodları',
+  sessions: 'Kapanmış oturumlar',
+  data_exports: 'Süresi dolan veri dosyaları',
+  view_once_photos: 'Açılmamış tek seferlik fotoğraflar',
+  error_logs: 'Çözülmüş hata kayıtları',
+};
+
+async function loadDestruction() {
+  const list = await api('GET', '/admin/api/privacy/destruction-log');
+  $('#destruction').innerHTML = list.length
+    ? list
+        .map(
+          (d) => `<div class="card audit-row"><div class="item-head">
+        <div><span class="item-title">${esc(DESTRUCTION[d.kind] || d.kind)}</span> <span class="pill">${esc(d.count)}</span>
+          ${d.details?.reason ? `<span class="muted">· ${esc(d.details.reason === 'inactive' ? 'hareketsizlik' : 'kullanıcı talebi')}</span>` : ''}</div>
+        <div class="muted">${fmtDate(d.createdAt)}</div></div></div>`,
+        )
+        .join('')
+    : '<div class="card empty">Henüz imha kaydı yok</div>';
+}
+
+$('#retention-run').addEventListener('click', async () => {
+  try {
+    const r = await api('POST', '/admin/api/privacy/retention/run');
+    toast(`Çalıştı: ${Object.values(r).reduce((a, b) => a + Math.max(0, b), 0)} kayıt`);
+    loadDestruction();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
 // ---------- Ekip ----------
 const ROLES = { super: 'Süper yönetici', moderator: 'Moderatör', finance: 'Finans' };
 
@@ -689,6 +835,12 @@ const ACTIONS = {
   'staff.reset_mfa': '2FA sıfırladı',
   'mfa.enable': '2FA kurdu',
   'mfa.backup_code_used': 'Yedek kodla girdi',
+  'dsr.answered': 'KVKK başvurusunu yanıtladı',
+  'dsr.rejected': 'KVKK başvurusunu reddetti',
+  'breach.create': 'İhlal kaydetti',
+  'breach.update': 'İhlal kaydını güncelledi',
+  'breach.notify_users': 'İhlal e-postası gönderdi',
+  'retention.run': 'İmha işini çalıştırdı',
 };
 let auditCursor = null;
 let auditTimer;

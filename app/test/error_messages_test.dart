@@ -35,6 +35,8 @@ const internalCodes = {
   'cannot_ban_self': 'sadece yönetim paneli',
   'cannot_change_own_role': 'sadece yönetim paneli',
   'cannot_reset_own_mfa': 'sadece yönetim paneli',
+  'reconsent_required': 'yönlendirici yeniden onay ekranına götürür',
+  'already_answered': 'sadece yönetim paneli',
 };
 
 Set<String> _serverCodes() {

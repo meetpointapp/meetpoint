@@ -43,6 +43,7 @@ describe('Para çekme (Faz 7)', () => {
     // Mavi tik şart
     const noVerify = await call(earner.t, 'POST', '/payouts', base);
     check('unverified cannot cash out', noVerify.http === 403 && noVerify.error === 'verification_required');
+    await call(earner.t, 'PUT', '/me/consents', { kind: 'selfie', granted: true, source: 'verification' });
     await call(earner.t, 'POST', '/me/verification/start');
     await upload(earner.t, '/me/verification', 'selfie');
     const q = await call(admin, 'GET', '/admin/api/verifications');
@@ -120,6 +121,10 @@ describe('Para çekme (Faz 7)', () => {
     // Hesap silinse de ödenmiş kayıt yönetimde kalır
     const delOk = await call(earner.t, 'DELETE', '/me', { password: TEST_PASSWORD });
     check('account deletable after payouts settle', delOk.http === 200);
+    // Bekleme süresi dolmuş gibi: imha işi hesabı kalıcı siler
+    await db.user.update({ where: { id: earner.id }, data: { deleteAfter: new Date(Date.now() - 1000) } });
+    const run = await call(admin, 'POST', '/admin/api/privacy/retention/run');
+    check('retention hard-deletes account after grace', run.http === 200 && run.deletionRequests >= 1, JSON.stringify(run));
     const paidList = await call(admin, 'GET', '/admin/api/payouts?status=PAID');
     const kept = paidList._arr?.find((p) => p.id === p3.id);
     check('paid record kept after deletion', kept && kept.user === null && kept.email.startsWith('ecep'));

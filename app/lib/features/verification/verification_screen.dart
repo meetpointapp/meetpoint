@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../privacy/consent_widgets.dart';
 
 // Mavi tik başvurusu: sunucunun verdiği pozda selfie çek, gönder, yönetim onaylasın
 class VerificationScreen extends ConsumerStatefulWidget {
@@ -33,10 +35,21 @@ class _VerificationScreenState extends ConsumerState<VerificationScreen> {
   }
 
   Future<void> _start() async {
-    final status = (await ref.read(meProvider.future)).verificationStatus;
+    final me = await ref.read(meProvider.future);
+    final status = me.verificationStatus;
     if (status == 'pending' || status == 'approved') {
       if (mounted) setState(() => _submitted = true);
       return;
+    }
+    // Selfie için açık rıza: vermezse ekran kapanır
+    if (!me.consents.selfie) {
+      if (!mounted) return;
+      final ok = await askConsent(context, ref, ConsentKind.selfie, source: 'verification');
+      if (!ok) {
+        if (mounted) Navigator.of(context).maybePop();
+        return;
+      }
+      ref.invalidate(meProvider);
     }
     try {
       final pose = await ref.read(apiProvider).startVerification();

@@ -7,12 +7,12 @@ import { EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, P
 import { ageOf } from '../age';
 import { verifyPassword } from '../passwords';
 import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
-import { privateStore } from '../storage';
 import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
 import { getBalance, getCashable } from '../wallet';
-import { closeAllPendingFor } from '../requestService';
+import { requestDeletion } from '../privacy/accounts';
+import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
 
 export const profileRouter = Router();
@@ -81,6 +81,9 @@ profileRouter.get('/me', async (req, res) => {
     profile: user.profile ? { ...publicProfile(user), interestedIn: user.profile.interestedIn, birthDate: user.profile.birthDate } : null,
     balance: await getBalance(user.id),
     cashable: await getCashable(user.id),
+    consents: consentState(user),
+    // Değişen yasal metinler: uygulama yeniden onay ekranı gösterir
+    legalUpdates: legalUpdatesNeeded(user),
   });
 });
 
@@ -145,28 +148,15 @@ profileRouter.post('/me/sessions/revoke-others', async (req, res) => {
   res.json({ ok: true });
 });
 
-// Hesap silme (App Store zorunluluğu). Şifre ile onaylanır; geri alınamaz.
+// Hesap silme (App Store zorunluluğu). Şifre ile onaylanır. Hesap hemen gizlenir ve oturumlar kapanır;
+// bekleme süresi içinde giriş yapılırsa geri gelir, sonra kalıcı silinir (privacy/accounts.ts).
 // Dahil olduğu bekleyen istekler kapatılır, bloke jetonlar gönderenlere iade edilir.
 profileRouter.delete('/me', async (req, res) => {
   const { password } = z.object({ password: z.string() }).parse(req.body);
-  const userId = uid(req);
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    include: { photos: true, verifications: true },
-  });
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) } });
   if (!(await verifyPassword(user.passwordHash, password)).ok) throw new HttpError(401, 'invalid_credentials');
-
-  // Bekleyen para çekme talebi varken hesap silinemez (önce iptal edilmeli ya da sonuçlanmalı)
-  if (await prisma.payout.count({ where: { userId, status: 'PENDING' } })) throw new HttpError(409, 'payout_pending');
-
-  await closeAllPendingFor(userId);
-  // Açık bağlantılar da kapansın (oturum kayıtları hesapla birlikte silinir)
-  await revokeAllSessions(userId, 'account_deleted');
-
-  await prisma.user.delete({ where: { id: userId } });
-  for (const p of user.photos) await removeProfilePhoto(p.path);
-  for (const v of user.verifications) await privateStore.remove(v.selfiePath);
-  res.json({ ok: true });
+  const deleteAfter = await requestDeletion(user.id);
+  res.json({ ok: true, deleteAfter });
 });
 
 const profileSchema = z.object({
@@ -200,6 +190,8 @@ profileRouter.put('/me/profile', async (req, res) => {
   const data = profileSchema.parse(req.body);
   if (ageOf(data.birthDate) < config.minAge) throw new HttpError(403, 'underage');
   const userId = uid(req);
+  // Kimi görmek istediğin (cinsel yönelim) özel nitelikli veridir: açık rıza olmadan kaydedilmez
+  await requireConsent(userId, 'special_category');
   await prisma.profile.upsert({ where: { userId }, create: { userId, ...data }, update: data });
   res.json({ ok: true });
 });
@@ -251,7 +243,7 @@ profileRouter.get('/users/:id', async (req, res) => {
     prisma.user.findUnique({ where: { id: target }, include: { profile: true, photos: true } }),
     prisma.profile.findUnique({ where: { userId: me }, select: { latitude: true, longitude: true } }),
   ]);
-  const profile = user && !user.bannedAt && publicProfile(user, target === me ? null : viewer);
+  const profile = user && !user.bannedAt && !user.deletionRequestedAt && publicProfile(user, target === me ? null : viewer);
   if (!profile) throw new HttpError(404, 'not_found');
   res.json(profile);
 });

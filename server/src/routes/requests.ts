@@ -20,7 +20,7 @@ requestsRouter.post('/requests', requestLimiter, async (req, res) => {
 
   if (toId === me) throw new HttpError(400, 'invalid_target');
   const target = await prisma.user.findUnique({ where: { id: toId }, include: { profile: true } });
-  if (!target?.profile || target.bannedAt || (await isBlockedEitherWay(me, toId))) throw new HttpError(404, 'not_found');
+  if (!target?.profile || target.bannedAt || target.deletionRequestedAt || (await isBlockedEitherWay(me, toId))) throw new HttpError(404, 'not_found');
 
   if (kind === 'MESSAGE') {
     if (!note) throw new HttpError(400, 'note_required');

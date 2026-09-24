@@ -58,6 +58,7 @@ export async function createSession(
   const session = await prisma.session.create({
     data: { userId: user.id, refreshHash: sha256(refreshToken), expiresAt: expiry(), ...device },
   });
+  await touchActivity(user.id);
   return { token: signAccess(user, session.id), refreshToken, userId: user.id };
 }
 
@@ -85,8 +86,13 @@ export async function refreshSession(refreshToken: string): Promise<IssuedTokens
     data: { refreshHash: sha256(next), prevRefreshHash: hash, rotatedAt: new Date(), lastUsedAt: new Date(), expiresAt: expiry() },
   });
   if (count !== 1) throw new HttpError(409, 'refresh_race');
+  await touchActivity(session.userId);
   return { token: signAccess(session.user, session.id), refreshToken: next, userId: session.userId };
 }
+
+// Son etkinlik: 2 yıl hareketsiz hesap silme sayacı sıfırlanır (giriş ve jeton yenilemede, ~15 dk'da bir)
+const touchActivity = (userId: string) =>
+  prisma.user.update({ where: { id: userId }, data: { lastActiveAt: new Date(), inactivityWarnedAt: null } });
 
 export async function revokeSession(id: string, reason: string) {
   await prisma.session.updateMany({ where: { id, revokedAt: null }, data: { revokedAt: new Date(), revokeReason: reason } });

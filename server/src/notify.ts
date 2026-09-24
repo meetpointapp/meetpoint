@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getMessaging, type Messaging } from 'firebase-admin/messaging';
-import { firebaseServiceAccount } from './config';
+import { firebaseServiceAccount, privacy } from './config';
 import { prisma } from './db';
 
 // Push bildirimleri (FCM). Servis hesabı ayarlı değilse bildirimler konsola yazılır.
@@ -42,10 +42,11 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
 export async function notify(toUserId: string, kind: Kind, fromUserId: string, extra?: string, data: Record<string, string> = {}) {
   try {
     const [to, from] = await Promise.all([
-      prisma.user.findUnique({ where: { id: toUserId }, select: { locale: true, devices: true } }),
+      prisma.user.findUnique({ where: { id: toUserId }, select: { locale: true, devices: true, consentOverseasAt: true } }),
       prisma.profile.findUnique({ where: { userId: fromUserId }, select: { displayName: true } }),
     ]);
-    if (!to) return;
+    // Bildirim yurt dışındaki Firebase üzerinden gider: rıza yoksa gönderilmez (uygulama içi bildirim sürer)
+    if (!to || (privacy.overseasConsentRequired && !to.consentOverseasAt)) return;
     const text = (TEXTS[to.locale] ?? TEXTS.en)[kind](from?.displayName ?? 'MeetPoint', extra);
     const payload = { ...data, kind };
 

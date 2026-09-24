@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
 import { hashPassword } from '../src/passwords';
 import { removeProfilePhoto, sanitizePrivatePhoto, storeProfilePhoto } from '../src/images';
+import { acceptLegal, recordConsent } from '../src/privacy/consents';
 import { privateStore, randomKey } from '../src/storage';
 import { credit, debit } from '../src/wallet';
 
@@ -245,6 +246,19 @@ async function main() {
   await privateStore.put(selfie, await sanitizePrivatePhoto(await gradient([127, 90, 240], [44, 182, 125])));
   await prisma.verificationRequest.create({ data: { userId: zeynep.id, pose: 'peace_sign', selfiePath: selfie } });
   await prisma.user.update({ where: { id: zeynep.id }, data: { verificationStatus: 'pending' } });
+
+  // KVKK: demo hesaplar güncel metinleri onaylamış, eşleştirme ve arama rızası vermiş sayılır.
+  // Mavi tikliler ve başvuranlar selfie rızası da vermiş. Test hesabının selfie rızası yok (rıza ekranı denenebilsin).
+  const admin = await prisma.user.findUniqueOrThrow({ where: { email: 'admin@meetpoint.dev' } });
+  for (const id of [test.id, admin.id, ...created.map((c) => c.id)]) {
+    await prisma.$transaction(async (tx) => {
+      await acceptLegal(tx, id, 'seed');
+      if (id === admin.id) return;
+      await recordConsent(tx, id, 'special_category', true, 'seed');
+      await recordConsent(tx, id, 'overseas_transfer', true, 'seed');
+      if (['Ayşe', 'Elif', 'Zeynep'].includes(created.find((c) => c.id === id)?.name ?? '')) await recordConsent(tx, id, 'selfie', true, 'seed');
+    });
+  }
 
   // Panel demosu: açık şikayet (Selin -> Can)
   const selin = created.find((c) => c.name === 'Selin')!;

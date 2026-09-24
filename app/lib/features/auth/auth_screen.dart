@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/models.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../privacy/consent_widgets.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -23,6 +25,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _busy = false;
   bool _obscure = true;
   bool _acceptedTerms = false;
+  bool _overseas = false;
+  bool _marketing = false;
 
   @override
   void dispose() {
@@ -41,9 +45,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final session = ref.read(sessionProvider.notifier);
     try {
       if (_registerMode) {
-        await session.register(_email.text.trim(), _password.text, ref.read(localeProvider).languageCode);
+        await session.register(_email.text.trim(), _password.text, ref.read(localeProvider).languageCode,
+            overseas: _overseas, marketing: _marketing);
       } else {
-        await session.login(_email.text.trim(), _password.text);
+        final restored = await session.login(_email.text.trim(), _password.text);
+        if (restored && mounted) showSnack(context, AppLocalizations.of(context).accountRestored);
       }
     } catch (e) {
       if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
@@ -139,6 +145,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               _TermsConsent(
                                 value: _acceptedTerms,
                                 onChanged: (v) => setState(() => _acceptedTerms = v),
+                              ),
+                              // İsteğe bağlı açık rızalar: ayrı kutucuk, varsayılan işaretsiz
+                              ConsentCheckbox(
+                                kind: ConsentKind.overseasTransfer,
+                                text: l.consentOverseasRegister,
+                                value: _overseas,
+                                onChanged: (v) => setState(() => _overseas = v),
+                              ),
+                              ConsentCheckbox(
+                                kind: ConsentKind.marketing,
+                                text: l.consentMarketingRegister,
+                                value: _marketing,
+                                onChanged: (v) => setState(() => _marketing = v),
                               ),
                             ] else
                               Align(

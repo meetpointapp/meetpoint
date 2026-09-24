@@ -1,6 +1,7 @@
 import { RtcRole, RtcTokenBuilder } from 'agora-token';
 import type { Call, Photo, Prisma, Profile, User } from '@prisma/client';
 import { agora, callTiming, economy, type CallKind } from './config';
+import { hasConsent, requireConsent } from './privacy/consents';
 import { HttpError, isBlockedEitherWay, prisma } from './db';
 import { notify } from './notify';
 import { emitToUser, isOnline, onUserOffline, onUserOnline } from './realtime';
@@ -86,9 +87,12 @@ const isBusy = async (tx: Tx, userId: string) =>
 export async function startCall(callerId: string, calleeId: string, kind: CallKind) {
   if (callerId === calleeId) throw new HttpError(400, 'invalid_target');
   const callee = await prisma.user.findUnique({ where: { id: calleeId }, include: { profile: true } });
-  if (!callee?.profile || callee.bannedAt || (await isBlockedEitherWay(callerId, calleeId))) {
+  if (!callee?.profile || callee.bannedAt || callee.deletionRequestedAt || (await isBlockedEitherWay(callerId, calleeId))) {
     throw new HttpError(404, 'not_found');
   }
+  // Ses/görüntü yurt dışındaki sunuculardan (Agora) geçer: iki tarafın da rızası gerekir
+  await requireConsent(callerId, 'overseas_transfer');
+  if (!hasConsent(callee, 'overseas_transfer')) throw new HttpError(409, 'peer_calls_disabled');
   const rate = economy.callRates[kind];
   if ((await getBalance(callerId)) < rate) throw new HttpError(402, 'insufficient_balance');
 
@@ -147,6 +151,7 @@ export async function chargeDueMinute(id: string, now = new Date()): Promise<'ch
 export async function acceptCall(id: string, userId: string) {
   const call = await load(id);
   if (!call || call.calleeId !== userId) throw new HttpError(404, 'not_found');
+  await requireConsent(userId, 'overseas_transfer');
   const now = new Date();
   // İlk dakika kabul anında alınır: ücret anı "şimdi"
   if (!(await transition(id, ['RINGING'], { status: 'ACTIVE', answeredAt: now, ringDeadline: null, nextBillingAt: now }))) {

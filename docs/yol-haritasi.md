@@ -96,6 +96,24 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 - **Ek sunucu örneği zamanlayıcı liderliğine karışabiliyordu:** `SCHEDULER=off` ile sadece API sunucusu çalıştırılabiliyor.
 
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
+**Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
+
+### Faz 11'de bulunanlar
+
+Faz 11 tamamlandı. Sunucuda 86 test (24 dosya), uygulamada 42 test.
+Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretilir; yeni tablo envantere eklenmeden testler geçmez).
+
+**Kullanıcı kararları:** Hesap silmede 30 gün bekleme (girişle geri gelir); 2 yıl hareketsiz hesap 30 gün önce uyarılıp silinir; "verilerimi indir" e-postayla tek kullanımlık ZIP bağlantısı (7 gün, ayda bir); yurt dışı aktarım için standart sözleşme + ayrı, geri alınabilir rıza (ayardan kapatılabilir: `OVERSEAS_CONSENT=off`).
+
+**Düzeltilenler:**
+- **Satın alma kayıtları hesapla birlikte siliniyordu:** muhasebe kaydı kayboluyordu. Artık hesap silinse de kalıyor (e-posta anlık görüntüsüyle).
+- **Cinsel yönelim açık rızasız işleniyordu:** artık onboarding'de ayrı kutucuk; rıza yoksa profil keşfette görünmez.
+- **Arama (Agora) ve bildirim (Firebase) için yurt dışı aktarım rızası yoktu.**
+- **Selfie için ayrı rıza yoktu;** rıza geri alınınca selfie silinmiyordu.
+- **Metin değişince yeniden onay alınmıyordu;** onayların sürümü ve zamanı kanıt olarak tutulmuyordu.
+- **Süresi dolan veriler (kodlar, kapanmış oturumlar, açılmamış tek seferlik fotoğraflar) hiç silinmiyordu;** artık saatlik imha işi var, her imha değiştirilemez kayıtta.
+
+**Test notu:** Bir tam koşuda arama testi bir kez düştü, ardından 3 koşu temiz; zamanlamaya bağlı bir kararsızlık olabilir, Faz 15'te (arama kalitesi) incelenecek.
 
 ---
 
@@ -136,22 +154,22 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 7. ✅ **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 17'de.
 8. ✅ **Bağımlılık güvenliği.** Prisma ve firebase-admin sürüm yükseltmeleriyle açık bildirimlerinin kapatılması.
 
-## Faz 11 · KVKK uyumu (uygulama içi)
+## Faz 11 · KVKK uyumu (uygulama içi) ✅
 
 **Amaç:** 6698 sayılı KVKK'nın uygulamada karşılanması gereken her şey.
 
-1. 🛠 **Veri envanteri.** Hangi veri, hangi amaçla, hangi hukuki sebeple, ne kadar süre, kime aktarılıyor. Envanter koddan üretilir ve güncel tutulur.
-2. 🛠 **Aydınlatma ve açık rıza ayrımı.**
+1. ✅ **Veri envanteri.** Hangi veri, hangi amaçla, hangi hukuki sebeple, ne kadar süre, kime aktarılıyor. Envanter koddan üretilir ve güncel tutulur.
+2. ✅ **Aydınlatma ve açık rıza ayrımı.**
    - Aydınlatma metni ayrı.
    - Ayrı kutucuklarla açık rıza: özel nitelikli veri (yönelim, selfie), yurt dışına aktarım, pazarlama.
    - Rıza geri alınabilir; her rızanın sürümü ve zamanı kaydedilir.
-3. 🛠 **Sürüm değişince yeniden onay.** Koşullar veya metinler değişince uygulama yeniden onay ister.
-4. 🛠 **İlgili kişi hakları (md. 11).**
+3. ✅ **Sürüm değişince yeniden onay.** Koşullar veya metinler değişince uygulama yeniden onay ister.
+4. ✅ **İlgili kişi hakları (md. 11).**
    - Uygulamada "verilerimi indir", düzeltme, silme ve bilgi talebi.
    - Yönetim panelinde başvuru kuyruğu ve 30 günlük süre takibi.
-5. 🛠 **Saklama ve imha.** Politikaya bağlı otomatik imha işleri; her imha kaydedilir.
-6. 🛠 **Veri ihlali altyapısı.** Etkilenen kullanıcıları tespit ve bilgilendirme aracı, ihlal kayıt defteri.
-7. 🛠 **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 17'de.
+5. ✅ **Saklama ve imha.** Politikaya bağlı otomatik imha işleri; her imha kaydedilir.
+6. ✅ **Veri ihlali altyapısı.** Etkilenen kullanıcıları tespit ve bilgilendirme aracı, ihlal kayıt defteri.
+7. ✅ **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 17'de.
 
 ## Faz 12 · İçerik güvenliği, moderasyon ve 5651 (uygulama içi)
 

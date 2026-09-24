@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { birthdayForAge } from '../age';
 import { uid } from '../auth';
 import { economy } from '../config';
+import { hasConsent, requireConsent } from '../privacy/consents';
 import { HttpError, isBlockedEitherWay, orderedPair, prisma } from '../db';
 import { swipeLimiter } from '../limits';
 import { notify } from '../notify';
@@ -26,6 +27,8 @@ discoverRouter.get('/discover', async (req, res) => {
   const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
   const my = me.profile;
   if (!my) throw new HttpError(400, 'profile_required');
+  // Eşleştirme cinsel yönelim verisini işler: açık rıza olmadan keşfet kullanılamaz
+  if (!hasConsent(me, 'special_category')) throw new HttpError(403, 'consent_required', { kind: 'special_category' });
 
   const hasLoc = my.latitude != null && my.longitude != null;
   const lat = my.latitude ?? 0;
@@ -59,6 +62,8 @@ discoverRouter.get('/discover', async (req, res) => {
     JOIN "Profile" p ON p."userId" = u."id"
     WHERE u."id" <> ${me.id}
       AND u."bannedAt" IS NULL
+      AND u."deletionRequestedAt" IS NULL
+      AND u."consentSpecialAt" IS NOT NULL
       AND u."emailVerifiedAt" IS NOT NULL
       AND EXISTS (SELECT 1 FROM "Photo" ph WHERE ph."userId" = u."id")
       ${genderFilter}
@@ -85,8 +90,9 @@ discoverRouter.post('/swipes', swipeLimiter, async (req, res) => {
     .parse(req.body);
   const me = uid(req);
   if (toId === me) throw new HttpError(400, 'invalid_target');
-  const target = await prisma.user.findUnique({ where: { id: toId }, select: { bannedAt: true } });
-  if (!target || target.bannedAt || (await isBlockedEitherWay(me, toId))) throw new HttpError(404, 'not_found');
+  await requireConsent(me, 'special_category');
+  const target = await prisma.user.findUnique({ where: { id: toId }, select: { bannedAt: true, deletionRequestedAt: true } });
+  if (!target || target.bannedAt || target.deletionRequestedAt || (await isBlockedEitherWay(me, toId))) throw new HttpError(404, 'not_found');
 
   await prisma.$transaction(async (tx) => {
     // Süper beğenide önce cüzdan kilitlenir: eşzamanlı iki istek çift ücret alamaz

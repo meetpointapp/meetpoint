@@ -95,6 +95,19 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## KVKK (Faz 11)
+
+Veri envanteri: [docs/kvkk/veri-envanteri.md](docs/kvkk/veri-envanteri.md) (`npm run kvkk:inventory` ile `src/privacy/inventory.ts`'den üretilir). Ayarlar: `src/config.ts` → `privacy`, `retention`.
+
+- **Açık rızalar** (`src/privacy/consents.ts`): cinsel yönelim (eşleştirme için zorunlu), yurt dışı aktarım (arama + bildirim), selfie, pazarlama. Her verme/geri alma `Consent` tablosunda kanıt olarak durur. Uygulamada Profil → Gizlilik ve verilerim.
+- **Yeniden onay:** `config.termsVersion` / `privacyVersion` artırılınca kullanıcılar onaylayana kadar sadece hesap ve veri hakları ekranlarını kullanabilir.
+- **Hesap silme:** hemen gizlenir, 30 gün içinde girişle geri gelir, sonra kalıcı silinir. Satış ve ödenmiş para çekme kayıtları kalır.
+- **Verilerimi indir:** ZIP (JSON + fotoğraflar + selfie), e-postayla tek kullanımlık bağlantı, 7 gün, ayda bir.
+- **Saklama ve imha** (`src/privacy/retention.ts`): saatlik; 2 yıl hareketsiz hesaplar (30 gün önce uyarı), kodlar, oturumlar, dosyalar. Her imha `DestructionLog`'da (değiştirilemez). Politika sayfası koddan üretilir: `/legal/retention`.
+- **Yönetim paneli → KVKK:** başvurular (30 gün süre takibi), ihlal kayıt defteri + etkilenenlere e-posta, imha kaydı.
+- Yasal metin taslakları `server/legal/` (aydınlatma, 4 açık rıza metni). Avukat onayı Faz 17'de.
+- Yayında `PUBLIC_URL` tanımlanmalı (indirme bağlantıları için).
+
 ## Güvenlik sertleştirme (Faz 10)
 
 Madde madde denetim: [docs/guvenlik-denetimi.md](docs/guvenlik-denetimi.md).

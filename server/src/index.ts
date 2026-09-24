@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { ZodError } from 'zod';
-import { requireAdmin, requireAuth, requireVerifiedEmail } from './auth';
+import { requireAdmin, requireAuth, requireCurrentLegal, requireVerifiedEmail } from './auth';
 import { assertProductionConfig, config, corsOrigins, scheduler as schedulerConfig } from './config';
 import { HttpError, prisma } from './db';
 import { recordError } from './errors';
@@ -13,6 +13,7 @@ import { closeRealtime, initRealtime } from './realtime';
 import { isLeader, startScheduler, stopScheduler } from './scheduler';
 import { adminRouter } from './routes/admin';
 import { adminAuthRouter } from './routes/adminAuth';
+import { adminPrivacyRouter } from './routes/adminPrivacy';
 import { authRouter } from './routes/auth';
 import { boostsRouter } from './routes/boosts';
 import { callsRouter } from './routes/calls';
@@ -22,6 +23,7 @@ import { conversationsRouter } from './routes/conversations';
 import { discoverRouter } from './routes/discover';
 import { legalRouter } from './routes/legal';
 import { mediaRouter } from './routes/media';
+import { dataExportDownloadRouter, privacyRouter } from './routes/privacy';
 import { profileRouter } from './routes/profile';
 import { requestsRouter } from './routes/requests';
 import { revenueCatRouter } from './routes/revenuecat';
@@ -71,14 +73,18 @@ app.use('/legal', legalRouter);
 app.use('/media', mediaRouter);
 app.use('/webhooks/revenuecat', revenueCatRouter);
 app.use('/client-errors', clientErrorsRouter);
+app.use('/data-export', dataExportDownloadRouter);
 app.use('/auth', authRouter);
 app.use('/admin/api/mfa', requireAuth, adminAuthRouter);
+app.use('/admin/api/privacy', requireAuth, requireAdmin, adminPrivacyRouter);
 app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,
   requireVerifiedEmail,
+  requireCurrentLegal,
   idempotency,
   profileRouter,
+  privacyRouter,
   verificationRouter,
   discoverRouter,
   boostsRouter,
@@ -91,7 +97,7 @@ app.use(
 );
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
-  if (err instanceof HttpError) return res.status(err.status).json({ error: err.code });
+  if (err instanceof HttpError) return res.status(err.status).json({ error: err.code, ...err.details });
   if (err instanceof ZodError) return res.status(400).json({ error: 'validation', issues: err.issues });
   console.error(err);
   const e = err instanceof Error ? err : new Error(String(err));

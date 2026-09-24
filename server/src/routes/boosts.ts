@@ -32,6 +32,7 @@ boostsRouter.get('/likes', async (req, res) => {
     direction: { in: ['like', 'superlike'] },
     from: {
       bannedAt: null,
+      deletionRequestedAt: null,
       profile: { isNot: null },
       swipesReceived: { none: { fromId: me.id } },
       blocksGiven: { none: { toId: me.id } },

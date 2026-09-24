@@ -66,13 +66,19 @@ export const SEED_PASSWORD = 'password123';
 
 export type TestUser = { t: string; id: string; email: string; refresh: string };
 
-// Kayıt + e-posta doğrulama
-export async function registerVerified(email: string, password = TEST_PASSWORD): Promise<TestUser> {
-  const r = await call(null, 'POST', '/auth/register', { email, password, acceptTerms: true });
+// Kayıt + e-posta doğrulama. Varsayılan olarak eşleştirme (özel nitelikli veri) ve yurt dışı aktarım
+// (arama, bildirim) rızaları verilir; rıza akışını deneyen testler `consents: false` geçer.
+export async function registerVerified(email: string, password = TEST_PASSWORD, opts: { consents?: boolean } = {}): Promise<TestUser> {
+  const consents = opts.consents ?? true;
+  const r = await call(null, 'POST', '/auth/register', { email, password, acceptTerms: true, consents: { overseas: consents } });
   if (r.http !== 201) throw new Error(`register failed ${r.http} ${r.error}`);
   const code = await latestCode(email);
   const v = await call(r.token, 'POST', '/auth/verify-email', { code });
   if (v.http !== 200) throw new Error(`verify failed ${v.http} ${v.error}`);
+  if (consents) {
+    const c = await call(r.token, 'PUT', '/me/consents', { kind: 'special_category', granted: true, source: 'onboarding' });
+    if (c.http !== 200) throw new Error(`consent failed ${c.http} ${c.error}`);
+  }
   return { t: r.token, id: r.userId, email, refresh: r.refreshToken };
 }
 

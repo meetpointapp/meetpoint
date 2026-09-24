@@ -1235,7 +1235,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountWarning.
   ///
   /// In tr, this message translates to:
-  /// **'Bu işlem geri alınamaz. Profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.'**
+  /// **'Hesabın hemen gizlenir ve oturumların kapanır. 30 gün içinde giriş yaparsan hesabın geri gelir; sonra profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.'**
   String get deleteAccountWarning;
 
   /// No description provided for @confirmWithPassword.
@@ -1247,7 +1247,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleted.
   ///
   /// In tr, this message translates to:
-  /// **'Hesabın silindi'**
+  /// **'Hesabın silinmek üzere kapatıldı. 30 gün içinde giriş yaparsan geri gelir.'**
   String get accountDeleted;
 
   /// No description provided for @legal.
@@ -2203,6 +2203,324 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şifren değiştirildi, diğer cihazlardan çıkış yapıldı.'**
   String get passwordChanged;
+
+  /// No description provided for @accountRestored.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın geri yüklendi, silme talebin iptal edildi.'**
+  String get accountRestored;
+
+  /// No description provided for @privacyAndData.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik ve verilerim'**
+  String get privacyAndData;
+
+  /// No description provided for @myConsents.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açık rızalarım'**
+  String get myConsents;
+
+  /// No description provided for @myData.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerim'**
+  String get myData;
+
+  /// No description provided for @legalTexts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Metinler'**
+  String get legalTexts;
+
+  /// No description provided for @retentionPolicy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saklama ve imha politikası'**
+  String get retentionPolicy;
+
+  /// No description provided for @readConsentText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Metni oku'**
+  String get readConsentText;
+
+  /// No description provided for @giveConsent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rıza veriyorum'**
+  String get giveConsent;
+
+  /// No description provided for @notNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi değil'**
+  String get notNow;
+
+  /// No description provided for @consentSpecialTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleştirme için yönelim bilgisi'**
+  String get consentSpecialTitle;
+
+  /// No description provided for @consentSpecialText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimi görmek istediğin, sana uygun kişileri göstermek için kullanılır.'**
+  String get consentSpecialText;
+
+  /// No description provided for @consentSpecialAsk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimi görmek istediğin özel nitelikli bir veridir; eşleştirme için açık rızan gerekir.'**
+  String get consentSpecialAsk;
+
+  /// No description provided for @consentSpecialOnboarding.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimi görmek istediğim bilgisinin (cinsel yönelim) eşleştirme için işlenmesine açık rıza veriyorum.'**
+  String get consentSpecialOnboarding;
+
+  /// No description provided for @consentOverseasTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arama ve bildirimler'**
+  String get consentOverseasTitle;
+
+  /// No description provided for @consentOverseasText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sesli/görüntülü arama ve telefon bildirimleri yurt dışındaki sunuculardan geçer.'**
+  String get consentOverseasText;
+
+  /// No description provided for @consentOverseasAsk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aramalar yurt dışındaki bir hizmet (Agora) üzerinden yapılır. Arama yapıp alabilmen için bu aktarıma açık rızan gerekir. Ses ve görüntü kaydedilmez.'**
+  String get consentOverseasAsk;
+
+  /// No description provided for @consentOverseasRegister.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sesli/görüntülü arama ve bildirimler için verilerimin yurt dışına aktarılmasına açık rıza veriyorum (isteğe bağlı).'**
+  String get consentOverseasRegister;
+
+  /// No description provided for @consentSelfieTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mavi tik selfie\'si'**
+  String get consentSelfieTitle;
+
+  /// No description provided for @consentSelfieText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrulama için çektiğin selfie sadece ekibimizce, elle incelenir.'**
+  String get consentSelfieText;
+
+  /// No description provided for @consentSelfieAsk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mavi tik için belirli bir pozla selfie çekeceksin. Selfie\'n sadece doğrulama ekibimizce incelenir, kimseye gösterilmez; rızanı geri alınca silinir.'**
+  String get consentSelfieAsk;
+
+  /// No description provided for @consentMarketingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kampanya e-postaları'**
+  String get consentMarketingTitle;
+
+  /// No description provided for @consentMarketingText.
+  ///
+  /// In tr, this message translates to:
+  /// **'İndirim ve yeni özellik duyuruları.'**
+  String get consentMarketingText;
+
+  /// No description provided for @consentMarketingRegister.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kampanya ve duyuru e-postaları almak istiyorum (isteğe bağlı).'**
+  String get consentMarketingRegister;
+
+  /// No description provided for @revokeConsentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rızanı geri almak istiyor musun?'**
+  String get revokeConsentTitle;
+
+  /// No description provided for @revokeConsent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri al'**
+  String get revokeConsent;
+
+  /// No description provided for @revokeSpecialWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilin keşfetten kalkar, keşfet ve beğeniler kullanılamaz. Var olan sohbetlerin sürer.'**
+  String get revokeSpecialWarning;
+
+  /// No description provided for @revokeOverseasWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arama yapamaz ve alamazsın, telefon bildirimi almazsın.'**
+  String get revokeOverseasWarning;
+
+  /// No description provided for @revokeSelfieWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saklanan selfie\'lerin silinir; bekleyen mavi tik başvurun iptal edilir. Mavi tikin varsa kalır.'**
+  String get revokeSelfieWarning;
+
+  /// No description provided for @dataExportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerimi indir'**
+  String get dataExportTitle;
+
+  /// No description provided for @dataExportSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm verilerinin bir kopyası e-postana bağlantı olarak gelir.'**
+  String get dataExportSubtitle;
+
+  /// No description provided for @dataExportAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'İste'**
+  String get dataExportAction;
+
+  /// No description provided for @dataExportRequested.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebin alındı. Hazır olunca e-postana bağlantı gelecek.'**
+  String get dataExportRequested;
+
+  /// No description provided for @dataExportPreparing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırlanıyor… Hazır olunca e-postana gelecek.'**
+  String get dataExportPreparing;
+
+  /// No description provided for @dataExportReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-postana gönderildi ({date} tarihine kadar geçerli).'**
+  String dataExportReady(String date);
+
+  /// No description provided for @dataExportNextAt.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir sonraki talep: {date}'**
+  String dataExportNextAt(String date);
+
+  /// No description provided for @kvkkRequestTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'KVKK başvurusu'**
+  String get kvkkRequestTitle;
+
+  /// No description provided for @kvkkRequestSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi, düzeltme, silme veya itiraz talebi'**
+  String get kvkkRequestSubtitle;
+
+  /// No description provided for @kvkkRequestInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başvurun en geç 30 gün içinde yanıtlanır; yanıt e-postana ve buraya gelir.'**
+  String get kvkkRequestInfo;
+
+  /// No description provided for @kvkkRequestHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebini yaz (en az 10 karakter)'**
+  String get kvkkRequestHint;
+
+  /// No description provided for @kvkkRequestSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başvurun alındı.'**
+  String get kvkkRequestSent;
+
+  /// No description provided for @kvkkRequestPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnceleniyor · son gün {date}'**
+  String kvkkRequestPending(String date);
+
+  /// No description provided for @kvkkMyRequests.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başvurularım'**
+  String get kvkkMyRequests;
+
+  /// No description provided for @kvkkKindInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgi talebi'**
+  String get kvkkKindInfo;
+
+  /// No description provided for @kvkkKindCorrection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzeltme'**
+  String get kvkkKindCorrection;
+
+  /// No description provided for @kvkkKindDeletion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Silme'**
+  String get kvkkKindDeletion;
+
+  /// No description provided for @kvkkKindObjection.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtiraz'**
+  String get kvkkKindObjection;
+
+  /// No description provided for @kvkkKindOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get kvkkKindOther;
+
+  /// No description provided for @reconsentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Metinlerimizi güncelledik'**
+  String get reconsentTitle;
+
+  /// No description provided for @reconsentBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam etmek için güncellenen metinleri okuyup onaylaman gerekiyor. Onaylamak istemezsen verilerini indirebilir veya hesabını silebilirsin.'**
+  String get reconsentBody;
+
+  /// No description provided for @reconsentAccept.
+  ///
+  /// In tr, this message translates to:
+  /// **'Okudum, kabul ediyorum'**
+  String get reconsentAccept;
+
+  /// No description provided for @errConsentRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu özellik için açık rızan gerekiyor.'**
+  String get errConsentRequired;
+
+  /// No description provided for @errPeerCallsDisabled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kişi aramaları kapatmış.'**
+  String get errPeerCallsDisabled;
+
+  /// No description provided for @errExportCooldown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerini ayda bir indirebilirsin.'**
+  String get errExportCooldown;
 }
 
 class _AppLocalizationsDelegate

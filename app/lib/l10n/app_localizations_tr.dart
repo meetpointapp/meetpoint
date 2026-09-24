@@ -718,13 +718,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get deleteAccountWarning =>
-      'Bu işlem geri alınamaz. Profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.';
+      'Hesabın hemen gizlenir ve oturumların kapanır. 30 gün içinde giriş yaparsan hesabın geri gelir; sonra profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.';
 
   @override
   String get confirmWithPassword => 'Onaylamak için şifreni gir';
 
   @override
-  String get accountDeleted => 'Hesabın silindi';
+  String get accountDeleted =>
+      'Hesabın silinmek üzere kapatıldı. 30 gün içinde giriş yaparsan geri gelir.';
 
   @override
   String get legal => 'Yasal';
@@ -1300,4 +1301,187 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get passwordChanged =>
       'Şifren değiştirildi, diğer cihazlardan çıkış yapıldı.';
+
+  @override
+  String get accountRestored =>
+      'Hesabın geri yüklendi, silme talebin iptal edildi.';
+
+  @override
+  String get privacyAndData => 'Gizlilik ve verilerim';
+
+  @override
+  String get myConsents => 'Açık rızalarım';
+
+  @override
+  String get myData => 'Verilerim';
+
+  @override
+  String get legalTexts => 'Metinler';
+
+  @override
+  String get retentionPolicy => 'Saklama ve imha politikası';
+
+  @override
+  String get readConsentText => 'Metni oku';
+
+  @override
+  String get giveConsent => 'Rıza veriyorum';
+
+  @override
+  String get notNow => 'Şimdi değil';
+
+  @override
+  String get consentSpecialTitle => 'Eşleştirme için yönelim bilgisi';
+
+  @override
+  String get consentSpecialText =>
+      'Kimi görmek istediğin, sana uygun kişileri göstermek için kullanılır.';
+
+  @override
+  String get consentSpecialAsk =>
+      'Kimi görmek istediğin özel nitelikli bir veridir; eşleştirme için açık rızan gerekir.';
+
+  @override
+  String get consentSpecialOnboarding =>
+      'Kimi görmek istediğim bilgisinin (cinsel yönelim) eşleştirme için işlenmesine açık rıza veriyorum.';
+
+  @override
+  String get consentOverseasTitle => 'Arama ve bildirimler';
+
+  @override
+  String get consentOverseasText =>
+      'Sesli/görüntülü arama ve telefon bildirimleri yurt dışındaki sunuculardan geçer.';
+
+  @override
+  String get consentOverseasAsk =>
+      'Aramalar yurt dışındaki bir hizmet (Agora) üzerinden yapılır. Arama yapıp alabilmen için bu aktarıma açık rızan gerekir. Ses ve görüntü kaydedilmez.';
+
+  @override
+  String get consentOverseasRegister =>
+      'Sesli/görüntülü arama ve bildirimler için verilerimin yurt dışına aktarılmasına açık rıza veriyorum (isteğe bağlı).';
+
+  @override
+  String get consentSelfieTitle => 'Mavi tik selfie\'si';
+
+  @override
+  String get consentSelfieText =>
+      'Doğrulama için çektiğin selfie sadece ekibimizce, elle incelenir.';
+
+  @override
+  String get consentSelfieAsk =>
+      'Mavi tik için belirli bir pozla selfie çekeceksin. Selfie\'n sadece doğrulama ekibimizce incelenir, kimseye gösterilmez; rızanı geri alınca silinir.';
+
+  @override
+  String get consentMarketingTitle => 'Kampanya e-postaları';
+
+  @override
+  String get consentMarketingText => 'İndirim ve yeni özellik duyuruları.';
+
+  @override
+  String get consentMarketingRegister =>
+      'Kampanya ve duyuru e-postaları almak istiyorum (isteğe bağlı).';
+
+  @override
+  String get revokeConsentTitle => 'Rızanı geri almak istiyor musun?';
+
+  @override
+  String get revokeConsent => 'Geri al';
+
+  @override
+  String get revokeSpecialWarning =>
+      'Profilin keşfetten kalkar, keşfet ve beğeniler kullanılamaz. Var olan sohbetlerin sürer.';
+
+  @override
+  String get revokeOverseasWarning =>
+      'Arama yapamaz ve alamazsın, telefon bildirimi almazsın.';
+
+  @override
+  String get revokeSelfieWarning =>
+      'Saklanan selfie\'lerin silinir; bekleyen mavi tik başvurun iptal edilir. Mavi tikin varsa kalır.';
+
+  @override
+  String get dataExportTitle => 'Verilerimi indir';
+
+  @override
+  String get dataExportSubtitle =>
+      'Tüm verilerinin bir kopyası e-postana bağlantı olarak gelir.';
+
+  @override
+  String get dataExportAction => 'İste';
+
+  @override
+  String get dataExportRequested =>
+      'Talebin alındı. Hazır olunca e-postana bağlantı gelecek.';
+
+  @override
+  String get dataExportPreparing =>
+      'Hazırlanıyor… Hazır olunca e-postana gelecek.';
+
+  @override
+  String dataExportReady(String date) {
+    return 'E-postana gönderildi ($date tarihine kadar geçerli).';
+  }
+
+  @override
+  String dataExportNextAt(String date) {
+    return 'Bir sonraki talep: $date';
+  }
+
+  @override
+  String get kvkkRequestTitle => 'KVKK başvurusu';
+
+  @override
+  String get kvkkRequestSubtitle => 'Bilgi, düzeltme, silme veya itiraz talebi';
+
+  @override
+  String get kvkkRequestInfo =>
+      'Başvurun en geç 30 gün içinde yanıtlanır; yanıt e-postana ve buraya gelir.';
+
+  @override
+  String get kvkkRequestHint => 'Talebini yaz (en az 10 karakter)';
+
+  @override
+  String get kvkkRequestSent => 'Başvurun alındı.';
+
+  @override
+  String kvkkRequestPending(String date) {
+    return 'İnceleniyor · son gün $date';
+  }
+
+  @override
+  String get kvkkMyRequests => 'Başvurularım';
+
+  @override
+  String get kvkkKindInfo => 'Bilgi talebi';
+
+  @override
+  String get kvkkKindCorrection => 'Düzeltme';
+
+  @override
+  String get kvkkKindDeletion => 'Silme';
+
+  @override
+  String get kvkkKindObjection => 'İtiraz';
+
+  @override
+  String get kvkkKindOther => 'Diğer';
+
+  @override
+  String get reconsentTitle => 'Metinlerimizi güncelledik';
+
+  @override
+  String get reconsentBody =>
+      'Devam etmek için güncellenen metinleri okuyup onaylaman gerekiyor. Onaylamak istemezsen verilerini indirebilir veya hesabını silebilirsin.';
+
+  @override
+  String get reconsentAccept => 'Okudum, kabul ediyorum';
+
+  @override
+  String get errConsentRequired => 'Bu özellik için açık rızan gerekiyor.';
+
+  @override
+  String get errPeerCallsDisabled => 'Bu kişi aramaları kapatmış.';
+
+  @override
+  String get errExportCooldown => 'Verilerini ayda bir indirebilirsin.';
 }

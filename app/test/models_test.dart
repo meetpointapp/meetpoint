@@ -173,4 +173,32 @@ void main() {
       expect(m.copyWith(viewedAt: DateTime(2026)).viewedAt, DateTime(2026));
     });
   });
+
+  group('KVKK modelleri', () {
+    test('rıza durumu ve eksik rıza türü', () {
+      final c = ConsentState.fromJson({'special_category': true, 'overseas_transfer': false, 'selfie': true, 'marketing': false, 'overseasConsentRequired': true});
+      expect(c.of(ConsentKind.specialCategory), isTrue);
+      expect(c.of(ConsentKind.overseasTransfer), isFalse);
+      expect(ConsentKind.fromApi('overseas_transfer'), ConsentKind.overseasTransfer);
+      expect(ConsentKind.fromApi('yok'), isNull);
+      expect(ConsentKind.selfie.doc, 'consent-selfie');
+    });
+
+    test('veri indirme: hazırlanıyor / bekleme süresi', () {
+      final preparing = DataExportInfo.fromJson({'status': 'BUILDING', 'createdAt': '2026-09-24T10:00:00Z', 'nextAt': '2099-01-01T00:00:00Z'});
+      expect(preparing.preparing, isTrue);
+      expect(preparing.canRequest, isFalse);
+      final failed = DataExportInfo.fromJson({'status': 'FAILED', 'createdAt': '2026-09-24T10:00:00Z', 'nextAt': null});
+      expect(failed.canRequest, isTrue);
+    });
+
+    test('Me: yeniden onay bekleyen metinler', () {
+      final me = Me.fromJson({
+        'id': 'u', 'email': 'a@b.c', 'locale': 'tr', 'balance': 0, 'cashable': 0,
+        'consents': {'special_category': true}, 'legalUpdates': ['terms'],
+      });
+      expect(me.legalUpdates, ['terms']);
+      expect(me.consents.specialCategory, isTrue);
+    });
+  });
 }

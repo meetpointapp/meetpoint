@@ -724,13 +724,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountWarning =>
-      'This cannot be undone. Your profile, photos, matches, messages and coin balance will be permanently deleted.';
+      'Your account is hidden right away and you are signed out. If you sign in within 30 days it comes back; after that your profile, photos, matches, messages and coin balance are permanently deleted.';
 
   @override
   String get confirmWithPassword => 'Enter your password to confirm';
 
   @override
-  String get accountDeleted => 'Your account has been deleted';
+  String get accountDeleted =>
+      'Your account is closed for deletion. Sign in within 30 days to restore it.';
 
   @override
   String get legal => 'Legal';
@@ -1311,4 +1312,188 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get passwordChanged =>
       'Password changed. Other devices were signed out.';
+
+  @override
+  String get accountRestored =>
+      'Your account has been restored and the deletion request cancelled.';
+
+  @override
+  String get privacyAndData => 'Privacy & my data';
+
+  @override
+  String get myConsents => 'My consents';
+
+  @override
+  String get myData => 'My data';
+
+  @override
+  String get legalTexts => 'Documents';
+
+  @override
+  String get retentionPolicy => 'Retention and deletion policy';
+
+  @override
+  String get readConsentText => 'Read text';
+
+  @override
+  String get giveConsent => 'I consent';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get consentSpecialTitle => 'Orientation for matching';
+
+  @override
+  String get consentSpecialText =>
+      'Who you want to see is used to show you suitable people.';
+
+  @override
+  String get consentSpecialAsk =>
+      'Who you want to see is special category data; matching needs your explicit consent.';
+
+  @override
+  String get consentSpecialOnboarding =>
+      'I explicitly consent to the processing of who I want to see (sexual orientation) for matching.';
+
+  @override
+  String get consentOverseasTitle => 'Calls and notifications';
+
+  @override
+  String get consentOverseasText =>
+      'Voice/video calls and push notifications go through servers abroad.';
+
+  @override
+  String get consentOverseasAsk =>
+      'Calls run through a provider abroad (Agora). To make and receive calls you need to consent to this transfer. Nothing is recorded.';
+
+  @override
+  String get consentOverseasRegister =>
+      'I consent to my data being transferred abroad for voice/video calls and notifications (optional).';
+
+  @override
+  String get consentSelfieTitle => 'Blue check selfie';
+
+  @override
+  String get consentSelfieText =>
+      'Your verification selfie is reviewed by hand, only by our team.';
+
+  @override
+  String get consentSelfieAsk =>
+      'You\'ll take a selfie in a specific pose. Only our verification team reviews it, it\'s never shown to anyone and it\'s deleted when you withdraw consent.';
+
+  @override
+  String get consentMarketingTitle => 'Offers by email';
+
+  @override
+  String get consentMarketingText => 'Discounts and new feature news.';
+
+  @override
+  String get consentMarketingRegister =>
+      'I\'d like to receive offers and news by email (optional).';
+
+  @override
+  String get revokeConsentTitle => 'Withdraw your consent?';
+
+  @override
+  String get revokeConsent => 'Withdraw';
+
+  @override
+  String get revokeSpecialWarning =>
+      'Your profile is removed from discover and you can\'t use discover or likes. Your chats continue.';
+
+  @override
+  String get revokeOverseasWarning =>
+      'You won\'t be able to make or receive calls or get push notifications.';
+
+  @override
+  String get revokeSelfieWarning =>
+      'Your stored selfies are deleted and a pending application is cancelled. An existing blue check stays.';
+
+  @override
+  String get dataExportTitle => 'Download my data';
+
+  @override
+  String get dataExportSubtitle =>
+      'A copy of all your data is sent to your email as a link.';
+
+  @override
+  String get dataExportAction => 'Request';
+
+  @override
+  String get dataExportRequested =>
+      'Request received. We\'ll email you a link when it\'s ready.';
+
+  @override
+  String get dataExportPreparing =>
+      'Preparing… we\'ll email you when it\'s ready.';
+
+  @override
+  String dataExportReady(String date) {
+    return 'Sent to your email (valid until $date).';
+  }
+
+  @override
+  String dataExportNextAt(String date) {
+    return 'Next request: $date';
+  }
+
+  @override
+  String get kvkkRequestTitle => 'Data request';
+
+  @override
+  String get kvkkRequestSubtitle =>
+      'Information, correction, deletion or objection';
+
+  @override
+  String get kvkkRequestInfo =>
+      'We\'ll answer within 30 days by email and here.';
+
+  @override
+  String get kvkkRequestHint => 'Write your request (at least 10 characters)';
+
+  @override
+  String get kvkkRequestSent => 'Request received.';
+
+  @override
+  String kvkkRequestPending(String date) {
+    return 'Under review · due $date';
+  }
+
+  @override
+  String get kvkkMyRequests => 'My requests';
+
+  @override
+  String get kvkkKindInfo => 'Information';
+
+  @override
+  String get kvkkKindCorrection => 'Correction';
+
+  @override
+  String get kvkkKindDeletion => 'Deletion';
+
+  @override
+  String get kvkkKindObjection => 'Objection';
+
+  @override
+  String get kvkkKindOther => 'Other';
+
+  @override
+  String get reconsentTitle => 'We\'ve updated our terms';
+
+  @override
+  String get reconsentBody =>
+      'Please read and accept the updated documents to continue. If you don\'t want to, you can download your data or delete your account.';
+
+  @override
+  String get reconsentAccept => 'I have read and accept';
+
+  @override
+  String get errConsentRequired => 'This feature needs your explicit consent.';
+
+  @override
+  String get errPeerCallsDisabled => 'This person has turned off calls.';
+
+  @override
+  String get errExportCooldown => 'You can download your data once a month.';
 }

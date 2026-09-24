@@ -140,6 +140,13 @@ class MeScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    title: Text(l.privacyAndData),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/me/privacy'),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
                     leading: const Icon(Icons.devices_rounded),
                     title: Text(l.devicesTitle),
                     trailing: const Icon(Icons.chevron_right_rounded),

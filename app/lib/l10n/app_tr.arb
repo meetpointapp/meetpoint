@@ -373,9 +373,9 @@
   },
   "mustAcceptTerms": "Devam etmek için koşulları kabul etmelisin.",
   "deleteAccount": "Hesabı sil",
-  "deleteAccountWarning": "Bu işlem geri alınamaz. Profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.",
+  "deleteAccountWarning": "Hesabın hemen gizlenir ve oturumların kapanır. 30 gün içinde giriş yaparsan hesabın geri gelir; sonra profilin, fotoğrafların, eşleşmelerin, mesajların ve jeton bakiyen kalıcı olarak silinir.",
   "confirmWithPassword": "Onaylamak için şifreni gir",
-  "accountDeleted": "Hesabın silindi",
+  "accountDeleted": "Hesabın silinmek üzere kapatıldı. 30 gün içinde giriş yaparsan geri gelir.",
   "legal": "Yasal",
   "verifyProfile": "Profilini doğrula",
   "verifyProfileHint": "Mavi tik al, daha çok güven ve eşleşme kazan.",
@@ -732,5 +732,79 @@
   "changePassword": "Şifre değiştir",
   "currentPassword": "Mevcut şifre",
   "changePasswordNote": "Şifren değişince bu cihaz dışındaki tüm oturumların kapanır.",
-  "passwordChanged": "Şifren değiştirildi, diğer cihazlardan çıkış yapıldı."
+  "passwordChanged": "Şifren değiştirildi, diğer cihazlardan çıkış yapıldı.",
+  "accountRestored": "Hesabın geri yüklendi, silme talebin iptal edildi.",
+  "privacyAndData": "Gizlilik ve verilerim",
+  "myConsents": "Açık rızalarım",
+  "myData": "Verilerim",
+  "legalTexts": "Metinler",
+  "retentionPolicy": "Saklama ve imha politikası",
+  "readConsentText": "Metni oku",
+  "giveConsent": "Rıza veriyorum",
+  "notNow": "Şimdi değil",
+  "consentSpecialTitle": "Eşleştirme için yönelim bilgisi",
+  "consentSpecialText": "Kimi görmek istediğin, sana uygun kişileri göstermek için kullanılır.",
+  "consentSpecialAsk": "Kimi görmek istediğin özel nitelikli bir veridir; eşleştirme için açık rızan gerekir.",
+  "consentSpecialOnboarding": "Kimi görmek istediğim bilgisinin (cinsel yönelim) eşleştirme için işlenmesine açık rıza veriyorum.",
+  "consentOverseasTitle": "Arama ve bildirimler",
+  "consentOverseasText": "Sesli/görüntülü arama ve telefon bildirimleri yurt dışındaki sunuculardan geçer.",
+  "consentOverseasAsk": "Aramalar yurt dışındaki bir hizmet (Agora) üzerinden yapılır. Arama yapıp alabilmen için bu aktarıma açık rızan gerekir. Ses ve görüntü kaydedilmez.",
+  "consentOverseasRegister": "Sesli/görüntülü arama ve bildirimler için verilerimin yurt dışına aktarılmasına açık rıza veriyorum (isteğe bağlı).",
+  "consentSelfieTitle": "Mavi tik selfie'si",
+  "consentSelfieText": "Doğrulama için çektiğin selfie sadece ekibimizce, elle incelenir.",
+  "consentSelfieAsk": "Mavi tik için belirli bir pozla selfie çekeceksin. Selfie'n sadece doğrulama ekibimizce incelenir, kimseye gösterilmez; rızanı geri alınca silinir.",
+  "consentMarketingTitle": "Kampanya e-postaları",
+  "consentMarketingText": "İndirim ve yeni özellik duyuruları.",
+  "consentMarketingRegister": "Kampanya ve duyuru e-postaları almak istiyorum (isteğe bağlı).",
+  "revokeConsentTitle": "Rızanı geri almak istiyor musun?",
+  "revokeConsent": "Geri al",
+  "revokeSpecialWarning": "Profilin keşfetten kalkar, keşfet ve beğeniler kullanılamaz. Var olan sohbetlerin sürer.",
+  "revokeOverseasWarning": "Arama yapamaz ve alamazsın, telefon bildirimi almazsın.",
+  "revokeSelfieWarning": "Saklanan selfie'lerin silinir; bekleyen mavi tik başvurun iptal edilir. Mavi tikin varsa kalır.",
+  "dataExportTitle": "Verilerimi indir",
+  "dataExportSubtitle": "Tüm verilerinin bir kopyası e-postana bağlantı olarak gelir.",
+  "dataExportAction": "İste",
+  "dataExportRequested": "Talebin alındı. Hazır olunca e-postana bağlantı gelecek.",
+  "dataExportPreparing": "Hazırlanıyor… Hazır olunca e-postana gelecek.",
+  "dataExportReady": "E-postana gönderildi ({date} tarihine kadar geçerli).",
+  "@dataExportReady": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dataExportNextAt": "Bir sonraki talep: {date}",
+  "@dataExportNextAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "kvkkRequestTitle": "KVKK başvurusu",
+  "kvkkRequestSubtitle": "Bilgi, düzeltme, silme veya itiraz talebi",
+  "kvkkRequestInfo": "Başvurun en geç 30 gün içinde yanıtlanır; yanıt e-postana ve buraya gelir.",
+  "kvkkRequestHint": "Talebini yaz (en az 10 karakter)",
+  "kvkkRequestSent": "Başvurun alındı.",
+  "kvkkRequestPending": "İnceleniyor · son gün {date}",
+  "@kvkkRequestPending": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "kvkkMyRequests": "Başvurularım",
+  "kvkkKindInfo": "Bilgi talebi",
+  "kvkkKindCorrection": "Düzeltme",
+  "kvkkKindDeletion": "Silme",
+  "kvkkKindObjection": "İtiraz",
+  "kvkkKindOther": "Diğer",
+  "reconsentTitle": "Metinlerimizi güncelledik",
+  "reconsentBody": "Devam etmek için güncellenen metinleri okuyup onaylaman gerekiyor. Onaylamak istemezsen verilerini indirebilir veya hesabını silebilirsin.",
+  "reconsentAccept": "Okudum, kabul ediyorum",
+  "errConsentRequired": "Bu özellik için açık rızan gerekiyor.",
+  "errPeerCallsDisabled": "Bu kişi aramaları kapatmış.",
+  "errExportCooldown": "Verilerini ayda bir indirebilirsin."
 }
