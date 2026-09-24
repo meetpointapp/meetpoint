@@ -6,7 +6,49 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api.dart';
 import 'auth_tokens.dart';
 
-const _storage = FlutterSecureStorage();
+const _secure = FlutterSecureStorage();
+final _storage = _SafeStorage();
+
+// Güvenli depo (Android Keystore / iOS Keychain / tarayıcıda WebCrypto). Tarayıcı güvenli olmayan bir
+// adreste (http + IP, ör. yerel ağdan test) WebCrypto'ya izin vermez: o durumda uygulama çökmesin diye
+// bellekte tutulur (sayfa yenilenince oturum düşer; yayında web https arkasında olacak).
+class _SafeStorage {
+  final Map<String, String> _memory = {};
+  bool _fallback = false;
+
+  Future<String?> read({required String key}) async {
+    if (!_fallback) {
+      try {
+        return await _secure.read(key: key);
+      } catch (_) {
+        _fallback = true;
+      }
+    }
+    return _memory[key];
+  }
+
+  Future<void> write({required String key, required String value}) async {
+    if (!_fallback) {
+      try {
+        return await _secure.write(key: key, value: value);
+      } catch (_) {
+        _fallback = true;
+      }
+    }
+    _memory[key] = value;
+  }
+
+  Future<void> delete({required String key}) async {
+    if (!_fallback) {
+      try {
+        return await _secure.delete(key: key);
+      } catch (_) {
+        _fallback = true;
+      }
+    }
+    _memory.remove(key);
+  }
+}
 
 // Kalıcı depodaki anahtarlar
 const _accessKey = 'token';
