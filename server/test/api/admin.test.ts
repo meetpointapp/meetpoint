@@ -162,5 +162,9 @@ describe('Yönetim paneli güvenliği (Faz 10)', () => {
     check('nosniff', panel.headers.get('x-content-type-options') === 'nosniff');
     check('no x-powered-by', !panel.headers.get('x-powered-by'));
     check('panel not cached', panel.headers.get('cache-control')?.includes('no-store'));
+    // Yasal sayfalar kendi satır içi stilini kullanabilmeli, betik çalıştıramamalı
+    const legal = await fetch(`${B}/legal/privacy?lang=tr`);
+    const legalCsp = legal.headers.get('content-security-policy') ?? '';
+    check('legal page styles allowed, scripts not', legalCsp.includes("style-src 'unsafe-inline'") && !legalCsp.includes('script-src'), legalCsp);
   });
 });

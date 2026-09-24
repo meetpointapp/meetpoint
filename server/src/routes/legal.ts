@@ -26,6 +26,8 @@ legalRouter.get('/:doc', (req, res) => {
   if (!fs.existsSync(file)) throw new HttpError(404, 'not_found');
   const body = fs.readFileSync(file, 'utf8');
   const other = lang === 'tr' ? 'en' : 'tr';
+  // Genel CSP satır içi stile izin vermez; bu sayfa betik içermez, sadece kendi stilini kullanır
+  res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
 
   res.type('html').send(`<!doctype html>
 <html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
