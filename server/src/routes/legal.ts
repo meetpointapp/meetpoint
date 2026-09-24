@@ -18,12 +18,14 @@ const TITLES: Record<string, Record<string, string>> = {
   'consent-selfie': { tr: "Açık Rıza: Doğrulama Selfie'si", en: 'Explicit Consent: Verification Selfie' },
   'consent-marketing': { tr: 'Ticari Elektronik İleti İzni', en: 'Marketing Emails' },
   retention: { tr: 'Kişisel Veri Saklama ve İmha Politikası', en: 'Data Retention and Deletion Policy' },
+  safety: { tr: 'Güvenlik Merkezi', en: 'Safety Center' },
+  community: { tr: 'Topluluk Kuralları', en: 'Community Rules' },
 };
 
 const DOCS = Object.keys(TITLES) as [string, ...string[]];
 
 const versionOf = (doc: string) =>
-  doc === 'terms'
+  doc === 'terms' || doc === 'community' || doc === 'safety'
     ? config.termsVersion
     : doc === 'privacy' || doc === 'retention'
       ? config.privacyVersion

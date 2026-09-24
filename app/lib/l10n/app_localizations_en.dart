@@ -1496,4 +1496,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errExportCooldown => 'You can download your data once a month.';
+
+  @override
+  String get contactWarningSender =>
+      'You shared contact details. For your safety, be careful with anyone asking for money, bank details or to talk outside the app.';
+
+  @override
+  String get contactSafetyTip =>
+      'Contact details were shared. Be careful with anyone asking for money or to move outside the app.';
+
+  @override
+  String get photoUnderReview => 'In review';
+
+  @override
+  String get callRulesReminder =>
+      'Be respectful: nudity, harassment and asking for money are not allowed. If you feel uncomfortable, use the flag to report and end the call.';
+
+  @override
+  String get reportAndEnd => 'Report and end';
+
+  @override
+  String get reportAndEndTitle =>
+      'Why are you reporting? The call ends right away.';
+
+  @override
+  String get safetyCenter => 'Safety center';
+
+  @override
+  String get errRestricted =>
+      'Your account is temporarily restricted. You can\'t message, like, send requests or call until it ends.';
+
+  @override
+  String get errAlreadyAppealed => 'You\'ve already appealed this decision.';
+
+  @override
+  String get sanctionWarningTitle => 'You received a warning';
+
+  @override
+  String get sanctionRestrictTitle => 'Your account is restricted';
+
+  @override
+  String get sanctionBanTitle => 'Your account has been banned';
+
+  @override
+  String sanctionReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String sanctionUntil(String date) {
+    return 'Until $date you can\'t message, like, send requests or call.';
+  }
+
+  @override
+  String get sanctionWarningBody =>
+      'We noticed behaviour that breaks our community rules. If it happens again your account may be restricted.';
+
+  @override
+  String get sanctionAppealed => 'Your appeal is being reviewed.';
+
+  @override
+  String get appeal => 'Appeal';
+
+  @override
+  String get appealHint =>
+      'Why do you think this is wrong? (at least 10 characters)';
+
+  @override
+  String get appealSent => 'Appeal received; we\'ll email you the result.';
+
+  @override
+  String get understood => 'Got it';
+
+  @override
+  String get reasonFake => 'Fake profile';
+
+  @override
+  String get reasonInappropriate => 'Inappropriate content';
+
+  @override
+  String get reasonHarassment => 'Harassment';
+
+  @override
+  String get reasonScam => 'Scam';
+
+  @override
+  String get reasonUnderage => 'Under 18';
+
+  @override
+  String get reasonSpam => 'Spam';
+
+  @override
+  String get reasonReportBurst => 'Several reports in a short time';
+
+  @override
+  String get reasonOther => 'Other';
 }

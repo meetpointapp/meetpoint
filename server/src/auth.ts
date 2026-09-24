@@ -14,6 +14,7 @@ export interface AuthedUser {
   mfa: boolean; // bu oturumda yönetim 2FA'sı doğrulandı
   emailVerified: boolean;
   legalCurrent: boolean; // kullanım koşulları ve aydınlatma metninin güncel sürümü onaylı mı
+  restrictedUntil: Date | null; // moderasyon kısıtı
 }
 
 export interface AuthedRequest extends Request {
@@ -51,6 +52,7 @@ export async function authenticate(token: string): Promise<AuthedUser> {
           emailVerifiedAt: true,
           termsVersion: true,
           privacyVersion: true,
+          restrictedUntil: true,
         },
       },
     },
@@ -71,6 +73,7 @@ export async function authenticate(token: string): Promise<AuthedUser> {
     mfa: session.mfa,
     emailVerified: user.emailVerifiedAt !== null,
     legalCurrent: user.termsVersion === config.termsVersion && user.privacyVersion === config.privacyVersion,
+    restrictedUntil: user.restrictedUntil,
   };
 }
 

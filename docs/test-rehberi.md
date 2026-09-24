@@ -97,6 +97,17 @@ Yeni hesap açarken `password123` gibi yaygın şifreler artık kabul edilmez; `
 - [ ] Profil → Şifre değiştir: yanlış mevcut şifre reddediliyor; `qwerty123` reddediliyor; güçlü şifre kabul, diğer cihazlar çıkış yapıyor
 - [ ] 10 kez yanlış şifreyle giriş → "Çok fazla hatalı deneme" (15 dk)
 
+### 7d. Güvenlik ve moderasyon (Faz 12)
+- [ ] Sohbette telefon numarası yaz (ör. 0532 123 45 67) → gönderen uyarı görür, karşı taraf mesajın altında güvenlik ipucu görür
+- [ ] Aynı kişi 3 kez iletişim bilgisi paylaşınca panel → Moderasyon kuyruğunda görünür
+- [ ] Panel → Moderasyon: bir kullanıcıya "Yaptırım (sıradaki)" → uygulamada açılışta uyarı penceresi, "İtiraz et" çalışıyor
+- [ ] İkinci yaptırım 24 saat kısıt → mesaj/beğeni gönderilemiyor ("Hesabın geçici olarak kısıtlı")
+- [ ] Panelde itirazı kabul et → kısıt kalkıyor
+- [ ] Kalıcı yasak → girişte "Hesabın kapatıldı" + itiraz formu
+- [ ] Görüntülü aramada sağ üstteki bayrak: "Bildir ve kapat"
+- [ ] Profil → Güvenlik merkezi sayfası açılıyor
+- [ ] Panel → Resmi talepler: talep kaydet, kullanıcı kimliğiyle trafik CSV indir, "Bütünlüğü doğrula"
+
 ### 7c. Gizlilik ve verilerim (Faz 11)
 - [ ] Kayıtta iki isteğe bağlı kutucuk var (arama/bildirim, kampanya); işaretsiz geliyor
 - [ ] Onboarding'de "kimi görmek istiyorsun" adımında yönelim rızası işaretlenmeden devam edilemiyor

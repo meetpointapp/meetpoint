@@ -2521,6 +2521,174 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Verilerini ayda bir indirebilirsin.'**
   String get errExportCooldown;
+
+  /// No description provided for @contactWarningSender.
+  ///
+  /// In tr, this message translates to:
+  /// **'İletişim bilgisi paylaştın. Güvenliğin için para, IBAN veya uygulama dışında görüşme isteyenlere dikkat et.'**
+  String get contactWarningSender;
+
+  /// No description provided for @contactSafetyTip.
+  ///
+  /// In tr, this message translates to:
+  /// **'İletişim bilgisi paylaşıldı. Para isteyen veya seni uygulama dışına çağıran kişilere dikkat et.'**
+  String get contactSafetyTip;
+
+  /// No description provided for @photoUnderReview.
+  ///
+  /// In tr, this message translates to:
+  /// **'İncelemede'**
+  String get photoUnderReview;
+
+  /// No description provided for @callRulesReminder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saygılı ol: çıplaklık, taciz ve para isteme yasaktır. Rahatsız olursan aramadaki bayrakla bildirip kapatabilirsin.'**
+  String get callRulesReminder;
+
+  /// No description provided for @reportAndEnd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildir ve kapat'**
+  String get reportAndEnd;
+
+  /// No description provided for @reportAndEndTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Neden bildiriyorsun? Arama hemen kapanır.'**
+  String get reportAndEndTitle;
+
+  /// No description provided for @safetyCenter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenlik merkezi'**
+  String get safetyCenter;
+
+  /// No description provided for @errRestricted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın geçici olarak kısıtlı. Bu sürede mesaj, beğeni, istek ve arama yapamazsın.'**
+  String get errRestricted;
+
+  /// No description provided for @errAlreadyAppealed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu karara zaten itiraz ettin.'**
+  String get errAlreadyAppealed;
+
+  /// No description provided for @sanctionWarningTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyarı aldın'**
+  String get sanctionWarningTitle;
+
+  /// No description provided for @sanctionRestrictTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın kısıtlandı'**
+  String get sanctionRestrictTitle;
+
+  /// No description provided for @sanctionBanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın kapatıldı'**
+  String get sanctionBanTitle;
+
+  /// No description provided for @sanctionReason.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sebep: {reason}'**
+  String sanctionReason(String reason);
+
+  /// No description provided for @sanctionUntil.
+  ///
+  /// In tr, this message translates to:
+  /// **'{date} tarihine kadar mesaj, beğeni, istek ve arama yapamazsın.'**
+  String sanctionUntil(String date);
+
+  /// No description provided for @sanctionWarningBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Topluluk kurallarımıza aykırı bir davranış tespit edildi. Tekrarı hâlinde hesabın kısıtlanabilir.'**
+  String get sanctionWarningBody;
+
+  /// No description provided for @sanctionAppealed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtirazın inceleniyor.'**
+  String get sanctionAppealed;
+
+  /// No description provided for @appeal.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtiraz et'**
+  String get appeal;
+
+  /// No description provided for @appealHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Neden yanlış olduğunu düşünüyorsun? (en az 10 karakter)'**
+  String get appealHint;
+
+  /// No description provided for @appealSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtirazın alındı; sonucu e-postayla bildirilecek.'**
+  String get appealSent;
+
+  /// No description provided for @understood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Anladım'**
+  String get understood;
+
+  /// No description provided for @reasonFake.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahte profil'**
+  String get reasonFake;
+
+  /// No description provided for @reasonInappropriate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygunsuz içerik'**
+  String get reasonInappropriate;
+
+  /// No description provided for @reasonHarassment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Taciz'**
+  String get reasonHarassment;
+
+  /// No description provided for @reasonScam.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dolandırıcılık'**
+  String get reasonScam;
+
+  /// No description provided for @reasonUnderage.
+  ///
+  /// In tr, this message translates to:
+  /// **'18 yaş altı'**
+  String get reasonUnderage;
+
+  /// No description provided for @reasonSpam.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplu / istenmeyen mesaj'**
+  String get reasonSpam;
+
+  /// No description provided for @reasonReportBurst.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa sürede birden çok şikayet'**
+  String get reasonReportBurst;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get reasonOther;
 }
 
 class _AppLocalizationsDelegate

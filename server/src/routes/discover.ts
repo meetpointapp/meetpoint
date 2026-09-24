@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 import { birthdayForAge } from '../age';
+import { requireNotRestricted } from '../moderation/sanctions';
 import { uid } from '../auth';
 import { economy } from '../config';
 import { hasConsent, requireConsent } from '../privacy/consents';
@@ -65,7 +66,7 @@ discoverRouter.get('/discover', async (req, res) => {
       AND u."deletionRequestedAt" IS NULL
       AND u."consentSpecialAt" IS NOT NULL
       AND u."emailVerifiedAt" IS NOT NULL
-      AND EXISTS (SELECT 1 FROM "Photo" ph WHERE ph."userId" = u."id")
+      AND EXISTS (SELECT 1 FROM "Photo" ph WHERE ph."userId" = u."id" AND ph."hiddenAt" IS NULL)
       ${genderFilter}
       AND p."interestedIn" IN ('everyone', ${my.gender})
       AND p."birthDate" <= ${birthdayForAge(my.filterMinAge)} AND p."birthDate" > ${birthdayForAge(my.filterMaxAge + 1)}
@@ -84,7 +85,7 @@ discoverRouter.get('/discover', async (req, res) => {
   );
 });
 
-discoverRouter.post('/swipes', swipeLimiter, async (req, res) => {
+discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, res) => {
   const { toId, direction } = z
     .object({ toId: z.string(), direction: z.enum(['like', 'pass', 'superlike']) })
     .parse(req.body);

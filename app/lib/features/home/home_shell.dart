@@ -12,6 +12,7 @@ import '../../core/session.dart';
 import '../../core/store.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../moderation/sanction_dialogs.dart';
 import '../../router.dart';
 
 // Alt menülü ana iskelet. Anlık olaylara göre listeleri tazeler ve uygulama
@@ -38,6 +39,20 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // Mağaza hesabını kullanıcıya bağla (satın almalar bu kimlikle webhook'a düşer)
     final userId = ref.read(sessionProvider).value?.userId;
     if (userId != null) CoinStore.instance.login(userId);
+    // Görülmemiş uyarı/kısıt varsa açılışta göster (itiraz seçeneğiyle)
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkSanction());
+  }
+
+  Future<void> _checkSanction() async {
+    Sanction? s;
+    try {
+      s = (await ref.read(meProvider.future)).pendingSanction;
+    } catch (_) {
+      return;
+    }
+    if (s == null || !mounted) return;
+    await showSanctionDialog(context, ref, s);
+    ref.invalidate(meProvider);
   }
 
   @override
@@ -76,6 +91,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         final convs = await ref.refresh(conversationsProvider.future).catchError((_) => <Conversation>[]);
         final name = convs.where((c) => c.id == data['conversationId']).firstOrNull?.user?.displayName ?? '';
         _banner(l.newMatchWith(name), '/chat/${data['conversationId']}');
+      case 'sanction':
+        ref.invalidate(meProvider);
+        await _checkSanction();
       case 'superlike':
         ref.invalidate(likesProvider);
         final fromId = Map<String, dynamic>.from(event.data as Map)['fromId'];

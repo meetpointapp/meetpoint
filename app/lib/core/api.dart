@@ -207,6 +207,15 @@ class Api {
   Future<List<KvkkRequest>> kvkkRequests() async =>
       [for (final r in (await _get('/me/kvkk-requests') as List)) KvkkRequest.fromJson(r)];
 
+  // Moderasyon: yaptırım bildirimi görüldü, itiraz
+  Future<void> sanctionSeen(String id) => _post('/me/sanctions/$id/seen');
+
+  Future<void> appeal(String sanctionId, String message) => _post('/me/appeals', {'sanctionId': sanctionId, 'message': message});
+
+  // Yasaklı kullanıcı (oturumu yok): girişte verilen itiraz anahtarıyla
+  Future<void> appealBanned(String appealToken, String message) =>
+      _post('/appeals', {'appealToken': appealToken, 'message': message});
+
   Future<void> sendKvkkRequest(String kind, String message) => _post('/me/kvkk-requests', {'kind': kind, 'message': message});
 
   Future<void> deleteAccount(String password) => _delete('/me', {'password': password});
@@ -334,6 +343,10 @@ class Api {
   Future<CallInfo> hangUp(String id) async => CallInfo.fromJson(await _post('/calls/$id/hangup'));
 
   Future<CallInfo> call(String id) async => CallInfo.fromJson(await _get('/calls/$id'));
+
+  // Arama içinden "bildir ve kapat"
+  Future<CallInfo> reportCall(String id, String reason) async =>
+      CallInfo.fromJson(await _post('/calls/$id/report', {'reason': reason}));
 
   Future<List<CallInfo>> calls() async => [for (final c in (await _get('/calls') as List)) CallInfo.fromJson(c)];
 

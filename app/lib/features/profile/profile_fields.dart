@@ -267,6 +267,17 @@ class _PhotoGridFieldState extends ConsumerState<PhotoGridField> {
               borderRadius: BorderRadius.circular(14),
               child: Stack(fit: StackFit.expand, children: [
                 NetPhoto(photos[i].url),
+                if (photos[i].underReview)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: ShapeDecoration(shape: const StadiumBorder(), color: Colors.black.withValues(alpha: 0.65)),
+                      child: Text(l.photoUnderReview,
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                    ),
+                  ),
                 if (i == 0)
                   Positioned(
                     left: 6,

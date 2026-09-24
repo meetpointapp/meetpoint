@@ -103,6 +103,8 @@ server {
     proxy_set_header Connection "upgrade";
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # 5651: trafik kaydında kaynak port (sunucu bu başlığı okur)
+    proxy_set_header X-Real-Port $remote_port;
     proxy_set_header X-Forwarded-Proto $scheme;
   }
 }

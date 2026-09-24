@@ -1484,4 +1484,98 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errExportCooldown => 'Verilerini ayda bir indirebilirsin.';
+
+  @override
+  String get contactWarningSender =>
+      'İletişim bilgisi paylaştın. Güvenliğin için para, IBAN veya uygulama dışında görüşme isteyenlere dikkat et.';
+
+  @override
+  String get contactSafetyTip =>
+      'İletişim bilgisi paylaşıldı. Para isteyen veya seni uygulama dışına çağıran kişilere dikkat et.';
+
+  @override
+  String get photoUnderReview => 'İncelemede';
+
+  @override
+  String get callRulesReminder =>
+      'Saygılı ol: çıplaklık, taciz ve para isteme yasaktır. Rahatsız olursan aramadaki bayrakla bildirip kapatabilirsin.';
+
+  @override
+  String get reportAndEnd => 'Bildir ve kapat';
+
+  @override
+  String get reportAndEndTitle => 'Neden bildiriyorsun? Arama hemen kapanır.';
+
+  @override
+  String get safetyCenter => 'Güvenlik merkezi';
+
+  @override
+  String get errRestricted =>
+      'Hesabın geçici olarak kısıtlı. Bu sürede mesaj, beğeni, istek ve arama yapamazsın.';
+
+  @override
+  String get errAlreadyAppealed => 'Bu karara zaten itiraz ettin.';
+
+  @override
+  String get sanctionWarningTitle => 'Uyarı aldın';
+
+  @override
+  String get sanctionRestrictTitle => 'Hesabın kısıtlandı';
+
+  @override
+  String get sanctionBanTitle => 'Hesabın kapatıldı';
+
+  @override
+  String sanctionReason(String reason) {
+    return 'Sebep: $reason';
+  }
+
+  @override
+  String sanctionUntil(String date) {
+    return '$date tarihine kadar mesaj, beğeni, istek ve arama yapamazsın.';
+  }
+
+  @override
+  String get sanctionWarningBody =>
+      'Topluluk kurallarımıza aykırı bir davranış tespit edildi. Tekrarı hâlinde hesabın kısıtlanabilir.';
+
+  @override
+  String get sanctionAppealed => 'İtirazın inceleniyor.';
+
+  @override
+  String get appeal => 'İtiraz et';
+
+  @override
+  String get appealHint =>
+      'Neden yanlış olduğunu düşünüyorsun? (en az 10 karakter)';
+
+  @override
+  String get appealSent => 'İtirazın alındı; sonucu e-postayla bildirilecek.';
+
+  @override
+  String get understood => 'Anladım';
+
+  @override
+  String get reasonFake => 'Sahte profil';
+
+  @override
+  String get reasonInappropriate => 'Uygunsuz içerik';
+
+  @override
+  String get reasonHarassment => 'Taciz';
+
+  @override
+  String get reasonScam => 'Dolandırıcılık';
+
+  @override
+  String get reasonUnderage => '18 yaş altı';
+
+  @override
+  String get reasonSpam => 'Toplu / istenmeyen mesaj';
+
+  @override
+  String get reasonReportBurst => 'Kısa sürede birden çok şikayet';
+
+  @override
+  String get reasonOther => 'Diğer';
 }

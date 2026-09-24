@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { uid } from '../auth';
-import { acceptCall, callHistory, getCall, hangUp, rateCall, sendGift, startCall } from '../calls';
+import { acceptCall, callHistory, getCall, hangUp, rateCall, reportAndHangUp, sendGift, startCall } from '../calls';
 import { CALL_KINDS } from '../config';
 import { requestLimiter } from '../limits';
+import { REPORT_REASONS } from '../moderation/reports';
+import { requireNotRestricted } from '../moderation/sanctions';
 
 export const callsRouter = Router();
 
-const REPORT_REASONS = ['fake_profile', 'inappropriate_content', 'harassment', 'scam', 'underage', 'other'] as const;
 
-callsRouter.post('/calls', requestLimiter, async (req, res) => {
+callsRouter.post('/calls', requireNotRestricted, requestLimiter, async (req, res) => {
   const { toId, kind } = z.object({ toId: z.string(), kind: z.enum(CALL_KINDS) }).parse(req.body);
   res.status(201).json(await startCall(uid(req), toId, kind));
 });
@@ -29,6 +30,11 @@ callsRouter.post('/calls/:id/accept', async (req, res) => {
 // Kapat / reddet / iptal: duruma göre sunucu karar verir
 callsRouter.post('/calls/:id/hangup', async (req, res) => {
   res.json(await hangUp(req.params.id, uid(req)));
+});
+
+callsRouter.post('/calls/:id/report', async (req, res) => {
+  const { reason } = z.object({ reason: z.enum(REPORT_REASONS) }).parse(req.body);
+  res.json(await reportAndHangUp(req.params.id, uid(req), reason));
 });
 
 callsRouter.post('/calls/:id/gifts', async (req, res) => {

@@ -95,6 +95,14 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## Moderasyon ve 5651 (Faz 12)
+
+- **Trafik kaydı** (`src/moderation/traffic.ts`): içerik oluşturan istekler + anlık bağlantılar; hash zincirli partiler, değiştirilemez, 2 yıl (`TRAFFIC_LOG_DAYS`). Panel → Resmi talepler → CSV / "Bütünlüğü doğrula". nginx `X-Real-Port` başlığı gerekir.
+- **Yaptırımlar** (`src/moderation/sanctions.ts`): uyarı → 24 saat → 7 gün → kalıcı; kısıtlı kullanıcı içerik oluşturamaz. Her yaptırıma bir itiraz (yasaklı kullanıcı girişte kısa ömürlü itiraz anahtarı alır).
+- **Otomatik işaretler** (`src/moderation/detect.ts`, `reports.ts`): sohbette iletişim bilgisi (uyarı + tekrarında kuyruk), toplu mesaj, şüpheli profil fotoğrafı (gizlenir), 7 günde 3 farklı şikayetçi (otomatik 24 saat kısıt). Görsel yapay zekâ sağlayıcısı `setImageModerator` ile takılır.
+- **Panel → Moderasyon:** öncelikli kuyruk (şikayet + işaret + itiraz), kullanıcı geçmişi; **Resmi talepler:** 5651 kaldırma / bilgi talebi / mahkeme kararı süre takibi.
+- Uygulama: sohbette güvenlik ipucu, arama içinden "bildir ve kapat", yaptırım bildirimi + itiraz, Profil → Güvenlik merkezi (`/legal/safety`, `/legal/community`).
+
 ## KVKK (Faz 11)
 
 Veri envanteri: [docs/kvkk/veri-envanteri.md](docs/kvkk/veri-envanteri.md) (`npm run kvkk:inventory` ile `src/privacy/inventory.ts`'den üretilir). Ayarlar: `src/config.ts` → `privacy`, `retention`.

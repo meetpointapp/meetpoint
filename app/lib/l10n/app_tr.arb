@@ -806,5 +806,47 @@
   "reconsentAccept": "Okudum, kabul ediyorum",
   "errConsentRequired": "Bu özellik için açık rızan gerekiyor.",
   "errPeerCallsDisabled": "Bu kişi aramaları kapatmış.",
-  "errExportCooldown": "Verilerini ayda bir indirebilirsin."
+  "errExportCooldown": "Verilerini ayda bir indirebilirsin.",
+  "contactWarningSender": "İletişim bilgisi paylaştın. Güvenliğin için para, IBAN veya uygulama dışında görüşme isteyenlere dikkat et.",
+  "contactSafetyTip": "İletişim bilgisi paylaşıldı. Para isteyen veya seni uygulama dışına çağıran kişilere dikkat et.",
+  "photoUnderReview": "İncelemede",
+  "callRulesReminder": "Saygılı ol: çıplaklık, taciz ve para isteme yasaktır. Rahatsız olursan aramadaki bayrakla bildirip kapatabilirsin.",
+  "reportAndEnd": "Bildir ve kapat",
+  "reportAndEndTitle": "Neden bildiriyorsun? Arama hemen kapanır.",
+  "safetyCenter": "Güvenlik merkezi",
+  "errRestricted": "Hesabın geçici olarak kısıtlı. Bu sürede mesaj, beğeni, istek ve arama yapamazsın.",
+  "errAlreadyAppealed": "Bu karara zaten itiraz ettin.",
+  "sanctionWarningTitle": "Uyarı aldın",
+  "sanctionRestrictTitle": "Hesabın kısıtlandı",
+  "sanctionBanTitle": "Hesabın kapatıldı",
+  "sanctionReason": "Sebep: {reason}",
+  "@sanctionReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "sanctionUntil": "{date} tarihine kadar mesaj, beğeni, istek ve arama yapamazsın.",
+  "@sanctionUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sanctionWarningBody": "Topluluk kurallarımıza aykırı bir davranış tespit edildi. Tekrarı hâlinde hesabın kısıtlanabilir.",
+  "sanctionAppealed": "İtirazın inceleniyor.",
+  "appeal": "İtiraz et",
+  "appealHint": "Neden yanlış olduğunu düşünüyorsun? (en az 10 karakter)",
+  "appealSent": "İtirazın alındı; sonucu e-postayla bildirilecek.",
+  "understood": "Anladım",
+  "reasonFake": "Sahte profil",
+  "reasonInappropriate": "Uygunsuz içerik",
+  "reasonHarassment": "Taciz",
+  "reasonScam": "Dolandırıcılık",
+  "reasonUnderage": "18 yaş altı",
+  "reasonSpam": "Toplu / istenmeyen mesaj",
+  "reasonReportBurst": "Kısa sürede birden çok şikayet",
+  "reasonOther": "Diğer"
 }

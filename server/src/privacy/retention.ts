@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { retention } from '../config';
 import { prisma } from '../db';
 import { sendMail } from '../mailer';
+import { purgeOldTraffic } from '../moderation/traffic';
 import { privateStore } from '../storage';
 import { hardDeleteUser } from './accounts';
 
@@ -111,6 +112,7 @@ export async function runRetention() {
     ['dataExports', cleanupDataExports],
     ['viewOncePhotos', cleanupViewOncePhotos],
     ['resolvedErrors', cleanupResolvedErrors],
+    ['trafficLogs', async () => log('traffic_logs', await purgeOldTraffic(), { days: retention.trafficLogDays })],
   ];
   // Bir iş hata verirse diğerleri yine çalışır
   for (const [name, job] of jobs) {

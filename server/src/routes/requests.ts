@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { requireNotRestricted } from '../moderation/sanctions';
 import { uid } from '../auth';
 import { economy, REQUEST_KINDS } from '../config';
 import { HttpError, isBlockedEitherWay, orderedPair, prisma } from '../db';
@@ -12,7 +13,7 @@ import { publicProfile } from './profile';
 
 export const requestsRouter = Router();
 
-requestsRouter.post('/requests', requestLimiter, async (req, res) => {
+requestsRouter.post('/requests', requireNotRestricted, requestLimiter, async (req, res) => {
   const { toId, kind, note } = z
     .object({ toId: z.string(), kind: z.enum(REQUEST_KINDS), note: z.string().trim().max(500).default('') })
     .parse(req.body);

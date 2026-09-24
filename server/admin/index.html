@@ -58,13 +58,14 @@
       <div class="logo">meetpoint <span class="badge-admin">yönetim</span></div>
       <nav id="tabs">
         <button data-tab="overview" class="tab active">Özet</button>
-        <button data-tab="reports" data-roles="moderator" class="tab">Şikayetler <span id="count-reports" class="count"></span></button>
+        <button data-tab="reports" data-roles="moderator" class="tab">Moderasyon <span id="count-reports" class="count"></span></button>
         <button data-tab="verifications" data-roles="moderator" class="tab">Mavi tik <span id="count-verifications" class="count"></span></button>
         <button data-tab="users" data-roles="moderator finance" class="tab">Kullanıcılar</button>
         <button data-tab="purchases" data-roles="finance" class="tab">Satışlar</button>
         <button data-tab="payouts" data-roles="finance" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
         <button data-tab="errors" data-roles="" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
         <button data-tab="kvkk" data-roles="" class="tab">KVKK <span id="count-dsr" class="count"></span></button>
+        <button data-tab="legal" data-roles="" class="tab">Resmi talepler <span id="count-legal" class="count"></span></button>
         <button data-tab="staff" data-roles="" class="tab">Ekip</button>
         <button data-tab="audit" data-roles="" class="tab">İşlem kaydı</button>
       </nav>
@@ -80,11 +81,45 @@
       <div id="tab-reports" class="panel hidden">
         <div class="toolbar">
           <div class="seg">
-            <button data-status="OPEN" class="seg-btn active">Açık</button>
-            <button data-status="RESOLVED" class="seg-btn">Çözülmüş</button>
+            <button data-status="QUEUE" class="seg-btn active">Kuyruk</button>
+            <button data-status="RESOLVED" class="seg-btn">Çözülmüş şikayetler</button>
           </div>
         </div>
-        <div id="reports" class="list"></div>
+        <div id="queue-stats" class="stats compact"></div>
+        <p class="muted small">Öncelik: 🔴 acil (reşit olmayan, müstehcenlik, ani şikayet artışı) · 🟠 yüksek · ⚪ normal. Yaptırım basamakları: uyarı → 24 saat → 7 gün → kalıcı yasak; ağır ihlalde doğrudan yasak verilebilir.</p>
+        <div id="queue" class="list"></div>
+        <div id="reports" class="list hidden"></div>
+      </div>
+
+      <div id="tab-legal" class="panel hidden">
+        <p class="muted">5651 kaldırma talepleri, kolluk/savcılık bilgi talepleri ve mahkeme kararları. Varsayılan süre: kaldırma ve mahkeme kararı 24 saat, bilgi talebi 72 saat.</p>
+        <form id="legal-form" class="card item">
+          <div class="actions">
+            <select id="legal-kind">
+              <option value="takedown">İçerik kaldırma (5651)</option>
+              <option value="information">Bilgi talebi (kolluk/savcılık)</option>
+              <option value="court_order">Mahkeme kararı</option>
+              <option value="other">Diğer</option>
+            </select>
+            <input id="legal-authority" placeholder="Makam (ör. İstanbul C. Başsavcılığı)" required>
+            <input id="legal-ref" placeholder="Evrak / dosya no">
+          </div>
+          <textarea id="legal-desc" rows="2" placeholder="Talep ne? Hangi içerik / kullanıcı?" required></textarea>
+          <div class="actions"><input id="legal-users" placeholder="İlgili kullanıcı kimlikleri (virgülle)"><button type="submit" class="btn primary">Kaydet</button></div>
+        </form>
+        <div id="legal" class="list"></div>
+
+        <h3>5651 trafik kaydı</h3>
+        <p class="muted">Resmi talep için kullanıcı veya IP'ye göre CSV. Her dışa aktarım işlem kaydına yazılır. Kayıtlar hash zinciriyle korunur; "Bütünlüğü doğrula" zincirin bozulmadığını gösterir.</p>
+        <form id="traffic-form" class="card item">
+          <div class="actions">
+            <input id="traffic-user" placeholder="Kullanıcı kimliği">
+            <input id="traffic-ip" placeholder="veya IP">
+            <input id="traffic-from" type="datetime-local" required>
+            <input id="traffic-to" type="datetime-local" required>
+          </div>
+          <div class="actions"><button type="submit" class="btn primary">CSV indir</button><button type="button" id="traffic-verify" class="btn soft">Bütünlüğü doğrula</button></div>
+        </form>
       </div>
 
       <div id="tab-verifications" class="panel hidden">

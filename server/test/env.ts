@@ -28,6 +28,8 @@ export const testEnv: Record<string, string> = {
   SCHEDULER_TICK_MS: '100',
   LEADER_RETRY_MS: '500',
   PRESENCE_SWEEP_MS: '1000',
+  // 5651 trafik kaydı partileri testte hızlı yazılsın
+  TRAFFIC_FLUSH_MS: '200',
   // Şifre sızıntı kontrolü sahte servise gider (kapalıysa kontrol atlanır, kayıt engellenmez)
   PWNED_API_BASE: `http://localhost:${FAKE_SECURITY_PORT}`,
   // Testte bu servisler kapalı (varsa geliştiricinin .env değerleri devralınmasın)

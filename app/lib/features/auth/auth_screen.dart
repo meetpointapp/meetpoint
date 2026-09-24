@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/api.dart';
 import '../../core/models.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../moderation/sanction_dialogs.dart';
 import '../privacy/consent_widgets.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -52,7 +54,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         if (restored && mounted) showSnack(context, AppLocalizations.of(context).accountRestored);
       }
     } catch (e) {
-      if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
+      if (!mounted) return;
+      // Yasaklı hesap: sebep ve (itiraz edilmediyse) itiraz seçeneği
+      if (e is ApiException && e.code == 'banned') {
+        await showBannedDialog(context, ref, e.data);
+      } else {
+        showSnack(context, errorText(AppLocalizations.of(context), e));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }

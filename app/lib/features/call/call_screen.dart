@@ -139,6 +139,35 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   void _accept() => _run(() => ref.read(apiProvider).acceptCall(widget.callId));
   void _hangUp() => _run(() => ref.read(apiProvider).hangUp(widget.callId));
 
+  // Arama içinden "bildir ve kapat": arama hemen biter, şikayet öncelikli incelenir
+  Future<void> _reportAndEnd() async {
+    final l = AppLocalizations.of(context);
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(l.reportAndEndTitle, style: Theme.of(ctx).textTheme.titleMedium),
+          ),
+          for (final (id, label) in [
+            ('inappropriate_content', l.reportInappropriate),
+            ('harassment', l.reportHarassment),
+            ('underage', l.reportUnderage),
+            ('scam', l.reportScam),
+            ('fake_profile', l.reportFake),
+            ('other', l.reportOther),
+          ])
+            ListTile(title: Text(label), onTap: () => Navigator.pop(ctx, id)),
+        ]),
+      ),
+    );
+    if (reason == null || !mounted) return;
+    await _run(() => ref.read(apiProvider).reportCall(widget.callId, reason));
+    if (mounted) showSnack(context, l.reportSent);
+  }
+
   void _close() => context.canPop() ? context.pop() : context.go('/discover');
 
   void _showGift(String emoji) {
@@ -199,7 +228,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
       SafeArea(
         child: Column(children: [
-          _TopBar(call: call, simulated: active && media != null && !media.isReal),
+          _TopBar(call: call, simulated: active && media != null && !media.isReal, onReport: active && !_busy ? _reportAndEnd : null),
           if (_lowBalance && call.outgoing && active)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -312,9 +341,10 @@ class _FloatingGift {
 
 // Üst çubuk: isim, süre ve harcanan/kazanılan jeton
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.call, required this.simulated});
+  const _TopBar({required this.call, required this.simulated, this.onReport});
   final CallInfo call;
   final bool simulated;
+  final VoidCallback? onReport;
 
   @override
   Widget build(BuildContext context) {
@@ -333,6 +363,12 @@ class _TopBar extends StatelessWidget {
             ),
             Text(formatCallTime(call.talkTime),
                 style: white?.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+            if (onReport != null)
+              IconButton(
+                tooltip: l.reportAndEnd,
+                icon: const Icon(Icons.flag_rounded, color: Colors.white),
+                onPressed: onReport,
+              ),
           ] else
             Expanded(
               child: Text(callKindLabel(l, call.kind), style: white?.copyWith(color: Colors.white70)),

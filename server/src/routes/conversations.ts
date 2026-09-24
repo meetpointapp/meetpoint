@@ -7,6 +7,8 @@ import { z } from 'zod';
 import { uid } from '../auth';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { messageLimiter } from '../limits';
+import { afterMessage, contactInfo } from '../moderation/detect';
+import { requireNotRestricted } from '../moderation/sanctions';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { publicProfile } from './profile';
@@ -30,6 +32,8 @@ export const messageDto = (m: Message) => ({
   senderId: m.senderId,
   kind: m.kind,
   body: m.body,
+  // contact: iletişim bilgisi paylaşıldı → alıcıya güvenlik ipucu gösterilir
+  flag: m.flag,
   viewedAt: m.viewedAt,
   readAt: m.readAt,
   createdAt: m.createdAt,
@@ -121,7 +125,7 @@ conversationsRouter.post('/conversations/:id/read', async (req, res) => {
   res.json({ ok: true });
 });
 
-async function deliver(conversationId: string, me: string, otherId: string, data: { kind: string; body: string; photoPath?: string }) {
+async function deliver(conversationId: string, me: string, otherId: string, data: { kind: string; body: string; photoPath?: string; flag?: string }) {
   const message = await prisma.message.create({ data: { conversationId, senderId: me, ...data } });
   const dto = messageDto(message);
   emitToUser(otherId, 'message:new', dto);
@@ -129,16 +133,21 @@ async function deliver(conversationId: string, me: string, otherId: string, data
   return dto;
 }
 
-conversationsRouter.post('/conversations/:id/messages', messageLimiter, async (req, res) => {
+conversationsRouter.post('/conversations/:id/messages', requireNotRestricted, messageLimiter, async (req, res) => {
   const me = uid(req);
   const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
   if (await isBlockedEitherWay(me, otherId)) throw new HttpError(403, 'blocked');
   const { body } = z.object({ body: z.string().trim().min(1).max(2000) }).parse(req.body);
-  res.status(201).json(await deliver(conv.id, me, otherId, { kind: 'text', body }));
+  // Telefon, IBAN, sosyal medya vb. paylaşımı engellenmez: gönderene uyarı, alıcıya güvenlik ipucu
+  const contact = contactInfo(body);
+  const flag = contact.length ? 'contact' : '';
+  const dto = await deliver(conv.id, me, otherId, { kind: 'text', body, flag });
+  void afterMessage(me, dto.id, body, flag !== '').catch((e) => console.error('[moderasyon] mesaj', e));
+  res.status(201).json({ ...dto, ...(flag ? { warning: 'contact_info', contact } : {}) });
 });
 
 // Tek seferlik fotoğraf gönder
-conversationsRouter.post('/conversations/:id/photos', messageLimiter, upload.single('photo'), async (req, res) => {
+conversationsRouter.post('/conversations/:id/photos', requireNotRestricted, messageLimiter, upload.single('photo'), async (req, res) => {
   if (!req.file) throw new HttpError(400, 'invalid_image');
   const me = uid(req);
   const { conv, otherId } = await getOwnConversation(String(req.params.id), me);

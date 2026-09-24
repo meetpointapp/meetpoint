@@ -159,6 +159,7 @@ export const retention = {
   emailCodeDays: 1, // kullanılmış/süresi dolmuş e-posta kodları
   unopenedViewOnceDays: 30, // açılmamış tek seferlik fotoğraflar
   resolvedErrorDays: 180, // çözülmüş hata kayıtları
+  trafficLogDays: Number(process.env.TRAFFIC_LOG_DAYS ?? 730), // 5651 trafik kayıtları (2 yıl)
   intervalMs: Number(process.env.RETENTION_INTERVAL_MS ?? 60 * 60_000), // imha işi ne sıklıkla çalışır
 };
 

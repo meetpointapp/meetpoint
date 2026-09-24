@@ -11,6 +11,8 @@ import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
 import { getBalance, getCashable } from '../wallet';
+import { reviewNewPhoto } from '../moderation/detect';
+import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
@@ -31,9 +33,10 @@ export function publicProfile(
     id: string;
     verificationStatus: string;
     profile: Profile | null;
-    photos: { id: string; path: string; position: number }[];
+    photos: { id: string; path: string; position: number; hiddenAt?: Date | null }[];
   },
   viewer?: Pick<Profile, 'latitude' | 'longitude'> | null,
+  opts: { owner?: boolean } = {},
 ) {
   const p = user.profile;
   if (!p) return null;
@@ -56,7 +59,11 @@ export function publicProfile(
     zodiac: p.zodiac,
     smoking: p.smoking,
     drinking: p.drinking,
-    photos: [...user.photos].sort((a, b) => a.position - b.position).map((ph) => ({ id: ph.id, ...photoUrls(ph.path) })),
+    // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
+    photos: [...user.photos]
+      .filter((ph) => opts.owner || !ph.hiddenAt)
+      .sort((a, b) => a.position - b.position)
+      .map((ph) => ({ id: ph.id, ...photoUrls(ph.path), ...(opts.owner && ph.hiddenAt ? { underReview: true } : {}) })),
   };
 }
 
@@ -78,12 +85,17 @@ profileRouter.get('/me', async (req, res) => {
     filters: user.profile
       ? { minAge: user.profile.filterMinAge, maxAge: user.profile.filterMaxAge, maxKm: user.profile.filterMaxKm }
       : null,
-    profile: user.profile ? { ...publicProfile(user), interestedIn: user.profile.interestedIn, birthDate: user.profile.birthDate } : null,
+    profile: user.profile ? { ...publicProfile(user, null, { owner: true }), interestedIn: user.profile.interestedIn, birthDate: user.profile.birthDate } : null,
     balance: await getBalance(user.id),
     cashable: await getCashable(user.id),
     consents: consentState(user),
     // Değişen yasal metinler: uygulama yeniden onay ekranı gösterir
     legalUpdates: legalUpdatesNeeded(user),
+    restrictedUntil: user.restrictedUntil && user.restrictedUntil > new Date() ? user.restrictedUntil : null,
+    // Henüz gösterilmemiş son yaptırım (uyarı/kısıt): uygulama açılışta bildirir, itiraz seçeneği sunar
+    pendingSanction: await prisma.sanction
+      .findFirst({ where: { userId: user.id, seenAt: null, revokedAt: null }, orderBy: { createdAt: 'desc' }, include: { appeal: true } })
+      .then((s) => (s ? sanctionDto(s) : null)),
   });
 });
 
@@ -186,7 +198,7 @@ const profileSchema = z.object({
   drinking: z.enum(HABIT).or(z.literal('')).default(''),
 });
 
-profileRouter.put('/me/profile', async (req, res) => {
+profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
   const data = profileSchema.parse(req.body);
   if (ageOf(data.birthDate) < config.minAge) throw new HttpError(403, 'underage');
   const userId = uid(req);
@@ -202,7 +214,7 @@ profileRouter.put('/me/locale', async (req, res) => {
   res.json({ ok: true });
 });
 
-profileRouter.post('/me/photos', upload.single('photo'), async (req, res) => {
+profileRouter.post('/me/photos', requireNotRestricted, upload.single('photo'), async (req, res) => {
   if (!req.file) throw new HttpError(400, 'invalid_image');
   const userId = uid(req);
   const count = await prisma.photo.count({ where: { userId } });
@@ -213,7 +225,12 @@ profileRouter.post('/me/photos', upload.single('photo'), async (req, res) => {
   const photo = await prisma.photo.create({
     data: { userId, path: base, position: (last?.position ?? -1) + 1 },
   });
-  res.status(201).json({ id: photo.id, ...photoUrls(photo.path) });
+  // Hemen yayında; şüpheliyse gizlenir ve moderasyon kuyruğuna düşer (sahibi "incelemede" görür)
+  const underReview = await reviewNewPhoto(userId, photo.id, req.file.buffer).catch((e) => {
+    console.error('[moderasyon] fotoğraf', e);
+    return false;
+  });
+  res.status(201).json({ id: photo.id, ...photoUrls(photo.path), underReview });
 });
 
 // Fotoğraf sırası: ilk sıradaki kapak fotoğrafı olur
@@ -243,7 +260,7 @@ profileRouter.get('/users/:id', async (req, res) => {
     prisma.user.findUnique({ where: { id: target }, include: { profile: true, photos: true } }),
     prisma.profile.findUnique({ where: { userId: me }, select: { latitude: true, longitude: true } }),
   ]);
-  const profile = user && !user.bannedAt && !user.deletionRequestedAt && publicProfile(user, target === me ? null : viewer);
+  const profile = user && !user.bannedAt && !user.deletionRequestedAt && publicProfile(user, target === me ? null : viewer, { owner: target === me });
   if (!profile) throw new HttpError(404, 'not_found');
   res.json(profile);
 });

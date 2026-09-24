@@ -98,6 +98,24 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
 **Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
 
+### Faz 12'de bulunanlar
+
+Faz 12 tamamlandı. Sunucuda 110 test (26 dosya), uygulamada 42 test; tam takım iki kez üst üste temiz.
+
+**Kullanıcı kararları:** 5651 trafik kayıtları 2 yıl; sohbette iletişim bilgisi paylaşımı engellenmez, uyarılır ve tekrarında kuyruğa düşer; profil fotoğrafı hemen yayında, şüpheliyse gizlenip kuyruğa düşer; yaptırım basamakları uyarı → 24 saat → 7 gün → kalıcı, ağır ihlalde doğrudan yasak, her karara bir itiraz.
+
+**Yapılanlar:**
+- **5651 trafik kaydı:** içerik oluşturan her istek ve anlık bağlantı (IP, port, zaman, kullanıcı). Kayıtlar parti parti yazılır, her parti bir öncekinin hash'ini içerir; veritabanı değiştirmeyi/silmeyi reddeder. Panelden CSV dışa aktarım ve zincir doğrulama. Hesap silinse de saklanır.
+- **Kademeli yaptırım ve kısıt:** kısıtlı kullanıcı okuyabilir ama mesaj, istek, beğeni, arama, fotoğraf ve profil değişikliği yapamaz. Yasaklı kullanıcı girişte itiraz formu görür.
+- **Otomatik işaretler:** şüpheli fotoğraf (ten oranı / çok şikayetli hesap), tekrarlayan iletişim bilgisi paylaşımı, toplu mesaj, kısa sürede 3 farklı kişiden şikayet (→ otomatik 24 saat kısıt, moderatör kaldırabilir).
+- **Moderasyon paneli:** öncelikli tek kuyruk (şikayet + işaret + itiraz), işlem süresi, kullanıcı geçmişi, resmi talepler (süre takibi).
+- **Arama:** kurallar hatırlatması ve "bildir ve kapat".
+- **Güvenlik merkezi ve topluluk kuralları** sayfaları.
+
+**Bulunan hata:** sohbette "IBAN TR33 …" gibi önünde kelime olan IBAN yakalanmıyordu (boşlukların hepsi silinince kelimeye yapışıyordu); düzeltildi ve birim testine eklendi.
+
+**Yayında yapılacak:** nginx'e `proxy_set_header X-Real-Port $remote_port;` (5651 için kaynak port; bkz. yayın rehberi).
+
 ### Faz 11'de bulunanlar
 
 Faz 11 tamamlandı. Sunucuda 86 test (24 dosya), uygulamada 42 test.
@@ -171,17 +189,17 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. ✅ **Veri ihlali altyapısı.** Etkilenen kullanıcıları tespit ve bilgilendirme aracı, ihlal kayıt defteri.
 7. ✅ **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 17'de.
 
-## Faz 12 · İçerik güvenliği, moderasyon ve 5651 (uygulama içi)
+## Faz 12 · İçerik güvenliği, moderasyon ve 5651 (uygulama içi) ✅
 
 **Amaç:** Müstehcenlik, dolandırıcılık ve tacize karşı güçlü koruma; 5651 yükümlülüklerinin sistemde karşılanması.
 
-1. 🛠 **Trafik kayıtları.** IP, port ve zaman; hash zinciriyle bütünlük koruması; saklama süresi ayarlanabilir; resmi talep için dışa aktarım.
-2. 🛠 **Otomatik görsel moderasyon katmanı.** Profil, sohbet ve selfie fotoğraflarında şüpheli içerik yayından önce kuyruğa düşer. Sağlayıcı sonradan takılır; şimdilik kural tabanlı ve manuel kuyruk.
-3. 🛠 **Görüntülü arama güvenliği.** Arama öncesi kurallar hatırlatması, arama içinden "bildir ve kapat", tekrarlayan şikayette otomatik kısıt.
-4. 🛠 **Sohbet güvenliği.** Dolandırıcılık, eskort, IBAN ve telefon paylaşımı kalıpları için uyarı ve işaret; spam ve toplu mesaj tespiti.
-5. 🛠 **Moderasyon paneli.** Öncelikli kuyruk, işlem süresi takibi, kullanıcı geçmişi, uyarı → kısıt → yasak kademeleri, itiraz akışı.
-6. 🛠 **Kaldırma ve resmi talepler.** Kaldırma kararı ve kolluk talebi kaydı, süre takibi, işlem geçmişi.
-7. 🛠 **Güvenlik merkezi.** Güvenli tanışma ipuçları, topluluk kuralları, yardım hatları.
+1. ✅ **Trafik kayıtları.** IP, port ve zaman; hash zinciriyle bütünlük koruması; saklama süresi ayarlanabilir; resmi talep için dışa aktarım.
+2. ✅ **Otomatik görsel moderasyon katmanı.** Profil fotoğrafları kural tabanlı kontrolden geçer; şüpheli olan gizlenip kuyruğa düşer. Görsel yapay zekâ sağlayıcısı sonradan takılır (`ImageModerator`). ⏭ Tek seferlik sohbet fotoğrafları otomatik kontrol edilmiyor (alıcı bildirebilir); selfie'ler zaten elle inceleniyor.
+3. ✅ **Görüntülü arama güvenliği.** Arama öncesi kurallar hatırlatması, arama içinden "bildir ve kapat", tekrarlayan şikayette otomatik kısıt.
+4. ✅ **Sohbet güvenliği.** Telefon, IBAN, e-posta, sosyal medya ve bağlantı paylaşımında uyarı ve işaret; toplu mesaj tespiti. ⏭ Eskort/müstehcen söz kalıpları için kelime listesi henüz yok (şikayetle yakalanıyor).
+5. ✅ **Moderasyon paneli.** Öncelikli kuyruk, işlem süresi takibi, kullanıcı geçmişi, uyarı → kısıt → yasak kademeleri, itiraz akışı.
+6. ✅ **Kaldırma ve resmi talepler.** Kaldırma kararı ve kolluk talebi kaydı, süre takibi, işlem geçmişi.
+7. ✅ **Güvenlik merkezi.** Güvenli tanışma ipuçları, topluluk kuralları, yardım hatları.
 
 ## Faz 13 · Para akışı güvenliği ve finans kayıtları
 

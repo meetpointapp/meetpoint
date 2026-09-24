@@ -47,6 +47,9 @@ model User {
   deletionRequestedAt DateTime? // silme talebi: hesap gizlenir, bekleme süresinde girişle geri gelir
   deleteAfter         DateTime?
 
+  // Moderasyon (Faz 12): kısıt süresince mesaj, istek, beğeni, arama ve fotoğraf yükleme kapalı
+  restrictedUntil DateTime?
+
   // Selfie ile profil doğrulama (mavi tik): none | pending | approved | rejected
   verificationStatus String    @default("none")
   verificationPose   String    @default("") // doğrulama başlatılınca atanan poz
@@ -69,6 +72,9 @@ model User {
   consents      Consent[]
   dataExports   DataExport[]
   dsrRequests   DsrRequest[]
+  sanctions     Sanction[]
+  appeals       Appeal[]
+  modFlags      ModerationFlag[]
 
   profile Profile?
   photos  Photo[]
@@ -136,12 +142,14 @@ model Profile {
 }
 
 model Photo {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   path      String
   position  Int
-  createdAt DateTime @default(now())
+  // Şüpheli bulunan fotoğraf incelenene kadar sadece sahibine görünür
+  hiddenAt  DateTime?
+  createdAt DateTime  @default(now())
 
   @@index([userId, position])
 }
@@ -235,6 +243,8 @@ model Message {
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
   kind           String       @default("text") // text | photo
   body           String
+  // Güvenlik işareti: contact = telefon/IBAN/sosyal medya paylaşımı (alıcıya uyarı gösterilir)
+  flag           String       @default("")
   // Tek seferlik fotoğraf: özel klasörde durur, alıcı bir kez açınca dosya silinir
   photoPath      String?
   viewedAt       DateTime?
@@ -469,7 +479,8 @@ model Report {
   reason     String
   details    String    @default("")
   status     String    @default("OPEN") // OPEN | RESOLVED
-  resolution String    @default("") // dismissed | photo_removed | banned
+  resolution String    @default("") // dismissed | photo_removed | banned | sanctioned
+  priority   Int       @default(3) // 1 = acil (reşit olmayan, müstehcenlik), 2 = yüksek, 3 = normal
   resolvedAt DateTime?
   createdAt  DateTime  @default(now())
 
@@ -586,4 +597,109 @@ model BreachRecord {
   createdBy           String
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+}
+
+// 5651: trafik kayıtları. Kullanıcı silinse de saklanır (bağlantısız). Satırlar partiler hâlinde yazılır;
+// her parti bir öncekinin özetini içerir (hash zinciri): sonradan değiştirilen/silinen kayıt anlaşılır.
+model TrafficLog {
+  id        BigInt   @id @default(autoincrement())
+  batchId   BigInt
+  userId    String   @default("")
+  ip        String
+  port      Int      @default(0)
+  method    String
+  path      String
+  status    Int      @default(0)
+  createdAt DateTime
+
+  @@index([userId, createdAt])
+  @@index([ip, createdAt])
+  @@index([createdAt])
+  @@index([batchId])
+}
+
+model TrafficBatch {
+  id        BigInt   @id @default(autoincrement())
+  count     Int
+  rowsHash  String // partideki satırların özeti
+  prevHash  String // önceki partinin hash'i
+  hash      String // sha256(prevHash + rowsHash + id)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Yaptırım basamakları: warning → restrict_24h → restrict_7d → ban
+model Sanction {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level     String
+  reason    String // kural: fake_profile | inappropriate_content | harassment | scam | underage | spam | other
+  note      String    @default("") // kullanıcıya gösterilen açıklama
+  source    String    @default("") // report:<id> | flag:<id> | auto | manual
+  createdBy String // yönetici e-postası veya "system"
+  endsAt    DateTime?
+  seenAt    DateTime? // kullanıcı bildirimi gördü
+  revokedAt DateTime? // itiraz kabul edildi / yönetim kaldırdı
+  createdAt DateTime  @default(now())
+  appeal    Appeal?
+
+  @@index([userId, createdAt])
+}
+
+// Her yaptırıma bir kez itiraz
+model Appeal {
+  id         String    @id @default(cuid())
+  sanctionId String    @unique
+  sanction   Sanction  @relation(fields: [sanctionId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message    String
+  status     String    @default("OPEN") // OPEN | ACCEPTED | REJECTED
+  answer     String    @default("")
+  decidedBy  String    @default("")
+  decidedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status, createdAt])
+}
+
+// Otomatik güvenlik sinyalleri (şüpheli fotoğraf, iletişim bilgisi paylaşımı, toplu mesaj, tekrarlayan şikayet)
+model ModerationFlag {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind       String // photo_suspicious | contact_repeat | spam | report_burst
+  refId      String    @default("") // fotoğraf / mesaj kimliği
+  details    Json      @default("{}")
+  priority   Int       @default(3)
+  status     String    @default("OPEN") // OPEN | RESOLVED
+  resolution String    @default("") // dismissed | photo_removed | photo_approved | sanctioned
+  resolvedBy String    @default("")
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status, priority, createdAt])
+  @@index([userId, kind, createdAt])
+}
+
+// Resmi talepler: 5651 içerik kaldırma, kolluk/savcılık bilgi talebi, mahkeme kararı
+model LegalRequest {
+  id           String    @id @default(cuid())
+  kind         String // takedown | information | court_order | other
+  authority    String // talep eden makam
+  referenceNo  String    @default("")
+  description  String
+  subjectUsers Json      @default("[]") // ilgili kullanıcı kimlikleri
+  receivedAt   DateTime
+  dueAt        DateTime
+  status       String    @default("OPEN") // OPEN | DONE | REJECTED
+  actions      String    @default("") // yapılan işlemler
+  handledBy    String    @default("")
+  closedAt     DateTime?
+  createdBy    String
+  createdAt    DateTime  @default(now())
+
+  @@index([status, dueAt])
 }

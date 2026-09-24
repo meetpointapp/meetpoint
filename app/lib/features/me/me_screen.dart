@@ -140,6 +140,13 @@ class MeScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(
+                    leading: const Icon(Icons.health_and_safety_outlined),
+                    title: Text(l.safetyCenter),
+                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                    onTap: () => openLegal('safety', locale),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
                     leading: const Icon(Icons.privacy_tip_outlined),
                     title: Text(l.privacyAndData),
                     trailing: const Icon(Icons.chevron_right_rounded),

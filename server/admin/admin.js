@@ -8,7 +8,7 @@ const REFRESH_KEY = 'mp_admin_refresh';
 let token = sessionStorage.getItem(TOKEN_KEY);
 let refreshToken = sessionStorage.getItem(REFRESH_KEY);
 let role = '';
-let reportStatus = 'OPEN';
+let reportStatus = 'QUEUE';
 
 // Cihaz kimliği: aynı tarayıcıdan her girişte "yeni cihaz" e-postası gitmesin
 const DEVICE_KEY = 'mp_admin_device';
@@ -32,6 +32,10 @@ const ERRORS = {
   cannot_change_own_role: 'Kendi rolünü değiştiremezsin.',
   cannot_ban_self: 'Kendini yasaklayamazsın.',
   cannot_reset_own_mfa: 'Kendi doğrulamanı sıfırlayamazsın.',
+  cannot_sanction_staff: 'Ekip üyesine yaptırım verilemez.',
+  already_resolved: 'Bu kayıt zaten kapatılmış.',
+  already_answered: 'Bu kayıt zaten yanıtlanmış.',
+  validation: 'Eksik veya hatalı bilgi.',
   banned: 'Bu hesap yasaklı.',
 };
 const errText = (err) => ERRORS[err.message] || `Hata: ${err.message}`;
@@ -234,7 +238,8 @@ $('#logout').addEventListener('click', () => logout());
 // ---------- Sekmeler ----------
 const loaders = {
   overview: loadStats,
-  reports: loadReports,
+  reports: () => loadReports(),
+  legal: loadLegal,
   verifications: loadVerifications,
   users: loadUsers,
   purchases: loadPurchases,
@@ -310,7 +315,8 @@ function photoStrip(u, { removable = false, reportId = '' } = {}) {
 // ---------- Özet ----------
 async function loadStats() {
   const s = await api('GET', '/admin/api/stats');
-  $('#count-reports').textContent = s.openReports || '';
+  $('#count-reports').textContent = s.openModeration || '';
+  $('#count-legal').textContent = s.openLegal || '';
   $('#count-verifications').textContent = s.pendingVerifications || '';
   $('#count-payouts').textContent = s.payoutsPending || '';
   $('#count-errors').textContent = s.openErrors || '';
@@ -341,8 +347,167 @@ async function loadStats() {
     .join('');
 }
 
-// ---------- Şikayetler ----------
+// ---------- Moderasyon kuyruğu ----------
+const LEVELS = { warning: 'Uyarı', restrict_24h: '24 saat kısıt', restrict_7d: '7 gün kısıt', ban: 'Kalıcı yasak' };
+const FLAG_KINDS = {
+  photo_suspicious: 'Şüpheli fotoğraf',
+  contact_repeat: 'Tekrarlayan iletişim bilgisi paylaşımı',
+  spam: 'Toplu mesaj',
+  report_burst: 'Kısa sürede çok şikayet (otomatik 24 saat kısıt verildi)',
+};
+const PRIO = { 1: '🔴 Acil', 2: '🟠 Yüksek', 3: '⚪ Normal' };
+const age = (h) => (h < 1 ? `${Math.round(h * 60)} dk` : h < 48 ? `${Math.round(h)} sa` : `${Math.round(h / 24)} gün`);
+
+function briefLine(u, extra = '') {
+  if (!u) return '<span class="muted">(hesap silinmiş)</span>';
+  const pills = [
+    u.banned ? '<span class="pill red">Yasaklı</span>' : '',
+    u.restrictedUntil ? `<span class="pill red">Kısıtlı: ${fmtDate(u.restrictedUntil)}</span>` : '',
+  ].join(' ');
+  return `<div><span class="item-title">${esc(u.displayName || '(profil yok)')}</span> ${pills}<div class="muted small">${esc(u.email)}${extra}</div></div>`;
+}
+
+function thumbs(u, reportId) {
+  if (!u?.photos?.length) return '';
+  return `<div class="thumbs">${u.photos
+    .map((p) => `<div class="photo"><img class="${p.hidden ? 'hidden-photo' : ''}" src="${esc(p.url)}" alt=""><button data-remove-photo="${esc(p.id)}" data-report="${esc(reportId || '')}">Kaldır</button></div>`)
+    .join('')}</div>`;
+}
+
+const sanctionButtons = (userId, attrs) => `
+  <button class="btn soft" data-sanction="${esc(userId)}" ${attrs}>Yaptırım (sıradaki)</button>
+  <button class="btn red" data-sanction="${esc(userId)}" data-level="ban" ${attrs}>Kalıcı yasak</button>
+  <button class="btn ghost" data-history="${esc(userId)}">Geçmiş</button>`;
+
+function queueItem(i) {
+  const head = `<div class="item-head"><div>${PRIO[i.priority] || ''} <span class="muted">· ${age(i.ageHours)} önce</span></div></div>`;
+  if (i.type === 'report') {
+    return `<div class="card item" data-item="${esc(i.id)}">${head}
+      <div><span class="pill red">Şikayet: ${esc(REASONS[i.reason] || i.reason)}</span> <span class="muted small">şikayet eden: ${esc(i.reporter?.displayName || i.reporter?.email || '?')}</span></div>
+      ${briefLine(i.user)}
+      ${i.details ? `<div class="detail">${esc(i.details)}</div>` : ''}
+      ${thumbs(i.user, i.id)}
+      <div class="actions"><button class="btn soft" data-dismiss="${esc(i.id)}">Yoksay</button>${sanctionButtons(i.user?.id, `data-report-id="${esc(i.id)}"`)}</div>
+      <div class="history hidden" data-history-for="${esc(i.user?.id)}"></div></div>`;
+  }
+  if (i.type === 'flag') {
+    const evidence = i.photo
+      ? `<img class="evidence" src="${esc(i.photo.url)}" alt="">`
+      : i.message
+        ? `<div class="detail">“${esc(i.message.body)}”</div>`
+        : '';
+    const actions = i.photo
+      ? `<button class="btn green" data-flag="${esc(i.id)}" data-action="approve_photo">Fotoğrafı onayla</button>
+         <button class="btn soft" data-flag="${esc(i.id)}" data-action="remove_photo">Fotoğrafı kaldır</button>
+         <button class="btn red" data-flag="${esc(i.id)}" data-action="sanction">Kaldır + yaptırım</button>`
+      : `<button class="btn soft" data-flag="${esc(i.id)}" data-action="dismiss">Yoksay</button>
+         <button class="btn red" data-flag="${esc(i.id)}" data-action="sanction">Yaptırım (sıradaki)</button>`;
+    return `<div class="card item" data-item="${esc(i.id)}">${head}
+      <div><span class="pill blue">Otomatik: ${esc(FLAG_KINDS[i.kind] || i.kind)}</span></div>
+      ${briefLine(i.user)}${evidence}
+      <div class="actions">${actions}<button class="btn ghost" data-history="${esc(i.user?.id)}">Geçmiş</button></div>
+      <div class="history hidden" data-history-for="${esc(i.user?.id)}"></div></div>`;
+  }
+  return `<div class="card item" data-item="${esc(i.id)}">${head}
+    <div><span class="pill green">İtiraz</span> <span class="muted small">${esc(LEVELS[i.sanction.level] || i.sanction.level)} · ${esc(REASONS[i.sanction.reason] || i.sanction.reason)} · ${fmtDate(i.sanction.createdAt)}</span></div>
+    ${briefLine(i.user)}
+    ${i.sanction.note ? `<div class="muted small">Yaptırım notu: ${esc(i.sanction.note)}</div>` : ''}
+    <div class="detail answer">${esc(i.message)}</div>
+    <div class="actions"><button class="btn green" data-appeal="${esc(i.id)}" data-accept="1">Kabul et (yaptırımı kaldır)</button>
+      <button class="btn soft" data-appeal="${esc(i.id)}" data-accept="0">Reddet</button>
+      <button class="btn ghost" data-history="${esc(i.user?.id)}">Geçmiş</button></div>
+    <div class="history hidden" data-history-for="${esc(i.user?.id)}"></div></div>`;
+}
+
+async function loadQueue() {
+  const { items, stats } = await api('GET', '/admin/api/moderation/queue');
+  $('#queue-stats').innerHTML = [
+    ['Açık', stats.open],
+    ['Acil', stats.urgent, stats.urgent > 0],
+    ['En eski', stats.open ? age(stats.oldestHours) : '—', stats.oldestHours > 24],
+    ['Ort. çözüm (7 gün)', stats.resolved7d ? age(stats.avgResolutionHours7d) : '—'],
+  ]
+    .map(([l, v, a]) => `<div class="card stat ${a ? 'alert' : ''}"><div class="value">${esc(v)}</div><div class="label">${esc(l)}</div></div>`)
+    .join('');
+  $('#queue').innerHTML = items.length ? items.map(queueItem).join('') : '<div class="card empty">Kuyruk boş 🎉</div>';
+}
+
+async function showHistory(userId) {
+  const box = document.querySelector(`.history[data-history-for="${CSS.escape(userId)}"]`);
+  if (!box) return;
+  if (!box.classList.contains('hidden')) return box.classList.add('hidden');
+  const h = await api('GET', `/admin/api/moderation/users/${encodeURIComponent(userId)}/history`);
+  box.innerHTML = `<div class="muted small">Sıradaki basamak: <b>${esc(LEVELS[h.nextLevel])}</b> · aldığı şikayet: ${h.reportsAgainst.length} · yaptığı şikayet: ${h.reportsFiled}</div>
+    ${h.sanctions
+      .map(
+        (s) => `<div class="small">${fmtDate(s.createdAt)} · <b>${esc(LEVELS[s.level] || s.level)}</b> · ${esc(REASONS[s.reason] || s.reason)}
+        ${s.revoked ? '<span class="pill green">kaldırıldı</span>' : `<button class="btn ghost" data-revoke="${esc(s.id)}">Kaldır</button>`}
+        ${s.appeal ? `<span class="pill">itiraz: ${esc(s.appeal.status)}</span>` : ''}</div>`,
+      )
+      .join('') || '<div class="muted small">Yaptırım yok</div>'}
+    ${h.reportsAgainst.slice(0, 10).map((r) => `<div class="small muted">${fmtDate(r.createdAt)} · şikayet: ${esc(REASONS[r.reason] || r.reason)} · ${esc(r.status)}</div>`).join('')}`;
+  box.classList.remove('hidden');
+}
+
+$('#queue').addEventListener('click', async (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  try {
+    if (t.dataset.history) return showHistory(t.dataset.history);
+    if (t.dataset.revoke) {
+      if (!confirm('Bu yaptırım kaldırılsın mı?')) return;
+      await api('POST', `/admin/api/moderation/sanctions/${t.dataset.revoke}/revoke`);
+      toast('Yaptırım kaldırıldı');
+    } else if (t.dataset.dismiss) {
+      await api('POST', `/admin/api/reports/${t.dataset.dismiss}/resolve`, { action: 'dismiss' });
+      toast('Şikayet yoksayıldı');
+    } else if (t.dataset.sanction) {
+      const ban = t.dataset.level === 'ban';
+      const note = prompt(ban ? 'Kalıcı yasak gerekçesi (kullanıcıya gösterilir):' : 'Kullanıcıya gösterilecek açıklama:', '');
+      if (note === null) return;
+      if (t.dataset.reportId) {
+        await api('POST', `/admin/api/reports/${t.dataset.reportId}/resolve`, { action: ban ? 'ban' : 'sanction', note });
+      } else {
+        const reason = prompt('Kural (fake_profile, inappropriate_content, harassment, scam, underage, spam, other):', 'harassment');
+        if (!reason) return;
+        await api('POST', `/admin/api/moderation/users/${t.dataset.sanction}/sanction`, { reason, note, ...(ban ? { level: 'ban' } : {}) });
+      }
+      toast('Yaptırım uygulandı');
+    } else if (t.dataset.flag) {
+      let body = { action: t.dataset.action };
+      if (t.dataset.action === 'sanction') {
+        const note = prompt('Kullanıcıya gösterilecek açıklama:', '');
+        if (note === null) return;
+        const reason = prompt('Kural (inappropriate_content, scam, spam, harassment, other):', 'other');
+        if (!reason) return;
+        body = { ...body, note, reason };
+      }
+      await api('POST', `/admin/api/moderation/flags/${t.dataset.flag}/resolve`, body);
+      toast('Kapatıldı');
+    } else if (t.dataset.appeal) {
+      const accept = t.dataset.accept === '1';
+      const answer = prompt(accept ? 'Kullanıcıya yanıt (yaptırım kaldırılacak):' : 'Ret gerekçesi (kullanıcıya gider):', '');
+      if (!answer) return;
+      await api('POST', `/admin/api/moderation/appeals/${t.dataset.appeal}/decide`, { accept, answer });
+      toast(accept ? 'İtiraz kabul edildi' : 'İtiraz reddedildi');
+    } else if (t.dataset.removePhoto) {
+      if (!confirm('Bu fotoğraf kalıcı olarak silinsin mi?')) return;
+      await api('DELETE', `/admin/api/photos/${t.dataset.removePhoto}`);
+      toast('Fotoğraf kaldırıldı');
+    } else return;
+    loadQueue();
+    loadStats();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+// ---------- Çözülmüş şikayetler ----------
 async function loadReports() {
+  const queueView = reportStatus === 'QUEUE';
+  ['#queue', '#queue-stats'].forEach((s) => $(s).classList.toggle('hidden', !queueView));
+  $('#reports').classList.toggle('hidden', queueView);
+  if (queueView) return loadQueue();
   const list = await api('GET', `/admin/api/reports?status=${reportStatus}`);
   const el = $('#reports');
   if (!list.length) {
@@ -355,7 +520,7 @@ async function loadReports() {
       <div class="item-head">
         <div><span class="pill red">${esc(REASONS[r.reason] || r.reason)}</span>
           <span class="muted">· ${fmtDate(r.createdAt)} · şikayet eden: ${esc(r.from.displayName || r.from.email)}</span></div>
-        ${r.status === 'RESOLVED' ? `<span class="pill green">${esc({ banned: 'Yasaklandı', dismissed: 'Yoksayıldı', photo_removed: 'Fotoğraf kaldırıldı' }[r.resolution] || r.resolution)}</span>` : ''}
+        ${r.status === 'RESOLVED' ? `<span class="pill green">${esc({ banned: 'Yasaklandı', dismissed: 'Yoksayıldı', photo_removed: 'Fotoğraf kaldırıldı', sanctioned: 'Yaptırım' }[r.resolution] || r.resolution)}</span>` : ''}
       </div>
       ${userLine(r.to)}
       ${r.details ? `<div class="detail">${esc(r.details)}</div>` : ''}
@@ -773,6 +938,87 @@ $('#retention-run').addEventListener('click', async () => {
   }
 });
 
+// ---------- Resmi talepler ----------
+const LEGAL_KINDS = { takedown: 'İçerik kaldırma', information: 'Bilgi talebi', court_order: 'Mahkeme kararı', other: 'Diğer' };
+
+async function loadLegal() {
+  const list = await api('GET', '/admin/api/moderation/legal-requests');
+  $('#legal').innerHTML = list.length
+    ? list
+        .map(
+          (r) => `<div class="card item"><div class="item-head">
+        <div><span class="pill blue">${esc(LEGAL_KINDS[r.kind] || r.kind)}</span> <span class="item-title">${esc(r.authority)}</span> <span class="muted small">${esc(r.referenceNo)}</span></div>
+        <span class="pill ${r.overdue ? 'red' : ''}">Son: ${fmtDate(r.dueAt)}${r.overdue ? ' (gecikti)' : ''}</span></div>
+        <div class="detail answer">${esc(r.description)}</div>
+        ${r.subjectUsers?.length ? `<div class="muted small">İlgili kullanıcılar: ${r.subjectUsers.map(esc).join(', ')}</div>` : ''}
+        <textarea rows="2" data-actions-for="${esc(r.id)}" placeholder="Yapılan işlemler (ör. içerik kaldırıldı, trafik kaydı gönderildi)"></textarea>
+        <div class="actions"><button class="btn green" data-close="${esc(r.id)}" data-status="DONE">Tamamlandı</button>
+          <button class="btn soft" data-close="${esc(r.id)}" data-status="REJECTED">Gerekçeyle reddet</button></div></div>`,
+        )
+        .join('')
+    : '<div class="card empty">Açık resmi talep yok</div>';
+}
+
+$('#legal-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await api('POST', '/admin/api/moderation/legal-requests', {
+      kind: $('#legal-kind').value,
+      authority: $('#legal-authority').value,
+      referenceNo: $('#legal-ref').value,
+      description: $('#legal-desc').value,
+      subjectUsers: $('#legal-users').value.split(',').map((s) => s.trim()).filter(Boolean),
+    });
+    e.target.reset();
+    toast('Talep kaydedildi');
+    loadLegal();
+    loadStats();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#legal').addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-close]');
+  if (!t) return;
+  const actions = document.querySelector(`textarea[data-actions-for="${t.dataset.close}"]`).value.trim();
+  if (actions.length < 5) return toast('Yapılan işlemleri yaz');
+  try {
+    await api('POST', `/admin/api/moderation/legal-requests/${t.dataset.close}/close`, { status: t.dataset.status, actions });
+    toast('Talep kapatıldı');
+    loadLegal();
+    loadStats();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#traffic-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const params = new URLSearchParams({
+    from: new Date($('#traffic-from').value).toISOString(),
+    to: new Date($('#traffic-to').value).toISOString(),
+  });
+  if ($('#traffic-user').value.trim()) params.set('userId', $('#traffic-user').value.trim());
+  if ($('#traffic-ip').value.trim()) params.set('ip', $('#traffic-ip').value.trim());
+  const res = await send('GET', `/admin/api/moderation/traffic?${params}`);
+  if (!res.ok) return toast(errText(new Error((await res.json().catch(() => ({}))).error || `http_${res.status}`)));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(await res.blob());
+  a.download = `trafik-${params.get('from').slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+$('#traffic-verify').addEventListener('click', async () => {
+  try {
+    const r = await api('GET', '/admin/api/moderation/traffic/verify');
+    toast(r.ok ? `Zincir sağlam: ${r.batches} parti, ${r.rows} kayıt` : `ZİNCİR BOZUK: parti ${r.brokenAt}`);
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
 // ---------- Ekip ----------
 const ROLES = { super: 'Süper yönetici', moderator: 'Moderatör', finance: 'Finans' };
 
@@ -841,6 +1087,23 @@ const ACTIONS = {
   'breach.update': 'İhlal kaydını güncelledi',
   'breach.notify_users': 'İhlal e-postası gönderdi',
   'retention.run': 'İmha işini çalıştırdı',
+  'report.sanction': 'Şikayetle yaptırım verdi',
+  'sanction.warning': 'Uyarı verdi',
+  'sanction.restrict_24h': '24 saat kısıtladı',
+  'sanction.restrict_7d': '7 gün kısıtladı',
+  'sanction.ban': 'Yasakladı',
+  'sanction.revoke': 'Yaptırımı kaldırdı',
+  'flag.dismissed': 'Otomatik işareti yoksaydı',
+  'flag.photo_approved': 'Şüpheli fotoğrafı onayladı',
+  'flag.photo_removed': 'Şüpheli fotoğrafı kaldırdı',
+  'flag.sanctioned': 'İşaretle yaptırım verdi',
+  'appeal.accept': 'İtirazı kabul etti',
+  'appeal.reject': 'İtirazı reddetti',
+  'legal_request.create': 'Resmi talep kaydetti',
+  'legal_request.done': 'Resmi talebi tamamladı',
+  'legal_request.rejected': 'Resmi talebi reddetti',
+  'traffic.export': 'Trafik kaydı dışa aktardı',
+  'traffic.verify': 'Trafik zincirini doğruladı',
 };
 let auditCursor = null;
 let auditTimer;

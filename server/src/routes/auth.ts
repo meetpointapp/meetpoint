@@ -6,6 +6,7 @@ import { HttpError, prisma } from '../db';
 import { authLimiter, codeLimiter, refreshLimiter } from '../limits';
 import { assertNotLocked, assertPasswordAllowed, clearLoginFailures, hashPassword, recordLoginFailure, verifyPassword } from '../passwords';
 import { grantSignupBonus } from '../purchases';
+import { appealToken, latestBan } from '../moderation/sanctions';
 import { restoreIfPendingDeletion } from '../privacy/accounts';
 import { acceptLegal, recordConsent } from '../privacy/consents';
 import { createSession, refreshSession, revokeAllSessions, revokeSession } from '../sessions';
@@ -49,6 +50,7 @@ authRouter.post('/register', authLimiter, async (req, res) => {
     return tx.user.findUniqueOrThrow({ where: { id: u.id } });
   });
   await issueCode(user, 'verify');
+  res.locals.userId = user.id;
   res.status(201).json(await createSession(user, req));
 });
 
@@ -64,8 +66,13 @@ authRouter.post('/login', authLimiter, async (req, res) => {
   }
   await clearLoginFailures(data.email);
   if (check.upgraded) await prisma.user.update({ where: { id: user.id }, data: { passwordHash: check.upgraded } });
-  if (user.bannedAt) throw new HttpError(403, 'banned');
+  if (user.bannedAt) {
+    // İtiraz edilmemiş bir yasak varsa uygulama itiraz formunu açabilsin
+    const ban = await latestBan(user.id);
+    throw new HttpError(403, 'banned', ban ? { reason: ban.reason, note: ban.note, appealed: !!ban.appeal, ...(ban.appeal ? {} : { appealToken: appealToken(user.id, ban.id) }) } : {});
+  }
   // Silme talebinden sonraki bekleme süresinde giriş: hesap geri gelir
+  res.locals.userId = user.id;
   const restored = await restoreIfPendingDeletion(user);
   res.json({ ...(await createSession(user, req, { notifyNewDevice: true })), ...(restored ? { restored: true } : {}) });
 });

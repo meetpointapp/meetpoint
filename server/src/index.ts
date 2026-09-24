@@ -8,11 +8,13 @@ import { assertProductionConfig, config, corsOrigins, scheduler as schedulerConf
 import { HttpError, prisma } from './db';
 import { recordError } from './errors';
 import { idempotency } from './idempotency';
+import { flushTraffic, trafficMiddleware } from './moderation/traffic';
 import { pool } from './pgPool';
 import { closeRealtime, initRealtime } from './realtime';
 import { isLeader, startScheduler, stopScheduler } from './scheduler';
 import { adminRouter } from './routes/admin';
 import { adminAuthRouter } from './routes/adminAuth';
+import { adminModerationRouter } from './routes/adminModeration';
 import { adminPrivacyRouter } from './routes/adminPrivacy';
 import { authRouter } from './routes/auth';
 import { boostsRouter } from './routes/boosts';
@@ -23,6 +25,7 @@ import { conversationsRouter } from './routes/conversations';
 import { discoverRouter } from './routes/discover';
 import { legalRouter } from './routes/legal';
 import { mediaRouter } from './routes/media';
+import { moderationRouter, publicAppealRouter } from './routes/moderation';
 import { dataExportDownloadRouter, privacyRouter } from './routes/privacy';
 import { profileRouter } from './routes/profile';
 import { requestsRouter } from './routes/requests';
@@ -63,6 +66,8 @@ app.use(
 // Yayında sadece izin verilen web adresleri; mobil uygulama tarayıcı olmadığı için CORS'tan etkilenmez
 app.use(cors(config.isProduction ? { origin: corsOrigins } : {}));
 app.use(express.json({ limit: '100kb' }));
+// 5651 trafik kaydı (içerik oluşturan istekler)
+app.use(trafficMiddleware);
 app.use('/admin', express.static('admin', { setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
 
 app.get('/health', (_req, res) => {
@@ -74,9 +79,11 @@ app.use('/media', mediaRouter);
 app.use('/webhooks/revenuecat', revenueCatRouter);
 app.use('/client-errors', clientErrorsRouter);
 app.use('/data-export', dataExportDownloadRouter);
+app.use('/appeals', publicAppealRouter);
 app.use('/auth', authRouter);
 app.use('/admin/api/mfa', requireAuth, adminAuthRouter);
 app.use('/admin/api/privacy', requireAuth, requireAdmin, adminPrivacyRouter);
+app.use('/admin/api/moderation', requireAuth, requireAdmin, adminModerationRouter);
 app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,
@@ -85,6 +92,7 @@ app.use(
   idempotency,
   profileRouter,
   privacyRouter,
+  moderationRouter,
   verificationRouter,
   discoverRouter,
   boostsRouter,
@@ -129,6 +137,7 @@ async function shutdown(signal: string) {
   await stopScheduler();
   await closeRealtime().catch(() => {});
   server.close();
+  await flushTraffic();
   await prisma.$disconnect();
   await pool.end().catch(() => {});
   process.exit(0);

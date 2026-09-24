@@ -152,6 +152,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     await _run(() async {
       final msg = await ref.read(apiProvider).sendMessage(_id, text);
       _input.clear();
+      if (msg.contactWarning && mounted) showSnack(context, AppLocalizations.of(context).contactWarningSender);
       return msg;
     });
   }
@@ -311,7 +312,7 @@ class _Bubble extends StatelessWidget {
       content = Text(m.body, style: TextStyle(color: fg));
     }
 
-    return Align(
+    final bubble = Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
@@ -342,6 +343,19 @@ class _Bubble extends StatelessWidget {
         ]),
       ),
     );
+    // İletişim bilgisi paylaşan mesajın altında alıcıya güvenlik ipucu
+    if (mine || m.flag != 'contact') return bubble;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      bubble,
+      Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 4),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.shield_outlined, size: 14, color: scheme.tertiary),
+          const SizedBox(width: 4),
+          Flexible(child: Text(l.contactSafetyTip, style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant))),
+        ]),
+      ),
+    ]);
   }
 }
 

@@ -2,6 +2,7 @@ import type { Server as HttpServer } from 'node:http';
 import { createAdapter } from '@socket.io/postgres-adapter';
 import { Server } from 'socket.io';
 import { authenticate } from './auth';
+import { recordTraffic } from './moderation/traffic';
 import { config, corsOrigins } from './config';
 import { prisma } from './db';
 import { pool } from './pgPool';
@@ -53,6 +54,18 @@ export function initRealtime(server: HttpServer) {
     const me: string = socket.data.userId;
     socket.join(`user:${me}`);
     socket.join(`session:${socket.data.sessionId}`);
+    // 5651: anlık bağlantı açılışı (vekil arkasında gerçek IP/port başlıklardan)
+    const h = socket.handshake.headers;
+    recordTraffic({
+      userId: me,
+      // Son değer bizim vekilin eklediği gerçek adres (baştakiler istemci tarafından uydurulabilir)
+      ip: String(h['x-forwarded-for'] ?? socket.handshake.address).split(',').at(-1)!.trim(),
+      port: Number(h['x-real-port'] ?? socket.request.socket.remotePort ?? 0) || 0,
+      method: 'WS',
+      path: '/socket.io',
+      status: 101,
+      createdAt: new Date(),
+    });
     for (const hook of onlineHooks) void Promise.resolve(hook(me)).catch((e) => console.error('online hook', e));
 
     socket.on('disconnect', async () => {

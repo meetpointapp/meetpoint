@@ -6,11 +6,13 @@ class Photo {
   final String url; // orta boy
   final String thumbUrl;
   final String fullUrl;
-  const Photo({required this.id, required this.url, String? thumbUrl, String? fullUrl})
+  // Otomatik kontrol şüpheli buldu: incelenene kadar sadece sahibi görür
+  final bool underReview;
+  const Photo({required this.id, required this.url, String? thumbUrl, String? fullUrl, this.underReview = false})
       : thumbUrl = thumbUrl ?? url,
         fullUrl = fullUrl ?? url;
   factory Photo.fromJson(Map<String, dynamic> j) =>
-      Photo(id: j['id'], url: j['url'], thumbUrl: j['thumbUrl'], fullUrl: j['fullUrl']);
+      Photo(id: j['id'], url: j['url'], thumbUrl: j['thumbUrl'], fullUrl: j['fullUrl'], underReview: j['underReview'] == true);
 }
 
 class ProfilePrompt {
@@ -244,6 +246,9 @@ class Me {
   final ConsentState consents;
   // Değişen ve yeniden onay bekleyen yasal metinler (terms, privacy)
   final List<String> legalUpdates;
+  // Moderasyon: kısıt bitişi ve henüz gösterilmemiş son yaptırım
+  final DateTime? restrictedUntil;
+  final Sanction? pendingSanction;
 
   const Me({
     required this.id,
@@ -260,6 +265,8 @@ class Me {
     this.filters = const DiscoverFilters(),
     this.consents = const ConsentState(),
     this.legalUpdates = const [],
+    this.restrictedUntil,
+    this.pendingSanction,
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -277,6 +284,8 @@ class Me {
         filters: DiscoverFilters.fromJson(j['filters']),
         consents: j['consents'] == null ? const ConsentState() : ConsentState.fromJson(j['consents']),
         legalUpdates: [for (final d in (j['legalUpdates'] as List? ?? const [])) d as String],
+        restrictedUntil: j['restrictedUntil'] == null ? null : _date(j['restrictedUntil']),
+        pendingSanction: j['pendingSanction'] == null ? null : Sanction.fromJson(j['pendingSanction']),
       );
 }
 
@@ -398,6 +407,10 @@ class ChatMessage {
   final DateTime? viewedAt; // fotoğraf açıldı mı
   final DateTime? readAt; // okundu mu
   final DateTime createdAt;
+  // contact: telefon/IBAN/sosyal medya paylaşıldı → alıcıya güvenlik ipucu
+  final String flag;
+  // Gönderene: az önce iletişim bilgisi paylaştın uyarısı (sadece gönderme yanıtında)
+  final bool contactWarning;
 
   const ChatMessage({
     required this.id,
@@ -408,6 +421,8 @@ class ChatMessage {
     this.viewedAt,
     this.readAt,
     required this.createdAt,
+    this.flag = '',
+    this.contactWarning = false,
   });
 
   bool get isPhoto => kind == 'photo';
@@ -421,6 +436,7 @@ class ChatMessage {
         viewedAt: viewedAt ?? this.viewedAt,
         readAt: readAt ?? this.readAt,
         createdAt: createdAt,
+        flag: flag,
       );
 
   factory ChatMessage.fromJson(Map<String, dynamic> j) => ChatMessage(
@@ -429,6 +445,8 @@ class ChatMessage {
         senderId: j['senderId'],
         kind: j['kind'] ?? 'text',
         body: j['body'] ?? '',
+        flag: j['flag'] ?? '',
+        contactWarning: j['warning'] == 'contact_info',
         viewedAt: j['viewedAt'] == null ? null : _date(j['viewedAt']),
         readAt: j['readAt'] == null ? null : _date(j['readAt']),
         createdAt: _date(j['createdAt']),
@@ -787,5 +805,38 @@ class KvkkRequest {
         answer: j['answer'] ?? '',
         dueAt: _date(j['dueAt']),
         createdAt: _date(j['createdAt']),
+      );
+}
+
+// Moderasyon yaptırımı: warning | restrict_24h | restrict_7d | ban
+class Sanction {
+  final String id;
+  final String level;
+  final String reason;
+  final String note;
+  final DateTime? endsAt;
+  final DateTime createdAt;
+  final String? appealStatus; // OPEN | ACCEPTED | REJECTED; null = itiraz yok
+
+  const Sanction({
+    required this.id,
+    required this.level,
+    required this.reason,
+    required this.note,
+    this.endsAt,
+    required this.createdAt,
+    this.appealStatus,
+  });
+
+  bool get canAppeal => appealStatus == null;
+
+  factory Sanction.fromJson(Map<String, dynamic> j) => Sanction(
+        id: j['id'],
+        level: j['level'],
+        reason: j['reason'] ?? '',
+        note: j['note'] ?? '',
+        endsAt: j['endsAt'] == null ? null : _date(j['endsAt']),
+        createdAt: _date(j['createdAt']),
+        appealStatus: (j['appeal'] as Map?)?['status'] as String?,
       );
 }

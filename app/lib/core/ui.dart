@@ -57,6 +57,8 @@ String errorText(AppLocalizations l, Object error) {
     'captcha_required' || 'captcha_failed' || 'captcha_unavailable' => l.errCaptcha,
     'refresh_race' => l.errRequestInProgress,
     'consent_required' => l.errConsentRequired,
+    'restricted' => l.errRestricted,
+    'already_appealed' => l.errAlreadyAppealed,
     'peer_calls_disabled' => l.errPeerCallsDisabled,
     'export_cooldown' => l.errExportCooldown,
     'export_unavailable' => l.errNotFound,

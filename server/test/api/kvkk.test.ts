@@ -267,7 +267,7 @@ describe('KVKK (Faz 11)', () => {
   });
 
   it('yasal metinler: açık rıza metinleri ve koddan üretilen saklama politikası', async () => {
-    for (const doc of ['consent-special', 'consent-overseas', 'consent-selfie', 'consent-marketing', 'retention']) {
+    for (const doc of ['consent-special', 'consent-overseas', 'consent-selfie', 'consent-marketing', 'retention', 'safety', 'community']) {
       for (const lang of ['tr', 'en']) {
         const r = await fetch(`${B}/legal/${doc}?lang=${lang}`);
         check(`${doc}.${lang}`, r.status === 200);

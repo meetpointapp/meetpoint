@@ -39,6 +39,9 @@ Future<void> startCallFlow(BuildContext context, WidgetRef ref, PublicProfile pr
         Text(profile.displayName, style: Theme.of(ctx).textTheme.titleMedium),
         const SizedBox(height: 12),
         Text(l.startCallInfo(rate!), textAlign: TextAlign.center),
+        const SizedBox(height: 8),
+        // Arama öncesi kurallar hatırlatması
+        Text(l.callRulesReminder, textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodySmall),
       ]),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel)),

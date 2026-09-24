@@ -49,6 +49,7 @@ async function collect(userId: string) {
       sessions: { select: { deviceName: true, platform: true, createdAt: true, lastUsedAt: true, revokedAt: true } },
       verifications: { select: { pose: true, status: true, createdAt: true, reviewedAt: true, selfiePath: true } },
       dsrRequests: true,
+      sanctions: { orderBy: { createdAt: 'asc' }, include: { appeal: true } },
     },
   });
   const [wallet, conversations, messages, calls, gifts, blocks, reports, devices] = await Promise.all([
@@ -135,6 +136,15 @@ async function collect(userId: string) {
     verification: u.verifications.map(({ pose, status, createdAt, reviewedAt }) => ({ pose, status, createdAt, reviewedAt })),
     sessions: u.sessions,
     pushDevices: devices,
+    moderation: u.sanctions.map((s) => ({
+      level: s.level,
+      reason: s.reason,
+      note: s.note,
+      createdAt: s.createdAt,
+      endsAt: s.endsAt,
+      revoked: s.revokedAt !== null,
+      appeal: s.appeal && { message: s.appeal.message, status: s.appeal.status, answer: s.appeal.answer, createdAt: s.appeal.createdAt },
+    })),
     kvkkRequests: u.dsrRequests.map(({ kind, message, status, answer, createdAt, answeredAt }) => ({ kind, message, status, answer, createdAt, answeredAt })),
   };
   return { user: u, data };

@@ -1,16 +1,15 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { type AdminRole, requireRole, uid } from '../auth';
-import { audit } from '../audit';
+import { adminEmailOf, audit } from '../audit';
+import { LEVELS, applySanction, revokeSanction } from '../moderation/sanctions';
 import { HttpError, prisma } from '../db';
 import { decryptField } from '../fieldCrypto';
 import { resetMfa } from '../mfa';
 import { revokeAllSessions } from '../sessions';
-import { disconnectUser } from '../realtime';
 import { photoUrls, removeProfilePhoto } from '../images';
 import { closePayout, markPayoutPaid } from '../payouts';
 import { privateStore } from '../storage';
-import { closeAllPendingFor } from '../requestService';
 import { getCashable } from '../wallet';
 
 // Yönetim paneli API'si (/admin/api). requireAuth + requireAdmin (2FA dahil) ile korunur.
@@ -56,16 +55,9 @@ function shapeUser(u: NonNullable<SummaryUser>) {
   };
 }
 
-// Yasakla: oturumları kapat, bekleyen istekleri iade et, keşfetten gizle
-async function banUser(userId: string, reason: string) {
-  await prisma.user.update({
-    where: { id: userId },
-    data: { bannedAt: new Date(), banReason: reason },
-  });
-  await revokeAllSessions(userId, 'banned');
-  await closeAllPendingFor(userId);
-  disconnectUser(userId);
-}
+// Yasakla (yaptırım kaydıyla): oturumlar kapanır, bekleyen istekler iade edilir, profil her yerden kalkar
+const banUser = async (req: import('express').Request, userId: string, reason: string, source = 'manual') =>
+  applySanction({ userId, level: 'ban', reason, source, createdBy: await adminEmailOf(req) });
 
 const MOD: AdminRole[] = ['moderator'];
 const FIN: AdminRole[] = ['finance'];
@@ -96,9 +88,12 @@ adminRouter.get('/stats', async (_req, res) => {
       prisma.payout.aggregate({ where: { status: 'PAID' }, _count: true, _sum: { usd: true } }),
       prisma.errorLog.count({ where: { resolvedAt: null } }),
     ]);
-  const [openDsr, overdueDsr] = await Promise.all([
+  const [openDsr, overdueDsr, openFlags, openAppeals, openLegal] = await Promise.all([
     prisma.dsrRequest.count({ where: { status: 'OPEN' } }),
     prisma.dsrRequest.count({ where: { status: 'OPEN', dueAt: { lt: new Date() } } }),
+    prisma.moderationFlag.count({ where: { status: 'OPEN' } }),
+    prisma.appeal.count({ where: { status: 'OPEN' } }),
+    prisma.legalRequest.count({ where: { status: 'OPEN' } }),
   ]);
   res.json({
     users,
@@ -125,6 +120,9 @@ adminRouter.get('/stats', async (_req, res) => {
     openErrors,
     openDsr,
     overdueDsr,
+    // Moderasyon kuyruğu = açık şikayet + otomatik işaret + itiraz
+    openModeration: openReports + openFlags + openAppeals,
+    openLegal,
   });
 });
 
@@ -255,19 +253,32 @@ adminRouter.get('/reports', requireRole(...MOD), async (req, res) => {
   );
 });
 
-// Şikayeti kapat: yoksay veya kullanıcıyı yasakla. Aynı kişiye ait diğer açık şikayetler de kapanır.
+// Şikayeti kapat: yoksay, kademeli yaptırım (basamak verilmezse sıradaki) veya doğrudan yasak.
+// Yaptırımda aynı kişiye ait diğer açık şikayetler de kapanır.
 adminRouter.post('/reports/:id/resolve', requireRole(...MOD), async (req, res) => {
-  const { action, reason } = z
-    .object({ action: z.enum(['dismiss', 'ban']), reason: z.string().max(200).default('') })
+  const { action, reason, level, note } = z
+    .object({
+      action: z.enum(['dismiss', 'ban', 'sanction']),
+      reason: z.string().max(200).default(''),
+      level: z.enum(LEVELS).optional(),
+      note: z.string().max(500).default(''),
+    })
     .parse(req.body);
   const report = await prisma.report.findUnique({ where: { id: req.params.id } });
   if (!report) throw new HttpError(404, 'not_found');
 
-  if (action === 'ban') {
-    await banUser(report.toId, reason || report.reason);
+  if (action === 'ban' || action === 'sanction') {
+    const s = await applySanction({
+      userId: report.toId,
+      level: action === 'ban' ? 'ban' : level,
+      reason: reason || report.reason,
+      note,
+      source: `report:${report.id}`,
+      createdBy: await adminEmailOf(req),
+    });
     await prisma.report.updateMany({
       where: { toId: report.toId, status: 'OPEN' },
-      data: { status: 'RESOLVED', resolution: 'banned', resolvedAt: new Date() },
+      data: { status: 'RESOLVED', resolution: s.level === 'ban' ? 'banned' : 'sanctioned', resolvedAt: new Date() },
     });
   } else {
     await prisma.report.update({
@@ -275,7 +286,7 @@ adminRouter.post('/reports/:id/resolve', requireRole(...MOD), async (req, res) =
       data: { status: 'RESOLVED', resolution: 'dismissed', resolvedAt: new Date() },
     });
   }
-  await audit(req, `report.${action}`, 'report', report.id, { userId: report.toId, reason });
+  await audit(req, `report.${action}`, 'report', report.id, { userId: report.toId, reason, level: level ?? '' });
   res.json({ ok: true });
 });
 
@@ -357,12 +368,15 @@ adminRouter.post('/users/:id/ban', requireRole(...MOD), async (req, res) => {
     throw new HttpError(404, 'not_found');
   });
   if (req.params.id === uid(req)) throw new HttpError(400, 'cannot_ban_self');
-  await banUser(req.params.id, reason);
+  await banUser(req, req.params.id, reason);
   await audit(req, 'user.ban', 'user', req.params.id, { reason });
   res.json({ ok: true });
 });
 
 adminRouter.post('/users/:id/unban', requireRole(...MOD), async (req, res) => {
+  // Açık yasak yaptırımları kaldırılır (kayıtları kalır); eski usul yasaklar da temizlenir
+  const bans = await prisma.sanction.findMany({ where: { userId: req.params.id, level: 'ban', revokedAt: null } });
+  for (const b of bans) await revokeSanction(b.id);
   await prisma.user.update({ where: { id: req.params.id }, data: { bannedAt: null, banReason: '' } });
   await audit(req, 'user.unban', 'user', req.params.id);
   res.json({ ok: true });

@@ -1,6 +1,7 @@
 import { RtcRole, RtcTokenBuilder } from 'agora-token';
 import type { Call, Photo, Prisma, Profile, User } from '@prisma/client';
 import { agora, callTiming, economy, type CallKind } from './config';
+import { fileReport } from './moderation/reports';
 import { hasConsent, requireConsent } from './privacy/consents';
 import { HttpError, isBlockedEitherWay, prisma } from './db';
 import { notify } from './notify';
@@ -219,10 +220,19 @@ export async function rateCall(id: string, userId: string, rating: number, repor
   if ((asCaller ? call.callerRating : call.calleeRating) != null) throw new HttpError(409, 'already_rated');
   await prisma.call.update({ where: { id }, data: asCaller ? { callerRating: rating } : { calleeRating: rating } });
   if (reportReason) {
-    await prisma.report.create({
-      data: { fromId: userId, toId: asCaller ? call.calleeId : call.callerId, reason: reportReason, details: `call:${id}` },
-    });
+    await fileReport({ fromId: userId, toId: asCaller ? call.calleeId : call.callerId, reason: reportReason, details: `call:${id}` });
   }
+}
+
+// Arama içinden "bildir ve kapat": arama hemen biter, şikayet öncelikli kuyruğa düşer
+export async function reportAndHangUp(id: string, userId: string, reason: string) {
+  const call = await prisma.call.findUnique({ where: { id } });
+  if (!call || (call.callerId !== userId && call.calleeId !== userId)) throw new HttpError(404, 'not_found');
+  const ended = await hangUp(id, userId).catch(() => null);
+  const other = call.callerId === userId ? call.calleeId : call.callerId;
+  // Arama sırasında yaşanan sorun: en az "yüksek" öncelik
+  await fileReport({ fromId: userId, toId: other, reason, details: `call:${id} (arama sırasında)`, priority: reason === 'underage' || reason === 'inappropriate_content' ? 1 : 2 });
+  return ended ?? getCall(id, userId);
 }
 
 export async function callHistory(userId: string) {

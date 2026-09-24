@@ -37,6 +37,8 @@ const internalCodes = {
   'cannot_reset_own_mfa': 'sadece yönetim paneli',
   'reconsent_required': 'yönlendirici yeniden onay ekranına götürür',
   'already_answered': 'sadece yönetim paneli',
+  'already_resolved': 'sadece yönetim paneli',
+  'cannot_sanction_staff': 'sadece yönetim paneli',
 };
 
 Set<String> _serverCodes() {
