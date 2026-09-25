@@ -2,7 +2,7 @@
 
 Faz 1–7 çalışan bir ürün çıkardı. Bu seri, ürünü **arka planda kusursuz, hukuki gereklilikleri uygulamanın içinde karşılayan ve kullanması basit** hale getirir.
 
-**Sıralama kararı (2026-09-23, 2026-09-25'te Faz 16 eklendi):** Önce uygulama tamamlanır (Faz 8–17). Avukat, mali müşavir, şirket, sunucu, mağaza ve yayın gibi dış işler en sona, Faz 18'e bırakılır.
+**Sıralama kararı (2026-09-23, 2026-09-25'te Faz 16 ve 17 eklendi):** Önce uygulama tamamlanır (Faz 8–18). Avukat, mali müşavir, şirket, sunucu, mağaza ve yayın gibi dış işler en sona, Faz 19'a bırakılır.
 
 Hukuki ve mali gereklilikler (KVKK, 5651, tüketici hakları, e-ticaret, vergi) uygulamada **şimdiden** kurulur. Avukatın görüşü sonradan değişiklik isterse maliyet düşük kalsın diye kurallar **ayarlanabilir** yapılır:
 
@@ -14,7 +14,7 @@ Her fazda en az 5 adım var. İşaretler:
 
 - 🛠 Yazılım: Claude yapar
 - 👤 Senin kararın veya görevin
-- ⏭ Faz 18'e bırakılan dış iş
+- ⏭ Faz 19'a bırakılan dış iş
 
 ---
 
@@ -114,7 +114,7 @@ Faz 14 tamamlandı. Sunucuda 131 test (29 dosya), uygulamada 42 test; arayüz tu
 
 **Bulunan eksik:** Google Play, uygulama dışından (web) hesap silme bağlantısı istiyor; yoktu, eklendi.
 
-**Açık sorular (Faz 18):** ⚠️ ücretli görüntülü aramanın Apple 1.1.4 / Google cinsel içerik kuralları açısından algısı; kazanç ödemesinin finansal özellik beyanı; satış metinleri ve onay kutusu metni avukat onayı; İYS dosya biçiminin güncel şablonla karşılaştırılması; iOS izin metinlerinin İngilizcesi (Xcode).
+**Açık sorular (Faz 19):** ⚠️ ücretli görüntülü aramanın Apple 1.1.4 / Google cinsel içerik kuralları açısından algısı; kazanç ödemesinin finansal özellik beyanı; satış metinleri ve onay kutusu metni avukat onayı; İYS dosya biçiminin güncel şablonla karşılaştırılması; iOS izin metinlerinin İngilizcesi (Xcode).
 
 ### Faz 13'te bulunanlar
 
@@ -133,7 +133,7 @@ Faz 13 tamamlandı. Sunucuda 116 test (27 dosya), uygulamada 42 test; tam takım
 
 **Geliştirme veritabanında bilinen fark:** test@gmail.com hesabının Faz 5 öncesi (satış kaydı yokken) yapılmış 6000 jetonluk test yüklemesi raporda "fark" olarak görünür; yayında böyle bir kayıt olmaz.
 
-**Açık sorular (Faz 18, muhasebeci/avukat):** stopaj oranı ve ödeme belgesi biçimi; ödeme yapılan kişinin TC'si hesap silindikten sonra saklanmalı mı; bankanın toplu EFT dosya biçimi.
+**Açık sorular (Faz 19, muhasebeci/avukat):** stopaj oranı ve ödeme belgesi biçimi; ödeme yapılan kişinin TC'si hesap silindikten sonra saklanmalı mı; bankanın toplu EFT dosya biçimi.
 
 ### Faz 12'de bulunanlar
 
@@ -206,7 +206,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 4. ✅ **Hassas veri şifreleme.** IBAN, PayPal ve kimlik bilgileri alan düzeyinde şifreli; anahtar veritabanı dışında.
 5. ✅ **Kötüye kullanım ve şifreler.** Bot koruması, cihaz başına hesap sınırı, sızdırılmış şifre kontrolü, şifre politikası. Şifre özeti yerel (native) Argon2id'ye geçer; mevcut şifreler girişte otomatik yükseltilir.
 6. ✅ **Sunucu yapılandırması.** CORS kısıtı, güvenlik başlıkları, istek boyutu sınırları, hata mesajlarında iç bilgi sızmaması.
-7. ✅ **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 18'de.
+7. ✅ **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 19'da.
 8. ✅ **Bağımlılık güvenliği.** Prisma ve firebase-admin sürüm yükseltmeleriyle açık bildirimlerinin kapatılması.
 
 ## Faz 11 · KVKK uyumu (uygulama içi) ✅
@@ -224,7 +224,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
    - Yönetim panelinde başvuru kuyruğu ve 30 günlük süre takibi.
 5. ✅ **Saklama ve imha.** Politikaya bağlı otomatik imha işleri; her imha kaydedilir.
 6. ✅ **Veri ihlali altyapısı.** Etkilenen kullanıcıları tespit ve bilgilendirme aracı, ihlal kayıt defteri.
-7. ✅ **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 18'de.
+7. ✅ **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 19'da.
 
 ## Faz 12 · İçerik güvenliği, moderasyon ve 5651 (uygulama içi) ✅
 
@@ -245,7 +245,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 1. ✅ **Kazanç olgunlaşma süresi.** Kazanç, iade süresi boyunca bekler (süre ayarlanabilir). Olgunlaşmadan iade gelirse kazanç kendiliğinden düşer.
 2. ✅ **Kimlik doğrulama katmanı.** Ad-soyad, TC (algoritma kontrolü, tekil), kimlik belgesi fotoğrafı (şifreli), IBAN sahibi eşleşmesi; panelden elle inceleme. ⏭ Doğrulama sağlayıcısı (e-Devlet/NFC) sonradan takılır.
 3. ✅ **Dolandırıcılık kuralları.** Aynı cihaz, IP veya ödeme kaynağından hesaplar arası para döngüsü tespiti; günlük/aylık limitler; şüpheli talebin incelemeye düşmesi.
-4. ✅ **Ödeme kanalı katmanı.** Bugünkü manuel akışa banka toplu EFT dosyası eklendi (genel CSV; bankanın kendi biçimi Faz 18'de hesap açılınca uyarlanır). ⏭ Lisanslı ödeme kuruluşu API'si sonradan takılır.
+4. ✅ **Ödeme kanalı katmanı.** Bugünkü manuel akışa banka toplu EFT dosyası eklendi (genel CSV; bankanın kendi biçimi Faz 19'da hesap açılınca uyarlanır). ⏭ Lisanslı ödeme kuruluşu API'si sonradan takılır.
 5. ✅ **Vergi alanları.** Ayarlanabilir stopaj oranı, ödeme belgesi taslağı, kullanıcıya yıllık kazanç dökümü.
 6. ✅ **Finans raporları.** Satış–jeton mutabakatı, dolaşımdaki jeton yükümlülüğü, ödenen ve bekleyen ödemeler, iadeler; muhasebeye aylık dışa aktarım.
 7. ✅ **TL fiyat yönetimi.** Mağaza fiyatlarının KDV dahil gösterimi; paket ve fiyatların panelden yönetimi.
@@ -258,7 +258,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 1. ✅ **Satın alma öncesi bilgilendirme.** Ön bilgilendirme, mesafeli satış sözleşmesi, cayma hakkı istisnasına açık onay, jeton kullanım koşulları.
 2. ✅ **Destek sistemi.** Uygulama içi destek talebi (kategori, ekran görüntüsü, ilgili işlem); panelde kuyruk ve yanıt; bildirimle geri dönüş.
 3. ✅ **Yardım merkezi.** Jeton, arama, para çekme, güvenlik ve hesap için Türkçe/İngilizce SSS.
-4. ✅ **Künye alanları.** Şirket unvanı, MERSİS, adres, KEP ve e-posta için ayarlanabilir alanlar; uygulamada ve web'de gösterim. Bilgiler Faz 18'de doldurulur.
+4. ✅ **Künye alanları.** Şirket unvanı, MERSİS, adres, KEP ve e-posta için ayarlanabilir alanlar; uygulamada ve web'de gösterim. Bilgiler Faz 19'da doldurulur.
 5. ✅ **Mağaza politika kontrolü.** Apple ve Google kurallarının madde madde kontrol listesi ve eksiklerin kapatılması.
 6. ✅ **Bildirim tercihleri ve İYS uyumu.** Bildirim türü bazında açma/kapama; pazarlama iletileri için ayrı izin kaydı.
 7. ✅ **Mağaza form içerikleri.** Gizlilik etiketleri, Veri Güvenliği formu ve yaş derecelendirme cevapları (Faz 11 envanterinden); inceleme notu ve demo hesap.
@@ -273,7 +273,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 4. 🛠 **Mesaj teslim garantisi.** Çevrimdışı kuyruk, tekrar deneme, çift gönderim önleme, "iletildi" durumu, sıra garantisi.
 5. 🛠 **Push güvenilirliği.** Yüksek öncelik, bildirimden doğru ekrana derin bağlantı, rozet sayaçları.
 6. 🛠 **Arama itirazı.** Geçmişten hatalı ücret bildirimi, panelde inceleme ve jeton iadesi.
-7. 🛠 **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 18'de.
+7. 🛠 **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 19'da.
 
 ## Faz 16 · Kimlik, premium katman ve mağaza
 
@@ -287,7 +287,19 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
 7. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
 
-## Faz 17 · Kullanım kolaylığı, erişilebilirlik ve performans
+## Faz 17 · Oyunlaştırma ve alışkanlık
+
+**Amaç:** Uygulamayı "aç, kaydır, kapat" döngüsünden çıkarıp gerçek bir alışkanlığa dönüştürmek; hepsi kendi sunucumuzda, dış servis/API maliyeti olmadan.
+
+1. 🛠 **Günlük giriş serisi (streak).** Art arda kaç gün açıldığı gösterilir; kırılma riski geri gelmeyi tetikler.
+2. 🛠 **Başarı rozetleri.** "İlk eşleşme", "İlk arama", "Profilini %100 tamamladın" gibi; ilerlemeyi somutlaştırır.
+3. 🛠 **Sosyal seviye.** Paraya değil etkileşime (sohbet, arama, profil tamamlama) dayalı seviye; seviye atlayınca Faz 16'daki kozmetik mağazadan ücretsiz bir ödül açılır.
+4. 🛠 **Sohbet içi buz kırıcı mini oyunlar.** "2 doğru 1 yalan", "bu mu o mu" gibi hızlı soru-cevap formatları; var olan gerçek zamanlı altyapı (Socket.IO) üzerinden çalışır.
+5. 🛠 **Sohbet içi iki kişilik mini oyun.** XOX (tic-tac-toe) gibi basit bir oyun; sohbeti mesajlaşmanın ötesine taşır.
+6. 🛠 **Eşleşme yıldönümü.** "1 hafta oldu 🎉" gibi küçük kutlama anları; ilişkiye kişisel bir tarih hissi katar.
+7. 🛠 **Haftalık özet.** "Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi kural tabanlı, kişisel bir özet.
+
+## Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans
 
 **Amaç:** "Profesyonel ama basit." Yeni kullanıcının hiçbir yerde takılmaması.
 
@@ -299,7 +311,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. 🛠 **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
 7. 🛠 **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
 
-## Faz 18 · Dış süreçler ve yayın
+## Faz 19 · Dış süreçler ve yayın
 
 **Amaç:** Uygulama bittikten sonra, hepsi bir arada.
 
@@ -331,5 +343,6 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 | 14 Tüketici ve mağaza | 4–6 gün |
 | 15 Gerçek zamanlı kalite | 6–9 gün |
 | 16 Kimlik, premium katman ve mağaza | 8–11 gün |
-| 17 Kullanım kolaylığı | 4–6 gün |
-| 18 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
+| 17 Oyunlaştırma ve alışkanlık | 5–8 gün |
+| 18 Kullanım kolaylığı | 4–6 gün |
+| 19 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
