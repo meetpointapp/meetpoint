@@ -89,8 +89,8 @@ export const INVENTORY: InventoryEntry[] = [
   },
   {
     category: 'Finans',
-    tables: ['Wallet', 'WalletEntry', 'Purchase', 'Payout'],
-    data: 'Jeton bakiyesi ve hareketleri, satın almalar, para çekme talepleri, IBAN/PayPal (şifreli)',
+    tables: ['Wallet', 'WalletEntry', 'Purchase', 'StorePurchase', 'Payout'],
+    data: 'Jeton bakiyesi ve hareketleri, satın almalar, kozmetik mağaza alımları, para çekme talepleri, IBAN/PayPal (şifreli)',
     purpose: 'Ödeme, muhasebe ve vergi yükümlülükleri, dolandırıcılık önleme',
     basis: ['sözleşme', 'yasal'],
     retention: 'Hesap süresince; ödenmiş para çekme ve satış kayıtları hesap silinse de 10 yıl (VUK/TTK)',

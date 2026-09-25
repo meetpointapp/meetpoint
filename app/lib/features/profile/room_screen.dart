@@ -44,7 +44,7 @@ class _RoomCanvas extends StatelessWidget {
                 onTap: onCellTap == null ? null : () => onCellTap!(x, y),
                 child: DecoratedBox(
                   decoration: BoxDecoration(border: Border.all(color: Colors.black.withValues(alpha: 0.06))),
-                  child: itemId == null ? null : Center(child: Text(roomItemEmoji[itemId] ?? '', style: const TextStyle(fontSize: 26))),
+                  child: itemId == null ? null : Center(child: Text(roomItemEmojiOf(itemId), style: const TextStyle(fontSize: 26))),
                 ),
               );
             },
@@ -67,6 +67,10 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
   String? _selectedItem;
   bool _saving = false;
   bool _dirty = false;
+
+  // Faz 16: kozmetik mağaza — satın alınmış premium mobilyalar ücretsiz kataloğa eklenir
+  Set<String> get _ownedItemIds =>
+      ref.watch(storeItemsProvider).value?.where((i) => i.owned).map((i) => i.id).toSet() ?? const <String>{};
 
   @override
   void initState() {
@@ -128,9 +132,9 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
               Text(l.roomItemsHint, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               const SizedBox(height: 10),
               Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final id in roomItemIds)
+                for (final id in [...roomItemIds, ...storeRoomItemIds.where(_ownedItemIds.contains)])
                   ChoiceChip(
-                    label: Text('${roomItemEmoji[id]} ${l.roomItemLabel(id)}'),
+                    label: Text('${roomItemEmojiOf(id)} ${l.roomItemLabel(id)}'),
                     selected: _selectedItem == id,
                     onSelected: (on) => setState(() => _selectedItem = on ? id : null),
                   ),

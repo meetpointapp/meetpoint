@@ -30,6 +30,7 @@ import { clientErrorsRouter } from './routes/clientErrors';
 import { payoutsRouter } from './routes/payouts';
 import { conversationsRouter } from './routes/conversations';
 import { discoverRouter } from './routes/discover';
+import { storeRouter } from './routes/store';
 import { legalRouter } from './routes/legal';
 import { mediaRouter } from './routes/media';
 import { moderationRouter, publicAppealRouter } from './routes/moderation';
@@ -106,6 +107,7 @@ app.use(
   moderationRouter,
   verificationRouter,
   discoverRouter,
+  storeRouter,
   boostsRouter,
   walletRouter,
   requestsRouter,

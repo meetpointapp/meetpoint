@@ -1091,7 +1091,7 @@
     }
   },
   "roomNotConnected": "Bu odayı görebilmek için önce bir sohbetiniz olmalı.",
-  "roomItemLabel": "{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} other{{id}}}",
+  "roomItemLabel": "{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} other{{id}}}",
   "@roomItemLabel": {
     "placeholders": {
       "id": {
@@ -1185,5 +1185,27 @@
     }
   },
   "interestGroupsTitle": "İlgi alanına göre keşfet",
-  "interestGroupEmpty": "Şu an bu grupta uygun kimse yok."
+  "interestGroupEmpty": "Şu an bu grupta uygun kimse yok.",
+  "storeItemName": "{id, select, frame_gold{Altın Çerçeve} frame_neon{Neon Çerçeve} frame_floral{Çiçekli Çerçeve} frame_stars{Yıldızlı Çerçeve} badge_crown{Taç Rozeti} badge_fire{Ateş Rozeti} badge_diamond{Elmas Rozeti} badge_heart{Kalp Rozeti} theme_galaxy{Galaksi Teması} theme_fire{Ateş Teması} theme_ice{Buz Teması} theme_royal{Kraliyet Teması} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} outfit_tuxedo{Smokin} outfit_superhero{Süper Kahraman} outfit_wizard{Büyücü} outfit_astronaut{Astronot} bubble_midnight{Gece Yarısı Baloncuğu} bubble_sunset{Gün Batımı Baloncuğu} bubble_mint{Nane Baloncuğu} bubble_rosegold{Rose Gold Baloncuğu} chatbg_stars{Yıldızlı Arka Plan} chatbg_waves{Dalga Arka Plan} chatbg_geometric{Geometrik Arka Plan} chatbg_minimal{Sade Arka Plan} other{{id}}}",
+  "@storeItemName": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "storeTitle": "Mağaza",
+  "storeIntro": "Jetonla alınan kozmetik öğeler; kullanıcıdan kullanıcıya geçmez, sadece görünümünü kişiselleştirir.",
+  "storeCategoryFrame": "Profil çerçeveleri",
+  "storeCategoryBadge": "Rozetler",
+  "storeCategoryTheme": "Premium temalar",
+  "storeCategoryRoomItem": "Oda mobilyaları",
+  "storeCategoryAvatarOutfit": "Avatar kıyafetleri",
+  "storeCategoryChatBubble": "Sohbet baloncuğu",
+  "storeCategoryChatBackground": "Sohbet arka planı",
+  "storeBuy": "Satın al",
+  "storeOwned": "Sahipsin",
+  "storePurchased": "Satın alındı!",
+  "errItemNotOwned": "Bu öğeyi henüz satın almadın.",
+  "errAlreadyOwned": "Bu öğeye zaten sahipsin."
 }

@@ -139,6 +139,7 @@ class _ProfileBody extends ConsumerWidget {
                   '${p.displayName}, ${p.age}',
                   verified: p.verified,
                   onPhoto: true,
+                  badgeId: p.badgeId,
                   style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
                 ),
                 if (p.online) ...[

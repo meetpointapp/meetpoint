@@ -77,6 +77,8 @@ String errorText(AppLocalizations l, Object error) {
     'ticket_closed' => l.errTicketClosed,
     'already_answered' => l.errGeneric,
     'not_connected' => l.roomNotConnected,
+    'item_not_owned' => l.errItemNotOwned,
+    'already_owned' => l.errAlreadyOwned,
     _ => l.errGeneric,
   };
 }
@@ -105,11 +107,13 @@ class VerifiedBadge extends StatelessWidget {
 
 // İsim + (varsa) mavi tik
 class NameWithBadge extends StatelessWidget {
-  const NameWithBadge(this.text, {super.key, required this.verified, this.style, this.onPhoto = false});
+  const NameWithBadge(this.text, {super.key, required this.verified, this.style, this.onPhoto = false, this.badgeId = ''});
   final String text;
   final bool verified;
   final TextStyle? style;
   final bool onPhoto;
+  // Faz 16: kozmetik mağaza rozeti (satın alınmış, isim yanında küçük bir emoji)
+  final String badgeId;
 
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
@@ -117,6 +121,10 @@ class NameWithBadge extends StatelessWidget {
         if (verified) ...[
           const SizedBox(width: 6),
           VerifiedBadge(size: (style?.fontSize ?? 16) * 0.9, onPhoto: onPhoto),
+        ],
+        if (badgeId.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(storeBadgeEmoji[badgeId] ?? '', style: TextStyle(fontSize: (style?.fontSize ?? 16) * 0.9)),
         ],
       ]);
 }
@@ -168,18 +176,29 @@ class NetPhoto extends StatelessWidget {
   }
 }
 
+// Faz 16: kozmetik mağaza çerçevesi — herkeste kullanılan tek bir Avatar bileşeninde
+// uygulanır, böylece her yerde (sohbet başlığı, kartlar) tutarlı görünür.
 class Avatar extends StatelessWidget {
   const Avatar(this.profile, {super.key, this.radius = 24});
   final PublicProfile? profile;
   final double radius;
 
   @override
-  Widget build(BuildContext context) => ClipOval(
-        child: SizedBox.square(
-          dimension: radius * 2,
-          child: NetPhoto(profile?.coverThumbUrl, width: radius * 2, height: radius * 2),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final frameId = profile?.frameId ?? '';
+    final photo = ClipOval(
+      child: SizedBox.square(
+        dimension: radius * 2,
+        child: NetPhoto(profile?.coverThumbUrl, width: radius * 2, height: radius * 2),
+      ),
+    );
+    if (frameId.isEmpty) return photo;
+    return Container(
+      padding: const EdgeInsets.all(2.5),
+      decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: storeFrameGradientOf(frameId))),
+      child: photo,
+    );
+  }
 }
 
 // Faz 16: çizgi avatar. Görsel dosyası yok — basit katmanlı şekillerle çizilir (ten, saç, kıyafet,

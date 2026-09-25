@@ -84,7 +84,7 @@ const avatarHairColor = <String, Color>{
 List<String> get avatarHairColorIds => avatarHairColor.keys.toList();
 
 // Kıyafet renkleri tema paletiyle aynı (tutarlı görünüm)
-Color avatarOutfitColorOf(String id) => themeColorOf(id);
+Color avatarOutfitColorOf(String id) => storeAvatarOutfitColor[id] ?? themeColorOf(id);
 List<String> get avatarOutfitIds => themeIds;
 
 const avatarAccessoryEmoji = <String, String>{'none': '', 'glasses': '👓', 'hat': '🎩', 'headphones': '🎧'};
@@ -145,3 +145,73 @@ const moodEmoji = <String, String>{
   'bored': '🥱',
 };
 List<String> get moodIds => moodEmoji.keys.toList();
+
+// Faz 16: kozmetik mağaza. Kimlikler server/src/catalog.ts STORE_* ile birebir aynı olmalı.
+// Fiyatlar sunucudan (/store/items) gelir — burada sadece görsel tasarım (renk/emoji) var.
+
+// Çerçeve: profil fotoğrafının etrafında renkli/gradyanlı bir halka
+const storeFrameGradient = <String, List<Color>>{
+  'frame_gold': [Color(0xFFFFD700), Color(0xFFB8860B)],
+  'frame_neon': [Color(0xFF00F5FF), Color(0xFFFF00E5)],
+  'frame_floral': [Color(0xFFFFB6D9), Color(0xFF7ED957)],
+  'frame_stars': [Color(0xFF4B0082), Color(0xFF9370DB)],
+};
+List<String> get storeFrameIds => storeFrameGradient.keys.toList();
+List<Color> storeFrameGradientOf(String id) => storeFrameGradient[id] ?? const [Colors.transparent, Colors.transparent];
+
+// Rozet: isim yanında küçük bir emoji
+const storeBadgeEmoji = <String, String>{
+  'badge_crown': '👑',
+  'badge_fire': '🔥',
+  'badge_diamond': '💎',
+  'badge_heart': '💖',
+};
+List<String> get storeBadgeIds => storeBadgeEmoji.keys.toList();
+
+// Premium temalar: themeId alanına eklenir, themeColorOf/cardGradientOf ile aynı şekilde kullanılır
+const storePremiumThemeAccent = <String, Color>{
+  'theme_galaxy': Color(0xFF6A0DAD),
+  'theme_fire': Color(0xFFFF4500),
+  'theme_ice': Color(0xFF7FDBFF),
+  'theme_royal': Color(0xFFB8860B),
+};
+List<String> get storeThemeIds => storePremiumThemeAccent.keys.toList();
+
+// Premium oda mobilyaları: roomItemEmoji ile aynı harita mantığı, ayrı bir katalog
+const storeRoomItemEmoji = <String, String>{
+  'item_piano': '🎹',
+  'item_aquarium': '🐠',
+  'item_chandelier': '🕯️',
+  'item_arcade': '🕹️',
+};
+List<String> get storeRoomItemIds => storeRoomItemEmoji.keys.toList();
+String roomItemEmojiOf(String id) => roomItemEmoji[id] ?? storeRoomItemEmoji[id] ?? '';
+
+// Premium avatar kıyafetleri: avatarOutfitColorOf ile aynı mantık, ayrı bir katalog
+const storeAvatarOutfitColor = <String, Color>{
+  'outfit_tuxedo': Color(0xFF1A1A1A),
+  'outfit_superhero': Color(0xFFDC143C),
+  'outfit_wizard': Color(0xFF4B0082),
+  'outfit_astronaut': Color(0xFFC0C0C0),
+};
+List<String> get storeAvatarOutfitIds => storeAvatarOutfitColor.keys.toList();
+
+// Sohbet baloncuğu rengi (sadece sahibinin kendi sohbet görünümünü etkiler)
+const storeChatBubbleColor = <String, Color>{
+  'bubble_midnight': Color(0xFF1B1B3A),
+  'bubble_sunset': Color(0xFFFF7E5F),
+  'bubble_mint': Color(0xFF3EB489),
+  'bubble_rosegold': Color(0xFFB76E79),
+};
+List<String> get storeChatBubbleIds => storeChatBubbleColor.keys.toList();
+Color? storeChatBubbleColorOf(String id) => storeChatBubbleColor[id];
+
+// Sohbet arka planı (sadece sahibinin kendi sohbet görünümünü etkiler)
+const storeChatBackgroundColor = <String, Color>{
+  'chatbg_stars': Color(0xFF0B0C2A),
+  'chatbg_waves': Color(0xFFDCF3FA),
+  'chatbg_geometric': Color(0xFFF5EDE6),
+  'chatbg_minimal': Color(0xFFF7F7F7),
+};
+List<String> get storeChatBackgroundIds => storeChatBackgroundColor.keys.toList();
+Color? storeChatBackgroundColorOf(String id) => storeChatBackgroundColor[id];

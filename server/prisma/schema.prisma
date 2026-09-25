@@ -82,6 +82,7 @@ model User {
   verifications   VerificationRequest[]
   devices         Device[]
   purchases       Purchase[]
+  storePurchases  StorePurchase[]
   callsMade       Call[]                @relation("CallCaller")
   callsReceived   Call[]                @relation("CallCallee")
   giftsSent       CallGift[]            @relation("GiftFrom")
@@ -174,6 +175,15 @@ model Profile {
   // ayrı bir temizlik işi yok, geçerliliği her okumada src/routes/profile.ts activeMood() hesaplar.
   moodId    String    @default("")
   moodSetAt DateTime?
+
+  // Faz 16: kozmetik mağaza (src/catalog.ts STORE_*). Sahiplik StorePurchase'te; buradaki alanlar
+  // sadece "şu an seçili olan" öğeyi tutar — seçebilmek için önce satın alınmış olması gerekir
+  // (server/src/routes/profile.ts assertOwned()). frameId/badgeId profilde herkese görünür;
+  // chatBubbleThemeId/chatBackgroundThemeId sadece sahibinin kendi sohbet görünümünü etkiler.
+  frameId               String @default("")
+  badgeId               String @default("")
+  chatBubbleThemeId     String @default("")
+  chatBackgroundThemeId String @default("")
 
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
@@ -320,6 +330,18 @@ model Message {
 
 // Jeton satın alımları (RevenueCat üzerinden App Store / Google Play).
 // transactionId benzersiz: aynı mağaza işlemi iki kez jetona dönüşemez.
+// Faz 16: kozmetik mağaza satın alması (jetonla, gerçek para değil — bkz. Purchase). Kalıcı sahiplik;
+// öğe bir kez satın alınır, sonra istendiği kadar seçilip profile uygulanabilir.
+model StorePurchase {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String // src/catalog.ts STORE_ITEMS kimliği
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemId])
+}
+
 model Purchase {
   id                String    @id @default(cuid())
   // Hesap silinse de satış kaydı muhasebe için kalır (kullanıcı bağlantısı boşalır)

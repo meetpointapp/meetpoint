@@ -25,9 +25,17 @@ import {
   ROOM_ITEMS,
   ROOM_MAX_ITEMS,
   ROOM_WALLPAPERS,
+  STORE_AVATAR_OUTFITS,
+  STORE_BADGES,
+  STORE_CHAT_BACKGROUNDS,
+  STORE_CHAT_BUBBLES,
+  STORE_FRAMES,
+  STORE_ROOM_ITEMS,
+  STORE_THEMES,
   THEMES,
   ZODIAC,
 } from '../catalog';
+import { assertOwned, ownedItemIds } from './store';
 import { computeArchetype, VIBE_QUESTIONS } from '../vibe';
 import { ageOf } from '../age';
 import { verifyPassword } from '../passwords';
@@ -104,6 +112,11 @@ export function publicProfile(
     vibeArchetypeId: p.vibeArchetypeId,
     moodId: activeMood(p).moodId,
     ...(opts.owner ? { moodExpiresAt: activeMood(p).moodExpiresAt } : {}),
+    // Faz 16: kozmetik mağaza. Çerçeve/rozet profilde herkese görünür; sohbet temaları sadece
+    // sahibinin kendi görünümünü etkilediği için başkasına döndürülmez.
+    frameId: p.frameId,
+    badgeId: p.badgeId,
+    ...(opts.owner ? { chatBubbleThemeId: p.chatBubbleThemeId, chatBackgroundThemeId: p.chatBackgroundThemeId } : {}),
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
       .filter((ph) => opts.owner || !ph.hiddenAt)
@@ -251,17 +264,31 @@ const profileSchema = z.object({
   zodiac: z.enum(ZODIAC).or(z.literal('')).default(''),
   smoking: z.enum(HABIT).or(z.literal('')).default(''),
   drinking: z.enum(HABIT).or(z.literal('')).default(''),
-  themeId: z.enum(THEMES).or(z.literal('')).default(''),
+  // themeId/avatarOutfitId: ücretsiz katalog + mağazadan satın alınmış premium seçenekler aynı
+  // alanı paylaşır (sahiplik kontrolü aşağıda assertOwned() ile yapılır, zod sadece kimliği doğrular)
+  themeId: z.enum([...THEMES, ...STORE_THEMES]).or(z.literal('')).default(''),
   cardBackgroundId: z.enum(CARD_BACKGROUNDS).or(z.literal('')).default(''),
   avatarSkinId: z.enum(AVATAR_SKINS).or(z.literal('')).default(''),
   avatarHairStyle: z.enum(AVATAR_HAIR_STYLES).or(z.literal('')).default(''),
   avatarHairColorId: z.enum(AVATAR_HAIR_COLORS).or(z.literal('')).default(''),
-  avatarOutfitId: z.enum(AVATAR_OUTFITS).or(z.literal('')).default(''),
+  avatarOutfitId: z.enum([...AVATAR_OUTFITS, ...STORE_AVATAR_OUTFITS]).or(z.literal('')).default(''),
   avatarAccessoryId: z.enum(AVATAR_ACCESSORIES).or(z.literal('')).default(''),
+  // Faz 16: kozmetik mağaza — hepsi sahiplik gerektiren premium kataloglar (assertOwned())
+  frameId: z.enum(STORE_FRAMES).or(z.literal('')).default(''),
+  badgeId: z.enum(STORE_BADGES).or(z.literal('')).default(''),
+  chatBubbleThemeId: z.enum(STORE_CHAT_BUBBLES).or(z.literal('')).default(''),
+  chatBackgroundThemeId: z.enum(STORE_CHAT_BACKGROUNDS).or(z.literal('')).default(''),
 });
 
 profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
   const data = profileSchema.parse(req.body);
+  const owned = await ownedItemIds(uid(req));
+  assertOwned(owned, data.themeId, STORE_THEMES);
+  assertOwned(owned, data.avatarOutfitId, STORE_AVATAR_OUTFITS);
+  assertOwned(owned, data.frameId, STORE_FRAMES);
+  assertOwned(owned, data.badgeId, STORE_BADGES);
+  assertOwned(owned, data.chatBubbleThemeId, STORE_CHAT_BUBBLES);
+  assertOwned(owned, data.chatBackgroundThemeId, STORE_CHAT_BACKGROUNDS);
   if (ageOf(data.birthDate) < config.minAge) throw new HttpError(403, 'underage');
   const userId = uid(req);
   // Kimi görmek istediğin (cinsel yönelim) özel nitelikli veridir: açık rıza olmadan kaydedilmez
@@ -374,7 +401,8 @@ profileRouter.get('/users/:id', async (req, res) => {
 
 // Faz 16: kendi oda (statik yerleşim, gerçek zamanlı gezinme yok). Izgara src/catalog.ts ROOM_GRID_*.
 const roomItemSchema = z.object({
-  itemId: z.enum(ROOM_ITEMS),
+  // Ücretsiz katalog + mağazadan satın alınmış premium mobilyalar (sahiplik aşağıda assertOwned())
+  itemId: z.enum([...ROOM_ITEMS, ...STORE_ROOM_ITEMS]),
   x: z.number().int().min(0).max(ROOM_GRID_W - 1),
   y: z.number().int().min(0).max(ROOM_GRID_H - 1),
 });
@@ -400,6 +428,8 @@ profileRouter.get('/me/room', async (req, res) => {
 
 profileRouter.put('/me/room', requireNotRestricted, async (req, res) => {
   const data = roomSchema.parse(req.body);
+  const owned = await ownedItemIds(uid(req));
+  for (const item of data.items) assertOwned(owned, item.itemId, STORE_ROOM_ITEMS);
   await prisma.profile.update({
     where: { userId: uid(req) },
     data: { roomWallpaperId: data.wallpaperId, roomFloorId: data.floorId, roomItems: data.items },

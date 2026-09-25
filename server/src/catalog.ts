@@ -55,3 +55,30 @@ export const MOODS = [
   'grateful', 'adventurous', 'lonely', 'busy', 'hopeful', 'bored',
 ] as const;
 export const MOOD_TTL_MS = 24 * 60 * 60 * 1000;
+
+// Faz 16: kozmetik mağaza. Jetonla alınan, ücretsiz kataloglara ek premium seçenekler. Bu jetonlar
+// kullanıcıdan kullanıcıya geçmez (hepsi platform geliri). Renk/görsel tasarımı app/lib/core/catalog.dart'ta.
+export const STORE_FRAMES = ['frame_gold', 'frame_neon', 'frame_floral', 'frame_stars'] as const;
+export const STORE_BADGES = ['badge_crown', 'badge_fire', 'badge_diamond', 'badge_heart'] as const;
+// themeId alanına eklenen premium seçenekler (ücretsiz THEMES ile aynı alan, sahiplik gerekir)
+export const STORE_THEMES = ['theme_galaxy', 'theme_fire', 'theme_ice', 'theme_royal'] as const;
+// roomItems[].itemId'ye eklenen premium mobilyalar (ücretsiz ROOM_ITEMS ile aynı ızgara)
+export const STORE_ROOM_ITEMS = ['item_piano', 'item_aquarium', 'item_chandelier', 'item_arcade'] as const;
+// avatarOutfitId alanına eklenen premium kıyafetler
+export const STORE_AVATAR_OUTFITS = ['outfit_tuxedo', 'outfit_superhero', 'outfit_wizard', 'outfit_astronaut'] as const;
+// Sadece sahibinin kendi sohbet görünümünü etkiler (başkasına gösterilmez)
+export const STORE_CHAT_BUBBLES = ['bubble_midnight', 'bubble_sunset', 'bubble_mint', 'bubble_rosegold'] as const;
+export const STORE_CHAT_BACKGROUNDS = ['chatbg_stars', 'chatbg_waves', 'chatbg_geometric', 'chatbg_minimal'] as const;
+
+export type StoreCategory = 'frame' | 'badge' | 'theme' | 'roomItem' | 'avatarOutfit' | 'chatBubble' | 'chatBackground';
+
+export const STORE_ITEMS: { id: string; category: StoreCategory; priceCoins: number }[] = [
+  ...STORE_FRAMES.map((id) => ({ id, category: 'frame' as const, priceCoins: 150 })),
+  ...STORE_BADGES.map((id) => ({ id, category: 'badge' as const, priceCoins: 200 })),
+  ...STORE_THEMES.map((id) => ({ id, category: 'theme' as const, priceCoins: 250 })),
+  ...STORE_ROOM_ITEMS.map((id) => ({ id, category: 'roomItem' as const, priceCoins: 300 })),
+  ...STORE_AVATAR_OUTFITS.map((id) => ({ id, category: 'avatarOutfit' as const, priceCoins: 300 })),
+  ...STORE_CHAT_BUBBLES.map((id) => ({ id, category: 'chatBubble' as const, priceCoins: 100 })),
+  ...STORE_CHAT_BACKGROUNDS.map((id) => ({ id, category: 'chatBackground' as const, priceCoins: 150 })),
+];
+export const STORE_ITEM_IDS = STORE_ITEMS.map((i) => i.id) as [string, ...string[]];

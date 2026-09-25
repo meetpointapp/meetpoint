@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/api.dart';
+import '../../core/catalog.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -259,6 +260,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final myId = ref.watch(sessionProvider).value?.userId;
     final other = ref.watch(conversationsProvider).value?.where((c) => c.id == _id).firstOrNull?.user;
     final messages = _messages;
+    // Faz 16: kozmetik mağaza — sohbet teması sadece benim kendi görünümümü etkiler (kişisel tercih)
+    final myProfile = ref.watch(meProvider).value?.profile;
+    final myBubbleColor = storeChatBubbleColorOf(myProfile?.chatBubbleThemeId ?? '');
+    final myBackgroundColor = storeChatBackgroundColorOf(myProfile?.chatBackgroundThemeId ?? '');
 
     return Scaffold(
       appBar: AppBar(
@@ -292,33 +297,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       body: Column(children: [
         Expanded(
-          child: _error != null
-              ? ErrorRetry(error: _error!, onRetry: _load)
-              : messages == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      reverse: true,
-                      padding: const EdgeInsets.all(12),
-                      // Liste ters: en üstteki (en eski) öğeye gelince önceki sayfa istenir
-                      itemCount: messages.length + (_hasOlder ? 1 : 0),
-                      itemBuilder: (_, i) {
-                        if (i == messages.length) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) => _loadOlder());
-                          return const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+          child: ColoredBox(
+            color: myBackgroundColor ?? Colors.transparent,
+            child: _error != null
+                ? ErrorRetry(error: _error!, onRetry: _load)
+                : messages == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        reverse: true,
+                        padding: const EdgeInsets.all(12),
+                        // Liste ters: en üstteki (en eski) öğeye gelince önceki sayfa istenir
+                        itemCount: messages.length + (_hasOlder ? 1 : 0),
+                        itemBuilder: (_, i) {
+                          if (i == messages.length) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) => _loadOlder());
+                            return const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+                            );
+                          }
+                          final m = messages[messages.length - 1 - i];
+                          return _Bubble(
+                            message: m,
+                            mine: m.senderId == myId,
+                            locale: l.localeName,
+                            bubbleColor: myBubbleColor,
+                            onOpenPhoto: () => _openPhoto(m),
+                            onRetry: m.failed ? () => _retry(m) : null,
                           );
-                        }
-                        final m = messages[messages.length - 1 - i];
-                        return _Bubble(
-                          message: m,
-                          mine: m.senderId == myId,
-                          locale: l.localeName,
-                          onOpenPhoto: () => _openPhoto(m),
-                          onRetry: m.failed ? () => _retry(m) : null,
-                        );
-                      },
-                    ),
+                        },
+                      ),
+          ),
         ),
         SafeArea(
           top: false,
@@ -356,12 +365,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.message, required this.mine, required this.locale, required this.onOpenPhoto, this.onRetry});
+  const _Bubble({required this.message, required this.mine, required this.locale, required this.onOpenPhoto, this.onRetry, this.bubbleColor});
   final ChatMessage message;
   final bool mine;
   final String locale;
   final VoidCallback onOpenPhoto;
   final VoidCallback? onRetry;
+  // Faz 16: kozmetik mağaza — sadece kendi mesaj baloncuklarımı etkiler (kişisel tercih)
+  final Color? bubbleColor;
 
   @override
   Widget build(BuildContext context) {
@@ -419,8 +430,8 @@ class _Bubble extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 3),
           padding: const EdgeInsets.fromLTRB(14, 8, 12, 6),
           decoration: BoxDecoration(
-            gradient: mine ? Brand.gradient : null,
-            color: mine ? null : scheme.surfaceContainerHighest,
+            gradient: mine && bubbleColor == null ? Brand.gradient : null,
+            color: mine ? bubbleColor : scheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(18).copyWith(
               bottomRight: mine ? const Radius.circular(4) : null,
               bottomLeft: mine ? null : const Radius.circular(4),

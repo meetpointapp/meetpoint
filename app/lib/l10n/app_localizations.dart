@@ -3648,7 +3648,7 @@ abstract class AppLocalizations {
   /// No description provided for @roomItemLabel.
   ///
   /// In tr, this message translates to:
-  /// **'{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} other{{id}}}'**
+  /// **'{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} other{{id}}}'**
   String roomItemLabel(String id);
 
   /// No description provided for @roomFull.
@@ -3800,6 +3800,96 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şu an bu grupta uygun kimse yok.'**
   String get interestGroupEmpty;
+
+  /// No description provided for @storeItemName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, frame_gold{Altın Çerçeve} frame_neon{Neon Çerçeve} frame_floral{Çiçekli Çerçeve} frame_stars{Yıldızlı Çerçeve} badge_crown{Taç Rozeti} badge_fire{Ateş Rozeti} badge_diamond{Elmas Rozeti} badge_heart{Kalp Rozeti} theme_galaxy{Galaksi Teması} theme_fire{Ateş Teması} theme_ice{Buz Teması} theme_royal{Kraliyet Teması} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} outfit_tuxedo{Smokin} outfit_superhero{Süper Kahraman} outfit_wizard{Büyücü} outfit_astronaut{Astronot} bubble_midnight{Gece Yarısı Baloncuğu} bubble_sunset{Gün Batımı Baloncuğu} bubble_mint{Nane Baloncuğu} bubble_rosegold{Rose Gold Baloncuğu} chatbg_stars{Yıldızlı Arka Plan} chatbg_waves{Dalga Arka Plan} chatbg_geometric{Geometrik Arka Plan} chatbg_minimal{Sade Arka Plan} other{{id}}}'**
+  String storeItemName(String id);
+
+  /// No description provided for @storeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mağaza'**
+  String get storeTitle;
+
+  /// No description provided for @storeIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Jetonla alınan kozmetik öğeler; kullanıcıdan kullanıcıya geçmez, sadece görünümünü kişiselleştirir.'**
+  String get storeIntro;
+
+  /// No description provided for @storeCategoryFrame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil çerçeveleri'**
+  String get storeCategoryFrame;
+
+  /// No description provided for @storeCategoryBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rozetler'**
+  String get storeCategoryBadge;
+
+  /// No description provided for @storeCategoryTheme.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium temalar'**
+  String get storeCategoryTheme;
+
+  /// No description provided for @storeCategoryRoomItem.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oda mobilyaları'**
+  String get storeCategoryRoomItem;
+
+  /// No description provided for @storeCategoryAvatarOutfit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Avatar kıyafetleri'**
+  String get storeCategoryAvatarOutfit;
+
+  /// No description provided for @storeCategoryChatBubble.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sohbet baloncuğu'**
+  String get storeCategoryChatBubble;
+
+  /// No description provided for @storeCategoryChatBackground.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sohbet arka planı'**
+  String get storeCategoryChatBackground;
+
+  /// No description provided for @storeBuy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın al'**
+  String get storeBuy;
+
+  /// No description provided for @storeOwned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahipsin'**
+  String get storeOwned;
+
+  /// No description provided for @storePurchased.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın alındı!'**
+  String get storePurchased;
+
+  /// No description provided for @errItemNotOwned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu öğeyi henüz satın almadın.'**
+  String get errItemNotOwned;
+
+  /// No description provided for @errAlreadyOwned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu öğeye zaten sahipsin.'**
+  String get errAlreadyOwned;
 }
 
 class _AppLocalizationsDelegate

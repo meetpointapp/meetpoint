@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/catalog.dart';
 import '../../core/config.dart';
 import '../../core/models.dart';
+import '../../core/providers.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
@@ -652,62 +653,145 @@ Widget swatchPicker(BuildContext context, List<String> ids, String selected, Wid
   ]);
 }
 
-class ShowcasePicker extends StatelessWidget {
+class ShowcasePicker extends ConsumerWidget {
   const ShowcasePicker({super.key, required this.draft, required this.onChanged});
   final ProfileDraft draft;
   final VoidCallback onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // Faz 16: kozmetik mağaza — satın alınmış premium seçenekler ücretsiz kataloglara eklenir
+    final owned = ref.watch(storeItemsProvider).value?.where((i) => i.owned).map((i) => i.id).toSet() ?? const <String>{};
+    Widget section(String title, String? hint, Widget child) => Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: theme.textTheme.titleSmall),
+            if (hint != null) ...[
+              const SizedBox(height: 4),
+              Text(hint, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            ],
+            const SizedBox(height: 10),
+            child,
+          ]),
+        );
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(l.showcaseTheme, style: theme.textTheme.titleSmall),
-      const SizedBox(height: 4),
-      Text(l.showcaseThemeHint, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-      const SizedBox(height: 10),
-      swatchPicker(
-        context,
-        themeIds,
-        draft.themeId,
-        (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: themeColorOf(id))),
-        (id) {
-          draft.themeId = id;
-          onChanged();
-        },
+      section(
+        l.showcaseTheme,
+        l.showcaseThemeHint,
+        swatchPicker(
+          context,
+          [...themeIds, ...storeThemeIds.where(owned.contains)],
+          draft.themeId,
+          (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: themeColorOf(id))),
+          (id) {
+            draft.themeId = id;
+            onChanged();
+          },
+        ),
       ),
-      const SizedBox(height: 24),
-      Text(l.showcaseBackground, style: theme.textTheme.titleSmall),
-      const SizedBox(height: 10),
-      swatchPicker(
-        context,
-        cardBackgroundIds,
-        draft.cardBackgroundId,
-        (id) => DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: cardGradientOf(id)),
+      section(
+        l.showcaseBackground,
+        null,
+        swatchPicker(
+          context,
+          cardBackgroundIds,
+          draft.cardBackgroundId,
+          (id) => DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: cardGradientOf(id)),
+            ),
+          ),
+          (id) {
+            draft.cardBackgroundId = id;
+            onChanged();
+          },
+        ),
+      ),
+      if (storeFrameIds.any(owned.contains))
+        section(
+          l.storeCategoryFrame,
+          null,
+          swatchPicker(
+            context,
+            storeFrameIds.where(owned.contains).toList(),
+            draft.frameId,
+            (id) => DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(colors: storeFrameGradientOf(id)),
+              ),
+            ),
+            (id) {
+              draft.frameId = id;
+              onChanged();
+            },
           ),
         ),
-        (id) {
-          draft.cardBackgroundId = id;
-          onChanged();
-        },
-      ),
+      if (storeBadgeIds.any(owned.contains))
+        section(
+          l.storeCategoryBadge,
+          null,
+          Wrap(spacing: 8, children: [
+            for (final id in storeBadgeIds.where(owned.contains))
+              ChoiceChip(
+                label: Text(storeBadgeEmoji[id] ?? ''),
+                selected: draft.badgeId == id,
+                onSelected: (_) {
+                  draft.badgeId = draft.badgeId == id ? '' : id;
+                  onChanged();
+                },
+              ),
+          ]),
+        ),
+      if (storeChatBubbleIds.any(owned.contains))
+        section(
+          l.storeCategoryChatBubble,
+          null,
+          swatchPicker(
+            context,
+            storeChatBubbleIds.where(owned.contains).toList(),
+            draft.chatBubbleThemeId,
+            (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: storeChatBubbleColorOf(id))),
+            (id) {
+              draft.chatBubbleThemeId = id;
+              onChanged();
+            },
+          ),
+        ),
+      if (storeChatBackgroundIds.any(owned.contains))
+        section(
+          l.storeCategoryChatBackground,
+          null,
+          swatchPicker(
+            context,
+            storeChatBackgroundIds.where(owned.contains).toList(),
+            draft.chatBackgroundThemeId,
+            (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: storeChatBackgroundColorOf(id))),
+            (id) {
+              draft.chatBackgroundThemeId = id;
+              onChanged();
+            },
+          ),
+        ),
     ]);
   }
 }
 
 // Faz 16: çizgi avatar düzenleyici — canlı önizleme + ten/saç şekli/saç rengi/kıyafet/aksesuar seçimi.
-class AvatarPicker extends StatelessWidget {
+class AvatarPicker extends ConsumerWidget {
   const AvatarPicker({super.key, required this.draft, required this.onChanged});
   final ProfileDraft draft;
   final VoidCallback onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // Faz 16: kozmetik mağaza — satın alınmış premium kıyafetler ücretsiz kataloğa eklenir
+    final owned = ref.watch(storeItemsProvider).value?.where((i) => i.owned).map((i) => i.id).toSet() ?? const <String>{};
     Widget section(String title, Widget child) => Padding(
           padding: const EdgeInsets.only(bottom: 22),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -766,7 +850,7 @@ class AvatarPicker extends StatelessWidget {
             l.avatarOutfit,
             swatchPicker(
               context,
-              avatarOutfitIds,
+              [...avatarOutfitIds, ...storeAvatarOutfitIds.where(owned.contains)],
               draft.avatarOutfitId,
               (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarOutfitColorOf(id))),
               (id) {

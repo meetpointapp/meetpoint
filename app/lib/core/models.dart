@@ -59,6 +59,10 @@ class PublicProfile {
   final String vibeArchetypeId;
   // Faz 16: günlük ruh hali. '' = paylaşmamış veya 24 saat dolmuş (sunucu hesaplar).
   final String moodId;
+  // Faz 16: kozmetik mağaza. Çerçeve/rozet herkese görünür; sohbet temaları sadece sahibine
+  // döner (chatBubbleThemeId/chatBackgroundThemeId → MyProfile'da).
+  final String frameId;
+  final String badgeId;
 
   const PublicProfile({
     required this.id,
@@ -91,6 +95,8 @@ class PublicProfile {
     this.avatarAccessoryId = '',
     this.vibeArchetypeId = '',
     this.moodId = '',
+    this.frameId = '',
+    this.badgeId = '',
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
@@ -128,6 +134,8 @@ class PublicProfile {
         avatarAccessoryId: j['avatarAccessoryId'] ?? '',
         vibeArchetypeId: j['vibeArchetypeId'] ?? '',
         moodId: j['moodId'] ?? '',
+        frameId: j['frameId'] ?? '',
+        badgeId: j['badgeId'] ?? '',
       );
 }
 
@@ -136,11 +144,17 @@ class MyProfile extends PublicProfile {
   final DateTime birthDate;
   // Faz 16: günlük ruh hali. Sadece sahibine döner (başkası sadece moodId'yi görür).
   final DateTime? moodExpiresAt;
+  // Faz 16: kozmetik mağaza — sohbet temaları sadece sahibinin kendi görünümünü etkiler,
+  // bu yüzden sunucu bunları başkasına döndürmez (sadece MyProfile'da).
+  final String chatBubbleThemeId;
+  final String chatBackgroundThemeId;
 
   MyProfile.fromJson(Map<String, dynamic> j)
       : interestedIn = j['interestedIn'],
         birthDate = DateTime.parse(j['birthDate']),
         moodExpiresAt = j['moodExpiresAt'] != null ? DateTime.parse(j['moodExpiresAt']).toLocal() : null,
+        chatBubbleThemeId = j['chatBubbleThemeId'] ?? '',
+        chatBackgroundThemeId = j['chatBackgroundThemeId'] ?? '',
         super(
           id: j['id'],
           verified: j['verified'] ?? false,
@@ -169,6 +183,8 @@ class MyProfile extends PublicProfile {
           avatarAccessoryId: j['avatarAccessoryId'] ?? '',
           vibeArchetypeId: j['vibeArchetypeId'] ?? '',
           moodId: j['moodId'] ?? '',
+          frameId: j['frameId'] ?? '',
+          badgeId: j['badgeId'] ?? '',
         );
 }
 
@@ -199,6 +215,22 @@ class InterestGroup {
       );
 }
 
+// Faz 16: kozmetik mağaza. category: frame | badge | theme | roomItem | avatarOutfit | chatBubble
+// | chatBackground. Jetonla alınır, kullanıcıdan kullanıcıya geçmez.
+class StoreItem {
+  final String id;
+  final String category;
+  final int priceCoins;
+  final bool owned;
+  const StoreItem({required this.id, required this.category, required this.priceCoins, this.owned = false});
+  factory StoreItem.fromJson(Map<String, dynamic> j) => StoreItem(
+        id: j['id'],
+        category: j['category'],
+        priceCoins: j['priceCoins'],
+        owned: j['owned'] ?? false,
+      );
+}
+
 // Kayıt sihirbazında ve profil düzenlemede kullanılan değiştirilebilir taslak
 class ProfileDraft {
   String displayName = '';
@@ -225,6 +257,11 @@ class ProfileDraft {
   String avatarHairColorId = '';
   String avatarOutfitId = '';
   String avatarAccessoryId = '';
+  // Faz 16: kozmetik mağaza (sadece satın alınmış öğeler seçilebilir)
+  String frameId = '';
+  String badgeId = '';
+  String chatBubbleThemeId = '';
+  String chatBackgroundThemeId = '';
 
   ProfileDraft();
 
@@ -252,7 +289,11 @@ class ProfileDraft {
         avatarHairStyle = p.avatarHairStyle,
         avatarHairColorId = p.avatarHairColorId,
         avatarOutfitId = p.avatarOutfitId,
-        avatarAccessoryId = p.avatarAccessoryId;
+        avatarAccessoryId = p.avatarAccessoryId,
+        frameId = p.frameId,
+        badgeId = p.badgeId,
+        chatBubbleThemeId = p.chatBubbleThemeId,
+        chatBackgroundThemeId = p.chatBackgroundThemeId;
 
   ProfileDraft copy() => ProfileDraft()
     ..displayName = displayName
@@ -278,7 +319,11 @@ class ProfileDraft {
     ..avatarHairStyle = avatarHairStyle
     ..avatarHairColorId = avatarHairColorId
     ..avatarOutfitId = avatarOutfitId
-    ..avatarAccessoryId = avatarAccessoryId;
+    ..avatarAccessoryId = avatarAccessoryId
+    ..frameId = frameId
+    ..badgeId = badgeId
+    ..chatBubbleThemeId = chatBubbleThemeId
+    ..chatBackgroundThemeId = chatBackgroundThemeId;
 
   // Önizleme bileşenleri (etiketler, sorular) için salt okunur profil
   PublicProfile toPreview({int age = 0}) => PublicProfile(
@@ -306,6 +351,8 @@ class ProfileDraft {
         avatarHairColorId: avatarHairColorId,
         avatarOutfitId: avatarOutfitId,
         avatarAccessoryId: avatarAccessoryId,
+        frameId: frameId,
+        badgeId: badgeId,
       );
 
   Map<String, dynamic> toJson() {
@@ -334,6 +381,10 @@ class ProfileDraft {
       'avatarHairColorId': avatarHairColorId,
       'avatarOutfitId': avatarOutfitId,
       'avatarAccessoryId': avatarAccessoryId,
+      'frameId': frameId,
+      'badgeId': badgeId,
+      'chatBubbleThemeId': chatBubbleThemeId,
+      'chatBackgroundThemeId': chatBackgroundThemeId,
     };
   }
 }

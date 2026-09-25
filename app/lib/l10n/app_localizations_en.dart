@@ -2154,6 +2154,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'rug': 'Rug',
       'window': 'Window',
       'picture': 'Picture',
+      'item_piano': 'Piano',
+      'item_aquarium': 'Aquarium',
+      'item_chandelier': 'Chandelier',
+      'item_arcade': 'Arcade Machine',
       'other': '$id',
     });
     return '$_temp0';
@@ -2397,4 +2401,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get interestGroupEmpty => 'No one available in this group right now.';
+
+  @override
+  String storeItemName(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'frame_gold': 'Gold Frame',
+      'frame_neon': 'Neon Frame',
+      'frame_floral': 'Floral Frame',
+      'frame_stars': 'Starry Frame',
+      'badge_crown': 'Crown Badge',
+      'badge_fire': 'Fire Badge',
+      'badge_diamond': 'Diamond Badge',
+      'badge_heart': 'Heart Badge',
+      'theme_galaxy': 'Galaxy Theme',
+      'theme_fire': 'Fire Theme',
+      'theme_ice': 'Ice Theme',
+      'theme_royal': 'Royal Theme',
+      'item_piano': 'Piano',
+      'item_aquarium': 'Aquarium',
+      'item_chandelier': 'Chandelier',
+      'item_arcade': 'Arcade Machine',
+      'outfit_tuxedo': 'Tuxedo',
+      'outfit_superhero': 'Superhero',
+      'outfit_wizard': 'Wizard',
+      'outfit_astronaut': 'Astronaut',
+      'bubble_midnight': 'Midnight Bubble',
+      'bubble_sunset': 'Sunset Bubble',
+      'bubble_mint': 'Mint Bubble',
+      'bubble_rosegold': 'Rose Gold Bubble',
+      'chatbg_stars': 'Starry Background',
+      'chatbg_waves': 'Waves Background',
+      'chatbg_geometric': 'Geometric Background',
+      'chatbg_minimal': 'Minimal Background',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get storeTitle => 'Store';
+
+  @override
+  String get storeIntro =>
+      'Cosmetic items bought with coins — they never transfer between users, they just personalize your look.';
+
+  @override
+  String get storeCategoryFrame => 'Profile frames';
+
+  @override
+  String get storeCategoryBadge => 'Badges';
+
+  @override
+  String get storeCategoryTheme => 'Premium themes';
+
+  @override
+  String get storeCategoryRoomItem => 'Room furniture';
+
+  @override
+  String get storeCategoryAvatarOutfit => 'Avatar outfits';
+
+  @override
+  String get storeCategoryChatBubble => 'Chat bubble';
+
+  @override
+  String get storeCategoryChatBackground => 'Chat background';
+
+  @override
+  String get storeBuy => 'Buy';
+
+  @override
+  String get storeOwned => 'Owned';
+
+  @override
+  String get storePurchased => 'Purchased!';
+
+  @override
+  String get errItemNotOwned => 'You haven\'t purchased this item yet.';
+
+  @override
+  String get errAlreadyOwned => 'You already own this item.';
 }

@@ -200,6 +200,24 @@ void main() {
     });
   });
 
+  group('Kozmetik mağaza (Faz 16)', () {
+    test('StoreItem ayrıştırma: sahip olunmamış ve olunmuş', () {
+      final notOwned = StoreItem.fromJson({'id': 'badge_crown', 'category': 'badge', 'priceCoins': 200});
+      expect(notOwned.owned, isFalse);
+      final owned = StoreItem.fromJson({'id': 'badge_crown', 'category': 'badge', 'priceCoins': 200, 'owned': true});
+      expect(owned.owned, isTrue);
+      expect(owned.priceCoins, 200);
+    });
+
+    test('Faz 16 çerçeve/rozet: eski yanıtta (alan yok) boş, yeni yanıtta ayrıştırılır', () {
+      final legacy = PublicProfile.fromJson(profileJson());
+      expect([legacy.frameId, legacy.badgeId], ['', '']);
+      final withStore = PublicProfile.fromJson({...profileJson(), 'frameId': 'frame_gold', 'badgeId': 'badge_crown'});
+      expect(withStore.frameId, 'frame_gold');
+      expect(withStore.badgeId, 'badge_crown');
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

@@ -38,6 +38,9 @@ final interestGroupMembersProvider = FutureProvider.autoDispose.family<List<Publ
   (ref, interestId) => ref.watch(apiProvider).discoverGroupMembers(interestId),
 );
 
+// Faz 16: kozmetik mağaza
+final storeItemsProvider = FutureProvider.autoDispose<List<StoreItem>>((ref) => ref.watch(apiProvider).storeItems());
+
 // Okunmamış toplam mesaj sayısı (alt menü rozeti için)
 final unreadCountProvider = Provider<int>((ref) =>
     ref.watch(conversationsProvider).value?.fold<int>(0, (sum, c) => sum + c.unreadCount) ?? 0);

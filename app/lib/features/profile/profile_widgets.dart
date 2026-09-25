@@ -142,6 +142,7 @@ class LikeActionCard extends StatelessWidget {
               NameWithBadge('${p.displayName}, ${p.age}',
                   verified: p.verified,
                   onPhoto: true,
+                  badgeId: p.badgeId,
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
               const SizedBox(height: 8),
               Row(children: [

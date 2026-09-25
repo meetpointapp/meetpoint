@@ -20,6 +20,7 @@ import 'features/chat/chat_screen.dart';
 import 'features/chat/conversations_screen.dart';
 import 'features/discover/discover_screen.dart';
 import 'features/discover/interest_group_screen.dart';
+import 'features/store/store_screen.dart';
 import 'features/home/home_shell.dart';
 import 'features/likes/likes_screen.dart';
 import 'features/me/me_screen.dart';
@@ -78,6 +79,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/user/:id/room', builder: (_, s) => RoomVisitScreen(userId: s.pathParameters['id']!)),
       GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
       GoRoute(path: '/discover/groups/:interestId', builder: (_, s) => InterestGroupScreen(interestId: s.pathParameters['interestId']!)),
+      GoRoute(path: '/store', builder: (_, _) => const StoreScreen()),
       GoRoute(
         path: '/call/:id',
         builder: (_, s) => CallScreen(callId: s.pathParameters['id']!, initial: s.extra is CallInfo ? s.extra as CallInfo : null),

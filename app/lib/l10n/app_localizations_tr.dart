@@ -2138,6 +2138,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'rug': 'Halı',
       'window': 'Pencere',
       'picture': 'Tablo',
+      'item_piano': 'Piyano',
+      'item_aquarium': 'Akvaryum',
+      'item_chandelier': 'Avize',
+      'item_arcade': 'Oyun Makinesi',
       'other': '$id',
     });
     return '$_temp0';
@@ -2382,4 +2386,83 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get interestGroupEmpty => 'Şu an bu grupta uygun kimse yok.';
+
+  @override
+  String storeItemName(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'frame_gold': 'Altın Çerçeve',
+      'frame_neon': 'Neon Çerçeve',
+      'frame_floral': 'Çiçekli Çerçeve',
+      'frame_stars': 'Yıldızlı Çerçeve',
+      'badge_crown': 'Taç Rozeti',
+      'badge_fire': 'Ateş Rozeti',
+      'badge_diamond': 'Elmas Rozeti',
+      'badge_heart': 'Kalp Rozeti',
+      'theme_galaxy': 'Galaksi Teması',
+      'theme_fire': 'Ateş Teması',
+      'theme_ice': 'Buz Teması',
+      'theme_royal': 'Kraliyet Teması',
+      'item_piano': 'Piyano',
+      'item_aquarium': 'Akvaryum',
+      'item_chandelier': 'Avize',
+      'item_arcade': 'Oyun Makinesi',
+      'outfit_tuxedo': 'Smokin',
+      'outfit_superhero': 'Süper Kahraman',
+      'outfit_wizard': 'Büyücü',
+      'outfit_astronaut': 'Astronot',
+      'bubble_midnight': 'Gece Yarısı Baloncuğu',
+      'bubble_sunset': 'Gün Batımı Baloncuğu',
+      'bubble_mint': 'Nane Baloncuğu',
+      'bubble_rosegold': 'Rose Gold Baloncuğu',
+      'chatbg_stars': 'Yıldızlı Arka Plan',
+      'chatbg_waves': 'Dalga Arka Plan',
+      'chatbg_geometric': 'Geometrik Arka Plan',
+      'chatbg_minimal': 'Sade Arka Plan',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get storeTitle => 'Mağaza';
+
+  @override
+  String get storeIntro =>
+      'Jetonla alınan kozmetik öğeler; kullanıcıdan kullanıcıya geçmez, sadece görünümünü kişiselleştirir.';
+
+  @override
+  String get storeCategoryFrame => 'Profil çerçeveleri';
+
+  @override
+  String get storeCategoryBadge => 'Rozetler';
+
+  @override
+  String get storeCategoryTheme => 'Premium temalar';
+
+  @override
+  String get storeCategoryRoomItem => 'Oda mobilyaları';
+
+  @override
+  String get storeCategoryAvatarOutfit => 'Avatar kıyafetleri';
+
+  @override
+  String get storeCategoryChatBubble => 'Sohbet baloncuğu';
+
+  @override
+  String get storeCategoryChatBackground => 'Sohbet arka planı';
+
+  @override
+  String get storeBuy => 'Satın al';
+
+  @override
+  String get storeOwned => 'Sahipsin';
+
+  @override
+  String get storePurchased => 'Satın alındı!';
+
+  @override
+  String get errItemNotOwned => 'Bu öğeyi henüz satın almadın.';
+
+  @override
+  String get errAlreadyOwned => 'Bu öğeye zaten sahipsin.';
 }

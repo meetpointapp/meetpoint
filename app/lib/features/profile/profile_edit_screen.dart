@@ -155,6 +155,15 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 const SizedBox(height: 8),
                 _SectionTitle(l.moodSection),
                 _MoodSummary(),
+                const SizedBox(height: 8),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.storefront_outlined),
+                    title: Text(l.storeTitle),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/store'),
+                  ),
+                ),
               ]),
       ),
     );
