@@ -129,6 +129,7 @@
   "callComingSoon": "Arama özelliği yakında geliyor. Jetonlar bakiyene eklendi.",
   "noChats": "Henüz sohbet yok. Keşfet'te birini beğen ya da mesaj isteği gönder.",
   "typeMessage": "Mesaj yaz...",
+  "sendFailedRetry": "Gönderilemedi, tekrar denemek için dokun",
   "matchedChat": "Eşleşme",
   "requestChat": "Mesaj isteği",
   "balance": "Bakiye",

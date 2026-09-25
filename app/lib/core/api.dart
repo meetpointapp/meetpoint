@@ -65,9 +65,16 @@ class Api {
   //
   // Erişim jetonu kısa ömürlü: bitmek üzereyse istekten önce, sunucu "token_expired" derse istekten
   // sonra bir kez yenilenip aynı istek tekrarlanır. Kullanıcı bunu hiç fark etmez.
-  Future<dynamic> _send(Future<Response<dynamic>> Function(Options options) call, {bool write = false, String? path}) async {
+  Future<dynamic> _send(
+    Future<Response<dynamic>> Function(Options options) call, {
+    bool write = false,
+    String? path,
+    String? idempotencyKey,
+  }) async {
     final idempotent = write && _hasToken && !(path?.startsWith('/auth/') ?? false);
-    final key = idempotent ? newIdempotencyKey() : null;
+    // Çevrimdışı kuyruktan tekrar denenen istekler kendi (kalıcı) anahtarını verir: uygulama yeniden
+    // başlasa da aynı mesaj iki kez işlenmez. Belirtilmezse her denemede yeni anahtar üretilir.
+    final key = idempotent ? (idempotencyKey ?? newIdempotencyKey()) : null;
     var refreshed = false;
     if (_auth?.expiresSoon ?? false) {
       await _refreshTokens();
@@ -137,8 +144,12 @@ class Api {
 
   Future<dynamic> _get(String path, [Map<String, dynamic>? query]) =>
       _send((o) => _dio.get(path, queryParameters: query, options: o));
-  Future<dynamic> _post(String path, [Object? body]) =>
-      _send((o) => _dio.post(path, data: _body(body), options: o), write: true, path: path);
+  Future<dynamic> _post(String path, [Object? body, String? idempotencyKey]) => _send(
+        (o) => _dio.post(path, data: _body(body), options: o),
+        write: true,
+        path: path,
+        idempotencyKey: idempotencyKey,
+      );
   Future<dynamic> _put(String path, [Object? body]) =>
       _send((o) => _dio.put(path, data: _body(body), options: o), write: true, path: path);
   Future<dynamic> _delete(String path, [Object? body]) =>
@@ -395,10 +406,17 @@ class Api {
           ChatMessage.fromJson(m),
       ];
 
-  Future<ChatMessage> sendMessage(String conversationId, String body) async =>
-      ChatMessage.fromJson(await _post('/conversations/$conversationId/messages', {'body': body}));
+  // idempotencyKey verilirse (Faz 15: çevrimdışı kuyruk) aynı mesaj uygulama yeniden başlasa da
+  // tekrar denense de yalnızca bir kez işlenir.
+  Future<ChatMessage> sendMessage(String conversationId, String body, {String? idempotencyKey}) async => ChatMessage.fromJson(
+        await _post('/conversations/$conversationId/messages', {'body': body}, idempotencyKey),
+      );
 
   Future<void> markRead(String conversationId) => _post('/conversations/$conversationId/read');
+
+  // Mesaj cihaza ulaşıp kalıcı depolandığında bildirilir (Faz 15: mesaj teslim garantisi)
+  Future<void> markDelivered(String conversationId, List<String> ids) =>
+      _post('/conversations/$conversationId/delivered', {'ids': ids});
 
   // Tek seferlik fotoğraf
   Future<ChatMessage> sendPhoto(String conversationId, XFile file) async {

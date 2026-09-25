@@ -50,6 +50,7 @@ class Realtime {
 }
 
 const _events = [
+  'connect',
   'match',
   'superlike',
   'request:new',
@@ -57,6 +58,7 @@ const _events = [
   'message:new',
   'message:read',
   'message:viewed',
+  'message:delivered',
   'typing',
   'wallet:updated',
   'call:incoming',

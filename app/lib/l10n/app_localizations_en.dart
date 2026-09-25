@@ -247,6 +247,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get typeMessage => 'Type a message...';
 
   @override
+  String get sendFailedRetry => 'Couldn\'t send, tap to retry';
+
+  @override
   String get matchedChat => 'Match';
 
   @override

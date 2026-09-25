@@ -10,7 +10,7 @@ import { messageLimiter } from '../limits';
 import { afterMessage, contactInfo } from '../moderation/detect';
 import { requireNotRestricted } from '../moderation/sanctions';
 import { notify } from '../notify';
-import { emitToUser } from '../realtime';
+import { emitToUser, isOnline } from '../realtime';
 import { publicProfile } from './profile';
 
 export const conversationsRouter = Router();
@@ -35,6 +35,7 @@ export const messageDto = (m: Message) => ({
   // contact: iletişim bilgisi paylaşıldı → alıcıya güvenlik ipucu gösterilir
   flag: m.flag,
   viewedAt: m.viewedAt,
+  deliveredAt: m.deliveredAt,
   readAt: m.readAt,
   createdAt: m.createdAt,
 });
@@ -112,21 +113,39 @@ conversationsRouter.get('/conversations/:id/messages', async (req, res) => {
   res.json(messages.reverse().map(messageDto));
 });
 
-// Karşı tarafın mesajlarını okundu işaretle
+// Karşı tarafın mesajlarını okundu işaretle (okunan mesaj her zaman teslim edilmiş sayılır)
 conversationsRouter.post('/conversations/:id/read', async (req, res) => {
   const me = uid(req);
   const { conv, otherId } = await getOwnConversation(req.params.id, me);
-  const readAt = new Date();
+  const now = new Date();
   const { count } = await prisma.message.updateMany({
     where: { conversationId: conv.id, senderId: otherId, readAt: null },
-    data: { readAt },
+    data: { readAt: now, deliveredAt: now },
   });
-  if (count > 0) emitToUser(otherId, 'message:read', { conversationId: conv.id, readAt });
+  if (count > 0) emitToUser(otherId, 'message:read', { conversationId: conv.id, readAt: now });
+  res.json({ ok: true });
+});
+
+// Faz 15: mesaj teslim garantisi. Uygulama, mesajı cihaza alıp kalıcı depoladığında bunu bildirir
+// (çevrimdışı alınan mesajlar da bağlantı gelince buradan işaretlenir).
+conversationsRouter.post('/conversations/:id/delivered', async (req, res) => {
+  const me = uid(req);
+  const { conv, otherId } = await getOwnConversation(req.params.id, me);
+  const { ids } = z.object({ ids: z.array(z.string()).min(1).max(100) }).parse(req.body);
+  const deliveredAt = new Date();
+  const { count } = await prisma.message.updateMany({
+    where: { id: { in: ids }, conversationId: conv.id, senderId: otherId, deliveredAt: null },
+    data: { deliveredAt },
+  });
+  if (count > 0) emitToUser(otherId, 'message:delivered', { conversationId: conv.id, ids, deliveredAt });
   res.json({ ok: true });
 });
 
 async function deliver(conversationId: string, me: string, otherId: string, data: { kind: string; body: string; photoPath?: string; flag?: string }) {
-  const message = await prisma.message.create({ data: { conversationId, senderId: me, ...data } });
+  // Alıcı şu an bağlıysa mesaj anında teslim edilmiş sayılır (soket olayı ulaşır); değilse
+  // çevrimdışı kuyruktan gelen /delivered çağrısı ya da "okundu" bunu sonradan işaretler.
+  const deliveredAt = (await isOnline(otherId)) ? new Date() : null;
+  const message = await prisma.message.create({ data: { conversationId, senderId: me, deliveredAt, ...data } });
   const dto = messageDto(message);
   emitToUser(otherId, 'message:new', dto);
   void notify(otherId, 'message', me, data.kind === 'photo' ? '📷' : data.body.slice(0, 120), { conversationId });

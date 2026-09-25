@@ -73,6 +73,7 @@
   "callComingSoon": "Calling is coming soon. The coins were added to your balance.",
   "noChats": "No chats yet. Like someone in Discover or send a message request.",
   "typeMessage": "Type a message...",
+  "sendFailedRetry": "Couldn't send, tap to retry",
   "matchedChat": "Match",
   "requestChat": "Message request",
   "balance": "Balance",

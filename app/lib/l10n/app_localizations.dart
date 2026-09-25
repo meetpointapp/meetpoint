@@ -536,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Mesaj yaz...'**
   String get typeMessage;
 
+  /// No description provided for @sendFailedRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderilemedi, tekrar denemek için dokun'**
+  String get sendFailedRetry;
+
   /// No description provided for @matchedChat.
   ///
   /// In tr, this message translates to:

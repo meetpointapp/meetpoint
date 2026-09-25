@@ -14,6 +14,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import 'message_outbox.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, required this.conversationId});
@@ -40,7 +41,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _load();
+    _load().then((_) => _loadPending());
     _sub = ref.read(realtimeProvider).events.listen(_onEvent);
   }
 
@@ -56,16 +57,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final data = e.data is Map ? Map<String, dynamic>.from(e.data as Map) : const <String, dynamic>{};
     if (data['conversationId'] != _id) return;
     switch (e.name) {
+      case 'connect':
+        _flushOutbox();
       case 'message:new':
-        _append(ChatMessage.fromJson(data));
+        final msg = ChatMessage.fromJson(data);
+        _append(msg);
         setState(() => _otherTyping = false);
         _markRead();
+        // Mesajı aldığımızı (cihaza ulaştığını) sunucuya bildiriyoruz: çevrimdışıyken kaçırılan
+        // mesajlar da yeniden bağlanınca message:new ile gelir ve burada teslim işaretlenir.
+        ref.read(apiProvider).markDelivered(_id, [msg.id]).catchError((_) {});
       case 'message:read':
         final readAt = DateTime.parse(data['readAt'] as String).toLocal();
         final myId = ref.read(sessionProvider).value?.userId;
-        _update((m) => m.senderId == myId && m.readAt == null ? m.copyWith(readAt: readAt) : m);
+        _update((m) => m.senderId == myId && m.readAt == null ? m.copyWith(readAt: readAt, deliveredAt: readAt) : m);
       case 'message:viewed':
         _update((m) => m.id == data['id'] ? m.copyWith(viewedAt: DateTime.now()) : m);
+      case 'message:delivered':
+        final deliveredAt = DateTime.parse(data['deliveredAt'] as String).toLocal();
+        final ids = (data['ids'] as List).cast<String>().toSet();
+        _update((m) => ids.contains(m.id) ? m.copyWith(deliveredAt: deliveredAt) : m);
       case 'typing':
         _typingTimer?.cancel();
         setState(() => _otherTyping = true);
@@ -110,6 +121,57 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
+  // Faz 15: çevrimdışı kuyruk. Bu sohbette daha önce gönderilemeyen mesajlar varsa iyimser balon
+  // olarak gösterilir ve göndermek yeniden denenir.
+  Future<void> _loadPending() async {
+    final myId = ref.read(sessionProvider).value?.userId;
+    if (myId == null) return;
+    final pending = await ref.read(messageOutboxProvider).pendingFor(_id, myId);
+    if (!mounted || pending.isEmpty) return;
+    setState(() => _messages = [...?_messages, ...pending]);
+    await _flushOutbox();
+  }
+
+  // Kuyruktaki tüm sohbetlerin mesajlarını (bu sohbet dahil) sırayla tekrar dener; bu ekrandaki
+  // iyimser balonları sonuca göre günceller.
+  Future<void> _flushOutbox() async {
+    final results = await ref.read(messageOutboxProvider).flush();
+    if (!mounted) return;
+    for (final r in results) {
+      if (r.outcome.sent != null) {
+        _replacePending(r.key, r.outcome.sent!);
+      } else if (r.outcome.permanentFailure) {
+        _markPendingFailed(r.key);
+      }
+    }
+  }
+
+  void _replacePending(String key, ChatMessage sent) {
+    if (!mounted || _messages == null) return;
+    setState(() => _messages = _messages!.map((m) => m.pendingKey == key ? sent : m).toList());
+    ref.invalidate(conversationsProvider);
+  }
+
+  void _markPendingFailed(String key) {
+    if (!mounted || _messages == null) return;
+    setState(() => _messages = _messages!.map((m) => m.pendingKey == key ? m.copyWith(failed: true) : m).toList());
+  }
+
+  // Kalıcı olarak başarısız kalan bir mesaja dokununca: kuyruğa yeniden eklenir, tekrar denenir.
+  Future<void> _retry(ChatMessage failed) async {
+    if (!mounted || _messages == null) return;
+    setState(() => _messages = _messages!.where((m) => m.id != failed.id).toList());
+    final outbox = ref.read(messageOutboxProvider);
+    final key = await outbox.enqueue(_id, failed.body);
+    _append(ChatMessage.pending(conversationId: _id, senderId: failed.senderId, body: failed.body, key: key));
+    final outcome = await outbox.attempt(key);
+    if (outcome.sent != null) {
+      _replacePending(key, outcome.sent!);
+    } else if (outcome.permanentFailure) {
+      _markPendingFailed(key);
+    }
+  }
+
   Future<void> _markRead() async {
     await ref.read(apiProvider).markRead(_id).catchError((_) {});
     ref.invalidate(conversationsProvider);
@@ -146,15 +208,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
+  // Metin mesajları çevrimdışı kuyruktan gider (Faz 15): önce iyimser balon gösterilir, sunucuya
+  // ulaşınca gerçek mesajla değiştirilir; ağ yoksa kuyrukta kalır ve bağlantı gelince tekrar denenir.
   Future<void> _send() async {
     final text = _input.text.trim();
-    if (text.isEmpty) return;
-    await _run(() async {
-      final msg = await ref.read(apiProvider).sendMessage(_id, text);
-      _input.clear();
-      if (msg.contactWarning && mounted) showSnack(context, AppLocalizations.of(context).contactWarningSender);
-      return msg;
-    });
+    final myId = ref.read(sessionProvider).value?.userId;
+    if (text.isEmpty || myId == null) return;
+    _input.clear();
+    final outbox = ref.read(messageOutboxProvider);
+    final key = await outbox.enqueue(_id, text);
+    _append(ChatMessage.pending(conversationId: _id, senderId: myId, body: text, key: key));
+    final outcome = await outbox.attempt(key);
+    if (!mounted) return;
+    if (outcome.sent != null) {
+      _replacePending(key, outcome.sent!);
+      if (outcome.sent!.contactWarning) showSnack(context, AppLocalizations.of(context).contactWarningSender);
+    } else if (outcome.permanentFailure) {
+      _markPendingFailed(key);
+    }
+    // Aksi halde (ağ yok) balon "gönderiliyor" durumunda kuyrukta kalır; bağlantı gelince otomatik dener.
   }
 
   Future<void> _sendPhoto() async {
@@ -235,6 +307,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           mine: m.senderId == myId,
                           locale: l.localeName,
                           onOpenPhoto: () => _openPhoto(m),
+                          onRetry: m.failed ? () => _retry(m) : null,
                         );
                       },
                     ),
@@ -275,11 +348,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.message, required this.mine, required this.locale, required this.onOpenPhoto});
+  const _Bubble({required this.message, required this.mine, required this.locale, required this.onOpenPhoto, this.onRetry});
   final ChatMessage message;
   final bool mine;
   final String locale;
   final VoidCallback onOpenPhoto;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -312,35 +386,55 @@ class _Bubble extends StatelessWidget {
       content = Text(m.body, style: TextStyle(color: fg));
     }
 
+    // Faz 15: durum ikonu — saat: kuyrukta/gönderiliyor, tek tik: sunucuya ulaştı, soluk çift tik:
+    // alıcıya ulaştı (henüz okumadı), belirgin çift tik: okundu. Başarısızsa hata ikonu (dokununca tekrar dener).
+    final Widget status;
+    if (m.failed) {
+      status = Icon(Icons.error_outline_rounded, size: 14, color: Colors.orange.shade200);
+    } else if (m.isPending) {
+      status = Icon(Icons.schedule_rounded, size: 13, color: fg.withValues(alpha: 0.7));
+    } else if (m.readAt != null) {
+      status = Icon(Icons.done_all_rounded, size: 14, color: fg.withValues(alpha: 0.85));
+    } else if (m.deliveredAt != null) {
+      status = Icon(Icons.done_all_rounded, size: 14, color: fg.withValues(alpha: 0.55));
+    } else {
+      status = Icon(Icons.done_rounded, size: 14, color: fg.withValues(alpha: 0.85));
+    }
+
     final bubble = Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
-        margin: const EdgeInsets.symmetric(vertical: 3),
-        padding: const EdgeInsets.fromLTRB(14, 8, 12, 6),
-        decoration: BoxDecoration(
-          gradient: mine ? Brand.gradient : null,
-          color: mine ? null : scheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(18).copyWith(
-            bottomRight: mine ? const Radius.circular(4) : null,
-            bottomLeft: mine ? null : const Radius.circular(4),
-          ),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          content,
-          const SizedBox(height: 2),
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(
-              DateFormat.Hm(locale).format(m.createdAt),
-              style: TextStyle(fontSize: 10, color: fg.withValues(alpha: 0.75)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onRetry,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
+          margin: const EdgeInsets.symmetric(vertical: 3),
+          padding: const EdgeInsets.fromLTRB(14, 8, 12, 6),
+          decoration: BoxDecoration(
+            gradient: mine ? Brand.gradient : null,
+            color: mine ? null : scheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(18).copyWith(
+              bottomRight: mine ? const Radius.circular(4) : null,
+              bottomLeft: mine ? null : const Radius.circular(4),
             ),
-            // Okundu bilgisi: tek tik gönderildi, çift tik okundu
-            if (mine) ...[
-              const SizedBox(width: 3),
-              Icon(m.readAt != null ? Icons.done_all_rounded : Icons.done_rounded, size: 14, color: fg.withValues(alpha: 0.85)),
-            ],
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Opacity(opacity: m.isPending || m.failed ? 0.75 : 1, child: content),
+            if (m.failed)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(l.sendFailedRetry, style: TextStyle(fontSize: 10, color: fg.withValues(alpha: 0.85))),
+              ),
+            const SizedBox(height: 2),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(
+                DateFormat.Hm(locale).format(m.createdAt),
+                style: TextStyle(fontSize: 10, color: fg.withValues(alpha: 0.75)),
+              ),
+              if (mine) ...[const SizedBox(width: 3), status],
+            ]),
           ]),
-        ]),
+        ),
       ),
     );
     // İletişim bilgisi paylaşan mesajın altında alıcıya güvenlik ipucu

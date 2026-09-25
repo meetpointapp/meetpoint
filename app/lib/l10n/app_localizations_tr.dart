@@ -247,6 +247,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get typeMessage => 'Mesaj yaz...';
 
   @override
+  String get sendFailedRetry => 'Gönderilemedi, tekrar denemek için dokun';
+
+  @override
   String get matchedChat => 'Eşleşme';
 
   @override

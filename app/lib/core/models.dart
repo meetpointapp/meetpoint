@@ -415,12 +415,17 @@ class ChatMessage {
   final String kind; // text | photo (tek seferlik)
   final String body;
   final DateTime? viewedAt; // fotoğraf açıldı mı
+  final DateTime? deliveredAt; // alıcının cihazına ulaştı mı
   final DateTime? readAt; // okundu mu
   final DateTime createdAt;
   // contact: telefon/IBAN/sosyal medya paylaşıldı → alıcıya güvenlik ipucu
   final String flag;
   // Gönderene: az önce iletişim bilgisi paylaştın uyarısı (sadece gönderme yanıtında)
   final bool contactWarning;
+  // Faz 15: çevrimdışı kuyruk. Sunucuya henüz ulaşmadıysa yerel kuyruk anahtarı (id geçicidir);
+  // ulaştıysa null. failed: sunucu kalıcı olarak reddetti (tekrar denenmeyecek).
+  final String? pendingKey;
+  final bool failed;
 
   const ChatMessage({
     required this.id,
@@ -429,24 +434,50 @@ class ChatMessage {
     this.kind = 'text',
     required this.body,
     this.viewedAt,
+    this.deliveredAt,
     this.readAt,
     required this.createdAt,
     this.flag = '',
     this.contactWarning = false,
+    this.pendingKey,
+    this.failed = false,
   });
+
+  // Çevrimdışı kuyruğa eklenirken gösterilen iyimser (geçici) balon
+  factory ChatMessage.pending({
+    required String conversationId,
+    required String senderId,
+    required String body,
+    required String key,
+    DateTime? createdAt,
+  }) =>
+      ChatMessage(
+        id: 'pending:$key',
+        conversationId: conversationId,
+        senderId: senderId,
+        body: body,
+        createdAt: createdAt ?? DateTime.now(),
+        pendingKey: key,
+      );
+
+  bool get isPending => pendingKey != null;
 
   bool get isPhoto => kind == 'photo';
 
-  ChatMessage copyWith({DateTime? viewedAt, DateTime? readAt}) => ChatMessage(
+  ChatMessage copyWith({DateTime? viewedAt, DateTime? deliveredAt, DateTime? readAt, bool? failed}) => ChatMessage(
         id: id,
         conversationId: conversationId,
         senderId: senderId,
         kind: kind,
         body: body,
         viewedAt: viewedAt ?? this.viewedAt,
+        deliveredAt: deliveredAt ?? this.deliveredAt,
         readAt: readAt ?? this.readAt,
         createdAt: createdAt,
         flag: flag,
+        contactWarning: contactWarning,
+        pendingKey: pendingKey,
+        failed: failed ?? this.failed,
       );
 
   factory ChatMessage.fromJson(Map<String, dynamic> j) => ChatMessage(
@@ -458,6 +489,7 @@ class ChatMessage {
         flag: j['flag'] ?? '',
         contactWarning: j['warning'] == 'contact_info',
         viewedAt: j['viewedAt'] == null ? null : _date(j['viewedAt']),
+        deliveredAt: j['deliveredAt'] == null ? null : _date(j['deliveredAt']),
         readAt: j['readAt'] == null ? null : _date(j['readAt']),
         createdAt: _date(j['createdAt']),
       );

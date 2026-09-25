@@ -274,6 +274,8 @@ model Message {
   // Tek seferlik fotoğraf: özel klasörde durur, alıcı bir kez açınca dosya silinir
   photoPath      String?
   viewedAt       DateTime?
+  // Faz 15: mesaj teslim garantisi. Alıcının cihazına ulaştı mı (okunmasından önce olur, okunmadan da olabilir)
+  deliveredAt    DateTime?
   readAt         DateTime?
   createdAt      DateTime     @default(now())
 
