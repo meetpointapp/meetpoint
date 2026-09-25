@@ -73,6 +73,34 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
   },
 };
 
+// Faz 15: push güvenilirliği. Bildirimden dokununca uygulama doğru ekrana gitsin diye (elde
+// zaten olan verilerden) bir yol hesaplanır. Karşılığı olmayan türler (superlike, request) genel
+// bir listeye gider.
+function routeFor(kind: Kind, data: Record<string, string>): string | undefined {
+  switch (kind) {
+    case 'message':
+    case 'match':
+      return data.conversationId ? `/chat/${data.conversationId}` : undefined;
+    case 'call':
+      return data.callId ? `/call/${data.callId}` : undefined;
+    case 'support':
+      return data.ticketId ? `/support/${data.ticketId}` : '/support';
+    case 'superlike':
+      return '/likes';
+    case 'request':
+      return '/requests';
+    case 'payout':
+      return '/wallet';
+  }
+}
+
+// Rozet sayacı: karşı taraftan gelen, henüz okunmamış mesajlar (uygulama içi rozetle aynı hesap)
+async function unreadBadge(userId: string) {
+  return prisma.message.count({
+    where: { readAt: null, senderId: { not: userId }, conversation: { OR: [{ userAId: userId }, { userBId: userId }] } },
+  });
+}
+
 // Alıcının diline göre bildirim gönderir. Hata olursa sessizce loglar (asıl işlemi bozmaz).
 export async function notify(toUserId: string, kind: Kind, fromUserId: string, extra?: string, data: Record<string, string> = {}) {
   try {
@@ -89,7 +117,8 @@ export async function notify(toUserId: string, kind: Kind, fromUserId: string, e
       return;
     }
     const text = (TEXTS[to.locale] ?? TEXTS.en)[kind](from?.displayName ?? 'MeetPoint', extra);
-    const payload = { ...data, kind };
+    const route = routeFor(kind, data);
+    const payload = { ...data, kind, ...(route ? { route } : {}) };
 
     if (!messaging) {
       console.log(`[push dev] → ${toUserId}: ${text.title} · ${text.body}`);
@@ -97,7 +126,16 @@ export async function notify(toUserId: string, kind: Kind, fromUserId: string, e
     }
     const tokens = to.devices.map((d) => d.token);
     if (!tokens.length) return;
-    const res = await messaging.sendEachForMulticast({ tokens, notification: text, data: payload });
+    const badge = await unreadBadge(toUserId);
+    const res = await messaging.sendEachForMulticast({
+      tokens,
+      notification: text,
+      data: payload,
+      // Aramalar ve mesajlar anlık olmalı: yüksek öncelik, uygulama arka plandayken de teslim edilsin.
+      // Aramalar ayrıca kendi bildirim kanalına gider (tam ekran gelen arama ekranı, bkz. Faz 15 madde 1).
+      android: { priority: 'high', notification: kind === 'call' ? { channelId: 'calls' } : undefined },
+      apns: { headers: { 'apns-priority': '10' }, payload: { aps: { badge, sound: 'default', 'content-available': 1 } } },
+    });
     // Geçersiz jetonları temizle
     const dead = res.responses
       .map((r, i) => (!r.success && r.error?.code === 'messaging/registration-token-not-registered' ? tokens[i] : null))

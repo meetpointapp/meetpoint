@@ -35,7 +35,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final api = ref.read(apiProvider);
     // Konumu sessizce tazele (izin daha önce verildiyse) ve bildirim cihazını kaydet
     syncLocation(api);
-    Push.instance.register(api);
+    Push.instance.register(api, onOpen: (route) {
+      if (mounted) context.push(route);
+    });
     // Mağaza hesabını kullanıcıya bağla (satın almalar bu kimlikle webhook'a düşer)
     final userId = ref.read(sessionProvider).value?.userId;
     if (userId != null) CoinStore.instance.login(userId);

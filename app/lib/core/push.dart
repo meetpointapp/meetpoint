@@ -20,8 +20,12 @@ class Push {
           _ => 'android',
         };
 
-  // Girişten sonra çağrılır: izin iste, cihaz jetonunu sunucuya kaydet
-  Future<void> register(Api api) async {
+  bool _openHandlerSet = false;
+
+  // Girişten sonra çağrılır: izin iste, cihaz jetonunu sunucuya kaydet. onOpen: kullanıcı bir
+  // bildirime dokununca (uygulama arka plandaydı ya da kapalıydı) sunucunun hesapladığı ekrana
+  // gitmek için çağrılır (Faz 15: push güvenilirliği · derin bağlantı).
+  Future<void> register(Api api, {void Function(String route)? onOpen}) async {
     try {
       if (!_ready) {
         await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -36,6 +40,16 @@ class Push {
         token = t;
         api.registerDevice(t, _platform).catchError((_) {});
       });
+      if (onOpen != null && !_openHandlerSet) {
+        _openHandlerSet = true;
+        void handle(RemoteMessage? m) {
+          final route = m?.data['route'];
+          if (route is String && route.isNotEmpty) onOpen(route);
+        }
+
+        FirebaseMessaging.onMessageOpenedApp.listen(handle);
+        handle(await messaging.getInitialMessage()); // uygulama bildirime dokunularak açıldıysa
+      }
     } catch (e) {
       // Firebase ayarlı değil veya izin yok: uygulama bildirimsiz çalışmaya devam eder
       debugPrint('push disabled: $e');
