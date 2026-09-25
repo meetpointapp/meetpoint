@@ -26,6 +26,7 @@ import {
   THEMES,
   ZODIAC,
 } from '../catalog';
+import { computeArchetype, VIBE_QUESTIONS } from '../vibe';
 import { ageOf } from '../age';
 import { verifyPassword } from '../passwords';
 import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
@@ -89,6 +90,7 @@ export function publicProfile(
     avatarHairColorId: p.avatarHairColorId,
     avatarOutfitId: p.avatarOutfitId,
     avatarAccessoryId: p.avatarAccessoryId,
+    vibeArchetypeId: p.vibeArchetypeId,
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
       .filter((ph) => opts.owner || !ph.hiddenAt)
@@ -251,8 +253,39 @@ profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
   const userId = uid(req);
   // Kimi görmek istediğin (cinsel yönelim) özel nitelikli veridir: açık rıza olmadan kaydedilmez
   await requireConsent(userId, 'special_category');
-  await prisma.profile.upsert({ where: { userId }, create: { userId, ...data }, update: data });
+  const saved = await prisma.profile.upsert({ where: { userId }, create: { userId, ...data }, update: data });
+  // Vibe testini tamamladıysan, ilgi alanların değiştikçe arketip yeniden hesaplanır — statik bir
+  // etiket değil, profilinle birlikte gelişen bir kimlik.
+  const answers = saved.vibeAnswers as Record<string, string>;
+  if (Object.keys(answers).length > 0) {
+    const archetypeId = computeArchetype(answers, data.interests);
+    if (archetypeId !== saved.vibeArchetypeId) {
+      await prisma.profile.update({ where: { userId }, data: { vibeArchetypeId: archetypeId } });
+    }
+  }
   res.json({ ok: true });
+});
+
+// Faz 16: "Kendini Keşfet" vibe sistemi. Soru/seçenek kimlikleri src/vibe.ts'te; metinler app'te.
+const vibeAnswersSchema = z.record(z.string(), z.string()).refine(
+  (a) =>
+    Object.keys(a).length === VIBE_QUESTIONS.length &&
+    VIBE_QUESTIONS.every((q) => q.options.some((o) => o.id === a[q.id])),
+  'invalid_vibe_answers',
+);
+
+profileRouter.get('/me/vibe', async (req, res) => {
+  const p = await prisma.profile.findUniqueOrThrow({ where: { userId: uid(req) } });
+  res.json({ answers: p.vibeAnswers, archetypeId: p.vibeArchetypeId });
+});
+
+profileRouter.put('/me/vibe', requireNotRestricted, async (req, res) => {
+  const answers = vibeAnswersSchema.parse(req.body);
+  const userId = uid(req);
+  const p = await prisma.profile.findUniqueOrThrow({ where: { userId } });
+  const archetypeId = computeArchetype(answers, p.interests as string[]);
+  await prisma.profile.update({ where: { userId }, data: { vibeAnswers: answers, vibeArchetypeId: archetypeId } });
+  res.json({ archetypeId });
 });
 
 profileRouter.put('/me/locale', async (req, res) => {

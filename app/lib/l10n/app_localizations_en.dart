@@ -2161,4 +2161,152 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roomFull => 'Room is full, remove an item first';
+
+  @override
+  String vibeQuestionLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'ideal_date': 'What\'s your ideal date?',
+      'flirt_style': 'How would you describe your flirting style?',
+      'weekend': 'What does a typical weekend look like for you?',
+      'communication': 'What\'s your communication style?',
+      'conflict': 'What do you do when a conflict comes up?',
+      'dream_trip': 'What\'s your dream trip?',
+      'friday_night': 'Your ideal Friday night?',
+      'gift_style': 'How do you like to give gifts?',
+      'social_battery': 'What fuels your social battery?',
+      'love_language': 'How do you show love?',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeOptionLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'road_trip': 'A spontaneous road trip',
+      'cafe_chat': 'A calm chat at a café',
+      'concert': 'A crowded concert or event',
+      'candlelit_dinner': 'A carefully planned romantic dinner',
+      'direct': 'Direct and bold',
+      'slow_burn': 'Slow, building trust step by step',
+      'playful': 'Playful and fun',
+      'deep_talk': 'I connect through deep conversations',
+      'explore_new_place': 'I explore somewhere new',
+      'stay_in': 'I unwind at home with a book or film',
+      'spontaneous_hangout': 'Unplanned hangouts with friends',
+      'planned_activity': 'A pre-planned activity',
+      'frequent_texts': 'Frequent, in-the-moment texting',
+      'rare_deep': 'Fewer but deeper conversations',
+      'voice_notes': 'Spontaneous voice notes',
+      'plans_ahead': 'I like clarity and planning ahead',
+      'talk_now': 'Talk it out right away',
+      'cool_off_first': 'I need to cool off first',
+      'bring_others': 'I ask mutual friends for advice',
+      'write_it_out': 'I write out my thoughts',
+      'backpacking': 'Unplanned backpacking adventure',
+      'quiet_cabin': 'A quiet cabin in the mountains',
+      'group_tour': 'A lively group tour',
+      'romantic_getaway': 'A romantic getaway for two',
+      'new_experience': 'Trying something I\'ve never done',
+      'movie_at_home': 'Movie night at home',
+      'party': 'A crowded party',
+      'one_on_one': 'One-on-one time with someone',
+      'surprise_adventure': 'A surprise adventure',
+      'practical': 'Something useful and practical',
+      'shared_experience': 'An experience to share together',
+      'handwritten_note': 'A heartfelt handwritten note',
+      'crowd_energizes': 'A crowd energizes me',
+      'small_group': 'A small, close group is enough',
+      'one_friend': 'One close friend',
+      'alone_time': 'Alone time recharges me',
+      'adventure_together': 'By diving into adventures together',
+      'words': 'Through words and heartfelt expression',
+      'fun_together': 'By having fun together',
+      'reliability': 'By being reliable and steady',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeArchetypeName(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'maceraci_romantik': 'Adventurous Romantic',
+      'sakin_gozlemci': 'Calm Observer',
+      'sosyal_kelebek': 'Social Butterfly',
+      'pragmatik_planlayici': 'Practical Planner',
+      'tutkulu_idealist': 'Passionate Idealist',
+      'ozgur_ruh': 'Free Spirit',
+      'sadik_yoldas': 'Loyal Companion',
+      'merakli_kasif': 'Curious Explorer',
+      'duygusal_derinlik': 'Emotional Depth',
+      'eglence_duskunu': 'Life of the Party',
+      'sessiz_guc': 'Quiet Strength',
+      'dengeli_ruh': 'Balanced Soul',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeArchetypeDesc(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'maceraci_romantik':
+          'You give your heart as fully as you chase new experiences.',
+      'sakin_gozlemci': 'You prefer deep, quiet moments over the noise.',
+      'sosyal_kelebek':
+          'You draw energy from a crowd and connect with anyone easily.',
+      'pragmatik_planlayici': 'Grounded and steady, you prefer a clear plan over spontaneous surprises.',
+      'tutkulu_idealist':
+          'You believe in big feelings and meaningful connections.',
+      'ozgur_ruh': 'Unplanned plans and new adventures excite you.',
+      'sadik_yoldas': 'Quiet but dependable, you\'re always there for the people you care about.',
+      'merakli_kasif': 'You look for a new experience around every corner — routine isn\'t your thing.',
+      'duygusal_derinlik': 'You choose real, deep bonds over small talk.',
+      'eglence_duskunu':
+          'You see life as a reason to celebrate and live every moment fully.',
+      'sessiz_guc': 'You speak less but mean more; a quiet, deep energy.',
+      'dengeli_ruh':
+          'Not too adventurous, not too calm — you know how to find balance.',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeCompatNote(String tier, String name1, String name2) {
+    String _temp0 = intl.Intl.selectLogic(tier, {
+      'similar': '$name1 + $name2: you\'re on the same wavelength',
+      'complementary':
+          '$name1 + $name2: different energies that complement each other',
+      'opposite': '$name1 + $name2: opposites attract',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get vibeSection => 'Your vibe';
+
+  @override
+  String get vibeTitle => 'Discover Yourself';
+
+  @override
+  String get vibeIntro =>
+      'A short quiz finds the \"vibe\" archetype that describes you best. No AI is used — your answers are matched with our own rules, together with your interests.';
+
+  @override
+  String get vibeStart => 'Start the quiz';
+
+  @override
+  String get vibeRetake => 'Retake the quiz';
+
+  @override
+  String get vibeNotTaken => 'You haven\'t taken the vibe quiz yet.';
+
+  @override
+  String get vibeCompatTitle => 'Compatibility note';
+
+  @override
+  String get vibeFinish => 'Finish';
 }

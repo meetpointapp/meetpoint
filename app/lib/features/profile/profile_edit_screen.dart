@@ -12,6 +12,7 @@ import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import 'profile_fields.dart';
 import 'profile_widgets.dart';
+import 'vibe_screen.dart';
 
 // Profil düzenleme: fotoğraflar anında kaydedilir, diğer bölümler
 // ayrı sayfada düzenlenip "Kaydet" ile sunucuya gönderilir.
@@ -147,6 +148,9 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     onTap: () => context.push('/room'),
                   ),
                 ),
+                const SizedBox(height: 8),
+                _SectionTitle(l.vibeSection),
+                _VibeSummary(),
               ]),
       ),
     );
@@ -200,6 +204,30 @@ class _SectionPageState extends ConsumerState<_SectionPage> {
         ),
       ),
     );
+  }
+}
+
+// Faz 16: vibe testi sonucu (varsa) veya teste başlama daveti. ProfileDraft'ta yok (ayrı uçtan
+// /me/vibe ile kaydedilir); en güncel arketip için meProvider'ı doğrudan izler.
+class _VibeSummary extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final archetypeId = ref.watch(meProvider).value?.profile?.vibeArchetypeId ?? '';
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (archetypeId.isNotEmpty)
+        VibeCard(archetypeId: archetypeId)
+      else
+        Text(l.vibeIntro, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      const SizedBox(height: 10),
+      OutlinedButton(
+        onPressed: () async {
+          await context.push<String>('/vibe');
+          ref.invalidate(meProvider);
+        },
+        child: Text(archetypeId.isEmpty ? l.vibeStart : l.vibeRetake),
+      ),
+    ]);
   }
 }
 

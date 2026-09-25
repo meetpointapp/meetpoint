@@ -164,6 +164,12 @@ model Profile {
   roomFloorId     String @default("")
   roomItems       Json   @default("[]")
 
+  // Faz 16: "Kendini Keşfet" vibe sistemi. answers: { [soruId]: seçenekId } — src/vibe.ts.
+  // Tüm sorular cevaplanmadan archetypeId boş kalır. Profil güncellendikçe (ör. ilgi alanı
+  // değişince) yeniden hesaplanır; statik bir etiket değil.
+  vibeAnswers     Json   @default("{}")
+  vibeArchetypeId String @default("")
+
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
   longitude  Float?

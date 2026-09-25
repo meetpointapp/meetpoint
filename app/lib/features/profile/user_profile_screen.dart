@@ -12,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import '../call/start_call.dart';
 import 'profile_widgets.dart';
 import 'request_actions.dart';
+import 'vibe_screen.dart';
 
 // Başka bir kullanıcının profili: fotoğraflar ve sorular sırayla akar,
 // altta ücretli iletişim isteği çubuğu sabit durur.
@@ -69,6 +70,13 @@ class _ProfileBody extends ConsumerWidget {
           onTap: () => context.push('/user/${p.id}/room'),
         ),
       )));
+      if (p.vibeArchetypeId.isNotEmpty) {
+        blocks.add(gap(VibeCard(archetypeId: p.vibeArchetypeId)));
+        final myArchetypeId = ref.watch(meProvider).value?.profile?.vibeArchetypeId ?? '';
+        if (myArchetypeId.isNotEmpty) {
+          blocks.add(gap(VibeCompatNote(myArchetypeId: myArchetypeId, otherArchetypeId: p.vibeArchetypeId)));
+        }
+      }
     }
     blocks.add(gap(BasicsChips(profile: p)));
     if (p.bio.isNotEmpty) blocks.add(gap(Card(child: Padding(padding: const EdgeInsets.all(18), child: Text(p.bio, style: theme.textTheme.bodyLarge)))));

@@ -55,6 +55,8 @@ class PublicProfile {
   final String avatarHairColorId;
   final String avatarOutfitId;
   final String avatarAccessoryId;
+  // Faz 16: "Kendini Keşfet" vibe sistemi. '' = testi henüz tamamlamamış.
+  final String vibeArchetypeId;
 
   const PublicProfile({
     required this.id,
@@ -85,6 +87,7 @@ class PublicProfile {
     this.avatarHairColorId = '',
     this.avatarOutfitId = '',
     this.avatarAccessoryId = '',
+    this.vibeArchetypeId = '',
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
@@ -120,6 +123,7 @@ class PublicProfile {
         avatarHairColorId: j['avatarHairColorId'] ?? '',
         avatarOutfitId: j['avatarOutfitId'] ?? '',
         avatarAccessoryId: j['avatarAccessoryId'] ?? '',
+        vibeArchetypeId: j['vibeArchetypeId'] ?? '',
       );
 }
 
@@ -156,7 +160,21 @@ class MyProfile extends PublicProfile {
           avatarHairColorId: j['avatarHairColorId'] ?? '',
           avatarOutfitId: j['avatarOutfitId'] ?? '',
           avatarAccessoryId: j['avatarAccessoryId'] ?? '',
+          vibeArchetypeId: j['vibeArchetypeId'] ?? '',
         );
+}
+
+// Faz 16: "Kendini Keşfet" vibe sistemi. answers: { soruId: seçenekId }. archetypeId '' ise test
+// henüz tamamlanmamış demektir.
+class VibeResult {
+  final Map<String, String> answers;
+  final String archetypeId;
+  const VibeResult({this.answers = const {}, this.archetypeId = ''});
+  factory VibeResult.fromJson(Map<String, dynamic> j) => VibeResult(
+        answers: {for (final e in (j['answers'] as Map? ?? const {}).entries) e.key as String: e.value as String},
+        archetypeId: j['archetypeId'] ?? '',
+      );
+  bool get completed => archetypeId.isNotEmpty;
 }
 
 // Kayıt sihirbazında ve profil düzenlemede kullanılan değiştirilebilir taslak

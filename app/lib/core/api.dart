@@ -275,6 +275,9 @@ class Api {
   Future<void> saveRoom(RoomInfo room) => _put('/me/room', room.toJson());
   Future<RoomInfo> userRoom(String id) async => RoomInfo.fromJson(await _get('/users/$id/room'));
 
+  Future<VibeResult> myVibe() async => VibeResult.fromJson(await _get('/me/vibe'));
+  Future<String> saveVibe(Map<String, String> answers) async => (await _put('/me/vibe', answers))['archetypeId'];
+
   // Keşfet
   Future<List<PublicProfile>> discover() async =>
       [for (final p in (await _get('/discover') as List)) PublicProfile.fromJson(p)];

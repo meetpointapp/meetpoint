@@ -2145,4 +2145,153 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get roomFull => 'Oda dolu, önce bir eşya kaldır';
+
+  @override
+  String vibeQuestionLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'ideal_date': 'İdeal bir randevu senin için nasıl olur?',
+      'flirt_style': 'Flört tarzını nasıl tanımlarsın?',
+      'weekend': 'Tipik bir hafta sonun nasıl geçer?',
+      'communication': 'İletişim tarzın nasıl?',
+      'conflict': 'Bir anlaşmazlık çıktığında ne yaparsın?',
+      'dream_trip': 'Hayalindeki seyahat nasıl?',
+      'friday_night': 'Cuma akşamı tercihin?',
+      'gift_style': 'Nasıl hediye vermeyi seversin?',
+      'social_battery': 'Sosyal enerjini ne besler?',
+      'love_language': 'Sevgini nasıl gösterirsin?',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeOptionLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'road_trip': 'Spontane bir yol gezisi',
+      'cafe_chat': 'Sakin bir kafede sohbet',
+      'concert': 'Kalabalık bir konser/etkinlik',
+      'candlelit_dinner': 'Özenle planlanmış romantik bir akşam yemeği',
+      'direct': 'Doğrudan ve cesur',
+      'slow_burn': 'Yavaş yavaş, güven inşa ederek',
+      'playful': 'Şakacı ve eğlenceli',
+      'deep_talk': 'Derin sohbetlerle bağ kurarım',
+      'explore_new_place': 'Yeni bir yer keşfederim',
+      'stay_in': 'Evde kitap ya da film ile dinlenirim',
+      'spontaneous_hangout': 'Arkadaşlarla plansız buluşurum',
+      'planned_activity': 'Önceden planlanmış bir aktiviteye giderim',
+      'frequent_texts': 'Sık sık, anlık mesajlaşırım',
+      'rare_deep': 'Az ama derin sohbetler tercih ederim',
+      'voice_notes': 'Sesli mesajlarla, spontane',
+      'plans_ahead': 'Netlik severim, önceden planlarım',
+      'talk_now': 'Hemen konuşup çözerim',
+      'cool_off_first': 'Önce sakinleşmem gerekir',
+      'bring_others': 'Ortak arkadaşlara danışırım',
+      'write_it_out': 'Düşüncelerimi yazarak ifade ederim',
+      'backpacking': 'Sırt çantayla plansız bir keşif',
+      'quiet_cabin': 'Sessiz bir dağ evinde huzur',
+      'group_tour': 'Kalabalık bir grup turu',
+      'romantic_getaway': 'Romantik, baş başa bir kaçamak',
+      'new_experience': 'Hiç denemediğim yeni bir şey',
+      'movie_at_home': 'Evde film gecesi',
+      'party': 'Kalabalık bir parti',
+      'one_on_one': 'Tek bir kişiyle baş başa zaman',
+      'surprise_adventure': 'Sürpriz bir macera',
+      'practical': 'Kullanışlı, pratik bir şey',
+      'shared_experience': 'Birlikte yaşanacak bir deneyim',
+      'handwritten_note': 'El yazısıyla, içten bir not',
+      'crowd_energizes': 'Kalabalık beni enerjilendirir',
+      'small_group': 'Küçük, yakın bir grup yeter',
+      'one_friend': 'Tek bir yakın arkadaş',
+      'alone_time': 'Yalnız zaman bana iyi gelir',
+      'adventure_together': 'Birlikte maceraya atılarak',
+      'words': 'Sözlerle, içten ifadelerle',
+      'fun_together': 'Birlikte eğlenerek',
+      'reliability': 'Güvenilir ve istikrarlı olarak',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeArchetypeName(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'maceraci_romantik': 'Maceracı Romantik',
+      'sakin_gozlemci': 'Sakin Gözlemci',
+      'sosyal_kelebek': 'Sosyal Kelebek',
+      'pragmatik_planlayici': 'Pragmatik Planlayıcı',
+      'tutkulu_idealist': 'Tutkulu İdealist',
+      'ozgur_ruh': 'Özgür Ruh',
+      'sadik_yoldas': 'Sadık Yoldaş',
+      'merakli_kasif': 'Meraklı Kaşif',
+      'duygusal_derinlik': 'Duygusal Derinlik',
+      'eglence_duskunu': 'Eğlence Düşkünü',
+      'sessiz_guc': 'Sessiz Güç',
+      'dengeli_ruh': 'Dengeli Ruh',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeArchetypeDesc(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'maceraci_romantik':
+          'Yeni deneyimleri sevdiğin kadar, kalbini de tam anlamıyla verirsin.',
+      'sakin_gozlemci': 'Gürültüden çok, derin ve sakin anları tercih edersin.',
+      'sosyal_kelebek':
+          'Enerjini kalabalıktan alır, herkesle kolayca kaynaşırsın.',
+      'pragmatik_planlayici': 'Ayakların yere sağlam basar, sürprizlerden çok net planları seversin.',
+      'tutkulu_idealist': 'Büyük duygulara ve anlamlı bağlara inanırsın.',
+      'ozgur_ruh': 'Plansız programlar ve yeni maceralar seni heyecanlandırır.',
+      'sadik_yoldas': 'Sessiz ama güvenilir; yanındakiler için hep oradasın.',
+      'merakli_kasif':
+          'Her köşede yeni bir deneyim ararsın, rutin sana göre değil.',
+      'duygusal_derinlik':
+          'Yüzeysel sohbetler yerine gerçek, derin bağlar kurmayı seçersin.',
+      'eglence_duskunu':
+          'Hayatı kutlama fırsatı olarak görür, anı dolu dolu yaşarsın.',
+      'sessiz_guc':
+          'Az konuşur, çok şey ifade edersin; içten ve derin bir enerjin var.',
+      'dengeli_ruh': 'Ne çok maceracı ne çok sakin — dengeyi bulmayı bilirsin.',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String vibeCompatNote(String tier, String name1, String name2) {
+    String _temp0 = intl.Intl.selectLogic(tier, {
+      'similar':
+          '$name1 + $name2: aynı frekanstasınız, birbirinizi hemen anlarsınız',
+      'complementary': '$name1 + $name2: birbirini tamamlayan farklı enerjiler',
+      'opposite': '$name1 + $name2: zıt kutuplar çekişimi',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get vibeSection => 'Vibe’ın';
+
+  @override
+  String get vibeTitle => 'Kendini Keşfet';
+
+  @override
+  String get vibeIntro =>
+      'Kısa bir soru seti seni en iyi anlatan \"vibe\" arketipini bulur. Yapay zekâ kullanılmaz; cevapların ilgi alanlarınla birlikte kendi kuralımızla eşleştirilir.';
+
+  @override
+  String get vibeStart => 'Testi başlat';
+
+  @override
+  String get vibeRetake => 'Yeniden yap';
+
+  @override
+  String get vibeNotTaken => 'Henüz vibe testini tamamlamadın.';
+
+  @override
+  String get vibeCompatTitle => 'Uyum notu';
+
+  @override
+  String get vibeFinish => 'Bitir';
 }

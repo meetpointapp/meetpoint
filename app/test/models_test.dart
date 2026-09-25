@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meetpoint/core/catalog.dart';
 import 'package:meetpoint/core/models.dart';
+import 'package:meetpoint/core/vibe.dart';
 
 // Sunucu yanıt biçimleriyle (server/src/*Dto) birebir örnekler
 Map<String, dynamic> profileJson({String id = 'u1', String name = 'Deren'}) => {
@@ -90,6 +91,13 @@ void main() {
       expect(showcase.cardBackgroundId, 'sunset');
       expect(showcase.online, isTrue);
     });
+
+    test('Faz 16 vibe arketipi: eski yanıtta (alan yok) boş, yeni yanıtta ayrıştırılır', () {
+      final legacy = PublicProfile.fromJson(profileJson());
+      expect(legacy.vibeArchetypeId, '');
+      final withVibe = PublicProfile.fromJson({...profileJson(), 'vibeArchetypeId': 'ozgur_ruh'});
+      expect(withVibe.vibeArchetypeId, 'ozgur_ruh');
+    });
   });
 
   group('Vitrin kataloğu (Faz 16)', () {
@@ -103,6 +111,39 @@ void main() {
     test('bilinen kimlik kendi rengini/gradyanını döner', () {
       expect(themeColorOf('ocean'), themeAccent['ocean']);
       expect(cardGradientOf('sunset'), cardBackgroundGradient['sunset']);
+    });
+  });
+
+  group('"Kendini Keşfet" vibe sistemi (Faz 16)', () {
+    test('VibeResult ayrıştırma: tamamlanmamış ve tamamlanmış', () {
+      final notTaken = VibeResult.fromJson({'answers': {}, 'archetypeId': ''});
+      expect(notTaken.completed, isFalse);
+      final taken = VibeResult.fromJson({
+        'answers': {'ideal_date': 'road_trip'},
+        'archetypeId': 'merakli_kasif',
+      });
+      expect(taken.completed, isTrue);
+      expect(taken.answers['ideal_date'], 'road_trip');
+    });
+
+    test('10 soru, her birinin 4 seçeneği var', () {
+      expect(vibeQuestions.length, 10);
+      for (final q in vibeQuestions) {
+        expect(q.optionIds.length, 4, reason: '${q.id} 4 seçenekli olmalı');
+      }
+    });
+
+    test('aynı arketip her zaman "benzer" çıkar', () {
+      expect(vibeCompatibilityTier('maceraci_romantik', 'maceraci_romantik'), VibeCompatTier.similar);
+    });
+
+    test('uzak vektörler "zıt kutuplar" çıkar (yol haritasındaki örnek)', () {
+      // maceraci_romantik [2,0,1,2] ile sakin_gozlemci [-2,-1,-1,0] arası uzaklık = 5.0 (> 4.5 eşiği)
+      expect(vibeCompatibilityTier('maceraci_romantik', 'sakin_gozlemci'), VibeCompatTier.opposite);
+    });
+
+    test('bilinmeyen arketip kimliğinde null döner', () {
+      expect(vibeCompatibilityTier('nope', 'maceraci_romantik'), isNull);
     });
   });
 

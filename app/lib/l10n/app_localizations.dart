@@ -3656,6 +3656,84 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Oda dolu, önce bir eşya kaldır'**
   String get roomFull;
+
+  /// No description provided for @vibeQuestionLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, ideal_date{İdeal bir randevu senin için nasıl olur?} flirt_style{Flört tarzını nasıl tanımlarsın?} weekend{Tipik bir hafta sonun nasıl geçer?} communication{İletişim tarzın nasıl?} conflict{Bir anlaşmazlık çıktığında ne yaparsın?} dream_trip{Hayalindeki seyahat nasıl?} friday_night{Cuma akşamı tercihin?} gift_style{Nasıl hediye vermeyi seversin?} social_battery{Sosyal enerjini ne besler?} love_language{Sevgini nasıl gösterirsin?} other{{id}}}'**
+  String vibeQuestionLabel(String id);
+
+  /// No description provided for @vibeOptionLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, road_trip{Spontane bir yol gezisi} cafe_chat{Sakin bir kafede sohbet} concert{Kalabalık bir konser/etkinlik} candlelit_dinner{Özenle planlanmış romantik bir akşam yemeği} direct{Doğrudan ve cesur} slow_burn{Yavaş yavaş, güven inşa ederek} playful{Şakacı ve eğlenceli} deep_talk{Derin sohbetlerle bağ kurarım} explore_new_place{Yeni bir yer keşfederim} stay_in{Evde kitap ya da film ile dinlenirim} spontaneous_hangout{Arkadaşlarla plansız buluşurum} planned_activity{Önceden planlanmış bir aktiviteye giderim} frequent_texts{Sık sık, anlık mesajlaşırım} rare_deep{Az ama derin sohbetler tercih ederim} voice_notes{Sesli mesajlarla, spontane} plans_ahead{Netlik severim, önceden planlarım} talk_now{Hemen konuşup çözerim} cool_off_first{Önce sakinleşmem gerekir} bring_others{Ortak arkadaşlara danışırım} write_it_out{Düşüncelerimi yazarak ifade ederim} backpacking{Sırt çantayla plansız bir keşif} quiet_cabin{Sessiz bir dağ evinde huzur} group_tour{Kalabalık bir grup turu} romantic_getaway{Romantik, baş başa bir kaçamak} new_experience{Hiç denemediğim yeni bir şey} movie_at_home{Evde film gecesi} party{Kalabalık bir parti} one_on_one{Tek bir kişiyle baş başa zaman} surprise_adventure{Sürpriz bir macera} practical{Kullanışlı, pratik bir şey} shared_experience{Birlikte yaşanacak bir deneyim} handwritten_note{El yazısıyla, içten bir not} crowd_energizes{Kalabalık beni enerjilendirir} small_group{Küçük, yakın bir grup yeter} one_friend{Tek bir yakın arkadaş} alone_time{Yalnız zaman bana iyi gelir} adventure_together{Birlikte maceraya atılarak} words{Sözlerle, içten ifadelerle} fun_together{Birlikte eğlenerek} reliability{Güvenilir ve istikrarlı olarak} other{{id}}}'**
+  String vibeOptionLabel(String id);
+
+  /// No description provided for @vibeArchetypeName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, maceraci_romantik{Maceracı Romantik} sakin_gozlemci{Sakin Gözlemci} sosyal_kelebek{Sosyal Kelebek} pragmatik_planlayici{Pragmatik Planlayıcı} tutkulu_idealist{Tutkulu İdealist} ozgur_ruh{Özgür Ruh} sadik_yoldas{Sadık Yoldaş} merakli_kasif{Meraklı Kaşif} duygusal_derinlik{Duygusal Derinlik} eglence_duskunu{Eğlence Düşkünü} sessiz_guc{Sessiz Güç} dengeli_ruh{Dengeli Ruh} other{{id}}}'**
+  String vibeArchetypeName(String id);
+
+  /// No description provided for @vibeArchetypeDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, maceraci_romantik{Yeni deneyimleri sevdiğin kadar, kalbini de tam anlamıyla verirsin.} sakin_gozlemci{Gürültüden çok, derin ve sakin anları tercih edersin.} sosyal_kelebek{Enerjini kalabalıktan alır, herkesle kolayca kaynaşırsın.} pragmatik_planlayici{Ayakların yere sağlam basar, sürprizlerden çok net planları seversin.} tutkulu_idealist{Büyük duygulara ve anlamlı bağlara inanırsın.} ozgur_ruh{Plansız programlar ve yeni maceralar seni heyecanlandırır.} sadik_yoldas{Sessiz ama güvenilir; yanındakiler için hep oradasın.} merakli_kasif{Her köşede yeni bir deneyim ararsın, rutin sana göre değil.} duygusal_derinlik{Yüzeysel sohbetler yerine gerçek, derin bağlar kurmayı seçersin.} eglence_duskunu{Hayatı kutlama fırsatı olarak görür, anı dolu dolu yaşarsın.} sessiz_guc{Az konuşur, çok şey ifade edersin; içten ve derin bir enerjin var.} dengeli_ruh{Ne çok maceracı ne çok sakin — dengeyi bulmayı bilirsin.} other{{id}}}'**
+  String vibeArchetypeDesc(String id);
+
+  /// No description provided for @vibeCompatNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'{tier, select, similar{{name1} + {name2}: aynı frekanstasınız, birbirinizi hemen anlarsınız} complementary{{name1} + {name2}: birbirini tamamlayan farklı enerjiler} opposite{{name1} + {name2}: zıt kutuplar çekişimi} other{}}'**
+  String vibeCompatNote(String tier, String name1, String name2);
+
+  /// No description provided for @vibeSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vibe’ın'**
+  String get vibeSection;
+
+  /// No description provided for @vibeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendini Keşfet'**
+  String get vibeTitle;
+
+  /// No description provided for @vibeIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa bir soru seti seni en iyi anlatan \"vibe\" arketipini bulur. Yapay zekâ kullanılmaz; cevapların ilgi alanlarınla birlikte kendi kuralımızla eşleştirilir.'**
+  String get vibeIntro;
+
+  /// No description provided for @vibeStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Testi başlat'**
+  String get vibeStart;
+
+  /// No description provided for @vibeRetake.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeniden yap'**
+  String get vibeRetake;
+
+  /// No description provided for @vibeNotTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz vibe testini tamamlamadın.'**
+  String get vibeNotTaken;
+
+  /// No description provided for @vibeCompatTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyum notu'**
+  String get vibeCompatTitle;
+
+  /// No description provided for @vibeFinish.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitir'**
+  String get vibeFinish;
 }
 
 class _AppLocalizationsDelegate

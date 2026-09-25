@@ -25,6 +25,7 @@ import 'features/me/me_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/profile/profile_edit_screen.dart';
 import 'features/profile/room_screen.dart';
+import 'features/profile/vibe_screen.dart';
 import 'features/profile/user_profile_screen.dart';
 import 'features/requests/requests_screen.dart';
 import 'features/wallet/cashout_screen.dart';
@@ -74,6 +75,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
       GoRoute(path: '/room', builder: (_, _) => const RoomEditorScreen()),
       GoRoute(path: '/user/:id/room', builder: (_, s) => RoomVisitScreen(userId: s.pathParameters['id']!)),
+      GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
       GoRoute(
         path: '/call/:id',
         builder: (_, s) => CallScreen(callId: s.pathParameters['id']!, initial: s.extra is CallInfo ? s.extra as CallInfo : null),
