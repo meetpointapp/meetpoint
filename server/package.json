@@ -61,7 +61,7 @@
     "@types/yauzl": "^3.4.0",
     "@types/yazl": "^3.3.1",
     "embedded-postgres": "^18.4.0-beta.17",
-    "prisma": "^6.19.3",
+    "prisma": "^7.10.0",
     "socket.io-client": "^4.8.3",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
