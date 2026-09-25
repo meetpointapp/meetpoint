@@ -98,6 +98,24 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
 **Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
 
+### Faz 14'te bulunanlar
+
+Faz 14 tamamlandı. Sunucuda 131 test (29 dosya), uygulamada 42 test; arayüz turu `tools/ui-tours/faz14.mjs` ve önizleme `docs/faz14-onizleme.png`.
+
+**Kullanıcı kararları:** cayma hakkı istisnası onayı ilk satın almadan önce bir kez (metin değişince tekrar), sonraki alımlarda özet satırı; destek = uygulama içi talep + panel kuyruğu + bildirim/e-posta, 48 saat hedef; bildirim tercihleri türe göre + sessiz saatler (aramalar muaf), kampanya bildirimi ayrı izin; yardım merkezi uygulamada ve web'de, panelden düzenlenir.
+
+**Yapılanlar:**
+- **Satın alma öncesi onay:** ön bilgilendirme formu (paket fiyatları tablodan otomatik) ve mesafeli satış sözleşmesi; işaretlenmemiş gelen açık onay kutusu (MSY md. 15/1-ğ). Onay Consent'e sürümüyle yazılır, her satın alma kaydı kabul edilen sürümü saklar; onay yoksa test yüklemesi 409 döner.
+- **Destek:** kategori, konu, açıklama, ekran görüntüsü (EXIF silinerek, özel depoda), ilgili işlem (cüzdan hareketine dokunarak; başkasının kaydı iliştirilemez). Panel → Destek: kuyruk (hedef süreye göre), kullanıcı özeti, ilgili işlem, yanıtla/kapat, ölçümler (ortalama ilk yanıt, hedefe uyum). Ek görüntüleme işlem kaydında. Kapanan talepler 2 yıl sonra silinir; "Verilerimi indir"e eklendi.
+- **Yardım merkezi:** 5 kategori, TR/EN 16'şar soru; fiyat ve süreler ayarlardan dolar (`{{voiceRate}}` vb.); Türkçe harf duyarlı arama; web'de `/help`.
+- **Künye:** panelden (süper yönetici) doldurulan şirket bilgileri; `/legal/imprint`; kullanım koşulları, gizlilik, ön bilgilendirme ve sözleşmedeki `{{alan}}` yer tutucuları otomatik dolar, boşsa köşeli parantezle görünür.
+- **Bildirimler ve İYS:** türe göre aç/kapa, sessiz saat (cihaz saat dilimiyle), kampanya e-postası ve kampanya bildirimi ayrı izin; panelden İYS toplu yükleme dosyası (e-posta izinlerinin son durumu).
+- **Mağaza uyumu:** [magaza-uyum.md](magaza-uyum.md): Apple/Google kontrol listesi, Veri Güvenliği ve gizlilik etiketi cevapları, yaş derecelendirmesi, inceleme notu. Google'ın istediği web'den hesap silme sayfası (`/account/delete`) eklendi. Demo hesap: `npm run review:account`.
+
+**Bulunan eksik:** Google Play, uygulama dışından (web) hesap silme bağlantısı istiyor; yoktu, eklendi.
+
+**Açık sorular (Faz 17):** ⚠️ ücretli görüntülü aramanın Apple 1.1.4 / Google cinsel içerik kuralları açısından algısı; kazanç ödemesinin finansal özellik beyanı; satış metinleri ve onay kutusu metni avukat onayı; İYS dosya biçiminin güncel şablonla karşılaştırılması; iOS izin metinlerinin İngilizcesi (Xcode).
+
 ### Faz 13'te bulunanlar
 
 Faz 13 tamamlandı. Sunucuda 116 test (27 dosya), uygulamada 42 test; tam takım iki kez üst üste temiz. Birim testlerindeki bekleyen ekonomi kuralı ("%30 mağaza payı") gerçek teste dönüştü.
@@ -233,17 +251,17 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 7. ✅ **TL fiyat yönetimi.** Mağaza fiyatlarının KDV dahil gösterimi; paket ve fiyatların panelden yönetimi.
 8. ✅ **Fiyat ve bonus kararları.** Paketlerin jeton başı fiyat sırası; bonus ve hediye jetonlarının kazanca dönüşme kuralı (ör. bonus jetondan gelen kazanç bozdurulamaz ya da bozdurma kuru/bonus oranı ayarlanır). Birim testlerindeki bekleyen kurallar yeşile döner.
 
-## Faz 14 · Tüketici hakları, destek ve mağaza uyumu (uygulama içi)
+## Faz 14 · Tüketici hakları, destek ve mağaza uyumu (uygulama içi) ✅
 
 **Amaç:** Tüketici Kanunu ve e-ticaret mevzuatının uygulamada karşılanması; Apple ve Google incelemesine hazır olmak.
 
-1. 🛠 **Satın alma öncesi bilgilendirme.** Ön bilgilendirme, mesafeli satış sözleşmesi, cayma hakkı istisnasına açık onay, jeton kullanım koşulları.
-2. 🛠 **Destek sistemi.** Uygulama içi destek talebi (kategori, ekran görüntüsü, ilgili işlem); panelde kuyruk ve yanıt; bildirimle geri dönüş.
-3. 🛠 **Yardım merkezi.** Jeton, arama, para çekme, güvenlik ve hesap için Türkçe/İngilizce SSS.
-4. 🛠 **Künye alanları.** Şirket unvanı, MERSİS, adres, KEP ve e-posta için ayarlanabilir alanlar; uygulamada ve web'de gösterim. Bilgiler Faz 17'de doldurulur.
-5. 🛠 **Mağaza politika kontrolü.** Apple ve Google kurallarının madde madde kontrol listesi ve eksiklerin kapatılması.
-6. 🛠 **Bildirim tercihleri ve İYS uyumu.** Bildirim türü bazında açma/kapama; pazarlama iletileri için ayrı izin kaydı.
-7. 🛠 **Mağaza form içerikleri.** Gizlilik etiketleri, Veri Güvenliği formu ve yaş derecelendirme cevapları (Faz 11 envanterinden); inceleme notu ve demo hesap.
+1. ✅ **Satın alma öncesi bilgilendirme.** Ön bilgilendirme, mesafeli satış sözleşmesi, cayma hakkı istisnasına açık onay, jeton kullanım koşulları.
+2. ✅ **Destek sistemi.** Uygulama içi destek talebi (kategori, ekran görüntüsü, ilgili işlem); panelde kuyruk ve yanıt; bildirimle geri dönüş.
+3. ✅ **Yardım merkezi.** Jeton, arama, para çekme, güvenlik ve hesap için Türkçe/İngilizce SSS.
+4. ✅ **Künye alanları.** Şirket unvanı, MERSİS, adres, KEP ve e-posta için ayarlanabilir alanlar; uygulamada ve web'de gösterim. Bilgiler Faz 17'de doldurulur.
+5. ✅ **Mağaza politika kontrolü.** Apple ve Google kurallarının madde madde kontrol listesi ve eksiklerin kapatılması.
+6. ✅ **Bildirim tercihleri ve İYS uyumu.** Bildirim türü bazında açma/kapama; pazarlama iletileri için ayrı izin kaydı.
+7. ✅ **Mağaza form içerikleri.** Gizlilik etiketleri, Veri Güvenliği formu ve yaş derecelendirme cevapları (Faz 11 envanterinden); inceleme notu ve demo hesap.
 
 ## Faz 15 · Gerçek zamanlı iletişimde üretim kalitesi
 

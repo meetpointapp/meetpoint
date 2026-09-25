@@ -26,7 +26,7 @@ export const INVENTORY: InventoryEntry[] = [
   {
     category: 'Kimlik ve iletişim',
     tables: ['User'],
-    data: 'E-posta, dil, kayıt tarihi, onaylanan metin sürümleri, rıza durumları, son etkinlik',
+    data: 'E-posta, dil, kayıt tarihi, onaylanan metin sürümleri (satış metinleri dahil), rıza durumları, bildirim tercihleri ve sessiz saatler, son etkinlik',
     purpose: 'Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı',
     basis: ['sözleşme', 'yasal'],
     retention: `Hesap süresince; silme talebinden ${g.deletionGraceDays} gün sonra veya ${Math.round(g.inactiveDays / 365)} yıl hareketsizlikte silinir`,
@@ -187,6 +187,24 @@ export const INVENTORY: InventoryEntry[] = [
     basis: ['yasal', 'meşru'],
     retention: 'Değiştirilemez; yasal süre boyunca',
     recipients: 'Aktarılmaz',
+  },
+  {
+    category: 'Destek talepleri',
+    tables: ['SupportTicket', 'SupportMessage'],
+    data: 'Talep kategorisi, konu, yazışmalar, isteğe bağlı ekran görüntüsü (konum bilgisi silinmiş), ilgili işlem, cihaz türü ve uygulama sürümü',
+    purpose: 'Müşteri desteği, tüketici şikayetlerinin çözümü ve kanıtı',
+    basis: ['sözleşme', 'yasal', 'hak'],
+    retention: `Hesapla birlikte silinir; kapanan talepler ${Math.round(g.supportClosedDays / 365)} yıl sonra silinir`,
+    recipients: 'E-posta sağlayıcısı (yanıt bildirimi)',
+  },
+  {
+    category: 'Yardım merkezi ve künye (kişisel veri değil)',
+    tables: ['HelpArticle', 'CompanyInfo'],
+    data: 'Sık sorulan sorular, şirket bilgileri, son değiştiren yönetici',
+    purpose: 'Bilgilendirme ve yasal künye yükümlülüğü',
+    basis: ['yasal', 'meşru'],
+    retention: 'Süresiz (değişiklikler işlem kaydında)',
+    recipients: 'Herkese açık',
   },
   {
     category: 'Teknik (kişisel veri değil)',

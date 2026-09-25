@@ -126,3 +126,31 @@ adminPrivacyRouter.post('/retention/run', async (req, res) => {
   await audit(req, 'retention.run', '', '', summary);
   res.json(summary);
 });
+
+// ---------- İYS (İleti Yönetim Sistemi) dışa aktarımı
+// E-posta kampanya izinleri (rıza kaydından) İYS toplu yükleme biçiminde: her alıcının belirtilen tarihten
+// sonraki en son onay/ret durumu. Kaynak: mobil uygulama. Biçim, İYS'ye ilk yüklemeden önce İYS
+// panelindeki güncel şablonla karşılaştırılmalı (Faz 17).
+const iysDate = (d: Date) => {
+  const p = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(d);
+  return p.replace('T', ' ');
+};
+
+adminPrivacyRouter.get('/iys.csv', async (req, res) => {
+  const { since } = z.object({ since: z.coerce.date().optional() }).parse(req.query);
+  const rows = await prisma.consent.findMany({
+    where: { kind: 'marketing', ...(since && { createdAt: { gte: since } }) },
+    orderBy: { createdAt: 'asc' },
+    include: { user: { select: { email: true } } },
+  });
+  // Kullanıcı başına son durum
+  const latest = new Map<string, (typeof rows)[number]>();
+  for (const r of rows) latest.set(r.userId, r);
+  const lines = ['recipient,type,source,status,consentDate,recipientType'];
+  for (const r of latest.values()) {
+    lines.push([r.user.email, 'EPOSTA', 'HS_MOBIL', r.granted ? 'ONAY' : 'RET', iysDate(r.createdAt), 'BIREYSEL'].join(','));
+  }
+  await audit(req, 'iys.export', '', '', { rows: latest.size, since: since?.toISOString() ?? '' });
+  res.setHeader('Content-Disposition', `attachment; filename="iys-eposta-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.type('text/csv; charset=utf-8').send(`﻿${lines.join('\n')}\n`);
+});

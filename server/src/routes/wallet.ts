@@ -8,6 +8,7 @@ import { payoutDto } from '../payouts';
 import { getFinance, getPacks, packById } from '../finance/settings';
 import { creditPurchase, type Store } from '../purchases';
 import { cashableNow, getBalance, getBuckets, total } from '../wallet';
+import { acceptSalesTerms, requireSalesTerms, salesTermsState } from '../consumer/salesTerms';
 
 export const walletRouter = Router();
 
@@ -20,7 +21,7 @@ walletRouter.get('/wallet', async (req, res) => {
     prisma.payout.findFirst({ where: { userId, status: 'PENDING' } }),
     getFinance(),
     getPacks(),
-    prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { kycStatus: true } }),
+    prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { kycStatus: true, salesTermsVersion: true } }),
   ]);
   const balance = total(buckets);
   const { cashable, pending, nextMatureAt } = await cashableNow(prisma, userId, buckets);
@@ -43,6 +44,8 @@ walletRouter.get('/wallet', async (req, res) => {
       pending: pendingPayout ? payoutDto(pendingPayout) : null,
     },
     entries,
+    // Satın alma öncesi onay (ön bilgilendirme + mesafeli satış + cayma istisnası)
+    salesTerms: salesTermsState(user),
     packs: packs.map(({ id, coins, usd, tryPrice, popular }) => ({ id, coins, usd, tryPrice, popular })),
     // İlk alım bonusu hâlâ geçerliyse yüzdesi, değilse 0
     firstPurchaseBonusPct: purchaseCount === 0 ? economy.firstPurchaseBonusPct : 0,
@@ -57,6 +60,13 @@ walletRouter.get('/wallet', async (req, res) => {
       likesUnlockHours: economy.likesUnlockHours,
     },
   });
+});
+
+// Satın alma öncesi onay: uygulama ilk satın almadan (veya metin değişince) önce gösterir
+walletRouter.post('/wallet/sales-terms', async (req, res) => {
+  z.object({ accept: z.literal(true) }).parse(req.body);
+  await acceptSalesTerms(uid(req), String(req.ip ?? ''));
+  res.json({ ok: true });
 });
 
 // Satın almadan sonra uygulama çağırır: RevenueCat'teki işlemleri çekip eksik olanları yükler.
@@ -96,6 +106,7 @@ walletRouter.post('/wallet/dev-topup', async (req, res) => {
   const { packId } = z.object({ packId: z.string() }).parse(req.body);
   if (!(await packById(packId))) throw new HttpError(400, 'invalid_pack');
   const userId = uid(req);
+  await requireSalesTerms(userId);
   const result = await creditPurchase({
     userId,
     productId: packId,

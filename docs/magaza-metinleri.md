@@ -84,6 +84,8 @@ dating,meet,match,chat,video call,singles,flirt,nearby,friends,relationship
 
 ## Mağaza formları için notlar
 
+> Güncel ve ayrıntılı form cevapları, kural kontrol listesi ve inceleme notu: [magaza-uyum.md](magaza-uyum.md) (Faz 14). Aşağıdaki özet eski sürümdür.
+
 **Yaş sınırı:** 18+ (Google Play: "Tanışma" kategorisi, içerik derecelendirme anketinde kullanıcılar arası iletişim ve paylaşım = evet). App Store: 17+ (Sık/Yoğun: Olgunlara yönelik temalar yok; kullanıcı üretimli içerik var).
 
 **Veri güvenliği (Google Play) / Gizlilik etiketleri (App Store) — toplanan veriler:**

@@ -10,16 +10,20 @@ import { HttpError, prisma } from '../db';
 // overseas_transfer Yurt dışındaki hizmetlere aktarım (Agora arama, Firebase bildirim).
 //                   Rıza yoksa arama yapılamaz/alınamaz, bildirim gitmez; gerisi çalışır.
 // selfie            Mavi tik için selfie. Geri alınınca saklanan selfie'ler silinir.
-// marketing         Kampanya ve duyuru e-postaları.
+// marketing         Kampanya ve duyuru e-postaları (İYS'ye EPOSTA kanalı olarak bildirilir).
+// marketing_push    Kampanya ve duyuru bildirimleri (push). E-postadan ayrı izin.
 
-export const CONSENT_KINDS = ['special_category', 'overseas_transfer', 'selfie', 'marketing'] as const;
+export const CONSENT_KINDS = ['special_category', 'overseas_transfer', 'selfie', 'marketing', 'marketing_push'] as const;
 export type ConsentKind = (typeof CONSENT_KINDS)[number];
 
-const FIELD: Record<ConsentKind, keyof Pick<User, 'consentSpecialAt' | 'consentOverseasAt' | 'consentSelfieAt' | 'consentMarketingAt'>> = {
+type ConsentField = 'consentSpecialAt' | 'consentOverseasAt' | 'consentSelfieAt' | 'consentMarketingAt' | 'consentMarketingPushAt';
+
+const FIELD: Record<ConsentKind, keyof Pick<User, ConsentField>> = {
   special_category: 'consentSpecialAt',
   overseas_transfer: 'consentOverseasAt',
   selfie: 'consentSelfieAt',
   marketing: 'consentMarketingAt',
+  marketing_push: 'consentMarketingPushAt',
 };
 
 type Tx = Prisma.TransactionClient;
@@ -50,7 +54,7 @@ export async function acceptLegal(tx: Tx, userId: string, source: string, ip = '
   });
 }
 
-export const hasConsent = (user: Pick<User, 'consentSpecialAt' | 'consentOverseasAt' | 'consentSelfieAt' | 'consentMarketingAt'>, kind: ConsentKind) =>
+export const hasConsent = (user: Pick<User, ConsentField>, kind: ConsentKind) =>
   kind === 'overseas_transfer' && !privacy.overseasConsentRequired ? true : user[FIELD[kind]] !== null;
 
 // Yeniden onay gereken belgeler (metin sürümü değiştiyse)
@@ -73,6 +77,7 @@ export function consentState(user: User) {
     overseas_transfer: hasConsent(user, 'overseas_transfer'),
     selfie: user.consentSelfieAt !== null,
     marketing: user.consentMarketingAt !== null,
+    marketing_push: user.consentMarketingPushAt !== null,
     overseasConsentRequired: privacy.overseasConsentRequired,
   };
 }

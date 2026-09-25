@@ -1668,4 +1668,226 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errAccountNameMismatch =>
       'IBAN sahibi, kimliği doğrulanan kişiyle aynı olmalı.';
+
+  @override
+  String get salesTermsTitle => 'Satın almadan önce';
+
+  @override
+  String get salesTermsUpdatedTitle => 'Satış koşulları güncellendi';
+
+  @override
+  String get salesTermsIntro =>
+      'Jetonlar dijital içeriktir ve ödeme onaylanır onaylanmaz hesabına yüklenir. Bu yüzden satın aldıktan sonra cayma hakkı kullanılamaz. Bu onayı bir kez verirsin.';
+
+  @override
+  String get preInfoForm => 'Ön Bilgilendirme Formu';
+
+  @override
+  String get distanceSalesContract => 'Mesafeli Satış Sözleşmesi';
+
+  @override
+  String get salesTermsCheckboxA => '';
+
+  @override
+  String get salesTermsCheckboxAnd => ' ve ';
+
+  @override
+  String get salesTermsCheckboxB =>
+      '\'ni okudum, onaylıyorum. Jetonların hemen hesabıma yüklenmesini istiyorum ve bu nedenle cayma hakkımın olmadığını kabul ediyorum.';
+
+  @override
+  String get salesTermsAccept => 'Onayla ve devam et';
+
+  @override
+  String get salesTermsLineA => 'Satın alma ';
+
+  @override
+  String get salesTermsLineB =>
+      '\'ne tabidir · Dijital içerik: cayma hakkı yoktur · Jetonların süresi dolmaz';
+
+  @override
+  String get supportAboutEntry => 'Bu işlemle ilgili yardım al';
+
+  @override
+  String get helpAndSupport => 'Yardım ve destek';
+
+  @override
+  String get helpSearchHint => 'Ne arıyorsun? (ör. arama ücreti)';
+
+  @override
+  String get helpNoResults =>
+      'Sonuç bulunamadı. Farklı kelimelerle dene ya da bize yaz.';
+
+  @override
+  String get helpStillNeed => 'Cevabını bulamadın mı?';
+
+  @override
+  String get contactSupport => 'Bize yaz';
+
+  @override
+  String get imprint => 'Künye';
+
+  @override
+  String get myTickets => 'Destek taleplerim';
+
+  @override
+  String get newTicket => 'Yeni talep';
+
+  @override
+  String get noTickets => 'Henüz destek talebin yok.';
+
+  @override
+  String get supportTicket => 'Destek talebi';
+
+  @override
+  String get ticketOpen => 'Yanıt bekliyor';
+
+  @override
+  String get ticketAnswered => 'Yanıtlandı';
+
+  @override
+  String get ticketClosed => 'Kapandı';
+
+  @override
+  String get ticketSent => 'Talebin alındı, en kısa sürede dönüyoruz.';
+
+  @override
+  String get ticketCategory => 'Konu ne hakkında?';
+
+  @override
+  String get ticketSubject => 'Başlık';
+
+  @override
+  String get ticketBodyHint =>
+      'Ne oldu? Ne zaman oldu? Ne kadar ayrıntı verirsen o kadar hızlı çözeriz.';
+
+  @override
+  String get relatedRecord => 'İlgili işlem';
+
+  @override
+  String get addScreenshot => 'Ekran görüntüsü ekle';
+
+  @override
+  String get screenshotAttached => 'Ekran görüntüsü eklendi';
+
+  @override
+  String get viewScreenshot => 'Ekran görüntüsü';
+
+  @override
+  String get remove => 'Kaldır';
+
+  @override
+  String get ticketResponseTime =>
+      'Genellikle 48 saat içinde yanıtlarız. Yanıt gelince bildirim ve e-posta alırsın.';
+
+  @override
+  String get ticketWaiting =>
+      'Talebin ekibimizde. Yanıt gelince haber vereceğiz.';
+
+  @override
+  String get ticketClosedNote =>
+      'Bu talep kapandı. Yeni bir sorun için yeni talep açabilirsin.';
+
+  @override
+  String get closeTicket => 'Talebi kapat';
+
+  @override
+  String get closeTicketConfirm =>
+      'Sorunun çözüldüyse talebi kapatabilirsin. Kapanan talebe mesaj yazılamaz.';
+
+  @override
+  String get writeReply => 'Yanıt yaz…';
+
+  @override
+  String get supportTeam => 'MeetPoint Destek';
+
+  @override
+  String get supportCatCoins => 'Jeton ve ödeme';
+
+  @override
+  String get supportCatCalls => 'Arama ve hediye';
+
+  @override
+  String get supportCatCashout => 'Para çekme';
+
+  @override
+  String get supportCatSafety => 'Güvenlik';
+
+  @override
+  String get supportCatAccount => 'Hesap';
+
+  @override
+  String get supportCatBug => 'Hata bildir';
+
+  @override
+  String get supportCatOther => 'Diğer';
+
+  @override
+  String get notificationsTitle => 'Bildirimler';
+
+  @override
+  String get notifyTypesTitle => 'Bildirim türleri';
+
+  @override
+  String get notifyTypesHint =>
+      'Kapattığın türler telefonuna gelmez; uygulamada görmeye devam edersin.';
+
+  @override
+  String get notifyMessages => 'Mesajlar';
+
+  @override
+  String get notifyMatches => 'Eşleşmeler';
+
+  @override
+  String get notifyRequests => 'Mesaj istekleri';
+
+  @override
+  String get notifyCalls => 'Aramalar';
+
+  @override
+  String get notifyLikes => 'Süper beğeniler';
+
+  @override
+  String get quietHoursTitle => 'Sessiz saatler';
+
+  @override
+  String get quietHoursHint => 'Bu saatlerde aramalar dışında bildirim gelmez.';
+
+  @override
+  String get quietHours => 'Sessiz saatleri aç';
+
+  @override
+  String get quietFrom => 'Başlangıç';
+
+  @override
+  String get quietTo => 'Bitiş';
+
+  @override
+  String get marketingTitle => 'Kampanya ve duyurular';
+
+  @override
+  String get marketingHint =>
+      'İzin kanal bazındadır; istediğin an geri alabilirsin.';
+
+  @override
+  String get consentMarketingPushTitle => 'Kampanya bildirimleri';
+
+  @override
+  String get consentMarketingPushText =>
+      'İndirim ve yeni özellik duyuruları bildirim olarak.';
+
+  @override
+  String get requiredNotificationsNote =>
+      'Ödeme, destek yanıtı ve güvenlik bildirimleri hesabınla ilgili olduğu için her zaman gönderilir.';
+
+  @override
+  String get errSalesTermsRequired =>
+      'Satın almadan önce satış koşullarını onaylaman gerekiyor.';
+
+  @override
+  String get errSupportLimit =>
+      'Çok fazla açık talebin var. Önce mevcut taleplerinden birini kapat.';
+
+  @override
+  String get errTicketClosed => 'Bu talep kapandı. Yeni bir talep açabilirsin.';
 }

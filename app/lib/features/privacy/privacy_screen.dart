@@ -44,6 +44,7 @@ class PrivacyScreen extends ConsumerWidget {
                 if (c.overseasConsentRequired) ConsentKind.overseasTransfer,
                 ConsentKind.selfie,
                 ConsentKind.marketing,
+                ConsentKind.marketingPush,
               ].indexed) ...[
                 if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
                 _ConsentSwitch(kind: k, value: c.of(k)),
@@ -75,6 +76,9 @@ class PrivacyScreen extends ConsumerWidget {
               ('privacy', l.privacyPolicy),
               ('retention', l.retentionPolicy),
               ('terms', l.termsOfService),
+              ('preinfo', l.preInfoForm),
+              ('distance-sales', l.distanceSalesContract),
+              ('imprint', l.imprint),
             ].indexed) ...[
               if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
               ListTile(
@@ -110,7 +114,7 @@ class _ConsentSwitchState extends ConsumerState<_ConsentSwitch> {
       ConsentKind.specialCategory => l.revokeSpecialWarning,
       ConsentKind.overseasTransfer => l.revokeOverseasWarning,
       ConsentKind.selfie => l.revokeSelfieWarning,
-      ConsentKind.marketing => null,
+      ConsentKind.marketing || ConsentKind.marketingPush => null,
     };
     if (!granted && warning != null) {
       final ok = await showDialog<bool>(
@@ -147,6 +151,7 @@ class _ConsentSwitchState extends ConsumerState<_ConsentSwitch> {
       ConsentKind.overseasTransfer => (l.consentOverseasTitle, l.consentOverseasText),
       ConsentKind.selfie => (l.consentSelfieTitle, l.consentSelfieText),
       ConsentKind.marketing => (l.consentMarketingTitle, l.consentMarketingText),
+      ConsentKind.marketingPush => (l.consentMarketingPushTitle, l.consentMarketingPushText),
     };
     return SwitchListTile(
       value: widget.value,

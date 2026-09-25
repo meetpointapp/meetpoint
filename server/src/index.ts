@@ -17,6 +17,12 @@ import { adminAuthRouter } from './routes/adminAuth';
 import { adminFinanceRouter } from './routes/adminFinance';
 import { adminModerationRouter } from './routes/adminModeration';
 import { adminPrivacyRouter } from './routes/adminPrivacy';
+import { adminSupportRouter } from './routes/adminSupport';
+import { accountWebRouter } from './routes/accountWeb';
+import { helpRouter } from './routes/help';
+import { notificationsRouter } from './routes/notifications';
+import { supportRouter } from './routes/support';
+import { ensureHelpArticles } from './support/help';
 import { authRouter } from './routes/auth';
 import { boostsRouter } from './routes/boosts';
 import { callsRouter } from './routes/calls';
@@ -81,11 +87,14 @@ app.use('/webhooks/revenuecat', revenueCatRouter);
 app.use('/client-errors', clientErrorsRouter);
 app.use('/data-export', dataExportDownloadRouter);
 app.use('/appeals', publicAppealRouter);
+app.use('/help', helpRouter);
+app.use('/account', accountWebRouter);
 app.use('/auth', authRouter);
 app.use('/admin/api/mfa', requireAuth, adminAuthRouter);
 app.use('/admin/api/privacy', requireAuth, requireAdmin, adminPrivacyRouter);
 app.use('/admin/api/moderation', requireAuth, requireAdmin, adminModerationRouter);
 app.use('/admin/api/finance', requireAuth, requireAdmin, adminFinanceRouter);
+app.use('/admin/api/support', requireAuth, requireAdmin, adminSupportRouter);
 app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,
@@ -104,6 +113,8 @@ app.use(
   callsRouter,
   payoutsRouter,
   safetyRouter,
+  supportRouter,
+  notificationsRouter,
 );
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
@@ -128,6 +139,8 @@ initRealtime(server);
 server.listen(config.port, () => {
   console.log(`MeetPoint server http://localhost:${config.port}`);
   if (schedulerConfig.enabled) startScheduler();
+  // Yardım merkezi boşsa varsayılan SSS metinleri
+  ensureHelpArticles().catch((e) => console.error('help seed', e));
 });
 
 // Düzgün kapanma: liderlik kilidini bırak (başka sunucu hemen devralsın), bağlantıları kapat

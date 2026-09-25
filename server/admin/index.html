@@ -60,6 +60,7 @@
         <button data-tab="overview" class="tab active">Özet</button>
         <button data-tab="reports" data-roles="moderator" class="tab">Moderasyon <span id="count-reports" class="count"></span></button>
         <button data-tab="verifications" data-roles="moderator" class="tab">Mavi tik <span id="count-verifications" class="count"></span></button>
+        <button data-tab="support" data-roles="moderator finance" class="tab">Destek <span id="count-support" class="count"></span></button>
         <button data-tab="users" data-roles="moderator finance" class="tab">Kullanıcılar</button>
         <button data-tab="purchases" data-roles="finance" class="tab">Satışlar</button>
         <button data-tab="payouts" data-roles="finance" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
@@ -121,6 +122,62 @@
           </div>
           <div class="actions"><button type="submit" class="btn primary">CSV indir</button><button type="button" id="traffic-verify" class="btn soft">Bütünlüğü doğrula</button></div>
         </form>
+      </div>
+
+      <div id="tab-support" class="panel hidden">
+        <div class="toolbar">
+          <div class="seg">
+            <button data-sup="tickets" class="seg-btn active">Talepler</button>
+            <button data-sup="help" data-roles="moderator" class="seg-btn">Yardım merkezi</button>
+            <button data-sup="company" class="seg-btn">Künye</button>
+          </div>
+        </div>
+        <div id="sup-tickets">
+          <div id="support-metrics" class="stats compact"></div>
+          <div class="toolbar">
+            <div class="seg">
+              <button data-tstatus="OPEN" class="seg-btn active">Yanıt bekleyen</button>
+              <button data-tstatus="ANSWERED" class="seg-btn">Kullanıcıda</button>
+              <button data-tstatus="CLOSED" class="seg-btn">Kapalı</button>
+            </div>
+          </div>
+          <p class="muted">Hedef: her yeni mesaja 48 saat içinde yanıt. Kırmızı olanlar gecikti. Yanıt kullanıcıya uygulamada görünür, bildirim ve e-postayla haber verilir. Ekran görüntüsünü açmak işlem kaydına yazılır.</p>
+          <div id="tickets" class="list"></div>
+        </div>
+        <div id="sup-help" class="hidden">
+          <div class="toolbar">
+            <div class="seg">
+              <button data-hlocale="tr" class="seg-btn active">Türkçe</button>
+              <button data-hlocale="en" class="seg-btn">English</button>
+            </div>
+            <a class="btn soft" href="/help" target="_blank" rel="noopener">Web'de gör</a>
+          </div>
+          <p class="muted">Uygulamada ve web'de (/help) görünen sık sorulan sorular. Cevapta <code>{{voiceRate}}</code>, <code>{{videoRate}}</code>, <code>{{messagePrice}}</code>, <code>{{bonusPct}}</code>, <code>{{minCashoutCoins}}</code>, <code>{{minCashoutUsd}}</code>, <code>{{maturityDays}}</code>, <code>{{deletionDays}}</code>, <code>{{slaHours}}</code> güncel ayardan dolar. Silmek yerine "yayından kaldır" tercih edin.</p>
+          <form id="help-form" class="card item">
+            <input type="hidden" id="help-id">
+            <div class="actions">
+              <select id="help-category">
+                <option value="coins">Jetonlar ve satın alma</option>
+                <option value="calls">Aramalar ve hediyeler</option>
+                <option value="cashout">Kazanç ve para çekme</option>
+                <option value="safety">Güvenlik</option>
+                <option value="account">Hesap ve gizlilik</option>
+              </select>
+              <input id="help-position" type="number" min="0" max="999" value="0" title="Sıra" class="w-90">
+              <label class="muted"><input id="help-published" type="checkbox" checked> Yayında</label>
+            </div>
+            <input id="help-question" placeholder="Soru" required maxlength="200">
+            <textarea id="help-answer" rows="4" placeholder="Cevap" required maxlength="4000"></textarea>
+            <div class="actions"><button type="submit" class="btn primary" id="help-save">Ekle</button><button type="button" class="btn ghost hidden" id="help-cancel">Vazgeç</button></div>
+          </form>
+          <div id="help-list" class="list"></div>
+        </div>
+        <div id="sup-company" class="hidden">
+          <p class="muted">Satıcı / hizmet sağlayıcı / veri sorumlusu bilgileri. Uygulamada ve web'de Künye sayfasında, Kullanım Koşulları, Gizlilik Politikası, Ön Bilgilendirme Formu ve Mesafeli Satış Sözleşmesi'nde otomatik görünür. Boş alanlar metinlerde köşeli parantezle görünür. Değiştirmeyi sadece süper yönetici yapabilir.</p>
+          <div id="company-missing"></div>
+          <form id="company-form" class="card item"><div id="company-fields" class="settings-grid"></div>
+            <div class="actions"><button type="submit" class="btn primary" id="company-save">Kaydet</button><a class="btn soft" href="/legal/imprint" target="_blank" rel="noopener">Künyeyi gör</a></div></form>
+        </div>
       </div>
 
       <div id="tab-verifications" class="panel hidden">
@@ -195,6 +252,7 @@
           </div>
         </div>
         <div id="kvkk-dsr">
+          <div class="toolbar"><button id="iys-export" class="btn soft">İYS dosyası indir (e-posta kampanya izinleri)</button></div>
           <p class="muted">İlgili kişi başvuruları (KVKK md. 11). En geç 30 gün içinde yanıtlanmalı; yanıt kullanıcıya e-postayla gider ve uygulamada görünür.</p>
           <div id="dsr" class="list"></div>
         </div>

@@ -2834,6 +2834,420 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'IBAN sahibi, kimliği doğrulanan kişiyle aynı olmalı.'**
   String get errAccountNameMismatch;
+
+  /// No description provided for @salesTermsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın almadan önce'**
+  String get salesTermsTitle;
+
+  /// No description provided for @salesTermsUpdatedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satış koşulları güncellendi'**
+  String get salesTermsUpdatedTitle;
+
+  /// No description provided for @salesTermsIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Jetonlar dijital içeriktir ve ödeme onaylanır onaylanmaz hesabına yüklenir. Bu yüzden satın aldıktan sonra cayma hakkı kullanılamaz. Bu onayı bir kez verirsin.'**
+  String get salesTermsIntro;
+
+  /// No description provided for @preInfoForm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ön Bilgilendirme Formu'**
+  String get preInfoForm;
+
+  /// No description provided for @distanceSalesContract.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesafeli Satış Sözleşmesi'**
+  String get distanceSalesContract;
+
+  /// No description provided for @salesTermsCheckboxA.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get salesTermsCheckboxA;
+
+  /// No description provided for @salesTermsCheckboxAnd.
+  ///
+  /// In tr, this message translates to:
+  /// **' ve '**
+  String get salesTermsCheckboxAnd;
+
+  /// No description provided for @salesTermsCheckboxB.
+  ///
+  /// In tr, this message translates to:
+  /// **'\'ni okudum, onaylıyorum. Jetonların hemen hesabıma yüklenmesini istiyorum ve bu nedenle cayma hakkımın olmadığını kabul ediyorum.'**
+  String get salesTermsCheckboxB;
+
+  /// No description provided for @salesTermsAccept.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onayla ve devam et'**
+  String get salesTermsAccept;
+
+  /// No description provided for @salesTermsLineA.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın alma '**
+  String get salesTermsLineA;
+
+  /// No description provided for @salesTermsLineB.
+  ///
+  /// In tr, this message translates to:
+  /// **'\'ne tabidir · Dijital içerik: cayma hakkı yoktur · Jetonların süresi dolmaz'**
+  String get salesTermsLineB;
+
+  /// No description provided for @supportAboutEntry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu işlemle ilgili yardım al'**
+  String get supportAboutEntry;
+
+  /// No description provided for @helpAndSupport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yardım ve destek'**
+  String get helpAndSupport;
+
+  /// No description provided for @helpSearchHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne arıyorsun? (ör. arama ücreti)'**
+  String get helpSearchHint;
+
+  /// No description provided for @helpNoResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuç bulunamadı. Farklı kelimelerle dene ya da bize yaz.'**
+  String get helpNoResults;
+
+  /// No description provided for @helpStillNeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevabını bulamadın mı?'**
+  String get helpStillNeed;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bize yaz'**
+  String get contactSupport;
+
+  /// No description provided for @imprint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Künye'**
+  String get imprint;
+
+  /// No description provided for @myTickets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Destek taleplerim'**
+  String get myTickets;
+
+  /// No description provided for @newTicket.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni talep'**
+  String get newTicket;
+
+  /// No description provided for @noTickets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz destek talebin yok.'**
+  String get noTickets;
+
+  /// No description provided for @supportTicket.
+  ///
+  /// In tr, this message translates to:
+  /// **'Destek talebi'**
+  String get supportTicket;
+
+  /// No description provided for @ticketOpen.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanıt bekliyor'**
+  String get ticketOpen;
+
+  /// No description provided for @ticketAnswered.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanıtlandı'**
+  String get ticketAnswered;
+
+  /// No description provided for @ticketClosed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapandı'**
+  String get ticketClosed;
+
+  /// No description provided for @ticketSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebin alındı, en kısa sürede dönüyoruz.'**
+  String get ticketSent;
+
+  /// No description provided for @ticketCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konu ne hakkında?'**
+  String get ticketCategory;
+
+  /// No description provided for @ticketSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlık'**
+  String get ticketSubject;
+
+  /// No description provided for @ticketBodyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne oldu? Ne zaman oldu? Ne kadar ayrıntı verirsen o kadar hızlı çözeriz.'**
+  String get ticketBodyHint;
+
+  /// No description provided for @relatedRecord.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgili işlem'**
+  String get relatedRecord;
+
+  /// No description provided for @addScreenshot.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekran görüntüsü ekle'**
+  String get addScreenshot;
+
+  /// No description provided for @screenshotAttached.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekran görüntüsü eklendi'**
+  String get screenshotAttached;
+
+  /// No description provided for @viewScreenshot.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekran görüntüsü'**
+  String get viewScreenshot;
+
+  /// No description provided for @remove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldır'**
+  String get remove;
+
+  /// No description provided for @ticketResponseTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Genellikle 48 saat içinde yanıtlarız. Yanıt gelince bildirim ve e-posta alırsın.'**
+  String get ticketResponseTime;
+
+  /// No description provided for @ticketWaiting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebin ekibimizde. Yanıt gelince haber vereceğiz.'**
+  String get ticketWaiting;
+
+  /// No description provided for @ticketClosedNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu talep kapandı. Yeni bir sorun için yeni talep açabilirsin.'**
+  String get ticketClosedNote;
+
+  /// No description provided for @closeTicket.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talebi kapat'**
+  String get closeTicket;
+
+  /// No description provided for @closeTicketConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sorunun çözüldüyse talebi kapatabilirsin. Kapanan talebe mesaj yazılamaz.'**
+  String get closeTicketConfirm;
+
+  /// No description provided for @writeReply.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanıt yaz…'**
+  String get writeReply;
+
+  /// No description provided for @supportTeam.
+  ///
+  /// In tr, this message translates to:
+  /// **'MeetPoint Destek'**
+  String get supportTeam;
+
+  /// No description provided for @supportCatCoins.
+  ///
+  /// In tr, this message translates to:
+  /// **'Jeton ve ödeme'**
+  String get supportCatCoins;
+
+  /// No description provided for @supportCatCalls.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arama ve hediye'**
+  String get supportCatCalls;
+
+  /// No description provided for @supportCatCashout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Para çekme'**
+  String get supportCatCashout;
+
+  /// No description provided for @supportCatSafety.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenlik'**
+  String get supportCatSafety;
+
+  /// No description provided for @supportCatAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap'**
+  String get supportCatAccount;
+
+  /// No description provided for @supportCatBug.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hata bildir'**
+  String get supportCatBug;
+
+  /// No description provided for @supportCatOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get supportCatOther;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler'**
+  String get notificationsTitle;
+
+  /// No description provided for @notifyTypesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim türleri'**
+  String get notifyTypesTitle;
+
+  /// No description provided for @notifyTypesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapattığın türler telefonuna gelmez; uygulamada görmeye devam edersin.'**
+  String get notifyTypesHint;
+
+  /// No description provided for @notifyMessages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesajlar'**
+  String get notifyMessages;
+
+  /// No description provided for @notifyMatches.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşmeler'**
+  String get notifyMatches;
+
+  /// No description provided for @notifyRequests.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesaj istekleri'**
+  String get notifyRequests;
+
+  /// No description provided for @notifyCalls.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aramalar'**
+  String get notifyCalls;
+
+  /// No description provided for @notifyLikes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süper beğeniler'**
+  String get notifyLikes;
+
+  /// No description provided for @quietHoursTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sessiz saatler'**
+  String get quietHoursTitle;
+
+  /// No description provided for @quietHoursHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu saatlerde aramalar dışında bildirim gelmez.'**
+  String get quietHoursHint;
+
+  /// No description provided for @quietHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sessiz saatleri aç'**
+  String get quietHours;
+
+  /// No description provided for @quietFrom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlangıç'**
+  String get quietFrom;
+
+  /// No description provided for @quietTo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitiş'**
+  String get quietTo;
+
+  /// No description provided for @marketingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kampanya ve duyurular'**
+  String get marketingTitle;
+
+  /// No description provided for @marketingHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İzin kanal bazındadır; istediğin an geri alabilirsin.'**
+  String get marketingHint;
+
+  /// No description provided for @consentMarketingPushTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kampanya bildirimleri'**
+  String get consentMarketingPushTitle;
+
+  /// No description provided for @consentMarketingPushText.
+  ///
+  /// In tr, this message translates to:
+  /// **'İndirim ve yeni özellik duyuruları bildirim olarak.'**
+  String get consentMarketingPushText;
+
+  /// No description provided for @requiredNotificationsNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ödeme, destek yanıtı ve güvenlik bildirimleri hesabınla ilgili olduğu için her zaman gönderilir.'**
+  String get requiredNotificationsNote;
+
+  /// No description provided for @errSalesTermsRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın almadan önce satış koşullarını onaylaman gerekiyor.'**
+  String get errSalesTermsRequired;
+
+  /// No description provided for @errSupportLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla açık talebin var. Önce mevcut taleplerinden birini kapat.'**
+  String get errSupportLimit;
+
+  /// No description provided for @errTicketClosed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu talep kapandı. Yeni bir talep açabilirsin.'**
+  String get errTicketClosed;
 }
 
 class _AppLocalizationsDelegate

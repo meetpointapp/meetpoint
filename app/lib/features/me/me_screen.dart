@@ -10,6 +10,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../support/support_screens.dart';
 
 // Profil tamamlama yüzdesi: fotoğraf, soru ve temel bilgiler eşleşmeyi artırır
 int profileCompletion(PublicProfile p) {
@@ -35,6 +36,8 @@ class MeScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final me = ref.watch(meProvider);
     final locale = ref.watch(localeProvider).languageCode;
+    // Destek yanıtı gelmiş ama okunmamış talepler
+    final supportUnread = ref.watch(supportInboxProvider).value?.unread ?? 0;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.navProfile)),
@@ -140,6 +143,26 @@ class MeScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(
+                    leading: const Icon(Icons.notifications_none_rounded),
+                    title: Text(l.notificationsTitle),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/me/notifications'),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
+                    leading: const Icon(Icons.support_agent_rounded),
+                    title: Text(l.helpAndSupport),
+                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                      if (supportUnread > 0) Badge(label: Text('$supportUnread'), backgroundColor: Brand.coral),
+                      const Icon(Icons.chevron_right_rounded),
+                    ]),
+                    onTap: () async {
+                      await context.push('/help');
+                      ref.invalidate(supportInboxProvider);
+                    },
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
                     leading: const Icon(Icons.health_and_safety_outlined),
                     title: Text(l.safetyCenter),
                     trailing: const Icon(Icons.open_in_new_rounded, size: 18),
@@ -194,6 +217,13 @@ class MeScreen extends ConsumerWidget {
                     title: Text(l.privacyPolicy),
                     trailing: const Icon(Icons.open_in_new_rounded, size: 18),
                     onTap: () => openLegal('privacy', locale),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
+                    leading: const Icon(Icons.business_outlined),
+                    title: Text(l.imprint),
+                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                    onTap: () => openLegal('imprint', locale),
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(

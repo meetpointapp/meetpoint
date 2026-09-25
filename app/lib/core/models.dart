@@ -330,6 +330,7 @@ class WalletInfo {
   final FeaturePrices featurePrices;
   final int firstPurchaseBonusPct; // 0 = ilk alım bonusu kullanılmış
   final CashoutRules cashout;
+  final SalesTerms salesTerms;
 
   const WalletInfo({
     required this.balance,
@@ -346,6 +347,7 @@ class WalletInfo {
     required this.featurePrices,
     this.firstPurchaseBonusPct = 0,
     this.cashout = const CashoutRules(),
+    this.salesTerms = const SalesTerms(),
   });
 
   factory WalletInfo.fromJson(Map<String, dynamic> j) => WalletInfo(
@@ -367,6 +369,7 @@ class WalletInfo {
         featurePrices: FeaturePrices.fromJson(j['featurePrices']),
         firstPurchaseBonusPct: j['firstPurchaseBonusPct'] ?? 0,
         cashout: j['cashout'] == null ? const CashoutRules() : CashoutRules.fromJson(j['cashout']),
+        salesTerms: j['salesTerms'] == null ? const SalesTerms() : SalesTerms.fromJson(j['salesTerms']),
       );
 }
 
@@ -776,7 +779,8 @@ enum ConsentKind {
   specialCategory('special_category', 'consent-special'),
   overseasTransfer('overseas_transfer', 'consent-overseas'),
   selfie('selfie', 'consent-selfie'),
-  marketing('marketing', 'consent-marketing');
+  marketing('marketing', 'consent-marketing'),
+  marketingPush('marketing_push', 'consent-marketing');
 
   const ConsentKind(this.api, this.doc);
   final String api; // sunucudaki adı
@@ -790,6 +794,7 @@ class ConsentState {
   final bool overseasTransfer;
   final bool selfie;
   final bool marketing;
+  final bool marketingPush;
   // false ise yurt dışı aktarım için ayrı rıza sorulmaz (standart sözleşme yeterli görülmüş)
   final bool overseasConsentRequired;
 
@@ -798,6 +803,7 @@ class ConsentState {
     this.overseasTransfer = false,
     this.selfie = false,
     this.marketing = false,
+    this.marketingPush = false,
     this.overseasConsentRequired = true,
   });
 
@@ -806,6 +812,7 @@ class ConsentState {
         ConsentKind.overseasTransfer => overseasTransfer,
         ConsentKind.selfie => selfie,
         ConsentKind.marketing => marketing,
+        ConsentKind.marketingPush => marketingPush,
       };
 
   factory ConsentState.fromJson(Map<String, dynamic> j) => ConsentState(
@@ -813,6 +820,7 @@ class ConsentState {
         overseasTransfer: j['overseas_transfer'] == true,
         selfie: j['selfie'] == true,
         marketing: j['marketing'] == true,
+        marketingPush: j['marketing_push'] == true,
         overseasConsentRequired: j['overseasConsentRequired'] != false,
       );
 }
@@ -899,4 +907,138 @@ class Sanction {
         createdAt: _date(j['createdAt']),
         appealStatus: (j['appeal'] as Map?)?['status'] as String?,
       );
+}
+
+// Satın alma öncesi onay (ön bilgilendirme + mesafeli satış + cayma hakkı istisnası)
+class SalesTerms {
+  final bool required; // satın almadan önce onay gerekli
+  final bool updated; // daha önce onaylanmış ama metin değişmiş
+  final String version;
+  const SalesTerms({this.required = false, this.updated = false, this.version = ''});
+  factory SalesTerms.fromJson(Map<String, dynamic> j) =>
+      SalesTerms(required: j['required'] == true, updated: j['updated'] == true, version: j['version'] ?? '');
+}
+
+// ---------- Destek ----------
+
+enum SupportCategory { coins, calls, cashout, safety, account, bug, other }
+
+enum TicketStatus { open, answered, closed }
+
+TicketStatus _ticketStatus(Object? v) => switch (v) {
+      'ANSWERED' => TicketStatus.answered,
+      'CLOSED' => TicketStatus.closed,
+      _ => TicketStatus.open,
+    };
+
+class SupportMessage {
+  final String id;
+  final bool fromStaff;
+  final String body;
+  final bool hasAttachment;
+  final DateTime createdAt;
+  const SupportMessage({required this.id, required this.fromStaff, required this.body, required this.hasAttachment, required this.createdAt});
+  factory SupportMessage.fromJson(Map<String, dynamic> j) => SupportMessage(
+        id: j['id'],
+        fromStaff: j['fromStaff'] == true,
+        body: j['body'] ?? '',
+        hasAttachment: j['hasAttachment'] == true,
+        createdAt: _date(j['createdAt']),
+      );
+}
+
+class SupportTicket {
+  final String id;
+  final SupportCategory category;
+  final String subject;
+  final TicketStatus status;
+  final bool unread; // destekten yanıt geldi, henüz açılmadı
+  final DateTime lastMessageAt;
+  final DateTime createdAt;
+  final List<SupportMessage> messages; // listede boş; ayrıntıda dolu
+
+  const SupportTicket({
+    required this.id,
+    required this.category,
+    required this.subject,
+    required this.status,
+    required this.unread,
+    required this.lastMessageAt,
+    required this.createdAt,
+    this.messages = const [],
+  });
+
+  factory SupportTicket.fromJson(Map<String, dynamic> j) => SupportTicket(
+        id: j['id'],
+        category: SupportCategory.values.asNameMap()[j['category']] ?? SupportCategory.other,
+        subject: j['subject'] ?? '',
+        status: _ticketStatus(j['status']),
+        unread: j['unread'] == true,
+        lastMessageAt: _date(j['lastMessageAt']),
+        createdAt: _date(j['createdAt']),
+        messages: [for (final m in (j['messages'] ?? const []) as List) SupportMessage.fromJson(m)],
+      );
+}
+
+class SupportInbox {
+  final List<SupportTicket> tickets;
+  final int unread;
+  const SupportInbox({this.tickets = const [], this.unread = 0});
+  factory SupportInbox.fromJson(Map<String, dynamic> j) => SupportInbox(
+        tickets: [for (final t in (j['tickets'] as List)) SupportTicket.fromJson(t)],
+        unread: j['unread'] ?? 0,
+      );
+}
+
+// Talebe iliştirilen işlem (cüzdan hareketi, para çekme, arama)
+typedef RelatedRecord = ({String type, String id});
+
+// ---------- Yardım merkezi ----------
+
+class HelpArticle {
+  final String id;
+  final String question;
+  final String answer;
+  const HelpArticle({required this.id, required this.question, required this.answer});
+  factory HelpArticle.fromJson(Map<String, dynamic> j) => HelpArticle(id: j['id'], question: j['question'] ?? '', answer: j['answer'] ?? '');
+}
+
+class HelpCategory {
+  final String id;
+  final String title;
+  final String icon;
+  final List<HelpArticle> articles;
+  const HelpCategory({required this.id, required this.title, required this.icon, required this.articles});
+  factory HelpCategory.fromJson(Map<String, dynamic> j) => HelpCategory(
+        id: j['id'],
+        title: j['title'] ?? '',
+        icon: j['icon'] ?? '',
+        articles: [for (final a in (j['articles'] as List)) HelpArticle.fromJson(a)],
+      );
+}
+
+// ---------- Bildirim tercihleri ----------
+
+enum NotifyType { message, match, request, call, like }
+
+class NotificationPrefs {
+  final Map<NotifyType, bool> prefs;
+  final bool quietEnabled;
+  final int quietStart; // yerel saat, dakika (0-1439)
+  final int quietEnd;
+
+  const NotificationPrefs({this.prefs = const {}, this.quietEnabled = false, this.quietStart = 23 * 60, this.quietEnd = 8 * 60});
+
+  bool of(NotifyType t) => prefs[t] ?? true;
+
+  factory NotificationPrefs.fromJson(Map<String, dynamic> j) {
+    final p = (j['prefs'] as Map<String, dynamic>? ?? const {});
+    final q = (j['quietHours'] as Map<String, dynamic>? ?? const {});
+    return NotificationPrefs(
+      prefs: {for (final t in NotifyType.values) t: p[t.name] != false},
+      quietEnabled: q['enabled'] == true,
+      quietStart: q['start'] ?? 23 * 60,
+      quietEnd: q['end'] ?? 8 * 60,
+    );
+  }
 }

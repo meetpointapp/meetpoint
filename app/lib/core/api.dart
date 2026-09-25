@@ -297,6 +297,9 @@ class Api {
   }
 
   // Mağaza satın alımından sonra: sunucu RevenueCat'ten eksik işlemleri çekip yükler
+  // Satın alma öncesi onay (ilk alımdan önce bir kez; metin değişince tekrar)
+  Future<void> acceptSalesTerms() => _post('/wallet/sales-terms', {'accept': true});
+
   Future<int> syncWallet() async => (await _post('/wallet/sync'))['credited'] as int;
 
   // İletişim istekleri
@@ -407,6 +410,70 @@ class Api {
         options: o.copyWith(responseType: ResponseType.bytes)));
     return Uint8List.fromList(data as List<int>);
   }
+
+  // Destek
+  Future<SupportInbox> supportTickets() async => SupportInbox.fromJson(await _get('/support/tickets'));
+
+  Future<SupportTicket> supportTicket(String id) async => SupportTicket.fromJson(await _get('/support/tickets/$id'));
+
+  static MultipartFile _shot(Uint8List bytes, String name) => MultipartFile.fromBytes(bytes,
+      filename: name, contentType: DioMediaType('image', name.toLowerCase().endsWith('.png') ? 'png' : 'jpeg'));
+
+  Future<SupportTicket> openSupportTicket({
+    required SupportCategory category,
+    required String subject,
+    required String body,
+    RelatedRecord? related,
+    XFile? screenshot,
+    required String platform,
+  }) async {
+    final shot = screenshot == null ? null : await screenshot.readAsBytes();
+    final form = FormData.fromMap({
+      'category': category.name,
+      'subject': subject,
+      'body': body,
+      'relatedType': ?related?.type,
+      'relatedId': ?related?.id,
+      'platform': platform,
+      'appVersion': appVersion,
+      if (shot != null) 'screenshot': _shot(shot, screenshot!.name.isEmpty ? 'ekran.jpg' : screenshot.name),
+    });
+    return SupportTicket.fromJson(await _post('/support/tickets', form));
+  }
+
+  Future<SupportTicket> replySupport(String id, String body, {XFile? screenshot}) async {
+    final shot = screenshot == null ? null : await screenshot.readAsBytes();
+    final form = FormData.fromMap({
+      'body': body,
+      if (shot != null) 'screenshot': _shot(shot, screenshot!.name.isEmpty ? 'ekran.jpg' : screenshot.name),
+    });
+    return SupportTicket.fromJson(await _post('/support/tickets/$id/messages', form));
+  }
+
+  Future<void> closeSupportTicket(String id) => _post('/support/tickets/$id/close');
+
+  Future<Uint8List> supportAttachment(String messageId) async {
+    final data = await _send((o) => _dio.get<List<int>>('/support/attachments/$messageId',
+        options: o.copyWith(responseType: ResponseType.bytes)));
+    return Uint8List.fromList(data as List<int>);
+  }
+
+  // Yardım merkezi (herkese açık)
+  Future<List<HelpCategory>> help(String locale, {String query = ''}) async {
+    final r = await _get('/help/articles', {'lang': locale, if (query.isNotEmpty) 'q': query});
+    return [for (final c in (r['categories'] as List)) HelpCategory.fromJson(c)];
+  }
+
+  // Bildirim tercihleri
+  Future<NotificationPrefs> notificationPrefs() async => NotificationPrefs.fromJson(await _get('/me/notifications'));
+
+  Future<NotificationPrefs> saveNotificationPrefs({Map<NotifyType, bool>? prefs, ({bool enabled, int start, int end})? quiet}) async =>
+      NotificationPrefs.fromJson(await _put('/me/notifications', {
+        if (prefs != null) 'prefs': {for (final e in prefs.entries) e.key.name: e.value},
+        if (quiet != null) 'quietHours': {'enabled': quiet.enabled, 'start': quiet.start, 'end': quiet.end},
+        // Sessiz saat cihazın yerel saatine göre
+        'tzOffsetMin': DateTime.now().timeZoneOffset.inMinutes,
+      }));
 
   // Güvenlik
   Future<void> block(String toId) => _post('/blocks', {'toId': toId});

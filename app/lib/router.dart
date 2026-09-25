@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/session.dart';
+import 'features/me/notification_settings_screen.dart';
 import 'features/me/security_screens.dart';
+import 'features/support/support_screens.dart';
 import 'features/privacy/privacy_screen.dart';
 import 'features/privacy/reconsent_screen.dart';
 import 'core/ui.dart';
@@ -63,6 +65,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/me/privacy', builder: (_, _) => const PrivacyScreen()),
       GoRoute(path: '/consent', builder: (_, _) => const ReconsentScreen()),
       GoRoute(path: '/me/password', builder: (_, _) => const ChangePasswordScreen()),
+      GoRoute(path: '/me/notifications', builder: (_, _) => const NotificationSettingsScreen()),
+      GoRoute(path: '/help', builder: (_, _) => const HelpCenterScreen()),
+      GoRoute(path: '/support', builder: (_, _) => const SupportTicketsScreen()),
+      GoRoute(path: '/support/new', builder: (_, s) => NewTicketScreen(args: s.extra is NewTicketArgs ? s.extra as NewTicketArgs : null)),
+      GoRoute(path: '/support/:id', builder: (_, s) => TicketScreen(ticketId: s.pathParameters['id']!)),
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
       GoRoute(
         path: '/call/:id',

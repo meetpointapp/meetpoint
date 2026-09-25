@@ -95,6 +95,16 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## Tüketici ve destek (Faz 14)
+
+- **Satın alma öncesi onay** (`src/consumer/salesTerms.ts`): ön bilgilendirme (`/legal/preinfo`) + mesafeli satış (`/legal/distance-sales`) + cayma istisnası, ilk alımdan önce bir kez. Sürüm: `config.consumer.salesTermsVersion` (değiştirince herkese yeniden sorulur).
+- **Destek talepleri** (`src/support/tickets.ts`): uygulama → Profil › Yardım ve destek; panel → Destek. Hedef süre `SUPPORT_SLA_HOURS` (48).
+- **Yardım merkezi** (`src/support/help.ts`): tablo boşsa varsayılan SSS yüklenir; panel → Destek → Yardım merkezi; web: `/help`.
+- **Künye** (`src/consumer/company.ts`): panel → Destek → Künye (süper yönetici); `/legal/imprint`, yasal metinlerde `{{legalName}}` vb.
+- **Bildirim tercihleri** (`src/notify.ts`, `/me/notifications`): türe göre + sessiz saatler; kampanya e-postası/bildirimi ayrı rıza; panel → KVKK → İYS dosyası.
+- **Web'den hesap silme:** `/account/delete` (Google Play zorunluluğu).
+- **Mağaza:** kontrol listesi, form cevapları, inceleme notu: [docs/magaza-uyum.md](docs/magaza-uyum.md). Demo hesap: `REVIEW_ACCOUNT_PASSWORD='...' npm run review:account`.
+
 ## Para akışı ve finans (Faz 13)
 
 - **Ekonomi ayarları ve paketler veritabanında** (`src/finance/settings.ts`): mağaza payı, KDV, bozdurma kuru, en az çekim, stopaj, olgunlaşma süresi, aylık tavan. Panel → Finans → Ekonomi (değiştirmek süper yöneticide); zarar eden paket kırmızı.
@@ -248,11 +258,11 @@ Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17)
 
 - [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
 - [x] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
-- [ ] **Faz 10 · Güvenlik sertleştirme:** EXIF temizleme, oturum yönetimi, yönetimde 2FA + roller + işlem kaydı, hassas veri şifreleme, ASVS denetimi
-- [ ] **Faz 11 · KVKK uyumu:** veri envanteri, ayrı açık rızalar, yeniden onay, md. 11 hakları, otomatik imha, ihlal altyapısı
-- [ ] **Faz 12 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, görsel moderasyon katmanı, arama ve sohbet güvenliği, kaldırma süreçleri
-- [ ] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
-- [ ] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
+- [x] **Faz 10 · Güvenlik sertleştirme:** EXIF temizleme, oturum yönetimi, yönetimde 2FA + roller + işlem kaydı, hassas veri şifreleme, ASVS denetimi
+- [x] **Faz 11 · KVKK uyumu:** veri envanteri, ayrı açık rızalar, yeniden onay, md. 11 hakları, otomatik imha, ihlal altyapısı
+- [x] **Faz 12 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, görsel moderasyon katmanı, arama ve sohbet güvenliği, kaldırma süreçleri
+- [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
+- [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
 - [ ] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 17 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın

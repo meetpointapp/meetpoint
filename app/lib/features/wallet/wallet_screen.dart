@@ -1,8 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/api.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -10,6 +12,8 @@ import '../../core/store.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../support/support_screens.dart';
+import 'sales_terms_sheet.dart';
 
 // Mağazanın yerel fiyatları (mağaza bağlı değilse boş: referans USD gösterilir)
 final localPricesProvider = FutureProvider<Map<String, String>>((ref) async {
@@ -34,7 +38,15 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   Future<void> _buy(CoinPack pack) async {
     final l = AppLocalizations.of(context);
     final api = ref.read(apiProvider);
-    final before = ref.read(walletProvider).value?.balance ?? 0;
+    final wallet = ref.read(walletProvider).value;
+    final before = wallet?.balance ?? 0;
+    // İlk satın almadan önce (veya metinler değişince) ön bilgilendirme + cayma hakkı istisnası onayı
+    final terms = wallet?.salesTerms ?? const SalesTerms();
+    if (terms.required) {
+      if (!await ensureSalesTerms(context, updated: terms.updated)) return;
+      ref.invalidate(walletProvider);
+    }
+    if (!mounted) return;
     setState(() => _buying = pack.id);
     try {
       if (CoinStore.instance.available) {
@@ -54,6 +66,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       if (mounted && after > before) showSnack(context, l.purchaseDone(after - before));
     } on StoreUnavailable {
       if (mounted) showSnack(context, l.errStoreUnavailable);
+    } on ApiException catch (e) {
+      // Metinler bu arada değiştiyse onay tekrar istenir
+      if (e.code == 'sales_terms_required') ref.invalidate(walletProvider);
+      if (mounted) showSnack(context, errorText(l, e));
     } catch (e) {
       if (mounted) showSnack(context, errorText(l, e));
     } finally {
@@ -108,6 +124,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                     ),
                 ],
               ),
+              const SizedBox(height: 10),
+              const _SalesTermsLine(),
               const SizedBox(height: 24),
               Text(l.history, style: theme.textTheme.titleMedium),
               if (w.entries.isEmpty)
@@ -267,6 +285,30 @@ class _PackTile extends StatelessWidget {
   }
 }
 
+// Paketlerin altında: satın almanın hangi metinlere tabi olduğu (sonraki alımlarda hatırlatma)
+class _SalesTermsLine extends ConsumerWidget {
+  const _SalesTermsLine();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final locale = ref.watch(localeProvider).languageCode;
+    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    final link = muted?.copyWith(color: Brand.coral, fontWeight: FontWeight.w600);
+    return Text.rich(
+      TextSpan(style: muted, children: [
+        TextSpan(text: l.salesTermsLineA),
+        TextSpan(text: l.preInfoForm, style: link, recognizer: TapGestureRecognizer()..onTap = () => openLegal('preinfo', locale)),
+        TextSpan(text: l.salesTermsCheckboxAnd),
+        TextSpan(text: l.distanceSalesContract, style: link, recognizer: TapGestureRecognizer()..onTap = () => openLegal('distance-sales', locale)),
+        TextSpan(text: l.salesTermsLineB),
+      ]),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
 class _EntryTile extends StatelessWidget {
   const _EntryTile({required this.entry});
   final WalletEntry entry;
@@ -291,6 +333,25 @@ class _EntryTile extends StatelessWidget {
     final positive = entry.amount > 0;
     return ListTile(
       contentPadding: EdgeInsets.zero,
+      // Hareketle ilgili sorun: talep bu işlem iliştirilmiş olarak açılır
+      onTap: () => showModalBottomSheet<void>(
+        context: context,
+        showDragHandle: true,
+        builder: (ctx) => SafeArea(
+          child: ListTile(
+            leading: const Icon(Icons.support_agent_rounded),
+            title: Text(l.supportAboutEntry),
+            subtitle: Text('$label · ${DateFormat.yMMMd(l.localeName).add_Hm().format(entry.createdAt)}'),
+            onTap: () {
+              Navigator.pop(ctx);
+              openNewTicket(context,
+                  category: entry.type == 'CALL' || entry.type == 'GIFT' ? SupportCategory.calls : entry.type.startsWith('CASHOUT') ? SupportCategory.cashout : SupportCategory.coins,
+                  related: (type: 'wallet', id: entry.id),
+                  relatedLabel: label);
+            },
+          ),
+        ),
+      ),
       title: Text(label),
       subtitle: Text(DateFormat.yMMMd(l.localeName).add_Hm().format(entry.createdAt)),
       trailing: CoinAmount(

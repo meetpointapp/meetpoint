@@ -51,6 +51,7 @@ async function collect(userId: string) {
       dsrRequests: true,
       sanctions: { orderBy: { createdAt: 'asc' }, include: { appeal: true } },
       kycSubmissions: { orderBy: { createdAt: 'asc' } },
+      supportTickets: { orderBy: { createdAt: 'asc' }, include: { messages: { orderBy: { createdAt: 'asc' } } } },
     },
   });
   const [wallet, conversations, messages, calls, gifts, blocks, reports, devices] = await Promise.all([
@@ -79,6 +80,8 @@ async function collect(userId: string) {
       verifiedAt: u.verifiedAt,
       bannedAt: u.bannedAt,
       banReason: u.banReason,
+      salesTermsVersion: u.salesTermsVersion,
+      notificationPreferences: { disabled: u.notifyPrefs, quietStart: u.quietStart, quietEnd: u.quietEnd },
     },
     profile: u.profile && {
       ...u.profile,
@@ -155,6 +158,15 @@ async function collect(userId: string) {
       createdAt: k.createdAt,
       reviewedAt: k.reviewedAt,
     })),
+    // Destek talepleri ve yazışmalar (ekran görüntüleri support/ klasöründe)
+    supportTickets: u.supportTickets.map((t) => ({
+      category: t.category,
+      subject: t.subject,
+      status: t.status,
+      createdAt: t.createdAt,
+      closedAt: t.closedAt,
+      messages: t.messages.map((m) => ({ from: m.fromStaff ? 'MeetPoint' : 'me', body: m.body, attachment: m.attachment ? `support/${m.id}.webp` : null, createdAt: m.createdAt })),
+    })),
     kvkkRequests: u.dsrRequests.map(({ kind, message, status, answer, createdAt, answeredAt }) => ({ kind, message, status, answer, createdAt, answeredAt })),
   };
   return { user: u, data };
@@ -174,6 +186,10 @@ export async function buildExportZip(userId: string): Promise<Buffer> {
   for (const [i, p] of user.photos.entries()) {
     const file = await publicStore.read(photoKey(p.path, 'lg'));
     if (file) zip.addBuffer(file, `photos/${i + 1}.webp`);
+  }
+  for (const m of user.supportTickets.flatMap((t) => t.messages)) {
+    const file = m.attachment ? await privateStore.read(m.attachment) : null;
+    if (file) zip.addBuffer(file, `support/${m.id}.webp`);
   }
   for (const [i, v] of user.verifications.entries()) {
     const file = v.selfiePath ? await privateStore.read(v.selfiePath) : null;

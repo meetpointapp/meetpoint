@@ -18,7 +18,8 @@
     "db": "tsx scripts/db.ts",
     "verify:ledger": "tsx scripts/verify-ledger.ts",
     "encrypt:payouts": "tsx scripts/encrypt-payouts.ts",
-    "kvkk:inventory": "tsx scripts/kvkk-inventory.ts"
+    "kvkk:inventory": "tsx scripts/kvkk-inventory.ts",
+    "review:account": "tsx scripts/review-account.ts"
   },
   "keywords": [],
   "author": "",

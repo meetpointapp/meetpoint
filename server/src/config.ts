@@ -129,7 +129,8 @@ export const privacy = {
     special_category: '2026-09-24',
     overseas_transfer: '2026-09-24',
     selfie: '2026-09-24',
-    marketing: '2026-09-24',
+    marketing: '2026-09-25',
+    marketing_push: '2026-09-25',
   },
   // Yurt dışı aktarım için ayrı rıza iste ("off": standart sözleşme yeterli görülürse kapatılır, herkes izinli sayılır)
   overseasConsentRequired: process.env.OVERSEAS_CONSENT !== 'off',
@@ -148,7 +149,19 @@ export const retention = {
   unopenedViewOnceDays: 30, // açılmamış tek seferlik fotoğraflar
   resolvedErrorDays: 180, // çözülmüş hata kayıtları
   trafficLogDays: Number(process.env.TRAFFIC_LOG_DAYS ?? 730), // 5651 trafik kayıtları (2 yıl)
+  supportClosedDays: 730, // kapanmış destek talepleri (tüketici şikayeti kanıtı: 2 yıl)
   intervalMs: Number(process.env.RETENTION_INTERVAL_MS ?? 60 * 60_000), // imha işi ne sıklıkla çalışır
+};
+
+// Tüketici ve destek (Faz 14)
+export const consumer = {
+  // Ön bilgilendirme + mesafeli satış sözleşmesi + cayma hakkı istisnası metinlerinin sürümü.
+  // Değişince kullanıcı bir sonraki satın almadan önce yeniden onaylar.
+  salesTermsVersion: '2026-09-25',
+  supportFirstResponseHours: Number(process.env.SUPPORT_SLA_HOURS ?? 48), // ilk yanıt hedefi
+  supportMaxOpenTickets: 5, // aynı anda açık talep sınırı (kötüye kullanıma karşı)
+  // Mağaza incelemesi için demo hesabın e-postası (scripts/review-account.ts)
+  reviewAccountEmail: process.env.REVIEW_ACCOUNT_EMAIL ?? 'review@meetpoint.app',
 };
 
 // Zamanlayıcı (scheduler.ts): tur aralığı, liderlik deneme aralığı, bağlantı taraması aralığı

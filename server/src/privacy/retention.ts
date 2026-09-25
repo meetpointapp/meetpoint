@@ -4,6 +4,7 @@ import { prisma } from '../db';
 import { sendMail } from '../mailer';
 import { purgeOldTraffic } from '../moderation/traffic';
 import { privateStore } from '../storage';
+import { removeTicketFiles } from '../support/tickets';
 import { hardDeleteUser } from './accounts';
 
 // Saklama ve imha (KVKK md. 7, Kişisel Verilerin Silinmesi Yönetmeliği). Süresi dolan veriler periyodik
@@ -102,6 +103,16 @@ async function cleanupResolvedErrors() {
   return log('error_logs', count);
 }
 
+// Kapanmış destek talepleri (saklama süresi dolunca, ekleriyle)
+async function cleanupClosedTickets() {
+  const old = await prisma.supportTicket.findMany({ where: { closedAt: { lt: ago(retention.supportClosedDays) } }, select: { id: true }, take: 1000 });
+  if (!old.length) return 0;
+  const ids = old.map((t) => t.id);
+  await removeTicketFiles({ id: { in: ids } });
+  const { count } = await prisma.supportTicket.deleteMany({ where: { id: { in: ids } } });
+  return log('support_tickets', count, { days: retention.supportClosedDays });
+}
+
 export async function runRetention() {
   const summary: Record<string, number> = {};
   const jobs: [string, () => Promise<number>][] = [
@@ -112,6 +123,7 @@ export async function runRetention() {
     ['dataExports', cleanupDataExports],
     ['viewOncePhotos', cleanupViewOncePhotos],
     ['resolvedErrors', cleanupResolvedErrors],
+    ['supportTickets', cleanupClosedTickets],
     ['trafficLogs', async () => log('traffic_logs', await purgeOldTraffic(), { days: retention.trafficLogDays })],
   ];
   // Bir iş hata verirse diğerleri yine çalışır

@@ -5,6 +5,7 @@ import { sendMail } from '../mailer';
 import { closeAllPendingFor } from '../requestService';
 import { revokeAllSessions } from '../sessions';
 import { privateStore } from '../storage';
+import { removeTicketFiles } from '../support/tickets';
 
 // Hesap silme (KVKK md. 7 + mağaza zorunluluğu). Talep edilince hesap hemen gizlenir ve oturumlar
 // kapanır; bekleme süresi içinde giriş yapılırsa hesap geri gelir, süre dolunca kalıcı silinir.
@@ -48,6 +49,8 @@ export async function hardDeleteUser(userId: string) {
   if (!user) return false;
   await closeAllPendingFor(userId);
   await revokeAllSessions(userId, 'account_deleted');
+  // Destek eklerinin dosyaları (kayıtlar kullanıcıyla birlikte silinir)
+  await removeTicketFiles({ userId });
   await prisma.user.delete({ where: { id: userId } });
   for (const p of user.photos) await removeProfilePhoto(p.path).catch(() => {});
   for (const v of user.verifications) if (v.selfiePath) await privateStore.remove(v.selfiePath).catch(() => {});

@@ -67,7 +67,8 @@ export const SEED_PASSWORD = 'password123';
 export type TestUser = { t: string; id: string; email: string; refresh: string };
 
 // Kayıt + e-posta doğrulama. Varsayılan olarak eşleştirme (özel nitelikli veri) ve yurt dışı aktarım
-// (arama, bildirim) rızaları verilir; rıza akışını deneyen testler `consents: false` geçer.
+// (arama, bildirim) rızaları verilir ve satın alma öncesi satış metinleri onaylanır; rıza/onay akışını
+// deneyen testler `consents: false` geçer.
 export async function registerVerified(email: string, password = TEST_PASSWORD, opts: { consents?: boolean } = {}): Promise<TestUser> {
   const consents = opts.consents ?? true;
   const r = await call(null, 'POST', '/auth/register', { email, password, acceptTerms: true, consents: { overseas: consents } });
@@ -78,6 +79,8 @@ export async function registerVerified(email: string, password = TEST_PASSWORD, 
   if (consents) {
     const c = await call(r.token, 'PUT', '/me/consents', { kind: 'special_category', granted: true, source: 'onboarding' });
     if (c.http !== 200) throw new Error(`consent failed ${c.http} ${c.error}`);
+    const s = await call(r.token, 'POST', '/wallet/sales-terms', { accept: true });
+    if (s.http !== 200) throw new Error(`sales terms failed ${s.http} ${s.error}`);
   }
   return { t: r.token, id: r.userId, email, refresh: r.refreshToken };
 }

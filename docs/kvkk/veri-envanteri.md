@@ -5,7 +5,7 @@
 
 | Kategori | Veriler | Amaç | Hukuki sebep | Saklama | Aktarım | Tablolar |
 |---|---|---|---|---|---|---|
-| Kimlik ve iletişim | E-posta, dil, kayıt tarihi, onaylanan metin sürümleri, rıza durumları, son etkinlik | Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı | sözleşme, yasal | Hesap süresince; silme talebinden 30 gün sonra veya 2 yıl hareketsizlikte silinir | E-posta sağlayıcısı (SMTP) | User |
+| Kimlik ve iletişim | E-posta, dil, kayıt tarihi, onaylanan metin sürümleri (satış metinleri dahil), rıza durumları, bildirim tercihleri ve sessiz saatler, son etkinlik | Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı | sözleşme, yasal | Hesap süresince; silme talebinden 30 gün sonra veya 2 yıl hareketsizlikte silinir | E-posta sağlayıcısı (SMTP) | User |
 | Profil | Görünen ad, doğum tarihi, cinsiyet, biyografi, şehir, ilgi alanları, sorular, boy, meslek, eğitim, burç, alışkanlıklar, fotoğraflar | Tanışma hizmetinin sunulması | sözleşme | Hesap süresince; kullanıcı istediği an değiştirebilir | Diğer kullanıcılar (profilde görünen kısmı) | Profile, Photo |
 | **Cinsel yönelim** (özel nitelikli) | Kimi görmek istediği (interestedIn) ve cinsiyetle birlikte çıkarılabilen yönelim | Eşleştirme | rıza | Hesap süresince; rıza geri alınınca eşleştirmede kullanılmaz | Aktarılmaz | Profile |
 | Konum | Yaklaşık konum (~1 km yuvarlanmış), mesafe filtresi | Yakındaki kişileri gösterme | sözleşme | Hesap süresince; en son konum saklanır, geçmiş tutulmaz | Diğer kullanıcılar (sadece yuvarlanmış mesafe) | Profile |
@@ -23,4 +23,6 @@
 | Hata kayıtları | Hata mesajı, ekran, uygulama sürümü (kişisel veri içermemeye çalışılır) | Hizmetin çalışır tutulması | meşru | Çözülen kayıtlar 180 gün | Aktarılmaz | ErrorLog |
 | KVKK süreç kayıtları | Rıza verme/geri alma geçmişi, veri indirme talepleri, başvurular ve yanıtları, imha ve ihlal kayıtları | KVKK yükümlülüklerinin yerine getirildiğinin kanıtı | yasal | İndirme dosyası 7 gün veya ilk indirmede silinir; kayıtlar yasal süre boyunca | Kişisel Verileri Koruma Kurulu (talep hâlinde) | Consent, DataExport, DsrRequest, DestructionLog, BreachRecord |
 | Yönetim işlem kaydı | Yönetici e-postası, işlem, hedef kayıt, IP | Yetkisiz erişimin önlenmesi ve denetim | yasal, meşru | Değiştirilemez; yasal süre boyunca | Aktarılmaz | AdminAudit |
+| Destek talepleri | Talep kategorisi, konu, yazışmalar, isteğe bağlı ekran görüntüsü (konum bilgisi silinmiş), ilgili işlem, cihaz türü ve uygulama sürümü | Müşteri desteği, tüketici şikayetlerinin çözümü ve kanıtı | sözleşme, yasal, hak | Hesapla birlikte silinir; kapanan talepler 2 yıl sonra silinir | E-posta sağlayıcısı (yanıt bildirimi) | SupportTicket, SupportMessage |
+| Yardım merkezi ve künye (kişisel veri değil) | Sık sorulan sorular, şirket bilgileri, son değiştiren yönetici | Bilgilendirme ve yasal künye yükümlülüğü | yasal, meşru | Süresiz (değişiklikler işlem kaydında) | Herkese açık | HelpArticle, CompanyInfo |
 | Teknik (kişisel veri değil) | Sunucular arası anlık olay aktarımı (geçici) | Çok sunuculu çalışma | meşru | Dakikalar içinde silinir | Aktarılmaz | SocketIoAttachment |

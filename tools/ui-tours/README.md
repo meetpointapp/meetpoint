@@ -30,6 +30,7 @@ Ekran görüntüleri `shots/` klasörüne düşer (git'e girmez). Kolaj: `node c
 | `dark.mjs`, `lang.mjs` | Karanlık mod, İngilizce |
 | `badge.mjs` | Mavi tik görünümü |
 | `faz3.mjs` … `faz7.mjs` | İlgili fazın akışları |
+| `faz14.mjs`, `web14.mjs` | Satın alma onayı, bildirimler, yardım ve destek, panel Destek sekmesi, web sayfaları |
 | `admin.mjs` | Yönetim paneli |
 | `icon.mjs` | Uygulama ikonunu üretir (`app/assets/icon`) |
 | `collage*.mjs` | Faz önizleme kolajları |

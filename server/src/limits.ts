@@ -80,3 +80,17 @@ export const errorReportLimiter = rateLimit({ ...base, ...store('error'), window
 
 // Şikayet: kullanıcı başına saatte 20
 export const reportLimiter = rateLimit({ ...base, ...store('report'), windowMs: 60 * 60_000, limit: 20, keyGenerator: byUser });
+
+// Destek: kullanıcı başına saatte 20 mesaj/talep
+export const supportLimiter = rateLimit({ ...base, ...store('support'), windowMs: 60 * 60_000, limit: 20, keyGenerator: byUser });
+
+// Web'den hesap silme: IP başına 15 dakikada 10 deneme (şifre sorar: kaba kuvvete karşı)
+export const webDeleteLimiter = rateLimit({
+  ...base,
+  ...store('webdelete'),
+  windowMs: 15 * 60_000,
+  limit: ipLimit(10),
+  // Tarayıcı sayfası: JSON yerine okunur metin
+  handler: (_req: Request, res: import('express').Response) =>
+    res.status(429).type('text/plain; charset=utf-8').send('Çok fazla deneme, 15 dakika sonra tekrar dene. / Too many attempts, try again in 15 minutes.'),
+});

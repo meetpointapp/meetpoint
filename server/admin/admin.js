@@ -250,6 +250,7 @@ const loaders = {
   errors: loadErrors,
   staff: loadStaff,
   kvkk: () => loadKvkk(),
+  support: () => loadSupport(),
   audit: () => loadAudit(),
 };
 let errorsResolved = '0';
@@ -324,6 +325,7 @@ async function loadStats() {
   $('#count-payouts').textContent = s.payoutsPending || '';
   $('#count-errors').textContent = s.openErrors || '';
   $('#count-dsr').textContent = s.openDsr || '';
+  $('#count-support').textContent = s.openSupport || '';
   const cards = [
     ['Kullanıcı', s.users],
     ['E-postası doğrulanmış', s.verifiedEmail],
@@ -344,6 +346,7 @@ async function loadStats() {
     ['Bekleyen ödeme', `${s.payoutsPending} · $${s.payoutsPendingUsd.toFixed(2)}`, s.payoutsPending > 0],
     ['Ödenen (USD)', '$' + s.payoutsPaidUsd.toLocaleString('tr-TR', { minimumFractionDigits: 2 })],
     ['Açık KVKK başvurusu', s.overdueDsr ? `${s.openDsr} · ${s.overdueDsr} gecikmiş` : s.openDsr, s.overdueDsr > 0],
+    ['Yanıt bekleyen destek', s.overdueSupport ? `${s.openSupport} · ${s.overdueSupport} gecikmiş` : s.openSupport, s.overdueSupport > 0],
   ];
   $('#stats').innerHTML = cards
     .map(([label, value, alert]) => `<div class="card stat ${alert ? 'alert' : ''}"><div class="value">${esc(value)}</div><div class="label">${esc(label)}</div></div>`)
@@ -1124,6 +1127,8 @@ const DESTRUCTION = {
   data_exports: 'Süresi dolan veri dosyaları',
   view_once_photos: 'Açılmamış tek seferlik fotoğraflar',
   error_logs: 'Çözülmüş hata kayıtları',
+  traffic_logs: '5651 trafik kayıtları',
+  support_tickets: 'Kapanmış destek talepleri',
 };
 
 async function loadDestruction() {
@@ -1356,10 +1361,283 @@ async function loadAudit(more = false) {
   $('#audit-more').classList.toggle('hidden', list.length < 100);
 }
 
+// ---------- Destek ----------
+const SUPPORT_CATS = { coins: 'Jeton', calls: 'Arama', cashout: 'Para çekme', safety: 'Güvenlik', account: 'Hesap', bug: 'Hata', other: 'Diğer' };
+const TICKET_STATUS = { OPEN: ['Yanıt bekliyor', 'red'], ANSWERED: ['Kullanıcıda', 'blue'], CLOSED: ['Kapalı', ''] };
+const RELATED = { purchase: 'Satın alma', payout: 'Para çekme', call: 'Arama', wallet: 'Cüzdan hareketi' };
+let supView = 'tickets';
+let ticketStatus = 'OPEN';
+let helpLocale = 'tr';
+
+document.querySelectorAll('#tab-support [data-sup]').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tab-support [data-sup]').forEach((b) => b.classList.toggle('active', b === btn));
+    supView = btn.dataset.sup;
+    loadSupport();
+  }),
+);
+document.querySelectorAll('#tab-support [data-tstatus]').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tab-support [data-tstatus]').forEach((b) => b.classList.toggle('active', b === btn));
+    ticketStatus = btn.dataset.tstatus;
+    loadTickets();
+  }),
+);
+document.querySelectorAll('#tab-support [data-hlocale]').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tab-support [data-hlocale]').forEach((b) => b.classList.toggle('active', b === btn));
+    helpLocale = btn.dataset.hlocale;
+    resetHelpForm();
+    loadHelp();
+  }),
+);
+
+function loadSupport() {
+  ['tickets', 'help', 'company'].forEach((v) => $(`#sup-${v}`).classList.toggle('hidden', v !== supView));
+  return { tickets: loadTickets, help: loadHelp, company: loadCompany }[supView]();
+}
+
+async function loadTickets() {
+  const [m, list] = await Promise.all([api('GET', '/admin/api/support/tickets/metrics'), api('GET', `/admin/api/support/tickets?status=${ticketStatus}`)]);
+  const cards = [
+    ['Yanıt bekleyen', m.open, false],
+    ['Geciken', m.overdue, m.overdue > 0],
+    ['Son 30 gün', m.last30Days, false],
+    ['Ort. ilk yanıt', m.avgFirstResponseHours === null ? '—' : `${m.avgFirstResponseHours} sa`, false],
+    [`${m.targetHours} saatte yanıt`, m.withinTargetPct === null ? '—' : `%${m.withinTargetPct}`, m.withinTargetPct !== null && m.withinTargetPct < 90],
+  ];
+  $('#support-metrics').innerHTML = cards
+    .map(([label, value, alert]) => `<div class="card stat ${alert ? 'alert' : ''}"><div class="value">${esc(value)}</div><div class="label">${esc(label)}</div></div>`)
+    .join('');
+  $('#tickets').innerHTML = list.length
+    ? list
+        .map(
+          (t) => `<div class="card item" data-ticket-card="${esc(t.id)}">
+        <div class="item-head"><div><span class="pill blue">${esc(SUPPORT_CATS[t.category] || t.category)}</span>
+          <span class="item-title">${esc(t.subject)}</span>
+          <span class="muted">· ${esc(t.email)} · ${fmtDate(t.createdAt)} · ${t.messageCount} mesaj${t.platform ? ` · ${esc(t.platform)}` : ''}</span></div>
+          ${t.status === 'OPEN' ? `<span class="pill ${t.overdue ? 'red' : ''}">Hedef: ${fmtDate(t.dueAt)}${t.overdue ? ' (gecikti)' : ''}</span>` : `<span class="pill ${TICKET_STATUS[t.status][1]}">${TICKET_STATUS[t.status][0]}</span>`}</div>
+        <div class="actions"><button class="btn soft" data-ticket-open="${esc(t.id)}">Aç</button></div>
+        <div class="ticket-body hidden"></div>
+      </div>`,
+        )
+        .join('')
+    : '<div class="card empty">Bu listede talep yok 🎉</div>';
+}
+
+async function openTicket(card, id) {
+  const body = card.querySelector('.ticket-body');
+  const t = await api('GET', `/admin/api/support/tickets/${encodeURIComponent(id)}`);
+  const u = t.user;
+  const pills = [
+    u.banned ? '<span class="pill red">Yasaklı</span>' : '',
+    u.verificationStatus === 'approved' ? '<span class="pill blue">Mavi tik</span>' : '',
+    u.kycStatus === 'approved' ? '<span class="pill green">Kimlik doğrulandı</span>' : '',
+  ].join(' ');
+  const related = t.related
+    ? `<div class="small"><b>${esc(RELATED[t.related.type] || t.related.type)}:</b> ${esc(t.related.text)} · ${fmtDate(t.related.createdAt)}${t.related.transactionId ? ` · <code>${esc(t.related.transactionId)}</code>` : ''}</div>`
+    : '';
+  const thread = t.messages
+    .map(
+      (m) => `<div class="msg ${m.fromStaff ? 'staff' : ''}">${esc(m.body)}${m.hasAttachment ? `<div><button class="btn soft small" data-attach="${esc(m.id)}">Ekran görüntüsünü aç</button></div>` : ''}
+        <div class="meta">${m.fromStaff ? `Destek${m.staff ? ` (${esc(m.staff)})` : ''}` : 'Kullanıcı'} · ${fmtDate(m.createdAt)}</div></div>`,
+    )
+    .join('');
+  const reply =
+    t.status === 'CLOSED'
+      ? '<p class="muted">Talep kapalı.</p>'
+      : `<textarea rows="3" data-reply-for="${esc(t.id)}" placeholder="Yanıt (uygulamada görünür, bildirim ve e-postayla gider)"></textarea>
+    <div class="actions"><button class="btn green" data-reply="${esc(t.id)}">Yanıtla</button>
+      <button class="btn soft" data-reply="${esc(t.id)}" data-close="1">Yanıtla ve kapat</button>
+      <button class="btn ghost" data-tclose="${esc(t.id)}">Yanıtsız kapat</button></div>`;
+  body.innerHTML = `
+    <div class="detail">${esc(u.name || '—')} · ${esc(u.email)} · ${esc(u.locale.toUpperCase())} · üyelik ${new Date(u.createdAt).toLocaleDateString('tr-TR')} · bakiye ${u.balance.toLocaleString('tr-TR')} jeton ${pills}
+      <div class="muted small">Kullanıcı kimliği: <code>${esc(u.id)}</code>${t.appVersion ? ` · Uygulama ${esc(t.appVersion)}` : ''}</div>
+      ${related}
+    </div>
+    <div class="thread">${thread}</div>
+    ${reply}`;
+  body.classList.remove('hidden');
+}
+
+$('#tickets').addEventListener('click', async (e) => {
+  const open = e.target.closest('button[data-ticket-open]');
+  const attach = e.target.closest('button[data-attach]');
+  const reply = e.target.closest('button[data-reply]');
+  const close = e.target.closest('button[data-tclose]');
+  try {
+    if (open) {
+      const card = open.closest('[data-ticket-card]');
+      const body = card.querySelector('.ticket-body');
+      if (!body.classList.contains('hidden')) return body.classList.add('hidden');
+      await openTicket(card, open.dataset.ticketOpen);
+    } else if (attach) {
+      const res = await send('GET', `/admin/api/support/tickets/attachments/${encodeURIComponent(attach.dataset.attach)}`);
+      if (!res.ok) return toast('Görüntü açılamadı');
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(await res.blob());
+      img.alt = 'Ekran görüntüsü';
+      attach.replaceWith(img);
+    } else if (reply) {
+      const text = document.querySelector(`textarea[data-reply-for="${reply.dataset.reply}"]`).value.trim();
+      if (text.length < 2) return toast('Yanıt yaz');
+      await api('POST', `/admin/api/support/tickets/${encodeURIComponent(reply.dataset.reply)}/reply`, { body: text, close: !!reply.dataset.close });
+      toast(reply.dataset.close ? 'Yanıtlandı ve kapatıldı' : 'Yanıt gönderildi');
+      loadTickets();
+      loadStats();
+    } else if (close) {
+      if (!confirm('Talep yanıtsız kapatılsın mı?')) return;
+      await api('POST', `/admin/api/support/tickets/${encodeURIComponent(close.dataset.tclose)}/close`);
+      toast('Kapatıldı');
+      loadTickets();
+      loadStats();
+    }
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+// Yardım merkezi (SSS)
+const HELP_CATS = { coins: 'Jetonlar ve satın alma', calls: 'Aramalar ve hediyeler', cashout: 'Kazanç ve para çekme', safety: 'Güvenlik', account: 'Hesap ve gizlilik' };
+let helpItems = [];
+
+function resetHelpForm() {
+  $('#help-form').reset();
+  $('#help-id').value = '';
+  $('#help-save').textContent = 'Ekle';
+  $('#help-cancel').classList.add('hidden');
+}
+
+async function loadHelp() {
+  // Uygulamadaki kategori sırasıyla
+  const order = Object.keys(HELP_CATS);
+  helpItems = (await api('GET', `/admin/api/support/help?locale=${helpLocale}`)).sort(
+    (a, b) => order.indexOf(a.category) - order.indexOf(b.category) || a.position - b.position,
+  );
+  $('#help-list').innerHTML = helpItems.length
+    ? helpItems
+        .map(
+          (a) => `<div class="card item">
+        <div class="item-head"><div><span class="pill blue">${esc(HELP_CATS[a.category] || a.category)}</span> <span class="muted">#${a.position}</span>
+          ${a.published ? '' : '<span class="pill red">Yayında değil</span>'}</div>
+          <span class="muted small">${esc(a.updatedBy)} · ${fmtDate(a.updatedAt)}</span></div>
+        <div class="faq-q">${esc(a.question)}</div><div class="faq-a">${esc(a.answer)}</div>
+        <div class="actions"><button class="btn soft" data-help-edit="${esc(a.id)}">Düzenle</button>
+          <button class="btn soft" data-help-toggle="${esc(a.id)}">${a.published ? 'Yayından kaldır' : 'Yayınla'}</button>
+          <button class="btn ghost" data-help-delete="${esc(a.id)}">Sil</button></div>
+      </div>`,
+        )
+        .join('')
+    : '<div class="card empty">Bu dilde soru yok</div>';
+}
+
+$('#help-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = $('#help-id').value;
+  const body = {
+    locale: helpLocale,
+    category: $('#help-category').value,
+    question: $('#help-question').value.trim(),
+    answer: $('#help-answer').value.trim(),
+    position: Number($('#help-position').value || 0),
+    published: $('#help-published').checked,
+  };
+  try {
+    await api(id ? 'PUT' : 'POST', id ? `/admin/api/support/help/${encodeURIComponent(id)}` : '/admin/api/support/help', body);
+    toast(id ? 'Güncellendi' : 'Eklendi');
+    resetHelpForm();
+    loadHelp();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+$('#help-cancel').addEventListener('click', resetHelpForm);
+
+$('#help-list').addEventListener('click', async (e) => {
+  const edit = e.target.closest('button[data-help-edit]');
+  const toggle = e.target.closest('button[data-help-toggle]');
+  const del = e.target.closest('button[data-help-delete]');
+  try {
+    if (edit) {
+      const a = helpItems.find((x) => x.id === edit.dataset.helpEdit);
+      $('#help-id').value = a.id;
+      $('#help-category').value = a.category;
+      $('#help-position').value = a.position;
+      $('#help-published').checked = a.published;
+      $('#help-question').value = a.question;
+      $('#help-answer').value = a.answer;
+      $('#help-save').textContent = 'Kaydet';
+      $('#help-cancel').classList.remove('hidden');
+      $('#help-form').scrollIntoView({ behavior: 'smooth' });
+    } else if (toggle) {
+      const a = helpItems.find((x) => x.id === toggle.dataset.helpToggle);
+      await api('PUT', `/admin/api/support/help/${encodeURIComponent(a.id)}`, { published: !a.published });
+      loadHelp();
+    } else if (del) {
+      if (!confirm('Soru kalıcı olarak silinsin mi? (Gizlemek için "Yayından kaldır" kullanabilirsin)')) return;
+      await api('DELETE', `/admin/api/support/help/${encodeURIComponent(del.dataset.helpDelete)}`);
+      loadHelp();
+    }
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+// Künye
+const COMPANY = [
+  ['legalName', 'Ticaret unvanı'],
+  ['mersisNo', 'MERSİS no'],
+  ['taxOffice', 'Vergi dairesi'],
+  ['taxNo', 'Vergi no'],
+  ['address', 'Adres'],
+  ['kepAddress', 'KEP adresi'],
+  ['email', 'Destek e-postası'],
+  ['kvkkEmail', 'KVKK başvuru e-postası'],
+  ['phone', 'Telefon'],
+  ['etbisNo', 'ETBİS kayıt no'],
+  ['verbisNo', 'VERBİS kayıt no'],
+];
+
+async function loadCompany() {
+  const c = await api('GET', '/admin/api/support/company');
+  const editable = role === 'super';
+  $('#company-fields').innerHTML = COMPANY.map(
+    ([k, label]) =>
+      `<label><span>${label}${c.missing.includes(k) ? ' <span class="pill red">zorunlu</span>' : ''}</span><input name="${k}" value="${esc(c[k] || '')}" maxlength="300" ${editable ? '' : 'disabled'}></label>`,
+  ).join('');
+  $('#company-save').classList.toggle('hidden', !editable);
+  $('#company-missing').innerHTML = c.missing.length
+    ? `<div class="card item mb-8"><div><b>Yayın öncesi eksik:</b> ${c.missing.map((k) => esc(COMPANY.find(([f]) => f === k)[1])).join(', ')}</div></div>`
+    : '';
+}
+
+$('#company-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const body = Object.fromEntries(COMPANY.map(([k]) => [k, $(`#company-fields input[name="${k}"]`).value.trim()]));
+  try {
+    await api('PUT', '/admin/api/support/company', body);
+    toast('Künye kaydedildi');
+    loadCompany();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+// İYS dosyası (KVKK sekmesi)
+$('#iys-export').addEventListener('click', async () => {
+  const res = await send('GET', '/admin/api/privacy/iys.csv');
+  if (!res.ok) return toast('İYS dosyası indirilemedi');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(await res.blob());
+  a.download = `iys-eposta-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
 // ---------- Başlat ----------
-// Sekmeler role göre: data-roles boşsa sadece süper yönetici görür
+// Sekmeler (ve alt bölümler) role göre: data-roles boşsa sadece süper yönetici görür
 function applyRole() {
-  document.querySelectorAll('.tab[data-roles]').forEach((btn) => {
+  document.querySelectorAll('[data-roles]').forEach((btn) => {
     const allowed = role === 'super' || btn.dataset.roles.split(' ').includes(role);
     btn.classList.toggle('hidden', !allowed);
   });

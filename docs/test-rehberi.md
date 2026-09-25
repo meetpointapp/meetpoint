@@ -97,6 +97,19 @@ Yeni hesap açarken `password123` gibi yaygın şifreler artık kabul edilmez; `
 - [ ] Profil → Şifre değiştir: yanlış mevcut şifre reddediliyor; `qwerty123` reddediliyor; güçlü şifre kabul, diğer cihazlar çıkış yapıyor
 - [ ] 10 kez yanlış şifreyle giriş → "Çok fazla hatalı deneme" (15 dk)
 
+### 7f. Tüketici ve destek (Faz 14)
+- [ ] Yeni hesap → Cüzdan → pakete dokun: "Satın almadan önce" penceresi; kutu işaretlenmeden "Onayla ve devam et" kapalı
+- [ ] Onaydan sonra satın alma çalışıyor; sonraki alımda pencere çıkmıyor, paketlerin altında özet satırı var
+- [ ] Profil › Bildirimler: tür anahtarları, sessiz saat (başlangıç/bitiş), kampanya e-postası ve bildirimi ayrı
+- [ ] Profil › Yardım ve destek: arama ("iade", "arama"), kategoriler, "Bize yaz"
+- [ ] Yeni talep: kategori + başlık + açıklama + ekran görüntüsü → yazışma ekranı "Yanıt bekliyor"
+- [ ] Cüzdan geçmişinde bir harekete dokun → "Bu işlemle ilgili yardım al" → talepte işlem iliştirilmiş
+- [ ] Panel → Destek: talebi aç, ekran görüntüsünü gör, yanıtla → uygulamada okunmamış rozeti, yazışmada "MeetPoint Destek"
+- [ ] Panel → Destek → Yardım merkezi: soru ekle / yayından kaldır; uygulamada görünüp kayboluyor
+- [ ] Panel → Destek → Künye: unvanı gir → http://localhost:4000/legal/imprint ve /legal/terms'te görünüyor
+- [ ] Web: http://localhost:4000/help, http://localhost:4000/account/delete (yanlış şifre / doğru şifre)
+- [ ] Panel → KVKK → "İYS dosyası indir"
+
 ### 7e. Para çekme ve finans (Faz 13)
 - [ ] Cüzdan: yeni kazanç "olgunlaşıyor" olarak görünüyor (14 gün)
 - [ ] Para çek: mavi tik sonrası "Kimlik doğrulama" kartı; geçersiz TC reddediliyor (algoritmaya uyan deneme numarası: 10000000146)

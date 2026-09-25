@@ -2,8 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Router } from 'express';
 import { z } from 'zod';
-import { config, privacy, retention } from '../config';
+import { config, consumer, privacy, retention } from '../config';
+import { COMPANY_FIELDS, COMPANY_LABELS, fillCompany, getCompany } from '../consumer/company';
 import { HttpError } from '../db';
+import { getPacks } from '../finance/settings';
 import { INVENTORY } from '../privacy/inventory';
 
 // Kullanım koşulları ve gizlilik politikası (herkese açık; mağaza sayfaları da bu adresleri kullanır).
@@ -20,12 +22,17 @@ const TITLES: Record<string, Record<string, string>> = {
   retention: { tr: 'Kişisel Veri Saklama ve İmha Politikası', en: 'Data Retention and Deletion Policy' },
   safety: { tr: 'Güvenlik Merkezi', en: 'Safety Center' },
   community: { tr: 'Topluluk Kuralları', en: 'Community Rules' },
+  preinfo: { tr: 'Ön Bilgilendirme Formu', en: 'Pre-contract Information' },
+  'distance-sales': { tr: 'Mesafeli Satış Sözleşmesi', en: 'Distance Sales Agreement' },
+  imprint: { tr: 'Künye', en: 'Imprint' },
 };
 
 const DOCS = Object.keys(TITLES) as [string, ...string[]];
 
 const versionOf = (doc: string) =>
-  doc === 'terms' || doc === 'community' || doc === 'safety'
+  doc === 'preinfo' || doc === 'distance-sales'
+    ? consumer.salesTermsVersion
+    : doc === 'terms' || doc === 'community' || doc === 'safety' || doc === 'imprint'
     ? config.termsVersion
     : doc === 'privacy' || doc === 'retention'
       ? config.privacyVersion
@@ -51,22 +58,52 @@ function retentionBody(lang: string) {
   return `${intro}<table><thead><tr><th>${lang === 'tr' ? 'Veri' : 'Data'}</th><th>${lang === 'tr' ? 'Saklama' : 'Retention'}</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
+// Paket fiyat tablosu (ön bilgilendirme formu): KDV dahil TL fiyatı ve referans USD
+async function packsTable(lang: string) {
+  const packs = await getPacks();
+  const rows = packs
+    .map((p) => {
+      const tl = p.tryPrice > 0 ? `${p.tryPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL` : '—';
+      return `<tr><td>${p.coins.toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')}</td><td>${tl}</td><td>$${p.usd.toFixed(2)}</td></tr>`;
+    })
+    .join('');
+  return `<table><thead><tr><th>${lang === 'tr' ? 'Jeton' : 'Coins'}</th><th>${lang === 'tr' ? 'Fiyat (KDV dahil)' : 'Price (TRY, VAT incl.)'}</th><th>${lang === 'tr' ? 'Referans' : 'Reference'}</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// Künye: panelde doldurulan şirket bilgileri
+async function imprintBody(lang: 'tr' | 'en') {
+  const c = await getCompany();
+  const rows = COMPANY_FIELDS.map((f) => {
+    const label = f === 'email' ? (lang === 'tr' ? 'Destek e-postası' : 'Support e-mail') : f === 'kvkkEmail' ? (lang === 'tr' ? 'KVKK başvuru e-postası' : 'Data protection e-mail') : f === 'verbisNo' ? (lang === 'tr' ? 'VERBİS kayıt no' : 'VERBIS registration') : COMPANY_LABELS[f][lang];
+    return `<tr><th>${esc(label)}</th><td>{{${f}}}</td></tr>`;
+  }).join('');
+  const note =
+    lang === 'tr'
+      ? '<p>Şikayet ve önerilerin için Uygulama içinde <b>Profil › Yardım ve destek</b> bölümünü kullanabilirsin.</p>'
+      : '<p>For complaints and suggestions use <b>Profile › Help &amp; support</b> in the App.</p>';
+  return fillCompany(`<table><tbody>${rows}</tbody></table>${note}`, c, lang);
+}
+
 const DRAFT: Record<string, string> = {
   tr: 'TASLAK: Bu metin yayın öncesinde bir hukukçu tarafından gözden geçirilmelidir. Köşeli parantezli alanlar şirket kurulunca doldurulacaktır.',
   en: 'DRAFT: This text must be reviewed by a lawyer before launch. Bracketed fields will be filled in once the company is founded.',
 };
 
-legalRouter.get('/:doc', (req, res) => {
+legalRouter.get('/:doc', async (req, res) => {
   const parsed = z.object({ doc: z.enum(DOCS) }).safeParse(req.params);
   if (!parsed.success) throw new HttpError(404, 'not_found');
   const { doc } = parsed.data;
   const { lang } = z.object({ lang: z.enum(['tr', 'en']).default('tr') }).parse(req.query);
   let body: string;
   if (doc === 'retention') body = retentionBody(lang);
+  else if (doc === 'imprint') body = await imprintBody(lang);
   else {
     const file = path.join('legal', `${doc}.${lang}.html`);
     if (!fs.existsSync(file)) throw new HttpError(404, 'not_found');
     body = fs.readFileSync(file, 'utf8');
+    if (body.includes('{{packs}}')) body = body.replace('{{packs}}', await packsTable(lang));
+    // Şirket bilgileri (künye) metne yerleşir; boş alanlar köşeli parantezle görünür
+    body = fillCompany(body, await getCompany(), lang);
   }
   const other = lang === 'tr' ? 'en' : 'tr';
   // Genel CSP satır içi stile izin vermez; bu sayfa betik içermez, sadece kendi stilini kullanır

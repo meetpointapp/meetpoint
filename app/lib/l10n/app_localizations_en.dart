@@ -1682,4 +1682,225 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errAccountNameMismatch =>
       'The IBAN holder must be the verified person.';
+
+  @override
+  String get salesTermsTitle => 'Before you buy';
+
+  @override
+  String get salesTermsUpdatedTitle => 'Sales terms updated';
+
+  @override
+  String get salesTermsIntro =>
+      'Coins are digital content and are credited as soon as the payment is confirmed, so the right of withdrawal doesn\'t apply after purchase. You confirm this once.';
+
+  @override
+  String get preInfoForm => 'Pre-contract Information';
+
+  @override
+  String get distanceSalesContract => 'Distance Sales Agreement';
+
+  @override
+  String get salesTermsCheckboxA => 'I have read the ';
+
+  @override
+  String get salesTermsCheckboxAnd => ' and the ';
+
+  @override
+  String get salesTermsCheckboxB =>
+      ' and accept them. I want the coins credited immediately and accept that I therefore have no right of withdrawal.';
+
+  @override
+  String get salesTermsAccept => 'Accept and continue';
+
+  @override
+  String get salesTermsLineA => 'Purchases are subject to the ';
+
+  @override
+  String get salesTermsLineB =>
+      ' · Digital content: no right of withdrawal · Coins never expire';
+
+  @override
+  String get supportAboutEntry => 'Get help with this transaction';
+
+  @override
+  String get helpAndSupport => 'Help & support';
+
+  @override
+  String get helpSearchHint => 'Search (e.g. call price)';
+
+  @override
+  String get helpNoResults => 'No results. Try other words or write to us.';
+
+  @override
+  String get helpStillNeed => 'Didn\'t find your answer?';
+
+  @override
+  String get contactSupport => 'Contact us';
+
+  @override
+  String get imprint => 'Imprint';
+
+  @override
+  String get myTickets => 'My requests';
+
+  @override
+  String get newTicket => 'New request';
+
+  @override
+  String get noTickets => 'You have no support requests yet.';
+
+  @override
+  String get supportTicket => 'Support request';
+
+  @override
+  String get ticketOpen => 'Awaiting reply';
+
+  @override
+  String get ticketAnswered => 'Answered';
+
+  @override
+  String get ticketClosed => 'Closed';
+
+  @override
+  String get ticketSent => 'Request received, we\'ll get back to you soon.';
+
+  @override
+  String get ticketCategory => 'What is it about?';
+
+  @override
+  String get ticketSubject => 'Subject';
+
+  @override
+  String get ticketBodyHint =>
+      'What happened and when? The more detail, the faster we can help.';
+
+  @override
+  String get relatedRecord => 'Related transaction';
+
+  @override
+  String get addScreenshot => 'Add screenshot';
+
+  @override
+  String get screenshotAttached => 'Screenshot attached';
+
+  @override
+  String get viewScreenshot => 'Screenshot';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get ticketResponseTime =>
+      'We usually reply within 48 hours. You\'ll get a notification and an email.';
+
+  @override
+  String get ticketWaiting =>
+      'Your request is with our team. We\'ll let you know when we reply.';
+
+  @override
+  String get ticketClosedNote =>
+      'This request is closed. Open a new one for another issue.';
+
+  @override
+  String get closeTicket => 'Close request';
+
+  @override
+  String get closeTicketConfirm =>
+      'Close the request if your issue is solved. Closed requests take no new messages.';
+
+  @override
+  String get writeReply => 'Write a reply…';
+
+  @override
+  String get supportTeam => 'MeetPoint Support';
+
+  @override
+  String get supportCatCoins => 'Coins & payment';
+
+  @override
+  String get supportCatCalls => 'Calls & gifts';
+
+  @override
+  String get supportCatCashout => 'Cash-out';
+
+  @override
+  String get supportCatSafety => 'Safety';
+
+  @override
+  String get supportCatAccount => 'Account';
+
+  @override
+  String get supportCatBug => 'Report a bug';
+
+  @override
+  String get supportCatOther => 'Other';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notifyTypesTitle => 'Notification types';
+
+  @override
+  String get notifyTypesHint =>
+      'Turned-off types won\'t reach your phone; you still see them in the app.';
+
+  @override
+  String get notifyMessages => 'Messages';
+
+  @override
+  String get notifyMatches => 'Matches';
+
+  @override
+  String get notifyRequests => 'Message requests';
+
+  @override
+  String get notifyCalls => 'Calls';
+
+  @override
+  String get notifyLikes => 'Super likes';
+
+  @override
+  String get quietHoursTitle => 'Quiet hours';
+
+  @override
+  String get quietHoursHint => 'Only calls come through during these hours.';
+
+  @override
+  String get quietHours => 'Turn on quiet hours';
+
+  @override
+  String get quietFrom => 'From';
+
+  @override
+  String get quietTo => 'To';
+
+  @override
+  String get marketingTitle => 'Offers & news';
+
+  @override
+  String get marketingHint => 'Permission is per channel; withdraw any time.';
+
+  @override
+  String get consentMarketingPushTitle => 'Offer notifications';
+
+  @override
+  String get consentMarketingPushText =>
+      'Discounts and new features as notifications.';
+
+  @override
+  String get requiredNotificationsNote =>
+      'Payment, support reply and security notifications are always sent because they concern your account.';
+
+  @override
+  String get errSalesTermsRequired =>
+      'Please accept the sales terms before buying.';
+
+  @override
+  String get errSupportLimit =>
+      'You have too many open requests. Close one of them first.';
+
+  @override
+  String get errTicketClosed =>
+      'This request is closed. You can open a new one.';
 }

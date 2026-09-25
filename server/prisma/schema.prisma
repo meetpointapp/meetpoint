@@ -36,10 +36,22 @@ model User {
   privacyVersion     String    @default("") // okunduğu onaylanan aydınlatma metni sürümü
 
   // Açık rızaların güncel durumu (her verme/geri alma Consent tablosunda kayıtlı). null = rıza yok
-  consentSpecialAt   DateTime? // cinsel yönelim (özel nitelikli veri): eşleştirme için zorunlu
-  consentOverseasAt  DateTime? // yurt dışına aktarım: sesli/görüntülü arama ve bildirimler
-  consentSelfieAt    DateTime? // mavi tik selfie'si
-  consentMarketingAt DateTime? // kampanya ve duyuru iletişimi
+  consentSpecialAt       DateTime? // cinsel yönelim (özel nitelikli veri): eşleştirme için zorunlu
+  consentOverseasAt      DateTime? // yurt dışına aktarım: sesli/görüntülü arama ve bildirimler
+  consentSelfieAt        DateTime? // mavi tik selfie'si
+  consentMarketingAt     DateTime? // kampanya ve duyuru iletişimi (e-posta)
+  consentMarketingPushAt DateTime? // kampanya ve duyuru bildirimleri (push)
+
+  // Tüketici (Faz 14): kabul edilen ön bilgilendirme + mesafeli satış sözleşmesi + cayma hakkı istisnası sürümü.
+  // Boş veya eski sürümse uygulama satın almadan önce yeniden onay ister.
+  salesTermsVersion String @default("")
+
+  // Bildirim tercihleri: kapatılan türler ({ "message": false }) ve sessiz saatler (yerel saat, dakika).
+  // Sessiz saatte aramalar dışındaki bildirimler gönderilmez (uygulama içinde görünmeye devam eder).
+  notifyPrefs Json @default("{}")
+  quietStart  Int? // 0-1439, null = sessiz saat kapalı
+  quietEnd    Int?
+  tzOffsetMin Int  @default(180) // cihazın UTC farkı (dakika), sessiz saati hesaplamak için
 
   // Saklama ve imha
   lastActiveAt        DateTime  @default(now()) // 2 yıl hareketsiz hesaplar silinir
@@ -82,6 +94,7 @@ model User {
   kycSubmissions KycSubmission[]
   appeals        Appeal[]
   modFlags       ModerationFlag[]
+  supportTickets SupportTicket[]
 
   profile Profile?
   photos  Photo[]
@@ -269,22 +282,24 @@ model Message {
 // Jeton satın alımları (RevenueCat üzerinden App Store / Google Play).
 // transactionId benzersiz: aynı mağaza işlemi iki kez jetona dönüşemez.
 model Purchase {
-  id            String    @id @default(cuid())
+  id                String    @id @default(cuid())
   // Hesap silinse de satış kaydı muhasebe için kalır (kullanıcı bağlantısı boşalır)
-  userId        String?
-  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  email         String    @default("") // satın alma anındaki e-posta
-  store         String // app_store | play_store | dev
-  productId     String
-  transactionId String    @unique
-  coins         Int // paketteki jeton
-  bonusCoins    Int       @default(0) // ilk alım bonusu
-  priceUsd      Float? // mağazanın bildirdiği USD karşılığı (rapor için)
-  currency      String    @default("")
-  sandbox       Boolean   @default(false)
-  status        String    @default("COMPLETED") // COMPLETED | REFUNDED
-  refundedAt    DateTime?
-  createdAt     DateTime  @default(now())
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email             String    @default("") // satın alma anındaki e-posta
+  store             String // app_store | play_store | dev
+  productId         String
+  transactionId     String    @unique
+  coins             Int // paketteki jeton
+  bonusCoins        Int       @default(0) // ilk alım bonusu
+  priceUsd          Float? // mağazanın bildirdiği USD karşılığı (rapor için)
+  currency          String    @default("")
+  sandbox           Boolean   @default(false)
+  status            String    @default("COMPLETED") // COMPLETED | REFUNDED
+  // Satın alma anında kabul edilmiş satış metinleri sürümü (cayma hakkı istisnası onayının kanıtı)
+  salesTermsVersion String    @default("")
+  refundedAt        DateTime?
+  createdAt         DateTime  @default(now())
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -540,7 +555,7 @@ model Consent {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind      String // terms | privacy | special_category | overseas_transfer | selfie | marketing
+  kind      String // terms | privacy | special_category | overseas_transfer | selfie | marketing | marketing_push | sales_terms
   version   String
   granted   Boolean
   source    String   @default("") // register | onboarding | settings | reconsent | verification | seed
@@ -766,4 +781,80 @@ model CoinPack {
   active    Boolean  @default(true)
   sortOrder Int      @default(0)
   updatedAt DateTime @updatedAt
+}
+
+// ---------- Faz 14: destek, yardım merkezi, künye ----------
+
+// Destek talebi. Durum: OPEN (bizde, yanıt bekliyor) | ANSWERED (kullanıcıda) | CLOSED.
+// İlk yanıt hedefi (dueAt) oluşturulurken belirlenir; panelde geciken talepler kırmızı.
+model SupportTicket {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category        String // coins | calls | cashout | safety | account | bug | other
+  subject         String
+  status          String           @default("OPEN")
+  relatedType     String           @default("") // purchase | payout | call | wallet (ilgili işlem)
+  relatedId       String           @default("")
+  platform        String           @default("") // talep anındaki cihaz (android | ios | web)
+  appVersion      String           @default("")
+  dueAt           DateTime // ilk yanıt hedefi
+  firstResponseAt DateTime?
+  lastMessageAt   DateTime         @default(now())
+  unreadForUser   Boolean          @default(false) // yanıt geldi, kullanıcı henüz açmadı
+  closedAt        DateTime?
+  createdAt       DateTime         @default(now())
+  messages        SupportMessage[]
+
+  @@index([status, dueAt])
+  @@index([userId, lastMessageAt])
+  @@index([closedAt])
+}
+
+model SupportMessage {
+  id         String        @id @default(cuid())
+  ticketId   String
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromStaff  Boolean       @default(false)
+  staffId    String        @default("") // yanıtlayan ekip üyesi (kullanıcıya "MeetPoint Destek" görünür)
+  body       String
+  attachment String        @default("") // ekran görüntüsü (özel depo anahtarı)
+  createdAt  DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+// Yardım merkezi (SSS). Panelden düzenlenir; uygulamada ve web'de (/help) gösterilir.
+model HelpArticle {
+  id        String   @id @default(cuid())
+  locale    String // tr | en
+  category  String // coins | calls | cashout | safety | account
+  question  String
+  answer    String
+  position  Int      @default(0)
+  published Boolean  @default(true)
+  updatedBy String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([locale, published, category, position])
+}
+
+// Künye (satıcı/hizmet sağlayıcı bilgileri): uygulamada, web'de ve yasal metinlerde gösterilir.
+// Şirket kurulunca panelden doldurulur (Faz 17); boş alanlar metinlerde köşeli parantezle görünür.
+model CompanyInfo {
+  id         Int      @id @default(1)
+  legalName  String   @default("") // ticaret unvanı
+  mersisNo   String   @default("")
+  taxOffice  String   @default("")
+  taxNo      String   @default("")
+  address    String   @default("")
+  kepAddress String   @default("")
+  email      String   @default("") // destek e-postası
+  kvkkEmail  String   @default("") // KVKK başvuru e-postası
+  phone      String   @default("")
+  etbisNo    String   @default("") // e-ticaret bilgi sistemi kaydı
+  verbisNo   String   @default("")
+  updatedBy  String   @default("")
+  updatedAt  DateTime @updatedAt
 }

@@ -88,12 +88,14 @@ adminRouter.get('/stats', async (_req, res) => {
       prisma.payout.aggregate({ where: { status: 'PAID' }, _count: true, _sum: { usd: true } }),
       prisma.errorLog.count({ where: { resolvedAt: null } }),
     ]);
-  const [openDsr, overdueDsr, openFlags, openAppeals, openLegal] = await Promise.all([
+  const [openDsr, overdueDsr, openFlags, openAppeals, openLegal, openSupport, overdueSupport] = await Promise.all([
     prisma.dsrRequest.count({ where: { status: 'OPEN' } }),
     prisma.dsrRequest.count({ where: { status: 'OPEN', dueAt: { lt: new Date() } } }),
     prisma.moderationFlag.count({ where: { status: 'OPEN' } }),
     prisma.appeal.count({ where: { status: 'OPEN' } }),
     prisma.legalRequest.count({ where: { status: 'OPEN' } }),
+    prisma.supportTicket.count({ where: { status: 'OPEN' } }),
+    prisma.supportTicket.count({ where: { status: 'OPEN', dueAt: { lt: new Date() } } }),
   ]);
   res.json({
     users,
@@ -123,6 +125,8 @@ adminRouter.get('/stats', async (_req, res) => {
     // Moderasyon kuyruğu = açık şikayet + otomatik işaret + itiraz
     openModeration: openReports + openFlags + openAppeals,
     openLegal,
+    openSupport,
+    overdueSupport,
   });
 });
 

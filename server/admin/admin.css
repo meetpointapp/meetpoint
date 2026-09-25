@@ -115,3 +115,13 @@ textarea { font: inherit; padding: 10px 14px; border-radius: 12px; border: 1px s
 
 code { font-family: ui-monospace, Consolas, monospace; font-size: 14px; background: var(--line); padding: 2px 6px; border-radius: 6px; user-select: all; }
 .stack { white-space: pre-wrap; font-size: 12px; max-height: 280px; overflow: auto; background: var(--line); padding: 10px; border-radius: 10px; margin: 8px 0 0; }
+
+/* Destek */
+.w-90 { width: 90px; }
+.thread { display: grid; gap: 8px; }
+.msg { max-width: 80%; padding: 10px 12px; border-radius: 14px; background: var(--bg); white-space: pre-wrap; }
+.msg.staff { justify-self: end; background: rgba(255, 77, 109, .10); }
+.msg .meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.msg img { max-width: 260px; border-radius: 10px; display: block; margin-top: 8px; }
+.faq-q { font-weight: 700; }
+.faq-a { white-space: pre-wrap; color: var(--muted); }

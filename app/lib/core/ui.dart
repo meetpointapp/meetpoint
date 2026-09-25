@@ -69,6 +69,10 @@ String errorText(AppLocalizations l, Object error) {
     'peer_calls_disabled' => l.errPeerCallsDisabled,
     'export_cooldown' => l.errExportCooldown,
     'export_unavailable' => l.errNotFound,
+    'sales_terms_required' => l.errSalesTermsRequired,
+    'support_limit' => l.errSupportLimit,
+    'invalid_related' => l.errNotFound,
+    'ticket_closed' => l.errTicketClosed,
     'already_answered' => l.errGeneric,
     _ => l.errGeneric,
   };

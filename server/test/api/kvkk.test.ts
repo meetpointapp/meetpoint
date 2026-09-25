@@ -10,6 +10,7 @@ import {
   makeUser,
   mailsFor,
   PRIVATE_DIR,
+  png,
   registerVerified,
   TEST_PASSWORD,
   testDb,
@@ -121,6 +122,13 @@ describe('KVKK (Faz 11)', () => {
     const match = await call(peer.t, 'POST', '/swipes', { toId: u.id, direction: 'like' });
     await call(u.t, 'POST', `/conversations/${match.conversationId}/messages`, { body: 'benim mesajım' });
     await call(peer.t, 'POST', `/conversations/${match.conversationId}/messages`, { body: 'karşı tarafın mesajı' });
+    // Ekran görüntülü destek talebi de kopyada olmalı
+    const fd = new FormData();
+    fd.append('category', 'account');
+    fd.append('subject', 'Verilerim hakkında');
+    fd.append('body', 'Verilerimin kopyasını nasıl alırım?');
+    fd.append('screenshot', new Blob([new Uint8Array(png)], { type: 'image/png' }), 'ekran.png');
+    const ticket = await (await fetch(`${B}/support/tickets`, { method: 'POST', headers: { authorization: `Bearer ${u.t}` }, body: fd })).json();
 
     const before = mailsFor(u.email).length;
     const req = await call(u.t, 'POST', '/me/data-export');
@@ -144,6 +152,7 @@ describe('KVKK (Faz 11)', () => {
     check("other person's messages excluded", !JSON.stringify(data).includes('karşı tarafın mesajı'));
     check('consents and likes included', data.consents?.length >= 3 && data.likesAndPasses?.some((s) => s.toId === peer.id));
     check('no password hash', !JSON.stringify(data).includes('argon2'));
+    check('support tickets + screenshot included', data.supportTickets?.[0]?.subject === 'Verilerim hakkında' && files.has(`support/${ticket.messages[0].id}.webp`));
 
     const second = await fetch(`${B}/data-export/${link![1]}`);
     check('link is single-use', second.status === 404);

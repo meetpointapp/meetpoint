@@ -33,7 +33,7 @@ export async function creditPurchase(input: PurchaseInput): Promise<{ credited: 
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.purchase.findUnique({ where: { transactionId: input.transactionId } });
       if (existing) return { credited: false, coins: 0, bonus: 0 };
-      const user = await tx.user.findUnique({ where: { id: input.userId }, select: { id: true, email: true } });
+      const user = await tx.user.findUnique({ where: { id: input.userId }, select: { id: true, email: true, salesTermsVersion: true } });
       if (!user) return { credited: false, coins: 0, bonus: 0 };
 
       const bonus = await firstPurchaseBonusFor(input.userId, pack.coins, tx);
@@ -41,6 +41,7 @@ export async function creditPurchase(input: PurchaseInput): Promise<{ credited: 
         data: {
           userId: input.userId,
           email: user.email,
+          salesTermsVersion: user.salesTermsVersion,
           store: input.store,
           productId: pack.id,
           transactionId: input.transactionId,
