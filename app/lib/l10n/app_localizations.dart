@@ -3500,6 +3500,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Fikrini paylaş ya da karşılaştığın bir sorunu anlat'**
   String get sendFeedbackHint;
+
+  /// No description provided for @showcaseSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitrin'**
+  String get showcaseSection;
+
+  /// No description provided for @showcaseTheme.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renk'**
+  String get showcaseTheme;
+
+  /// No description provided for @showcaseThemeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilinde ve rozetlerinde kullanılan vurgu rengi'**
+  String get showcaseThemeHint;
+
+  /// No description provided for @showcaseBackground.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kart zemini'**
+  String get showcaseBackground;
+
+  /// No description provided for @showcaseDefault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Varsayılan görünüm'**
+  String get showcaseDefault;
+
+  /// No description provided for @showcaseCustom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kişiselleştirildi'**
+  String get showcaseCustom;
+
+  /// No description provided for @activeNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu an aktif'**
+  String get activeNow;
 }
 
 class _AppLocalizationsDelegate

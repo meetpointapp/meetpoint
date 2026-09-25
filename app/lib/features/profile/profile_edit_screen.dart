@@ -109,6 +109,27 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   for (final p in d.prompts) Padding(padding: const EdgeInsets.only(bottom: 8), child: PromptCard(prompt: p)),
                 _SectionTitle(l.basics, onEdit: () => _editSection(l.basics, (d, c) => BasicsEditor(draft: d, onChanged: c))),
                 BasicsChips(profile: d.toPreview(), showBio: true),
+                _SectionTitle(l.showcaseSection,
+                    onEdit: () => _editSection(l.showcaseSection, (d, c) => ShowcasePicker(draft: d, onChanged: c))),
+                Row(children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    margin: const EdgeInsets.only(right: 10),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: themeColorOf(d.themeId)),
+                  ),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(colors: cardGradientOf(d.cardBackgroundId)),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(d.themeId.isEmpty && d.cardBackgroundId.isEmpty ? l.showcaseDefault : l.showcaseCustom,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                ]),
               ]),
       ),
     );

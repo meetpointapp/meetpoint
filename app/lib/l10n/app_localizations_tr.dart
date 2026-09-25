@@ -2030,4 +2030,26 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get sendFeedbackHint =>
       'Fikrini paylaş ya da karşılaştığın bir sorunu anlat';
+
+  @override
+  String get showcaseSection => 'Vitrin';
+
+  @override
+  String get showcaseTheme => 'Renk';
+
+  @override
+  String get showcaseThemeHint =>
+      'Profilinde ve rozetlerinde kullanılan vurgu rengi';
+
+  @override
+  String get showcaseBackground => 'Kart zemini';
+
+  @override
+  String get showcaseDefault => 'Varsayılan görünüm';
+
+  @override
+  String get showcaseCustom => 'Kişiselleştirildi';
+
+  @override
+  String get activeNow => 'Şu an aktif';
 }

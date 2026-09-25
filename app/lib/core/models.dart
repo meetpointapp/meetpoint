@@ -44,6 +44,11 @@ class PublicProfile {
   final String zodiac;
   final String smoking;
   final String drinking;
+  // Faz 16: kişisel profil vitrini. '' = varsayılan marka görünümü. online: sadece bazı uçlarda
+  // (profil detayı, keşfet destesi) doldurulur; başka yerlerde bilinmediği için false gelir.
+  final String themeId;
+  final String cardBackgroundId;
+  final bool online;
 
   const PublicProfile({
     required this.id,
@@ -66,6 +71,9 @@ class PublicProfile {
     this.zodiac = '',
     this.smoking = '',
     this.drinking = '',
+    this.themeId = '',
+    this.cardBackgroundId = '',
+    this.online = false,
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
@@ -93,6 +101,9 @@ class PublicProfile {
         zodiac: j['zodiac'] ?? '',
         smoking: j['smoking'] ?? '',
         drinking: j['drinking'] ?? '',
+        themeId: j['themeId'] ?? '',
+        cardBackgroundId: j['cardBackgroundId'] ?? '',
+        online: j['online'] ?? false,
       );
 }
 
@@ -122,6 +133,8 @@ class MyProfile extends PublicProfile {
           zodiac: j['zodiac'] ?? '',
           smoking: j['smoking'] ?? '',
           drinking: j['drinking'] ?? '',
+          themeId: j['themeId'] ?? '',
+          cardBackgroundId: j['cardBackgroundId'] ?? '',
         );
 }
 
@@ -144,6 +157,8 @@ class ProfileDraft {
   String zodiac = '';
   String smoking = '';
   String drinking = '';
+  String themeId = '';
+  String cardBackgroundId = '';
 
   ProfileDraft();
 
@@ -164,7 +179,9 @@ class ProfileDraft {
         education = p.education,
         zodiac = p.zodiac,
         smoking = p.smoking,
-        drinking = p.drinking;
+        drinking = p.drinking,
+        themeId = p.themeId,
+        cardBackgroundId = p.cardBackgroundId;
 
   ProfileDraft copy() => ProfileDraft()
     ..displayName = displayName
@@ -183,7 +200,9 @@ class ProfileDraft {
     ..education = education
     ..zodiac = zodiac
     ..smoking = smoking
-    ..drinking = drinking;
+    ..drinking = drinking
+    ..themeId = themeId
+    ..cardBackgroundId = cardBackgroundId;
 
   // Önizleme bileşenleri (etiketler, sorular) için salt okunur profil
   PublicProfile toPreview({int age = 0}) => PublicProfile(
@@ -204,6 +223,8 @@ class ProfileDraft {
         zodiac: zodiac,
         smoking: smoking,
         drinking: drinking,
+        themeId: themeId,
+        cardBackgroundId: cardBackgroundId,
       );
 
   Map<String, dynamic> toJson() {
@@ -225,6 +246,8 @@ class ProfileDraft {
       'zodiac': zodiac,
       'smoking': smoking,
       'drinking': drinking,
+      'themeId': themeId,
+      'cardBackgroundId': cardBackgroundId,
     };
   }
 }

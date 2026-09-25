@@ -330,8 +330,10 @@ class _ProfileCardState extends State<_ProfileCard> {
       builder: (context, box) => GestureDetector(
         onTapUp: (d) => _tap(d, box.maxWidth),
         child: DecoratedBox(
+          // Faz 16: kişisel profil vitrini — özel bir renk seçilmişse kartın çerçevesinde görünür
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
+            border: p.themeId.isEmpty ? null : Border.all(color: themeColorOf(p.themeId), width: 3),
             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 16, offset: const Offset(0, 6))],
           ),
           child: ClipRRect(
@@ -371,6 +373,20 @@ class _ProfileCardState extends State<_ProfileCard> {
                         ),
                       ),
                   ]),
+                ),
+              if (p.online)
+                Positioned(
+                  top: 20,
+                  right: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: ShapeDecoration(shape: const StadiumBorder(), color: Colors.black.withValues(alpha: 0.45)),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.like)),
+                      const SizedBox(width: 6),
+                      Text(l.activeNow, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
+                    ]),
+                  ),
                 ),
               if (p.superLikedMe)
                 Positioned(

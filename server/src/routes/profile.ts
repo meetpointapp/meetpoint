@@ -3,13 +3,14 @@ import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
 import { currentSession, uid } from '../auth';
-import { EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, PROMPTS, ZODIAC } from '../catalog';
+import { CARD_BACKGROUNDS, EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, PROMPTS, THEMES, ZODIAC } from '../catalog';
 import { ageOf } from '../age';
 import { verifyPassword } from '../passwords';
 import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
 import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
+import { isOnline } from '../realtime';
 import { getBalance, getCashable } from '../wallet';
 import { reviewNewPhoto } from '../moderation/detect';
 import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
@@ -59,12 +60,23 @@ export function publicProfile(
     zodiac: p.zodiac,
     smoking: p.smoking,
     drinking: p.drinking,
+    themeId: p.themeId,
+    cardBackgroundId: p.cardBackgroundId,
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
       .filter((ph) => opts.owner || !ph.hiddenAt)
       .sort((a, b) => a.position - b.position)
       .map((ph) => ({ id: ph.id, ...photoUrls(ph.path), ...(opts.owner && ph.hiddenAt ? { underReview: true } : {}) })),
   };
+}
+
+// "Şu an" rozeti: anlık bağlantı durumu, publicProfile()'a dahil değil (çoğu yerde gerekmiyor,
+// sorgu maliyeti var) — sadece gösterileceği yerlerde (profil detayı, keşfet destesi) eklenir.
+export async function withOnline<T extends { id: string }>(profile: T): Promise<T & { online: boolean }> {
+  return { ...profile, online: await isOnline(profile.id) };
+}
+export async function withOnlineMany<T extends { id: string }>(profiles: T[]): Promise<(T & { online: boolean })[]> {
+  return Promise.all(profiles.map(withOnline));
 }
 
 profileRouter.get('/me', async (req, res) => {
@@ -197,6 +209,8 @@ const profileSchema = z.object({
   zodiac: z.enum(ZODIAC).or(z.literal('')).default(''),
   smoking: z.enum(HABIT).or(z.literal('')).default(''),
   drinking: z.enum(HABIT).or(z.literal('')).default(''),
+  themeId: z.enum(THEMES).or(z.literal('')).default(''),
+  cardBackgroundId: z.enum(CARD_BACKGROUNDS).or(z.literal('')).default(''),
 });
 
 profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
@@ -263,5 +277,5 @@ profileRouter.get('/users/:id', async (req, res) => {
   ]);
   const profile = user && !user.bannedAt && !user.deletionRequestedAt && publicProfile(user, target === me ? null : viewer, { owner: target === me });
   if (!profile) throw new HttpError(404, 'not_found');
-  res.json(profile);
+  res.json(target === me ? profile : await withOnline(profile));
 });

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meetpoint/core/catalog.dart';
 import 'package:meetpoint/core/models.dart';
 
 // Sunucu yanıt biçimleriyle (server/src/*Dto) birebir örnekler
@@ -79,6 +80,29 @@ void main() {
       expect([sized.thumbUrl, sized.url, sized.fullUrl], ['/m-sm', '/m-md', '/m-lg']);
       final legacy = Photo.fromJson({'id': 'p', 'url': '/old.png'});
       expect([legacy.thumbUrl, legacy.fullUrl], ['/old.png', '/old.png']);
+    });
+
+    test('Faz 16 vitrin alanları: eski yanıtta (alan yok) varsayılan, yeni yanıtta ayrıştırılır', () {
+      final legacy = PublicProfile.fromJson(profileJson());
+      expect([legacy.themeId, legacy.cardBackgroundId, legacy.online], ['', '', false]);
+      final showcase = PublicProfile.fromJson({...profileJson(), 'themeId': 'ocean', 'cardBackgroundId': 'sunset', 'online': true});
+      expect(showcase.themeId, 'ocean');
+      expect(showcase.cardBackgroundId, 'sunset');
+      expect(showcase.online, isTrue);
+    });
+  });
+
+  group('Vitrin kataloğu (Faz 16)', () {
+    test('bilinmeyen/boş kimlik varsayılana düşer', () {
+      expect(themeColorOf(''), themeAccent['coral']);
+      expect(themeColorOf('nope'), themeAccent['coral']);
+      expect(cardGradientOf(''), cardBackgroundGradient['default']);
+      expect(cardGradientOf('nope'), cardBackgroundGradient['default']);
+    });
+
+    test('bilinen kimlik kendi rengini/gradyanını döner', () {
+      expect(themeColorOf('ocean'), themeAccent['ocean']);
+      expect(cardGradientOf('sunset'), cardBackgroundGradient['sunset']);
     });
   });
 

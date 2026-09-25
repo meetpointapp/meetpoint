@@ -12,7 +12,7 @@ import { swipeLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { debit, lockWallet } from '../wallet';
-import { publicProfile } from './profile';
+import { publicProfile, withOnlineMany } from './profile';
 
 export const discoverRouter = Router();
 
@@ -79,11 +79,8 @@ discoverRouter.get('/discover', async (req, res) => {
 
   const users = await prisma.user.findMany({ where: { id: { in: rows.map((r) => r.id) } }, include: { profile: true, photos: true } });
   const byId = new Map(users.map((u) => [u.id, u]));
-  res.json(
-    rows
-      .filter((r) => byId.has(r.id))
-      .map((r) => ({ ...publicProfile(byId.get(r.id)!, my), superLikedMe: r.superLikedMe })),
-  );
+  const deck = rows.filter((r) => byId.has(r.id)).map((r) => ({ ...publicProfile(byId.get(r.id)!, my)!, superLikedMe: r.superLikedMe }));
+  res.json(await withOnlineMany(deck));
 });
 
 discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, res) => {

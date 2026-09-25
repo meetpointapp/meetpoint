@@ -2046,4 +2046,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sendFeedbackHint =>
       'Share an idea or tell us about a problem you ran into';
+
+  @override
+  String get showcaseSection => 'Showcase';
+
+  @override
+  String get showcaseTheme => 'Color';
+
+  @override
+  String get showcaseThemeHint =>
+      'The accent color used on your profile and badges';
+
+  @override
+  String get showcaseBackground => 'Card background';
+
+  @override
+  String get showcaseDefault => 'Default look';
+
+  @override
+  String get showcaseCustom => 'Customized';
+
+  @override
+  String get activeNow => 'Active now';
 }

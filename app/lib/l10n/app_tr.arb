@@ -1045,5 +1045,12 @@
   "consentAnalyticsTitle": "Kullanım analitiği",
   "consentAnalyticsText": "Kayıt, eşleşme, ilk mesaj ve ilk satın alma gibi kilometre taşlarının anonim sayılarla kendi sunucumuzda tutulması (uygulamayı iyileştirmek için); üçüncü tarafa gitmez.",
   "sendFeedback": "Öneri ve hata bildir",
-  "sendFeedbackHint": "Fikrini paylaş ya da karşılaştığın bir sorunu anlat"
+  "sendFeedbackHint": "Fikrini paylaş ya da karşılaştığın bir sorunu anlat",
+  "showcaseSection": "Vitrin",
+  "showcaseTheme": "Renk",
+  "showcaseThemeHint": "Profilinde ve rozetlerinde kullanılan vurgu rengi",
+  "showcaseBackground": "Kart zemini",
+  "showcaseDefault": "Varsayılan görünüm",
+  "showcaseCustom": "Kişiselleştirildi",
+  "activeNow": "Şu an aktif"
 }

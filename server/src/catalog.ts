@@ -26,3 +26,9 @@ export const VERIFICATION_POSES = ['peace_sign', 'thumbs_up', 'hand_on_head', 'p
 
 export const MAX_INTERESTS = 5;
 export const MAX_PROMPTS = 3;
+
+// Faz 16: kişisel profil vitrini. Renk (rozet/vurgu) ve arkaplan (kart zemini) ayrı seçilir; ''
+// varsayılan marka görünümü demektir. Renkler/gradyanlar uygulamada core/catalog.dart'ta tutulur,
+// burada sadece kimlikler doğrulanır (sunucu görsel bir şey saklamaz).
+export const THEMES = ['coral', 'ocean', 'sunset', 'forest', 'lavender', 'rose'] as const;
+export const CARD_BACKGROUNDS = ['default', 'ocean', 'sunset', 'forest', 'lavender', 'midnight'] as const;

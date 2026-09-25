@@ -630,3 +630,70 @@ class _BasicsEditorState extends State<BasicsEditor> {
     ]);
   }
 }
+
+// Faz 16: kişisel profil vitrini — renk (rozet/vurgu) ve kart zemini ayrı seçilir; ikisi de boşsa
+// varsayılan marka görünümü kullanılır. Swatch'e dokunmak seçili olanı tekrar seçersen kaldırır.
+class ShowcasePicker extends StatelessWidget {
+  const ShowcasePicker({super.key, required this.draft, required this.onChanged});
+  final ProfileDraft draft;
+  final VoidCallback onChanged;
+
+  Widget _swatches(BuildContext context, List<String> ids, String selected, Widget Function(String) swatchFor, ValueChanged<String> onSelect) {
+    return Wrap(spacing: 12, runSpacing: 12, children: [
+      for (final id in ids)
+        GestureDetector(
+          onTap: () => onSelect(id == selected ? '' : id),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: id == selected ? Theme.of(context).colorScheme.onSurface : Colors.transparent, width: 2.5),
+            ),
+            padding: const EdgeInsets.all(3),
+            child: swatchFor(id),
+          ),
+        ),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(l.showcaseTheme, style: theme.textTheme.titleSmall),
+      const SizedBox(height: 4),
+      Text(l.showcaseThemeHint, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+      const SizedBox(height: 10),
+      _swatches(
+        context,
+        themeIds,
+        draft.themeId,
+        (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: themeColorOf(id))),
+        (id) {
+          draft.themeId = id;
+          onChanged();
+        },
+      ),
+      const SizedBox(height: 24),
+      Text(l.showcaseBackground, style: theme.textTheme.titleSmall),
+      const SizedBox(height: 10),
+      _swatches(
+        context,
+        cardBackgroundIds,
+        draft.cardBackgroundId,
+        (id) => DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: cardGradientOf(id)),
+          ),
+        ),
+        (id) {
+          draft.cardBackgroundId = id;
+          onChanged();
+        },
+      ),
+    ]);
+  }
+}

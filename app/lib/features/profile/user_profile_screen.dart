@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/catalog.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -115,13 +116,26 @@ class _ProfileBody extends ConsumerWidget {
               left: 20,
               right: 20,
               bottom: 18,
-              child: NameWithBadge(
-                '${p.displayName}, ${p.age}',
-                verified: p.verified,
-                onPhoto: true,
-                style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
-              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                NameWithBadge(
+                  '${p.displayName}, ${p.age}',
+                  verified: p.verified,
+                  onPhoto: true,
+                  style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
+                ),
+                if (p.online) ...[
+                  const SizedBox(height: 4),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.like)),
+                    const SizedBox(width: 6),
+                    Text(l.activeNow, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
+                  ]),
+                ],
+              ]),
             ),
+            // Kişisel profil vitrini: özel bir renk seçilmişse alt kenarda ince bir vurgu şeridi
+            if (p.themeId.isNotEmpty)
+              Positioned(left: 0, right: 0, bottom: 0, child: Container(height: 4, color: themeColorOf(p.themeId))),
           ]),
         ),
       ),

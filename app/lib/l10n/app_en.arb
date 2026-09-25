@@ -565,5 +565,12 @@
   "consentAnalyticsTitle": "Usage analytics",
   "consentAnalyticsText": "Keeping anonymous counts of milestones (registration, match, first message, first purchase) on our own server to improve the app; never shared with a third party.",
   "sendFeedback": "Send feedback",
-  "sendFeedbackHint": "Share an idea or tell us about a problem you ran into"
+  "sendFeedbackHint": "Share an idea or tell us about a problem you ran into",
+  "showcaseSection": "Showcase",
+  "showcaseTheme": "Color",
+  "showcaseThemeHint": "The accent color used on your profile and badges",
+  "showcaseBackground": "Card background",
+  "showcaseDefault": "Default look",
+  "showcaseCustom": "Customized",
+  "activeNow": "Active now"
 }

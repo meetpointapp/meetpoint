@@ -147,6 +147,10 @@ model Profile {
   smoking      String   @default("") // no | sometimes | yes
   drinking     String   @default("") // no | sometimes | yes
 
+  // Faz 16: kişisel profil vitrini (kataloglar src/catalog.ts THEMES/CARD_BACKGROUNDS). "" = varsayılan.
+  themeId          String @default("")
+  cardBackgroundId String @default("")
+
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
   longitude  Float?
