@@ -281,25 +281,26 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 
 1. 🛠 **Kişisel profil vitrini.** Profil kartına renk teması, arkaplan ve "şu an" rozeti gibi kişiselleştirme seçenekleri; profil gerçekten kendi alanın gibi hissettirir.
 2. 🛠 **Kendi odan, avatar ve ziyaret.** Dekore edilebilir statik bir profil odası (mobilya, duvar kağıdı) ve özelleştirilebilir çizgi avatar (fotoğraf yanında, sohbet balonlarında kullanılır). Eşleştiğin kişi odanı ziyaret edebilir (salt görüntüleme, gerçek zamanlı gezinme/çok oyunculu harita YOK — kapsam dışı bırakıldı, haftalar sürecek ayrı bir proje büyüklüğünde); "gel bizim eve" daveti gibi, dating ile kişisel alan temasını birleştiren en güçlü parça.
-3. 🛠 **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
-4. 🛠 **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
-5. 🛠 **Kozmetik mağaza.** Jetonla alınan profil çerçeveleri, temalar, rozetler, oda mobilyaları, avatar kıyafetleri ve sohbet temaları (baloncuk rengi, sohbet arka planı). Bu jetonlar kullanıcıdan kullanıcıya geçmediği için tamamı platform geliri — en yüksek marjlı özellik.
-6. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
-7. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
+3. 🛠 **"Kendini Keşfet" vibe sistemi.** Kısa, oyunlaştırılmış bir soru seti (flört tarzı, ideal randevu, iletişim tarzı gibi ~10-12 soru); kural tabanlı bir eşleştirme motoru (yapay zekâ yok) cevapları 10-12 "vibe" arketipinden birine bağlar (ör. "Maceracı Romantik", "Sakin Gözlemci", "Sosyal Kelebek"). Sonuç, özenle tasarlanmış görsel bir "vibe kartı" olarak profilde görünür ve paylaşılabilir (Faz 17'deki organik büyüme döngüsüyle bağlantılı). Profil güncellendikçe (yeni ilgi alanı, yeni prompt cevabı) vibe yeniden hesaplanır — statik bir etiket değil, seninle birlikte gelişen bir kimlik. Eşleştiğin kişiyle vibe'lar kural tabanlı bir "uyum notu" olarak da gösterilir (ör. "Maceracı Romantik + Sakin Gözlemci: zıt kutuplar çekişimi").
+4. 🛠 **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
+5. 🛠 **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
+6. 🛠 **Kozmetik mağaza.** Jetonla alınan profil çerçeveleri, temalar, rozetler, oda mobilyaları, avatar kıyafetleri ve sohbet temaları (baloncuk rengi, sohbet arka planı). Bu jetonlar kullanıcıdan kullanıcıya geçmediği için tamamı platform geliri — en yüksek marjlı özellik.
+7. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
+8. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
 
 ## Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme
 
 **Amaç:** Uygulamayı "aç, kaydır, kapat" döngüsünden çıkarıp gerçek bir alışkanlığa dönüştürmek; reklam bütçesi olmadan, kullanıcıların kendi isteğiyle paylaşarak büyümesi. Hepsi kendi sunucumuzda, dış servis/API maliyeti olmadan.
 
 1. 🛠 **Günlük giriş serisi (streak).** Art arda kaç gün açıldığı gösterilir; kırılma riski geri gelmeyi tetikler.
-2. 🛠 **Başarı rozetleri.** "İlk eşleşme", "İlk arama", "Profilini %100 tamamladın" gibi; ilerlemeyi somutlaştırır.
-3. 🛠 **Sosyal seviye.** Paraya değil etkileşime (sohbet, arama, profil tamamlama) dayalı seviye; seviye atlayınca Faz 16'daki kozmetik mağazadan ücretsiz bir ödül açılır.
+2. 🛠 **Sosyal cesaret yolculuğu.** Üç ayrı izde kademeli ilerleme: **İletişim** (ilk mesaj, bir sohbeti 7 gün sürdürme, ilk buz kırıcı oyunu), **Bağlantı** (ilk eşleşme, ilk oda ziyareti, ilk sesli/görüntülü arama) ve **Kimlik** (profilini tamamlama, doğrulama, vibe testini tamamlama). Her iz kendi içinde kademeler taşır (bronz/gümüş/altın) ve her kademe kendi unvanını kazandırır ("Cesur Adım", "Sohbet Başlatıcı" gibi). Puana değil gerçek eyleme dayalı — her kademe Faz 16'daki kozmetik mağazadan ücretsiz bir oda/avatar ödülü açar, böylece gelişim sadece hissedilmiyor, odanda ve avatarında görülüyor.
+3. 🛠 **"Gelişimim" ekranı.** Vibe kartını, üç izdeki kademeleri, açılan oda/avatar ödüllerini ve bir sonraki hedefi tek, özenle tasarlanmış bir ekranda toplar — dağınık bir rozet listesi değil, gerçek bir yolculuk hissi veren bütünlüklü bir tasarım. Bağlam duyarlı ipuçları da burada: eşleştiğin kişiyle ortak ilgi alanınıza dayalı, kural tabanlı bir "sıradaki adım" önerisi (ör. "Ortak ilginiz kahve — bundan bahsederek başla"), yapay zekâ kullanmadan, var olan profil verisinden üretilir.
 4. 🛠 **Sohbet içi buz kırıcı mini oyunlar.** "2 doğru 1 yalan", "bu mu o mu" gibi hızlı soru-cevap formatları; var olan gerçek zamanlı altyapı (Socket.IO) üzerinden çalışır.
 5. 🛠 **Sohbet içi iki kişilik mini oyun.** XOX (tic-tac-toe) gibi basit bir oyun; sohbeti mesajlaşmanın ötesine taşır.
 6. 🛠 **Eşleşme yıldönümü.** "1 hafta oldu 🎉" gibi küçük kutlama anları; ilişkiye kişisel bir tarih hissi katar.
 7. 🛠 **Haftalık özet.** "Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi kural tabanlı, kişisel bir özet.
 8. 🛠 **Davet programı.** Arkadaşını davet et, ikiniz de ödül kazanın (bozdurulamaz promo jeton, kayıt hediyesiyle aynı mekanik — gerçek maliyeti yok).
-9. 🛠 **Paylaşılabilir anlar.** Eşleşme anını veya profil kartını kendi şablonumuzla görsele dönüştürüp Instagram/WhatsApp'a paylaşma; dış servis yok.
+9. 🛠 **Paylaşılabilir anlar.** Eşleşme anını, profil kartını veya vibe kartını kendi şablonumuzla görsele dönüştürüp Instagram/WhatsApp'a paylaşma; dış servis yok.
 10. 🛠 **Odanı sergile.** Faz 16'daki dekore edilmiş odaların haftalık "en güzel odalar" galerisi; emek verilen bir şeyi paylaşma isteği doğal viral döngü yaratır.
 11. 🛠 **Kişisel bağlantı linki.** "Beni MeetPoint'te bul" — paylaşılınca profile/indirmeye yönlendiren basit bir bağlantı.
 
@@ -346,7 +347,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 | 13 Para akışı ve finans | 6–9 gün |
 | 14 Tüketici ve mağaza | 4–6 gün |
 | 15 Gerçek zamanlı kalite | 6–9 gün |
-| 16 Kimlik, premium katman ve mağaza | 8–11 gün |
-| 17 Oyunlaştırma, alışkanlık ve organik büyüme | 7–10 gün |
+| 16 Kimlik, premium katman ve mağaza | 9–13 gün |
+| 17 Oyunlaştırma, alışkanlık ve organik büyüme | 8–12 gün |
 | 18 Kullanım kolaylığı | 4–6 gün |
 | 19 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
