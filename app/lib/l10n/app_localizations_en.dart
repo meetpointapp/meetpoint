@@ -2068,4 +2068,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activeNow => 'Active now';
+
+  @override
+  String get none => 'None';
+
+  @override
+  String get avatarSection => 'Avatar';
+
+  @override
+  String get avatarSkin => 'Skin tone';
+
+  @override
+  String get avatarHairStyle => 'Hair style';
+
+  @override
+  String get avatarHairColor => 'Hair color';
+
+  @override
+  String get avatarOutfit => 'Outfit color';
+
+  @override
+  String get avatarAccessory => 'Accessory';
+
+  @override
+  String avatarHairStyleLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'bald': 'Bald',
+      'short': 'Short',
+      'long': 'Long',
+      'curly': 'Curly',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarAccessoryLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'glasses': 'Glasses',
+      'hat': 'Hat',
+      'headphones': 'Headphones',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get roomSection => 'My room';
+
+  @override
+  String get roomEditTitle => 'Decorate your room';
+
+  @override
+  String get roomWallpaper => 'Wallpaper';
+
+  @override
+  String get roomFloor => 'Floor';
+
+  @override
+  String get roomItemsHint =>
+      'Pick an item, then tap an empty spot on the grid. Tapping a placed item removes it.';
+
+  @override
+  String get roomVisit => 'See their room';
+
+  @override
+  String roomVisitTitle(String name) {
+    return '$name\'s room';
+  }
+
+  @override
+  String get roomNotConnected =>
+      'You need to have chatted with each other to see this room.';
+
+  @override
+  String roomItemLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'sofa': 'Sofa',
+      'bed': 'Bed',
+      'plant': 'Plant',
+      'lamp': 'Lamp',
+      'tv': 'TV',
+      'bookshelf': 'Bookshelf',
+      'table': 'Table',
+      'rug': 'Rug',
+      'window': 'Window',
+      'picture': 'Picture',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get roomFull => 'Room is full, remove an item first';
 }

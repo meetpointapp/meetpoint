@@ -32,3 +32,18 @@ export const MAX_PROMPTS = 3;
 // burada sadece kimlikler doğrulanır (sunucu görsel bir şey saklamaz).
 export const THEMES = ['coral', 'ocean', 'sunset', 'forest', 'lavender', 'rose'] as const;
 export const CARD_BACKGROUNDS = ['default', 'ocean', 'sunset', 'forest', 'lavender', 'midnight'] as const;
+
+// Faz 16: çizgi avatar. Renkler/çizim uygulamada core/catalog.dart'ta; burada sadece kimlik doğrulanır.
+export const AVATAR_SKINS = ['light', 'medium', 'tan', 'brown', 'dark'] as const;
+export const AVATAR_HAIR_STYLES = ['bald', 'short', 'long', 'curly'] as const;
+export const AVATAR_HAIR_COLORS = ['black', 'brown', 'blonde', 'red', 'gray'] as const;
+export const AVATAR_OUTFITS = ['coral', 'ocean', 'sunset', 'forest', 'lavender', 'midnight'] as const;
+export const AVATAR_ACCESSORIES = ['none', 'glasses', 'hat', 'headphones'] as const;
+
+// Faz 16: kendi oda. Statik yerleşim (gerçek zamanlı gezinme yok) — her eşya bir ızgara hücresinde.
+export const ROOM_WALLPAPERS = ['plain', 'coral', 'ocean', 'sunset', 'forest', 'lavender'] as const;
+export const ROOM_FLOORS = ['wood', 'tile', 'coral', 'ocean'] as const;
+export const ROOM_ITEMS = ['sofa', 'bed', 'plant', 'lamp', 'tv', 'bookshelf', 'table', 'rug', 'window', 'picture'] as const;
+export const ROOM_GRID_W = 4;
+export const ROOM_GRID_H = 5;
+export const ROOM_MAX_ITEMS = 12;

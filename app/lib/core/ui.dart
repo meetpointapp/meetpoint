@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 import 'api.dart';
+import 'catalog.dart';
 import 'config.dart';
 import 'models.dart';
 import 'theme.dart';
@@ -75,6 +76,7 @@ String errorText(AppLocalizations l, Object error) {
     'invalid_related' => l.errNotFound,
     'ticket_closed' => l.errTicketClosed,
     'already_answered' => l.errGeneric,
+    'not_connected' => l.roomNotConnected,
     _ => l.errGeneric,
   };
 }
@@ -178,6 +180,76 @@ class Avatar extends StatelessWidget {
           child: NetPhoto(profile?.coverThumbUrl, width: radius * 2, height: radius * 2),
         ),
       );
+}
+
+// Faz 16: çizgi avatar. Görsel dosyası yok — basit katmanlı şekillerle çizilir (ten, saç, kıyafet,
+// aksesuar). Fotoğraf yanında rozet olarak veya sohbet başlığında kullanılır.
+class AvatarFace extends StatelessWidget {
+  const AvatarFace({super.key, required this.profile, this.size = 40, this.border});
+  final PublicProfile profile;
+  final double size;
+  final Color? border;
+
+  @override
+  Widget build(BuildContext context) {
+    final skin = avatarSkinColor[profile.avatarSkinId] ?? avatarSkinColor['light']!;
+    final hairStyle = profile.avatarHairStyle;
+    final hairColor = avatarHairColor[profile.avatarHairColorId] ?? avatarHairColor['black']!;
+    final outfit = avatarOutfitColorOf(profile.avatarOutfitId.isEmpty ? 'coral' : profile.avatarOutfitId);
+    final accessory = avatarAccessoryEmoji[profile.avatarAccessoryId] ?? '';
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, border: border == null ? null : Border.all(color: border!, width: 2)),
+      padding: border == null ? EdgeInsets.zero : const EdgeInsets.all(2),
+      child: ClipOval(
+        child: ColoredBox(
+          color: skin,
+          child: Stack(children: [
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: size * 0.32,
+              child: ColoredBox(color: outfit),
+            ),
+            if (hairStyle.isNotEmpty && hairStyle != 'bald')
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: size * (hairStyle == 'long' ? 0.55 : 0.38),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: hairColor,
+                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(size * 0.5)),
+                  ),
+                ),
+              ),
+            Positioned(
+              top: size * 0.44,
+              left: size * 0.26,
+              child: _Dot(size: size * 0.09),
+            ),
+            Positioned(
+              top: size * 0.44,
+              right: size * 0.26,
+              child: _Dot(size: size * 0.09),
+            ),
+            if (accessory.isNotEmpty) Center(child: Text(accessory, style: TextStyle(fontSize: size * 0.5))),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _Dot extends StatelessWidget {
+  const _Dot({required this.size});
+  final double size;
+  @override
+  Widget build(BuildContext context) =>
+      Container(width: size, height: size, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF2B2118)));
 }
 
 class CoinAmount extends StatelessWidget {

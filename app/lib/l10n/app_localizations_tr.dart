@@ -2052,4 +2052,97 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get activeNow => 'Şu an aktif';
+
+  @override
+  String get none => 'Yok';
+
+  @override
+  String get avatarSection => 'Avatar';
+
+  @override
+  String get avatarSkin => 'Ten rengi';
+
+  @override
+  String get avatarHairStyle => 'Saç şekli';
+
+  @override
+  String get avatarHairColor => 'Saç rengi';
+
+  @override
+  String get avatarOutfit => 'Kıyafet rengi';
+
+  @override
+  String get avatarAccessory => 'Aksesuar';
+
+  @override
+  String avatarHairStyleLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'bald': 'Kel',
+      'short': 'Kısa',
+      'long': 'Uzun',
+      'curly': 'Kıvırcık',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarAccessoryLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'glasses': 'Gözlük',
+      'hat': 'Şapka',
+      'headphones': 'Kulaklık',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get roomSection => 'Odam';
+
+  @override
+  String get roomEditTitle => 'Odanı dekore et';
+
+  @override
+  String get roomWallpaper => 'Duvar kağıdı';
+
+  @override
+  String get roomFloor => 'Zemin';
+
+  @override
+  String get roomItemsHint =>
+      'Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.';
+
+  @override
+  String get roomVisit => 'Odasını gör';
+
+  @override
+  String roomVisitTitle(String name) {
+    return '$name kişisinin odası';
+  }
+
+  @override
+  String get roomNotConnected =>
+      'Bu odayı görebilmek için önce bir sohbetiniz olmalı.';
+
+  @override
+  String roomItemLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'sofa': 'Koltuk',
+      'bed': 'Yatak',
+      'plant': 'Bitki',
+      'lamp': 'Lamba',
+      'tv': 'Televizyon',
+      'bookshelf': 'Kitaplık',
+      'table': 'Masa',
+      'rug': 'Halı',
+      'window': 'Pencere',
+      'picture': 'Tablo',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get roomFull => 'Oda dolu, önce bir eşya kaldır';
 }

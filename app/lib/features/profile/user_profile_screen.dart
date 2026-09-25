@@ -60,6 +60,16 @@ class _ProfileBody extends ConsumerWidget {
         );
     Widget gap(Widget w) => Padding(padding: const EdgeInsets.only(bottom: 12), child: w);
 
+    if (!isMe) {
+      blocks.add(gap(Card(
+        child: ListTile(
+          leading: AvatarFace(profile: p, size: 36),
+          title: Text(l.roomVisit),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => context.push('/user/${p.id}/room'),
+        ),
+      )));
+    }
     blocks.add(gap(BasicsChips(profile: p)));
     if (p.bio.isNotEmpty) blocks.add(gap(Card(child: Padding(padding: const EdgeInsets.all(18), child: Text(p.bio, style: theme.textTheme.bodyLarge)))));
     if (prompts.isNotEmpty) blocks.add(gap(PromptCard(prompt: prompts[0])));

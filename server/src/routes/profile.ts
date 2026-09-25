@@ -3,12 +3,34 @@ import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
 import { currentSession, uid } from '../auth';
-import { CARD_BACKGROUNDS, EDUCATION, HABIT, INTERESTS, LOOKING_FOR, MAX_INTERESTS, MAX_PROMPTS, PROMPTS, THEMES, ZODIAC } from '../catalog';
+import {
+  AVATAR_ACCESSORIES,
+  AVATAR_HAIR_COLORS,
+  AVATAR_HAIR_STYLES,
+  AVATAR_OUTFITS,
+  AVATAR_SKINS,
+  CARD_BACKGROUNDS,
+  EDUCATION,
+  HABIT,
+  INTERESTS,
+  LOOKING_FOR,
+  MAX_INTERESTS,
+  MAX_PROMPTS,
+  PROMPTS,
+  ROOM_FLOORS,
+  ROOM_GRID_H,
+  ROOM_GRID_W,
+  ROOM_ITEMS,
+  ROOM_MAX_ITEMS,
+  ROOM_WALLPAPERS,
+  THEMES,
+  ZODIAC,
+} from '../catalog';
 import { ageOf } from '../age';
 import { verifyPassword } from '../passwords';
 import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
 import { config } from '../config';
-import { HttpError, isBlockedEitherWay, prisma } from '../db';
+import { HttpError, isBlockedEitherWay, orderedPair, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
 import { isOnline } from '../realtime';
 import { getBalance, getCashable } from '../wallet';
@@ -62,6 +84,11 @@ export function publicProfile(
     drinking: p.drinking,
     themeId: p.themeId,
     cardBackgroundId: p.cardBackgroundId,
+    avatarSkinId: p.avatarSkinId,
+    avatarHairStyle: p.avatarHairStyle,
+    avatarHairColorId: p.avatarHairColorId,
+    avatarOutfitId: p.avatarOutfitId,
+    avatarAccessoryId: p.avatarAccessoryId,
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
       .filter((ph) => opts.owner || !ph.hiddenAt)
@@ -211,6 +238,11 @@ const profileSchema = z.object({
   drinking: z.enum(HABIT).or(z.literal('')).default(''),
   themeId: z.enum(THEMES).or(z.literal('')).default(''),
   cardBackgroundId: z.enum(CARD_BACKGROUNDS).or(z.literal('')).default(''),
+  avatarSkinId: z.enum(AVATAR_SKINS).or(z.literal('')).default(''),
+  avatarHairStyle: z.enum(AVATAR_HAIR_STYLES).or(z.literal('')).default(''),
+  avatarHairColorId: z.enum(AVATAR_HAIR_COLORS).or(z.literal('')).default(''),
+  avatarOutfitId: z.enum(AVATAR_OUTFITS).or(z.literal('')).default(''),
+  avatarAccessoryId: z.enum(AVATAR_ACCESSORIES).or(z.literal('')).default(''),
 });
 
 profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
@@ -278,4 +310,54 @@ profileRouter.get('/users/:id', async (req, res) => {
   const profile = user && !user.bannedAt && !user.deletionRequestedAt && publicProfile(user, target === me ? null : viewer, { owner: target === me });
   if (!profile) throw new HttpError(404, 'not_found');
   res.json(target === me ? profile : await withOnline(profile));
+});
+
+// Faz 16: kendi oda (statik yerleşim, gerçek zamanlı gezinme yok). Izgara src/catalog.ts ROOM_GRID_*.
+const roomItemSchema = z.object({
+  itemId: z.enum(ROOM_ITEMS),
+  x: z.number().int().min(0).max(ROOM_GRID_W - 1),
+  y: z.number().int().min(0).max(ROOM_GRID_H - 1),
+});
+const roomSchema = z.object({
+  wallpaperId: z.enum(ROOM_WALLPAPERS).or(z.literal('')).default(''),
+  floorId: z.enum(ROOM_FLOORS).or(z.literal('')).default(''),
+  items: z
+    .array(roomItemSchema)
+    .max(ROOM_MAX_ITEMS)
+    .default([])
+    .refine((items) => new Set(items.map((i) => `${i.x},${i.y}`)).size === items.length, 'duplicate_position'),
+});
+const roomDto = (p: Pick<Profile, 'roomWallpaperId' | 'roomFloorId' | 'roomItems'>) => ({
+  wallpaperId: p.roomWallpaperId,
+  floorId: p.roomFloorId,
+  items: p.roomItems as { itemId: string; x: number; y: number }[],
+});
+
+profileRouter.get('/me/room', async (req, res) => {
+  const p = await prisma.profile.findUniqueOrThrow({ where: { userId: uid(req) } });
+  res.json(roomDto(p));
+});
+
+profileRouter.put('/me/room', requireNotRestricted, async (req, res) => {
+  const data = roomSchema.parse(req.body);
+  await prisma.profile.update({
+    where: { userId: uid(req) },
+    data: { roomWallpaperId: data.wallpaperId, roomFloorId: data.floorId, roomItems: data.items },
+  });
+  res.json({ ok: true });
+});
+
+// Ziyaret: sadece bağlantın olan (bir konuşmanız olan) kişilerin odasını görebilirsin, salt görüntüleme
+profileRouter.get('/users/:id/room', async (req, res) => {
+  const me = uid(req);
+  const target = req.params.id;
+  if (target !== me) {
+    if (await isBlockedEitherWay(me, target)) throw new HttpError(404, 'not_found');
+    const [userAId, userBId] = orderedPair(me, target);
+    const conv = await prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } } });
+    if (!conv) throw new HttpError(403, 'not_connected');
+  }
+  const user = await prisma.user.findUnique({ where: { id: target }, include: { profile: true } });
+  if (!user?.profile || user.bannedAt || user.deletionRequestedAt) throw new HttpError(404, 'not_found');
+  res.json({ ...roomDto(user.profile), displayName: user.profile.displayName });
 });

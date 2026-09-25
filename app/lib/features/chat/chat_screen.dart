@@ -266,7 +266,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: InkWell(
           onTap: other == null ? null : () => context.push('/user/${other.id}'),
           child: Row(children: [
-            Avatar(other, radius: 18),
+            Stack(clipBehavior: Clip.none, children: [
+              Avatar(other, radius: 18),
+              if (other != null)
+                Positioned(
+                  bottom: -2,
+                  right: -2,
+                  child: AvatarFace(profile: other, size: 18, border: theme.colorScheme.surface),
+                ),
+            ]),
             const SizedBox(width: 10),
             Flexible(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [

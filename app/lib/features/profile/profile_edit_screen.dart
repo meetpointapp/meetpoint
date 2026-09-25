@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/catalog.dart';
@@ -130,6 +131,22 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   Text(d.themeId.isEmpty && d.cardBackgroundId.isEmpty ? l.showcaseDefault : l.showcaseCustom,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ]),
+                _SectionTitle(l.avatarSection,
+                    onEdit: () => _editSection(l.avatarSection, (d, c) => AvatarPicker(draft: d, onChanged: c))),
+                Row(children: [
+                  AvatarFace(profile: d.toPreview(), size: 40),
+                  const SizedBox(width: 12),
+                  Text(l.avatarSection, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                ]),
+                const SizedBox(height: 8),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.chair_alt_outlined),
+                    title: Text(l.roomSection),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/room'),
+                  ),
+                ),
               ]),
       ),
     );

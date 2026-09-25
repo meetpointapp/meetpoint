@@ -3542,6 +3542,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şu an aktif'**
   String get activeNow;
+
+  /// No description provided for @none.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yok'**
+  String get none;
+
+  /// No description provided for @avatarSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Avatar'**
+  String get avatarSection;
+
+  /// No description provided for @avatarSkin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ten rengi'**
+  String get avatarSkin;
+
+  /// No description provided for @avatarHairStyle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saç şekli'**
+  String get avatarHairStyle;
+
+  /// No description provided for @avatarHairColor.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saç rengi'**
+  String get avatarHairColor;
+
+  /// No description provided for @avatarOutfit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kıyafet rengi'**
+  String get avatarOutfit;
+
+  /// No description provided for @avatarAccessory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aksesuar'**
+  String get avatarAccessory;
+
+  /// No description provided for @avatarHairStyleLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, bald{Kel} short{Kısa} long{Uzun} curly{Kıvırcık} other{{id}}}'**
+  String avatarHairStyleLabel(String id);
+
+  /// No description provided for @avatarAccessoryLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, glasses{Gözlük} hat{Şapka} headphones{Kulaklık} other{{id}}}'**
+  String avatarAccessoryLabel(String id);
+
+  /// No description provided for @roomSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odam'**
+  String get roomSection;
+
+  /// No description provided for @roomEditTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odanı dekore et'**
+  String get roomEditTitle;
+
+  /// No description provided for @roomWallpaper.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duvar kağıdı'**
+  String get roomWallpaper;
+
+  /// No description provided for @roomFloor.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zemin'**
+  String get roomFloor;
+
+  /// No description provided for @roomItemsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.'**
+  String get roomItemsHint;
+
+  /// No description provided for @roomVisit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odasını gör'**
+  String get roomVisit;
+
+  /// No description provided for @roomVisitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} kişisinin odası'**
+  String roomVisitTitle(String name);
+
+  /// No description provided for @roomNotConnected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu odayı görebilmek için önce bir sohbetiniz olmalı.'**
+  String get roomNotConnected;
+
+  /// No description provided for @roomItemLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} other{{id}}}'**
+  String roomItemLabel(String id);
+
+  /// No description provided for @roomFull.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oda dolu, önce bir eşya kaldır'**
+  String get roomFull;
 }
 
 class _AppLocalizationsDelegate

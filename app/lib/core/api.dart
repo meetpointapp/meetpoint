@@ -270,6 +270,11 @@ class Api {
 
   Future<PublicProfile> user(String id) async => PublicProfile.fromJson(await _get('/users/$id'));
 
+  // Faz 16: kendi oda (statik yerleşim). Ziyaret sadece bağlantın olan kişilerde çalışır (403 not_connected).
+  Future<RoomInfo> myRoom() async => RoomInfo.fromJson(await _get('/me/room'));
+  Future<void> saveRoom(RoomInfo room) => _put('/me/room', room.toJson());
+  Future<RoomInfo> userRoom(String id) async => RoomInfo.fromJson(await _get('/users/$id/room'));
+
   // Keşfet
   Future<List<PublicProfile>> discover() async =>
       [for (final p in (await _get('/discover') as List)) PublicProfile.fromJson(p)];

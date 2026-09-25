@@ -1052,5 +1052,52 @@
   "showcaseBackground": "Kart zemini",
   "showcaseDefault": "Varsayılan görünüm",
   "showcaseCustom": "Kişiselleştirildi",
-  "activeNow": "Şu an aktif"
+  "activeNow": "Şu an aktif",
+  "none": "Yok",
+  "avatarSection": "Avatar",
+  "avatarSkin": "Ten rengi",
+  "avatarHairStyle": "Saç şekli",
+  "avatarHairColor": "Saç rengi",
+  "avatarOutfit": "Kıyafet rengi",
+  "avatarAccessory": "Aksesuar",
+  "avatarHairStyleLabel": "{id, select, bald{Kel} short{Kısa} long{Uzun} curly{Kıvırcık} other{{id}}}",
+  "@avatarHairStyleLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarAccessoryLabel": "{id, select, glasses{Gözlük} hat{Şapka} headphones{Kulaklık} other{{id}}}",
+  "@avatarAccessoryLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSection": "Odam",
+  "roomEditTitle": "Odanı dekore et",
+  "roomWallpaper": "Duvar kağıdı",
+  "roomFloor": "Zemin",
+  "roomItemsHint": "Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.",
+  "roomVisit": "Odasını gör",
+  "roomVisitTitle": "{name} kişisinin odası",
+  "@roomVisitTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNotConnected": "Bu odayı görebilmek için önce bir sohbetiniz olmalı.",
+  "roomItemLabel": "{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} other{{id}}}",
+  "@roomItemLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "roomFull": "Oda dolu, önce bir eşya kaldır"
 }

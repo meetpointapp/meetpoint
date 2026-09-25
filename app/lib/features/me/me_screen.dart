@@ -81,6 +81,15 @@ class MeScreen extends ConsumerWidget {
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12)),
                       ),
                     ),
+                    if (p != null)
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () => context.push('/me/edit'),
+                          child: AvatarFace(profile: p, size: 34, border: theme.colorScheme.surface),
+                        ),
+                      ),
                   ]),
                 ),
               ),

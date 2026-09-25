@@ -49,6 +49,12 @@ class PublicProfile {
   final String themeId;
   final String cardBackgroundId;
   final bool online;
+  // Faz 16: çizgi avatar (fotoğraf yanında ve sohbette kullanılır). '' = varsayılan.
+  final String avatarSkinId;
+  final String avatarHairStyle;
+  final String avatarHairColorId;
+  final String avatarOutfitId;
+  final String avatarAccessoryId;
 
   const PublicProfile({
     required this.id,
@@ -74,6 +80,11 @@ class PublicProfile {
     this.themeId = '',
     this.cardBackgroundId = '',
     this.online = false,
+    this.avatarSkinId = '',
+    this.avatarHairStyle = '',
+    this.avatarHairColorId = '',
+    this.avatarOutfitId = '',
+    this.avatarAccessoryId = '',
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
@@ -104,6 +115,11 @@ class PublicProfile {
         themeId: j['themeId'] ?? '',
         cardBackgroundId: j['cardBackgroundId'] ?? '',
         online: j['online'] ?? false,
+        avatarSkinId: j['avatarSkinId'] ?? '',
+        avatarHairStyle: j['avatarHairStyle'] ?? '',
+        avatarHairColorId: j['avatarHairColorId'] ?? '',
+        avatarOutfitId: j['avatarOutfitId'] ?? '',
+        avatarAccessoryId: j['avatarAccessoryId'] ?? '',
       );
 }
 
@@ -135,6 +151,11 @@ class MyProfile extends PublicProfile {
           drinking: j['drinking'] ?? '',
           themeId: j['themeId'] ?? '',
           cardBackgroundId: j['cardBackgroundId'] ?? '',
+          avatarSkinId: j['avatarSkinId'] ?? '',
+          avatarHairStyle: j['avatarHairStyle'] ?? '',
+          avatarHairColorId: j['avatarHairColorId'] ?? '',
+          avatarOutfitId: j['avatarOutfitId'] ?? '',
+          avatarAccessoryId: j['avatarAccessoryId'] ?? '',
         );
 }
 
@@ -159,6 +180,11 @@ class ProfileDraft {
   String drinking = '';
   String themeId = '';
   String cardBackgroundId = '';
+  String avatarSkinId = '';
+  String avatarHairStyle = '';
+  String avatarHairColorId = '';
+  String avatarOutfitId = '';
+  String avatarAccessoryId = '';
 
   ProfileDraft();
 
@@ -181,7 +207,12 @@ class ProfileDraft {
         smoking = p.smoking,
         drinking = p.drinking,
         themeId = p.themeId,
-        cardBackgroundId = p.cardBackgroundId;
+        cardBackgroundId = p.cardBackgroundId,
+        avatarSkinId = p.avatarSkinId,
+        avatarHairStyle = p.avatarHairStyle,
+        avatarHairColorId = p.avatarHairColorId,
+        avatarOutfitId = p.avatarOutfitId,
+        avatarAccessoryId = p.avatarAccessoryId;
 
   ProfileDraft copy() => ProfileDraft()
     ..displayName = displayName
@@ -202,7 +233,12 @@ class ProfileDraft {
     ..smoking = smoking
     ..drinking = drinking
     ..themeId = themeId
-    ..cardBackgroundId = cardBackgroundId;
+    ..cardBackgroundId = cardBackgroundId
+    ..avatarSkinId = avatarSkinId
+    ..avatarHairStyle = avatarHairStyle
+    ..avatarHairColorId = avatarHairColorId
+    ..avatarOutfitId = avatarOutfitId
+    ..avatarAccessoryId = avatarAccessoryId;
 
   // Önizleme bileşenleri (etiketler, sorular) için salt okunur profil
   PublicProfile toPreview({int age = 0}) => PublicProfile(
@@ -225,6 +261,11 @@ class ProfileDraft {
         drinking: drinking,
         themeId: themeId,
         cardBackgroundId: cardBackgroundId,
+        avatarSkinId: avatarSkinId,
+        avatarHairStyle: avatarHairStyle,
+        avatarHairColorId: avatarHairColorId,
+        avatarOutfitId: avatarOutfitId,
+        avatarAccessoryId: avatarAccessoryId,
       );
 
   Map<String, dynamic> toJson() {
@@ -248,8 +289,42 @@ class ProfileDraft {
       'drinking': drinking,
       'themeId': themeId,
       'cardBackgroundId': cardBackgroundId,
+      'avatarSkinId': avatarSkinId,
+      'avatarHairStyle': avatarHairStyle,
+      'avatarHairColorId': avatarHairColorId,
+      'avatarOutfitId': avatarOutfitId,
+      'avatarAccessoryId': avatarAccessoryId,
     };
   }
+}
+
+// Faz 16: kendi oda. Statik yerleşim (ızgara hücresi başına bir eşya); eşleşilen/bağlantılı
+// kişi salt görüntüleme ile ziyaret edebilir.
+class RoomItem {
+  final String itemId;
+  final int x;
+  final int y;
+  const RoomItem({required this.itemId, required this.x, required this.y});
+  factory RoomItem.fromJson(Map<String, dynamic> j) => RoomItem(itemId: j['itemId'], x: j['x'], y: j['y']);
+  Map<String, dynamic> toJson() => {'itemId': itemId, 'x': x, 'y': y};
+}
+
+class RoomInfo {
+  final String wallpaperId;
+  final String floorId;
+  final List<RoomItem> items;
+  final String displayName; // sadece ziyarette dolu
+  const RoomInfo({this.wallpaperId = '', this.floorId = '', this.items = const [], this.displayName = ''});
+  factory RoomInfo.fromJson(Map<String, dynamic> j) => RoomInfo(
+        wallpaperId: j['wallpaperId'] ?? '',
+        floorId: j['floorId'] ?? '',
+        items: [for (final i in (j['items'] as List? ?? const [])) RoomItem.fromJson(i)],
+        displayName: j['displayName'] ?? '',
+      );
+  Map<String, dynamic> toJson() => {'wallpaperId': wallpaperId, 'floorId': floorId, 'items': [for (final i in items) i.toJson()]};
+
+  RoomInfo copyWith({String? wallpaperId, String? floorId, List<RoomItem>? items}) =>
+      RoomInfo(wallpaperId: wallpaperId ?? this.wallpaperId, floorId: floorId ?? this.floorId, items: items ?? this.items);
 }
 
 class Me {

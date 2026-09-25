@@ -151,6 +151,19 @@ model Profile {
   themeId          String @default("")
   cardBackgroundId String @default("")
 
+  // Faz 16: çizgi avatar (kataloglar src/catalog.ts AVATAR_*). "" = varsayılan.
+  avatarSkinId      String @default("")
+  avatarHairStyle   String @default("") // bald | short | long | curly
+  avatarHairColorId String @default("")
+  avatarOutfitId    String @default("")
+  avatarAccessoryId String @default("") // none | glasses | hat | headphones
+
+  // Faz 16: kendi oda. Eşleştiğin/bağlantılı olduğun kişi salt görüntüleme ile ziyaret edebilir.
+  // items: [{ itemId, x, y }] — en fazla ROOM_MAX_ITEMS (src/catalog.ts), ROOM_GRID_W×ROOM_GRID_H ızgarası.
+  roomWallpaperId String @default("")
+  roomFloorId     String @default("")
+  roomItems       Json   @default("[]")
+
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
   longitude  Float?

@@ -633,29 +633,29 @@ class _BasicsEditorState extends State<BasicsEditor> {
 
 // Faz 16: kişisel profil vitrini — renk (rozet/vurgu) ve kart zemini ayrı seçilir; ikisi de boşsa
 // varsayılan marka görünümü kullanılır. Swatch'e dokunmak seçili olanı tekrar seçersen kaldırır.
+Widget swatchPicker(BuildContext context, List<String> ids, String selected, Widget Function(String) swatchFor, ValueChanged<String> onSelect) {
+  return Wrap(spacing: 12, runSpacing: 12, children: [
+    for (final id in ids)
+      GestureDetector(
+        onTap: () => onSelect(id == selected ? '' : id),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: id == selected ? Theme.of(context).colorScheme.onSurface : Colors.transparent, width: 2.5),
+          ),
+          padding: const EdgeInsets.all(3),
+          child: swatchFor(id),
+        ),
+      ),
+  ]);
+}
+
 class ShowcasePicker extends StatelessWidget {
   const ShowcasePicker({super.key, required this.draft, required this.onChanged});
   final ProfileDraft draft;
   final VoidCallback onChanged;
-
-  Widget _swatches(BuildContext context, List<String> ids, String selected, Widget Function(String) swatchFor, ValueChanged<String> onSelect) {
-    return Wrap(spacing: 12, runSpacing: 12, children: [
-      for (final id in ids)
-        GestureDetector(
-          onTap: () => onSelect(id == selected ? '' : id),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: id == selected ? Theme.of(context).colorScheme.onSurface : Colors.transparent, width: 2.5),
-            ),
-            padding: const EdgeInsets.all(3),
-            child: swatchFor(id),
-          ),
-        ),
-    ]);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -666,7 +666,7 @@ class ShowcasePicker extends StatelessWidget {
       const SizedBox(height: 4),
       Text(l.showcaseThemeHint, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
       const SizedBox(height: 10),
-      _swatches(
+      swatchPicker(
         context,
         themeIds,
         draft.themeId,
@@ -679,7 +679,7 @@ class ShowcasePicker extends StatelessWidget {
       const SizedBox(height: 24),
       Text(l.showcaseBackground, style: theme.textTheme.titleSmall),
       const SizedBox(height: 10),
-      _swatches(
+      swatchPicker(
         context,
         cardBackgroundIds,
         draft.cardBackgroundId,
@@ -693,6 +693,103 @@ class ShowcasePicker extends StatelessWidget {
           draft.cardBackgroundId = id;
           onChanged();
         },
+      ),
+    ]);
+  }
+}
+
+// Faz 16: çizgi avatar düzenleyici — canlı önizleme + ten/saç şekli/saç rengi/kıyafet/aksesuar seçimi.
+class AvatarPicker extends StatelessWidget {
+  const AvatarPicker({super.key, required this.draft, required this.onChanged});
+  final ProfileDraft draft;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    Widget section(String title, Widget child) => Padding(
+          padding: const EdgeInsets.only(bottom: 22),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: theme.textTheme.titleSmall),
+            const SizedBox(height: 10),
+            child,
+          ]),
+        );
+    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Center(child: AvatarFace(profile: draft.toPreview(), size: 96)),
+      const SizedBox(height: 24),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          section(
+            l.avatarSkin,
+            swatchPicker(
+              context,
+              avatarSkinIds,
+              draft.avatarSkinId,
+              (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarSkinColor[id])),
+              (id) {
+                draft.avatarSkinId = id;
+                onChanged();
+              },
+            ),
+          ),
+          section(
+            l.avatarHairStyle,
+            Wrap(spacing: 8, children: [
+              for (final s in avatarHairStyles)
+                ChoiceChip(
+                  label: Text(l.avatarHairStyleLabel(s)),
+                  selected: draft.avatarHairStyle == s,
+                  onSelected: (_) {
+                    draft.avatarHairStyle = draft.avatarHairStyle == s ? '' : s;
+                    onChanged();
+                  },
+                ),
+            ]),
+          ),
+          section(
+            l.avatarHairColor,
+            swatchPicker(
+              context,
+              avatarHairColorIds,
+              draft.avatarHairColorId,
+              (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarHairColor[id])),
+              (id) {
+                draft.avatarHairColorId = id;
+                onChanged();
+              },
+            ),
+          ),
+          section(
+            l.avatarOutfit,
+            swatchPicker(
+              context,
+              avatarOutfitIds,
+              draft.avatarOutfitId,
+              (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarOutfitColorOf(id))),
+              (id) {
+                draft.avatarOutfitId = id;
+                onChanged();
+              },
+            ),
+          ),
+          section(
+            l.avatarAccessory,
+            Wrap(spacing: 8, children: [
+              for (final a in avatarAccessoryIds)
+                ChoiceChip(
+                  label: Text(a == 'none' ? l.none : '${avatarAccessoryEmoji[a]} ${l.avatarAccessoryLabel(a)}'),
+                  selected: draft.avatarAccessoryId == a,
+                  onSelected: (_) {
+                    draft.avatarAccessoryId = a == 'none' ? '' : a;
+                    onChanged();
+                  },
+                ),
+            ]),
+          ),
+        ]),
       ),
     ]);
   }

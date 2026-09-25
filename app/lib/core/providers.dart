@@ -21,6 +21,11 @@ final userProvider = FutureProvider.autoDispose.family<PublicProfile, String>(
   (ref, id) => ref.watch(apiProvider).user(id),
 );
 
+// Faz 16: ziyaret edilen odayı gösterir; bağlantı yoksa sunucu 403 not_connected döner.
+final userRoomProvider = FutureProvider.autoDispose.family<RoomInfo, String>(
+  (ref, id) => ref.watch(apiProvider).userRoom(id),
+);
+
 final payoutsProvider = FutureProvider.autoDispose<List<Payout>>((ref) => ref.watch(apiProvider).payouts());
 
 final callHistoryProvider = FutureProvider.autoDispose<List<CallInfo>>((ref) => ref.watch(apiProvider).calls());
