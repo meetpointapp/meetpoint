@@ -513,12 +513,12 @@ model AdminAudit {
   @@index([targetType, targetId])
 }
 
-// Push bildirim cihaz jetonları (FCM)
+// Push bildirim cihaz jetonları (FCM). ios-voip: PushKit jetonu (Faz 15 · CallKit)
 model Device {
   token     String   @id
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  platform  String // android | ios | web
+  platform  String // android | ios | web | ios-voip
   updatedAt DateTime @updatedAt
 
   @@index([userId])

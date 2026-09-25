@@ -79,5 +79,12 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- Faz 15: yerel gelen arama ekranı. voip: PushKit'in uygulamayı kapalıyken uyandırabilmesi
+	     için; remote-notification: arka planda içerik güncellemesi. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>voip</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

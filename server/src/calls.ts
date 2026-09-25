@@ -7,6 +7,7 @@ import { HttpError, isBlockedEitherWay, prisma } from './db';
 import { notify } from './notify';
 import { emitToUser, isOnline, onUserOffline, onUserOnline } from './realtime';
 import { publicProfile } from './routes/profile';
+import { sendVoipPush, voipConfigured } from './voip';
 import { getBalance, refundCallCharge, transfer } from './wallet';
 
 // Sesli/görüntülü arama yaşam döngüsü:
@@ -121,7 +122,20 @@ export async function startCall(callerId: string, calleeId: string, kind: CallKi
 
   emitToUser(calleeId, 'call:incoming', callDto(call, calleeId));
   void notify(calleeId, 'call', callerId, kind, { callId: call.id });
+  void notifyVoip(calleeId, call.id, callDto(call, calleeId).user?.displayName ?? 'MeetPoint', kind === 'VIDEO');
   return callDto(call, callerId);
+}
+
+// Faz 15 · iOS'ta normal push uygulamayı kapalıyken güvenilir uyandırmaz: kayıtlı PushKit jetonu
+// varsa (Apple hesabı Faz 17'de açılınca) ayrıca VoIP push gönderilir; CallKit'i doğrudan tetikler.
+async function notifyVoip(calleeId: string, callId: string, callerName: string, isVideo: boolean) {
+  if (!voipConfigured()) return;
+  try {
+    const devices = await prisma.device.findMany({ where: { userId: calleeId, platform: 'ios-voip' } });
+    await Promise.all(devices.map((d) => sendVoipPush(d.token, { id: callId, nameCaller: callerName, handle: callerName, isVideo })));
+  } catch (e) {
+    console.error('[voip] failed', e);
+  }
 }
 
 // Zamanı gelmiş dakikanın ücretini al. Satır kilidi: aynı dakika iki kez alınamaz.

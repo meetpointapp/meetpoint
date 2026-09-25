@@ -53,6 +53,7 @@ dependencies:
   firebase_messaging: ^16.7.0
   purchases_flutter: ^10.13.1
   agora_rtc_engine: ^6.6.4
+  flutter_callkit_incoming: ^3.1.6
   permission_handler: ^13.0.2
 
 dev_dependencies:

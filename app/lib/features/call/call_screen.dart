@@ -13,6 +13,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import 'call_media.dart';
+import 'native_call_ui.dart';
 import 'start_call.dart';
 
 // Tam ekran arama: çalıyor (giden/gelen) → görüşme → bitti (özet + puan)
@@ -45,6 +46,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   void initState() {
     super.initState();
     _call = widget.initial;
+    // Bu ekran açıldıysa (kabul edildi ya da uygulama zaten öndeydi) yerel gelen arama arayüzü/
+    // bildirimi varsa artık gereksiz (Faz 15): kapatılır.
+    endNativeCallUi(widget.callId);
     _sub = ref.read(realtimeProvider).events.listen(_onEvent);
     if (_call == null) _refresh();
     if (_call?.status == CallStatus.active) _startMedia(_call!);
@@ -78,6 +82,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     setState(() => _call = next);
     if (next.status == CallStatus.active && (!wasActive || _media == null)) _startMedia(next);
     if (!next.isLive) {
+      endNativeCallUi(widget.callId);
       _tokenSub?.cancel();
       _tokenSub = null;
       _media?.dispose();

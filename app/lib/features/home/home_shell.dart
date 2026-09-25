@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +29,7 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   StreamSubscription<RealtimeEvent>? _sub;
+  StreamSubscription<CallEvent?>? _callKitSub;
 
   @override
   void initState() {
@@ -38,11 +41,30 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     Push.instance.register(api, onOpen: (route) {
       if (mounted) context.push(route);
     });
+    // Yerel gelen arama ekranından (CallKit/Android tam ekran) kabul/ret (Faz 15)
+    _callKitSub = FlutterCallkitIncoming.onEvent.listen(_onCallKitEvent);
     // Mağaza hesabını kullanıcıya bağla (satın almalar bu kimlikle webhook'a düşer)
     final userId = ref.read(sessionProvider).value?.userId;
     if (userId != null) CoinStore.instance.login(userId);
     // Görülmemiş uyarı/kısıt varsa açılışta göster (itiraz seçeneğiyle)
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkSanction());
+  }
+
+  Future<void> _onCallKitEvent(CallEvent? event) async {
+    switch (event) {
+      case CallEventActionCallAccept(:final callKitParams):
+        final id = callKitParams.id;
+        try {
+          await ref.read(apiProvider).acceptCall(id);
+        } catch (_) {}
+        if (mounted) context.push('/call/$id');
+      case CallEventActionCallDecline(:final callKitParams):
+        try {
+          await ref.read(apiProvider).hangUp(callKitParams.id);
+        } catch (_) {}
+      default:
+        break;
+    }
   }
 
   Future<void> _checkSanction() async {
@@ -60,6 +82,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   void dispose() {
     _sub?.cancel();
+    _callKitSub?.cancel();
     super.dispose();
   }
 

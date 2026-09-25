@@ -38,4 +38,8 @@ export const testEnv: Record<string, string> = {
   FIREBASE_SERVICE_ACCOUNT: '',
   AGORA_APP_ID: '',
   AGORA_APP_CERT: '',
+  APNS_KEY_ID: '',
+  APNS_TEAM_ID: '',
+  APNS_AUTH_KEY: '',
+  APNS_BUNDLE_ID: '',
 };

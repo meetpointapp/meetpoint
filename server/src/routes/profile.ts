@@ -128,9 +128,10 @@ profileRouter.put('/me/filters', async (req, res) => {
 });
 
 // Push bildirim cihazı kaydı (FCM jetonu). Aynı jeton başka hesaba geçerse sahibi güncellenir.
+// ios-voip: normal FCM değil, CallKit'i uyandıran PushKit jetonu (Faz 15 · yerel gelen arama ekranı).
 profileRouter.post('/me/devices', async (req, res) => {
   const { token, platform } = z
-    .object({ token: z.string().min(10).max(4096), platform: z.enum(['android', 'ios', 'web']) })
+    .object({ token: z.string().min(10).max(4096), platform: z.enum(['android', 'ios', 'web', 'ios-voip']) })
     .parse(req.body);
   const userId = uid(req);
   await prisma.device.upsert({ where: { token }, create: { token, platform, userId }, update: { userId, platform } });

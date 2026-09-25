@@ -118,7 +118,16 @@ export async function notify(toUserId: string, kind: Kind, fromUserId: string, e
     }
     const text = (TEXTS[to.locale] ?? TEXTS.en)[kind](from?.displayName ?? 'MeetPoint', extra);
     const route = routeFor(kind, data);
-    const payload = { ...data, kind, ...(route ? { route } : {}) };
+    // Arama: uygulama, veriyi kendi tam ekran arama arayüzünü göstermek için kullanır (Faz 15
+    // madde 1). Sadece veri mesajı olarak gider — üstte bir "notification" bloğu olursa Android
+    // bunu SİSTEM tarafından otomatik gösterir ve arka plan işleyicimiz hiç çalışmaz.
+    const isCall = kind === 'call';
+    const payload = {
+      ...data,
+      kind,
+      ...(route ? { route } : {}),
+      ...(isCall ? { callerName: from?.displayName ?? 'MeetPoint', callKind: extra ?? 'VOICE' } : {}),
+    };
 
     if (!messaging) {
       console.log(`[push dev] → ${toUserId}: ${text.title} · ${text.body}`);
@@ -129,12 +138,14 @@ export async function notify(toUserId: string, kind: Kind, fromUserId: string, e
     const badge = await unreadBadge(toUserId);
     const res = await messaging.sendEachForMulticast({
       tokens,
-      notification: text,
+      notification: isCall ? undefined : text,
       data: payload,
-      // Aramalar ve mesajlar anlık olmalı: yüksek öncelik, uygulama arka plandayken de teslim edilsin.
-      // Aramalar ayrıca kendi bildirim kanalına gider (tam ekran gelen arama ekranı, bkz. Faz 15 madde 1).
-      android: { priority: 'high', notification: kind === 'call' ? { channelId: 'calls' } : undefined },
-      apns: { headers: { 'apns-priority': '10' }, payload: { aps: { badge, sound: 'default', 'content-available': 1 } } },
+      // Anlık olmalı: yüksek öncelik, uygulama arka plandayken de teslim edilsin
+      android: { priority: 'high' },
+      apns: {
+        headers: { 'apns-priority': '10', ...(isCall ? { 'apns-push-type': 'background' } : {}) },
+        payload: { aps: { badge, sound: 'default', 'content-available': 1 } },
+      },
     });
     // Geçersiz jetonları temizle
     const dead = res.responses
