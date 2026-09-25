@@ -1,8 +1,8 @@
 # MeetPoint · Mağaza uyumu ve form içerikleri
 
 > Faz 14. Apple App Store ve Google Play kurallarının madde madde kontrolü, mağaza formlarının cevapları ve inceleme notu.
-> Kurallar sık güncellenir: gönderimden hemen önce (Faz 17) resmi metinlerle tekrar karşılaştırılmalı.
-> Durum: ✅ karşılandı · ⚠️ risk / karar gerekli · ⏭ Faz 17'de (dış iş)
+> Kurallar sık güncellenir: gönderimden hemen önce (Faz 19) resmi metinlerle tekrar karşılaştırılmalı.
+> Durum: ✅ karşılandı · ⚠️ risk / karar gerekli · ⏭ Faz 19'da (dış iş)
 
 ## 1. Kontrol listesi
 
@@ -10,9 +10,9 @@
 
 | Kural | Durum | Nerede / not |
 |---|---|---|
-| 1.1.4 Açık cinsel içerik, fuhuşa aracılık eden "hookup" uygulamaları yasak | ⚠️ | Topluluk kuralları, şikayet, ten oranı tespiti, moderasyon kuyruğu, aramada şikayet. **Risk:** dakika başı ücretli görüntülü arama incelemede "ücretli yetişkin içerik" gibi algılanabilir. İnceleme notunda amacı ve moderasyonu açıkça anlat (aşağıda). Avukat görüşüyle birlikte değerlendir (Faz 17). |
+| 1.1.4 Açık cinsel içerik, fuhuşa aracılık eden "hookup" uygulamaları yasak | ⚠️ | Topluluk kuralları, şikayet, ten oranı tespiti, moderasyon kuyruğu, aramada şikayet. **Risk:** dakika başı ücretli görüntülü arama incelemede "ücretli yetişkin içerik" gibi algılanabilir. İnceleme notunda amacı ve moderasyonu açıkça anlat (aşağıda). Avukat görüşüyle birlikte değerlendir (Faz 19). |
 | 1.2 Kullanıcı içeriği: süzme, şikayet + zamanında yanıt, engelleme, iletişim bilgisi | ✅ | Otomatik işaretler (iletişim bilgisi, spam, ten oranı), şikayet → moderasyon kuyruğu (öncelikli), engelleme, künye + destek. |
-| 2.1 Uygulama eksiksiz, inceleme sırasında sunucu çalışıyor, demo hesap | ✅ / ⏭ | Demo hesap: `npm run review:account` (bölüm 3). Sunucu yayında olmalı (Faz 17). |
+| 2.1 Uygulama eksiksiz, inceleme sırasında sunucu çalışıyor, demo hesap | ✅ / ⏭ | Demo hesap: `npm run review:account` (bölüm 3). Sunucu yayında olmalı (Faz 19). |
 | 3.1.1 Dijital içerik uygulama içi satın almayla | ✅ | Jetonlar sadece App Store IAP (RevenueCat). Web'de ödeme yolu yok. |
 | 3.1.1 Satın alınan sanal para birimi süresi dolmamalı | ✅ | Jetonların süresi dolmaz (Kullanım Koşulları md. 4, ön bilgilendirme). |
 | 3.1.1 Uygulama içi para birimiyle içerik üreticisine "bahşiş" | ✅ | Hediye ve arama jetonu alıcıya geçer. |
@@ -23,7 +23,7 @@
 | 5.1.1(ii) Veri toplamaya izin, amaç açıklaması | ✅ | Açık rızalar (özel nitelikli, yurt dışı, selfie, kampanya), izin açıklamaları (Info.plist). |
 | 5.1.1(v) Hesap silme uygulama içinden | ✅ | Profil › Hesabı sil (+ web: `/account/delete`). |
 | 5.1.2 Takip (ATT) | ✅ | Reklam/takip SDK'sı yok, ATT izni istenmez. Gizlilik etiketinde "Tracking: No". |
-| İzin metinleri (Info.plist) | ⚠️ | Şu an sadece Türkçe. İngilizce `InfoPlist.strings` Xcode'da eklenmeli (Faz 17, Mac gerekli). |
+| İzin metinleri (Info.plist) | ⚠️ | Şu an sadece Türkçe. İngilizce `InfoPlist.strings` Xcode'da eklenmeli (Faz 19, Mac gerekli). |
 | Yaş derecelendirmesi | ✅ | 18+ (bölüm 2). |
 
 ### Google Play (Developer Program Policies)
@@ -38,7 +38,7 @@
 | Veri Güvenliği formu | ✅ | Bölüm 2. |
 | İzinler | ✅ | Kamera, mikrofon (arama, fotoğraf), yaklaşık konum (ACCESS_COARSE_LOCATION, arka planda değil), Bluetooth (kulaklıkla arama). Kesin konum ve arka plan konumu yok. |
 | Bildirim izni (Android 13+) | ⏭ | İzin uygulama açılınca isteniyor (Push.register); Firebase kurulunca (`flutterfire configure`) gerçek cihazda doğrula. |
-| Finansal özellikler beyanı | ⚠️ | Listedeki finansal hizmetlerden hiçbirini sunmuyoruz; kazanç ödemesi "içerik üreticisi ödemesi". Beyanda "yok" seçilir, gerekirse açıklama yazılır. Avukat/mali müşavirle teyit (e-para riski, Faz 17). |
+| Finansal özellikler beyanı | ⚠️ | Listedeki finansal hizmetlerden hiçbirini sunmuyoruz; kazanç ödemesi "içerik üreticisi ödemesi". Beyanda "yok" seçilir, gerekirse açıklama yazılır. Avukat/mali müşavirle teyit (e-para riski, Faz 19). |
 | Destek iletişimi (mağaza sayfası) | ✅ | Destek adresi: `https://<alan-adı>/help`, e-posta: künyedeki destek adresi. |
 
 ### Türkiye mevzuatı (uygulamada karşılananlar, Faz 14)
@@ -49,7 +49,7 @@
 | Cayma hakkı istisnası (MSY md. 15/1-ğ) açık onayı | ✅ | İlk satın almadan önce işaretlenmemiş onay kutusu; sürüm + zaman Consent'te, satın alma kaydında sürüm. Metin değişince tekrar sorulur. |
 | Künye (unvan, MERSİS, adres, KEP, e-posta, ETBİS) | ✅ / ⏭ | Panel › Destek › Künye; `/legal/imprint`; yasal metinlere otomatik yerleşir. Bilgiler şirket kurulunca doldurulur. |
 | Şikayet/destek kanalı | ✅ | Uygulama içi destek talebi, 48 saat hedef, panelde gecikme takibi. |
-| Ticari elektronik ileti (6563) ve İYS | ✅ / ⏭ | E-posta ve bildirim için ayrı izin, geri alma her an; panelden İYS toplu yükleme dosyası. İYS hesabı ve yükleme Faz 17. |
+| Ticari elektronik ileti (6563) ve İYS | ✅ / ⏭ | E-posta ve bildirim için ayrı izin, geri alma her an; panelden İYS toplu yükleme dosyası. İYS hesabı ve yükleme Faz 19. |
 
 ## 2. Form cevapları
 
@@ -117,7 +117,7 @@ REVIEW_ACCOUNT_PASSWORD='buraya-en-az-12-karakterlik-sifre' npm run review:accou
 > Account deletion: Profile › Delete account (also on the web: https://<domain>/account/delete).
 > Support: Profile › Help & support (in-app tickets), https://<domain>/help
 
-## 4. Yayın öncesi yapılacaklar (Faz 17)
+## 4. Yayın öncesi yapılacaklar (Faz 19)
 
 - Künyeyi panelden doldur; `/legal/imprint` ve yasal metinlerde köşeli parantez kalmadığını kontrol et.
 - Alan adını belgelerdeki `<alan-adı>` yerlerine yaz; mağaza formlarına gizlilik, hesap silme ve destek adreslerini gir.

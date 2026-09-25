@@ -2,7 +2,7 @@
 
 Faz 1–7 çalışan bir ürün çıkardı. Bu seri, ürünü **arka planda kusursuz, hukuki gereklilikleri uygulamanın içinde karşılayan ve kullanması basit** hale getirir.
 
-**Sıralama kararı (2026-09-23):** Önce uygulama tamamlanır (Faz 8–16). Avukat, mali müşavir, şirket, sunucu, mağaza ve yayın gibi dış işler en sona, Faz 17'ye bırakılır.
+**Sıralama kararı (2026-09-23, 2026-09-25'te Faz 16 ve 17 eklendi):** Önce uygulama tamamlanır (Faz 8–18). Avukat, mali müşavir, şirket, sunucu, mağaza ve yayın gibi dış işler en sona, Faz 19'a bırakılır.
 
 Hukuki ve mali gereklilikler (KVKK, 5651, tüketici hakları, e-ticaret, vergi) uygulamada **şimdiden** kurulur. Avukatın görüşü sonradan değişiklik isterse maliyet düşük kalsın diye kurallar **ayarlanabilir** yapılır:
 
@@ -14,7 +14,7 @@ Her fazda en az 5 adım var. İşaretler:
 
 - 🛠 Yazılım: Claude yapar
 - 👤 Senin kararın veya görevin
-- ⏭ Faz 17'ye bırakılan dış iş
+- ⏭ Faz 19'a bırakılan dış iş
 
 ---
 
@@ -32,8 +32,8 @@ Her fazda en az 5 adım var. İşaretler:
 | 8 | Cinsel yönelim ve selfie için ayrı açık rıza yok | KVKK md. 6 özel nitelikli veri | 11 |
 | 9 | Koşullar sürümü değişince yeniden onay istenmiyor | Güncel koşulları kabul etmemiş kullanıcılar | 11 |
 | 10 | Kazanç anında çekilebiliyor | Alıcı mağazadan iade alırsa para kaybı (iade dolandırıcılığı) | 13 |
-| 11 | ~~Agora jetonu 1 saat geçerli, yenilenmiyor~~ | ✅ Faz 15'te çözüldü (süresi dolmadan yenileme) | 15 |
-| 12 | ~~Uygulama kapalıyken gelen arama sadece bildirim olarak düşüyor~~ | ✅ Faz 15'te çözüldü (yerel arama ekranı, best-effort) | 15 |
+| 11 | Agora jetonu 1 saat geçerli, yenilenmiyor | 1 saatten uzun aramalar kopar | 15 |
+| 12 | Uygulama kapalıyken gelen arama sadece bildirim olarak düşüyor | Aramaların çoğu kaçırılır | 15 |
 
 ### Faz 8'de bulunanlar
 
@@ -98,50 +98,6 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
 **Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
 
-### Faz 16'da bulunanlar
-
-Faz 16 tamamlandı. Sunucuda 138 test (33 dosya), uygulamada 50 test (7 dosya); tam takım temiz. Arayüz turu `tools/ui-tours/faz16.mjs` (ilk kullanım rehberi → cüzdan bilgi sayfası → çevrimdışı şeridi → gizlilik/analitik anahtarı → geri bildirim girişi) sayfa hatası vermeden tamamlandı.
-
-**Bu fazda soru sorulmadan (Claude kararı) verilen tasarım kararları:** Kullanım analitiği rızası varsayılan kapalı ve sadece Gizlilik ayarlarından açılıyor (kayıt sırasında sorulmuyor); bu yüzden "kayıt oldu" sayısı gerçek kayıt sayısından azdır — bilinçli bir seçim (gerçek isteğe bağlılık, kayda zorlama yok). Rıza verildiğinde o ana kadar zaten ulaşılmış aşamalar (ör. daha önce eşleşmişse) bir kerelik geriye dönük işaretleniyor; bu yeni bir izleme değil, uygulamanın zaten işlevi için tuttuğu verinin bir özeti. Uygulama içi geri bildirim, ayrı bir sistem kurmak yerine Faz 14'teki destek talebi altyapısına "Öneri" adlı yeni bir kategori eklenerek karşılandı. Cüzdan ekranındaki "jetonlar nasıl çalışır" bilgisi her zaman bir bilgi simgesinden açılabiliyor (tek seferlik değil, sürekli erişilebilir).
-
-**Yapılanlar:**
-- **İlk kullanım rehberi:** profil kurulumundan sonra bir kez açılan 4 sayfalık tanıtım (keşfet, istek, jetonlar, kazanç); Profil ekranından "Nasıl çalışır?" ile her zaman tekrar açılabilir. Cüzdan ekranında her zaman erişilebilir "Jetonlar nasıl çalışır?" bilgi sayfası (istek/arama ücretleri, kazanç ve olgunlaşma). İlk aramada, mevcut ücret onay penceresine adil ücretlendirme güvencesini hatırlatan tek seferlik bir satır eklendi.
-- **Durum ekranları:** anlık bağlantı kopunca üstte "çevrimdışısın" şeridi (Socket.IO `disconnect`/`connect` olaylarına bağlı); hata ekranı artık çevrimdışı ("bağlantı yok" simgesi) ile gerçek sunucu hatalarını (genel hata simgesi) görsel olarak ayırıyor; cüzdan geçmişi boş durumu ve para çekme ekranının yükleniyor durumu diğer ekranlarla tutarlı hale getirildi (paylaşılan `CenteredMessage`/`ListSkeleton`).
-- **Erişilebilirlik:** 5 simge-bandonlu düğmeye ekran okuyucu etiketi (şifre göster/gizle, profil kurulumunda geri/çıkış, bir tanıtım sorusunu kaldırma) eklendi; keşfetteki küçük dokunma alanları (profil bilgi düğmesi 38×38→44×44, süper beğeni/istek düğmeleri 46→48) büyütüldü; cüzdan ve para çekme kartlarındaki gradyan zemin üstü soluk (white70) yazılar okunabilirlik için tam beyaza çevrildi; sistemin yazı boyutu ölçeklemesini kısıtlayan bir kod bulunmadı (zaten doğru).
-- **Performans:** küçük gösterimlerde (avatar, eşleşme kartı, fotoğraf düzenleme ızgarası) tam çözünürlük yerine sunucunun ürettiği küçük boy fotoğraf + bellekte boyut sınırlama (`memCacheWidth/Height`) kullanılacak şekilde değiştirildi; sohbet listesi büyüyebilecek veriyi artık ekranda görünen kadarını oluşturan tembel (lazy) bir liste ile çiziyor; `main.dart`'taki tek gerçek gecikme adayı (Firebase başlatma) gerekli ve bilinçli (arka plan bildirim işleyicisi runApp'ten önce kaydedilmeli) olduğu için değiştirilmedi.
-- **Metin ve dil denetimi:** TR/EN dosyaları arasında anahtar kümesi karşılaştırması artık kalıcı bir teste bağlandı (561/561 anahtar eşleşiyor, sadece marka adı/birim gibi 5 bilinçli istisna dışında hiçbir metin iki dilde birebir aynı değil); yer tutucu/"TODO" kalıntısı bulunamadı.
-- **Gizlilik dostu kullanım analitiği:** yeni "analytics" açık rızası (varsayılan kapalı), yeni `AnalyticsEvent` tablosu (kullanıcı başına aşama başına en fazla bir satır, hesap silinince kullanıcıyla birlikte silinir), kayıt/eşleşme/ilk mesaj/ilk satın alma anlarına best-effort kanca; panelde Finans → Kullanım hunisi (sadece toplam sayılar, finans rolü görür). KVKK envanterine ve saklama/imha metnine eklendi.
-- **Uygulama içi geri bildirim:** Profil ekranında tek dokunuşla "Öneri" kategorisi seçili açılan destek talebi; panelde mevcut destek kuyruğunda "Öneri" etiketiyle görünür.
-
-**Bulunan tutarsızlıklar (test yazılırken, testten önce):** cüzdan geçmişi boş durumu ve para çekme yükleme göstergesi diğer ekranlardan farklı bileşen kullanıyordu; hata ekranı her zaman "bulut kapalı" simgesi gösteriyordu (bağlantı sorunu olmayan hatalarda bile yanıltıcı); 5 simge düğmesinde ekran okuyucu etiketi eksikti; keşfetteki bilgi düğmesi önerilen 44×44 dokunma alanının altındaydı.
-
-**Test ortamı notu:** Faz 15'teki gibi bu ortamda Google Fonts ve CanvasKit CDN'lerine erişim kapalı (ekran görüntülerinde bazı yazılar bu yüzden görünmüyor, işlevsellik etkilenmiyor). Çevrimdışı şeridini test etmek için tarayıcının ağını tamamen kesmek (Playwright `setOffline`) güvenilir sonuç vermedi (zaten açık olan WebSocket'i kapatmıyor); gerçek WebSocket nesnesinin doğrudan kapatılması (`ws.close()`) ile güvenilir şekilde doğrulandı.
-
-**Açık notlar (Faz 17):** ⏭ Gerçek Android/iOS cihazında açılış süresi, kaydırma akıcılığı ve APK/IPA boyutu ölçümü (bu ortamda Android SDK/emülatör yok); erişilebilirlik denetimi TalkBack/VoiceOver ile gerçek ekran okuyucuda tekrar doğrulanmalı.
-
-### Faz 15'te bulunanlar
-
-Faz 15 tamamlandı. Sunucuda 134 test (32 dosya), uygulamada 46 test (6 dosya); tam takım temiz. Ayrıca arayüz turu `tools/ui-tours/faz15.mjs` (arama → hemen kapatma → itiraz açma → sohbet akışını gerçek bir tarayıcıda, derlenmiş web sürümüyle çalıştırır) sayfa hatası vermeden tamamlandı.
-
-**Kullanıcı kararları:** iOS CallKit/PushKit kodu bu ortamda derlenip Xcode'da çalıştırılamasa da yazıldı, gerçek cihaz doğrulaması Faz 17'ye bırakıldı; kısmi dakika iadesi saniye bazlı orantılı hesaplanır (sadece "tam dakikanın altı ücretsiz" değil); arama itirazı onaylanırsa iade arayana yapılır, alıcının henüz olgunlaşmamış kazancı geri alınır, olgunlaşmış kazanca dokunulmaz.
-
-**Yapılanlar:**
-- **Adil ücretlendirme:** `POST /calls/:id/joined` ile Agora'ya gerçekten bağlanma sunucuya bildirilir; Agora yapılandırılmışsa kabul sonrası bir bağlanma süresi tanınır, süre dolar da kimse bağlanmazsa çağrı ücretsiz `connect_failed` ile kapanır. Kapanışta kısmi dakikanın kalan saniyesi orantılı olarak iade edilir; iade hem arayanın ödediği kovalardan (jeton/promosyon/kazanç) aynı oranda düşülür hem de alıcının o çağrıdan gelen olgunlaşmamış kazancından aynı oranda geri alınır — böylece promosyon jetonuyla yapılan ödemelerde "kayıp jeton" oluşmuyor.
-- **Uzun ve kesintisiz aramalar:** Agora jetonu süresi dolmadan yenileniyor (`onTokenPrivilegeWillExpire` → `renewToken`); ağ kalitesi göstergesi ve zayıf bağlantı uyarısı; bağlantı koptuğunda otomatik yeniden katılma denemesi.
-- **Mesaj teslim garantisi:** Uygulama içi çevrimdışı kuyruk (`MessageOutbox`, diske yazılır), `Idempotency-Key` ile tekrar denemede çift gönderim yok, sunucu "iletildi" (`deliveredAt`) durumunu "okundu"dan ayrı tutuyor, sohbet balonunda gönderiliyor/iletildi/okundu/başarısız simgeleri.
-- **Push güvenilirliği:** Arama bildirimleri yüksek öncelikli ve veri-only (arka planda uyandırma), rozet sayacı sunucuda hesaplanıp gönderiliyor, bildirime dokununca doğru ekrana (sohbet, arama geçmişi, profil) derin bağlantı.
-- **Yerel gelen arama ekranı:** Android'de tam ekran gelen arama bildirimi, iOS'ta VoIP push (kendi yazdığımız APNs http/2 gönderici, ek paket gerekmedi) + CallKit/PushKit (`flutter_callkit_incoming`); kapalı/arka plandaki uygulamada da arama Firebase arka plan işleyicisiyle yakalanıyor.
-- **Arama itirazı:** Arama geçmişinden "yanlış ücret alındı" bildirimi (sadece biten aramada, sadece ücreti ödeyen taraf, aynı arama için tek sefer); yönetim panelinde Finans → Arama itirazları kuyruğu (bekleyen/onaylanan/reddedilen), onayda kalan tutar (daha önce otomatik iade edilmemiş kısım) arayana iade edilir, reddte gerekçe zorunlu.
-- **Emülatör/simülatör testleri:** Gerçek Android/iOS cihazı ve Xcode/emülatör bu bulut ortamında yok; bunun yerine `flutter build web --release` ile tam derleme + gerçek (headless) Chromium'da arayüz turu koşuldu. iOS native (Swift/CallKit/PushKit) kodu derlenip çalıştırılamadı, sadece yazıldı ve pub cache'teki gerçek paket kaynak koduna göre elden geçirildi; gerçek cihaz matrisi zaten planlandığı gibi Faz 17'de.
-
-**Bulunan hatalar (test yazılırken, testten önce):**
-- İlk tasarımda `refundCallCharge` iadeyi genel bir kovaya yazıp alıcıdan sadece "kazanç" kovasından geri alıyordu; ödeme promosyon jetonuyla yapılmışsa alıcının kazancı yanlış kovadan (veya hiç) geri alınmıyor, sistemden jeton "sızıyordu". Düzeltme: iade, orijinal ödemenin kova oranlarını birebir yansıtıyor.
-- `endCall` ile zamanlayıcının eşzamanlı dakika ücretlendirmesi arasında yarış durumu vardı; `endCall` artık satır kilidiyle (`SELECT ... FOR UPDATE`) bir işlemde çalışıyor.
-- Aynı arama için hem otomatik kısmi dakika iadesi hem de sonradan onaylanan bir itiraz iadesi tetiklenirse çift iade riski vardı; `WalletEntry`'ye `reclaimedCoins`/`reclaimedPromo`/`refundedCoins` alanları eklenerek her iade "kalan iade edilebilir tutar"ı hesaplıyor.
-- `flutter_callkit_incoming` paketinin README'si güncel değil (eski düz `Event`/`body` API'sini anlatıyor); gerçek 3.1.6 kaynağı `entities/entities.dart`'taki mühürlü `CallEvent` sınıflarını kullanıyor, `flutter analyze` bu farkı yakaladı ve koda göre düzeltildi.
-
-**Test ortamı notu:** Bu bulut ortamında `www.gstatic.com` (Flutter CanvasKit CDN'i) ve Google Fonts CDN'ine ağ erişimi kapalı; arayüz turu bu yüzden derlemeyi CanvasKit'in yerel `canvaskit/` klasörünü kullanacak şekilde (sadece test derlemesinde, kaynak kodda değil) ayarlayarak koşuldu. Ekran görüntülerinde bu nedenle bazı yazı tipleri yüklenemedi; gerçek kullanıcı ağında (veya kendi fontlarımız pakete gömülürse) bu sorun oluşmaz — Faz 16'da değerlendirilebilir.
-
 ### Faz 14'te bulunanlar
 
 Faz 14 tamamlandı. Sunucuda 131 test (29 dosya), uygulamada 42 test; arayüz turu `tools/ui-tours/faz14.mjs` ve önizleme `docs/faz14-onizleme.png`.
@@ -158,7 +114,7 @@ Faz 14 tamamlandı. Sunucuda 131 test (29 dosya), uygulamada 42 test; arayüz tu
 
 **Bulunan eksik:** Google Play, uygulama dışından (web) hesap silme bağlantısı istiyor; yoktu, eklendi.
 
-**Açık sorular (Faz 17):** ⚠️ ücretli görüntülü aramanın Apple 1.1.4 / Google cinsel içerik kuralları açısından algısı; kazanç ödemesinin finansal özellik beyanı; satış metinleri ve onay kutusu metni avukat onayı; İYS dosya biçiminin güncel şablonla karşılaştırılması; iOS izin metinlerinin İngilizcesi (Xcode).
+**Açık sorular (Faz 19):** ⚠️ ücretli görüntülü aramanın Apple 1.1.4 / Google cinsel içerik kuralları açısından algısı; kazanç ödemesinin finansal özellik beyanı; satış metinleri ve onay kutusu metni avukat onayı; İYS dosya biçiminin güncel şablonla karşılaştırılması; iOS izin metinlerinin İngilizcesi (Xcode).
 
 ### Faz 13'te bulunanlar
 
@@ -177,7 +133,7 @@ Faz 13 tamamlandı. Sunucuda 116 test (27 dosya), uygulamada 42 test; tam takım
 
 **Geliştirme veritabanında bilinen fark:** test@gmail.com hesabının Faz 5 öncesi (satış kaydı yokken) yapılmış 6000 jetonluk test yüklemesi raporda "fark" olarak görünür; yayında böyle bir kayıt olmaz.
 
-**Açık sorular (Faz 17, muhasebeci/avukat):** stopaj oranı ve ödeme belgesi biçimi; ödeme yapılan kişinin TC'si hesap silindikten sonra saklanmalı mı; bankanın toplu EFT dosya biçimi.
+**Açık sorular (Faz 19, muhasebeci/avukat):** stopaj oranı ve ödeme belgesi biçimi; ödeme yapılan kişinin TC'si hesap silindikten sonra saklanmalı mı; bankanın toplu EFT dosya biçimi.
 
 ### Faz 12'de bulunanlar
 
@@ -250,7 +206,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 4. ✅ **Hassas veri şifreleme.** IBAN, PayPal ve kimlik bilgileri alan düzeyinde şifreli; anahtar veritabanı dışında.
 5. ✅ **Kötüye kullanım ve şifreler.** Bot koruması, cihaz başına hesap sınırı, sızdırılmış şifre kontrolü, şifre politikası. Şifre özeti yerel (native) Argon2id'ye geçer; mevcut şifreler girişte otomatik yükseltilir.
 6. ✅ **Sunucu yapılandırması.** CORS kısıtı, güvenlik başlıkları, istek boyutu sınırları, hata mesajlarında iç bilgi sızmaması.
-7. ✅ **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 17'de.
+7. ✅ **İç güvenlik denetimi.** ASVS kontrol listesiyle madde madde tarama ve bulguların kapatılması. ⏭ Bağımsız sızma testi Faz 19'da.
 8. ✅ **Bağımlılık güvenliği.** Prisma ve firebase-admin sürüm yükseltmeleriyle açık bildirimlerinin kapatılması.
 
 ## Faz 11 · KVKK uyumu (uygulama içi) ✅
@@ -268,7 +224,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
    - Yönetim panelinde başvuru kuyruğu ve 30 günlük süre takibi.
 5. ✅ **Saklama ve imha.** Politikaya bağlı otomatik imha işleri; her imha kaydedilir.
 6. ✅ **Veri ihlali altyapısı.** Etkilenen kullanıcıları tespit ve bilgilendirme aracı, ihlal kayıt defteri.
-7. ✅ **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 17'de.
+7. ✅ **Metin taslakları.** Aydınlatma metni, açık rıza metinleri, saklama-imha politikası ve çerez metni taslakları. ⏭ Avukat onayı, VERBİS ve Kurul bildirimleri Faz 19'da.
 
 ## Faz 12 · İçerik güvenliği, moderasyon ve 5651 (uygulama içi) ✅
 
@@ -289,7 +245,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 1. ✅ **Kazanç olgunlaşma süresi.** Kazanç, iade süresi boyunca bekler (süre ayarlanabilir). Olgunlaşmadan iade gelirse kazanç kendiliğinden düşer.
 2. ✅ **Kimlik doğrulama katmanı.** Ad-soyad, TC (algoritma kontrolü, tekil), kimlik belgesi fotoğrafı (şifreli), IBAN sahibi eşleşmesi; panelden elle inceleme. ⏭ Doğrulama sağlayıcısı (e-Devlet/NFC) sonradan takılır.
 3. ✅ **Dolandırıcılık kuralları.** Aynı cihaz, IP veya ödeme kaynağından hesaplar arası para döngüsü tespiti; günlük/aylık limitler; şüpheli talebin incelemeye düşmesi.
-4. ✅ **Ödeme kanalı katmanı.** Bugünkü manuel akışa banka toplu EFT dosyası eklendi (genel CSV; bankanın kendi biçimi Faz 17'de hesap açılınca uyarlanır). ⏭ Lisanslı ödeme kuruluşu API'si sonradan takılır.
+4. ✅ **Ödeme kanalı katmanı.** Bugünkü manuel akışa banka toplu EFT dosyası eklendi (genel CSV; bankanın kendi biçimi Faz 19'da hesap açılınca uyarlanır). ⏭ Lisanslı ödeme kuruluşu API'si sonradan takılır.
 5. ✅ **Vergi alanları.** Ayarlanabilir stopaj oranı, ödeme belgesi taslağı, kullanıcıya yıllık kazanç dökümü.
 6. ✅ **Finans raporları.** Satış–jeton mutabakatı, dolaşımdaki jeton yükümlülüğü, ödenen ve bekleyen ödemeler, iadeler; muhasebeye aylık dışa aktarım.
 7. ✅ **TL fiyat yönetimi.** Mağaza fiyatlarının KDV dahil gösterimi; paket ve fiyatların panelden yönetimi.
@@ -302,36 +258,65 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 1. ✅ **Satın alma öncesi bilgilendirme.** Ön bilgilendirme, mesafeli satış sözleşmesi, cayma hakkı istisnasına açık onay, jeton kullanım koşulları.
 2. ✅ **Destek sistemi.** Uygulama içi destek talebi (kategori, ekran görüntüsü, ilgili işlem); panelde kuyruk ve yanıt; bildirimle geri dönüş.
 3. ✅ **Yardım merkezi.** Jeton, arama, para çekme, güvenlik ve hesap için Türkçe/İngilizce SSS.
-4. ✅ **Künye alanları.** Şirket unvanı, MERSİS, adres, KEP ve e-posta için ayarlanabilir alanlar; uygulamada ve web'de gösterim. Bilgiler Faz 17'de doldurulur.
+4. ✅ **Künye alanları.** Şirket unvanı, MERSİS, adres, KEP ve e-posta için ayarlanabilir alanlar; uygulamada ve web'de gösterim. Bilgiler Faz 19'da doldurulur.
 5. ✅ **Mağaza politika kontrolü.** Apple ve Google kurallarının madde madde kontrol listesi ve eksiklerin kapatılması.
 6. ✅ **Bildirim tercihleri ve İYS uyumu.** Bildirim türü bazında açma/kapama; pazarlama iletileri için ayrı izin kaydı.
 7. ✅ **Mağaza form içerikleri.** Gizlilik etiketleri, Veri Güvenliği formu ve yaş derecelendirme cevapları (Faz 11 envanterinden); inceleme notu ve demo hesap.
 
-## Faz 15 · Gerçek zamanlı iletişimde üretim kalitesi ✅
+## Faz 15 · Gerçek zamanlı iletişimde üretim kalitesi
 
 **Amaç:** Arama ve mesajlaşmanın zayıf internette ve uygulama kapalıyken kusursuz çalışması; haksız ücret kesilmemesi.
 
-1. ✅ **Yerel gelen arama ekranı.** iOS'ta CallKit ve PushKit, Android'de tam ekran bildirim; kapalı uygulamada da arama çalar. ⏭ Gerçek cihazda doğrulama Faz 17'de.
-2. ✅ **Adil ücretlendirme.** Agora sunucu olaylarıyla iki tarafın gerçekten bağlandığı doğrulanır. Bağlantı kurulmazsa ücret alınmaz. Kopmada net kısmi dakika kuralı.
-3. ✅ **Uzun ve kesintisiz aramalar.** Agora jetonu yenileme, ağ değişiminde yeniden bağlanma, bağlantı kalitesi göstergesi.
-4. ✅ **Mesaj teslim garantisi.** Çevrimdışı kuyruk, tekrar deneme, çift gönderim önleme, "iletildi" durumu, sıra garantisi.
-5. ✅ **Push güvenilirliği.** Yüksek öncelik, bildirimden doğru ekrana derin bağlantı, rozet sayaçları.
-6. ✅ **Arama itirazı.** Geçmişten hatalı ücret bildirimi, panelde inceleme ve jeton iadesi.
-7. ✅ **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 17'de.
+1. 🛠 **Yerel gelen arama ekranı.** iOS'ta CallKit ve PushKit, Android'de tam ekran bildirim; kapalı uygulamada da arama çalar.
+2. 🛠 **Adil ücretlendirme.** Agora sunucu olaylarıyla iki tarafın gerçekten bağlandığı doğrulanır. Bağlantı kurulmazsa ücret alınmaz. Kopmada net kısmi dakika kuralı.
+3. 🛠 **Uzun ve kesintisiz aramalar.** Agora jetonu yenileme, ağ değişiminde yeniden bağlanma, bağlantı kalitesi göstergesi.
+4. 🛠 **Mesaj teslim garantisi.** Çevrimdışı kuyruk, tekrar deneme, çift gönderim önleme, "iletildi" durumu, sıra garantisi.
+5. 🛠 **Push güvenilirliği.** Yüksek öncelik, bildirimden doğru ekrana derin bağlantı, rozet sayaçları.
+6. 🛠 **Arama itirazı.** Geçmişten hatalı ücret bildirimi, panelde inceleme ve jeton iadesi.
+7. 🛠 **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 19'da.
 
-## Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans ✅
+## Faz 16 · Kimlik, premium katman ve mağaza
+
+**Amaç:** Uygulamayı "sağlam bir Tinder/Bumble klonu" olmaktan çıkarıp kullanıcının kendi alanı gibi hissettirmesi; aynı zamanda jeton dışında yeni bir gelir katmanı eklemek — işletme maliyetini artırmadan (yapay zekâ/dış API yok, hepsi kendi sunucumuzda).
+
+1. 🛠 **Kişisel profil vitrini.** Profil kartına renk teması, arkaplan ve "şu an" rozeti gibi kişiselleştirme seçenekleri; profil gerçekten kendi alanın gibi hissettirir.
+2. 🛠 **Kendi odan, avatar ve ziyaret.** Dekore edilebilir statik bir profil odası (mobilya, duvar kağıdı) ve özelleştirilebilir çizgi avatar (fotoğraf yanında, sohbet balonlarında kullanılır). Eşleştiğin kişi odanı ziyaret edebilir (salt görüntüleme, gerçek zamanlı gezinme/çok oyunculu harita YOK — kapsam dışı bırakıldı, haftalar sürecek ayrı bir proje büyüklüğünde); "gel bizim eve" daveti gibi, dating ile kişisel alan temasını birleştiren en güçlü parça.
+3. 🛠 **"Kendini Keşfet" vibe sistemi.** Kısa, oyunlaştırılmış bir soru seti (flört tarzı, ideal randevu, iletişim tarzı gibi ~10-12 soru); kural tabanlı bir eşleştirme motoru (yapay zekâ yok) cevapları 10-12 "vibe" arketipinden birine bağlar (ör. "Maceracı Romantik", "Sakin Gözlemci", "Sosyal Kelebek"). Sonuç, özenle tasarlanmış görsel bir "vibe kartı" olarak profilde görünür ve paylaşılabilir (Faz 17'deki organik büyüme döngüsüyle bağlantılı). Profil güncellendikçe (yeni ilgi alanı, yeni prompt cevabı) vibe yeniden hesaplanır — statik bir etiket değil, seninle birlikte gelişen bir kimlik. Eşleştiğin kişiyle vibe'lar kural tabanlı bir "uyum notu" olarak da gösterilir (ör. "Maceracı Romantik + Sakin Gözlemci: zıt kutuplar çekişimi").
+4. 🛠 **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
+5. 🛠 **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
+6. 🛠 **Kozmetik mağaza.** Jetonla alınan profil çerçeveleri, temalar, rozetler, oda mobilyaları, avatar kıyafetleri ve sohbet temaları (baloncuk rengi, sohbet arka planı). Bu jetonlar kullanıcıdan kullanıcıya geçmediği için tamamı platform geliri — en yüksek marjlı özellik.
+7. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
+8. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
+
+## Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme
+
+**Amaç:** Uygulamayı "aç, kaydır, kapat" döngüsünden çıkarıp gerçek bir alışkanlığa dönüştürmek; reklam bütçesi olmadan, kullanıcıların kendi isteğiyle paylaşarak büyümesi. Hepsi kendi sunucumuzda, dış servis/API maliyeti olmadan.
+
+1. 🛠 **Günlük giriş serisi (streak).** Art arda kaç gün açıldığı gösterilir; kırılma riski geri gelmeyi tetikler.
+2. 🛠 **Sosyal cesaret yolculuğu.** Üç ayrı izde kademeli ilerleme: **İletişim** (ilk mesaj, bir sohbeti 7 gün sürdürme, ilk buz kırıcı oyunu), **Bağlantı** (ilk eşleşme, ilk oda ziyareti, ilk sesli/görüntülü arama) ve **Kimlik** (profilini tamamlama, doğrulama, vibe testini tamamlama). Her iz kendi içinde kademeler taşır (bronz/gümüş/altın) ve her kademe kendi unvanını kazandırır ("Cesur Adım", "Sohbet Başlatıcı" gibi). Puana değil gerçek eyleme dayalı — her kademe Faz 16'daki kozmetik mağazadan ücretsiz bir oda/avatar ödülü açar, böylece gelişim sadece hissedilmiyor, odanda ve avatarında görülüyor. Güncel kademe rozeti sadece "Gelişimim" ekranında değil, **profilde ve keşfet (kaydırma) kartında** da görünür. Kademe atlama anı, Faz 16'daki mikro-etkileşimlerle aynı kalitede bir kutlamayla karşılanır (konfeti animasyonu, haptik geri bildirim, kısa ses) — an gerçekten mutluluk hissettirmeli, sessizce arka planda gerçekleşen bir sayaç artışı değil.
+3. 🛠 **"Gelişimim" ekranı.** Vibe kartını, üç izdeki kademeleri, açılan oda/avatar ödüllerini ve bir sonraki hedefi tek, özenle tasarlanmış bir ekranda toplar — dağınık bir rozet listesi değil, gerçek bir yolculuk hissi veren bütünlüklü bir tasarım. Bağlam duyarlı ipuçları da burada: eşleştiğin kişiyle ortak ilgi alanınıza dayalı, kural tabanlı bir "sıradaki adım" önerisi (ör. "Ortak ilginiz kahve — bundan bahsederek başla"), yapay zekâ kullanmadan, var olan profil verisinden üretilir.
+4. 🛠 **Sohbet içi buz kırıcı mini oyunlar.** "2 doğru 1 yalan", "bu mu o mu" gibi hızlı soru-cevap formatları; var olan gerçek zamanlı altyapı (Socket.IO) üzerinden çalışır.
+5. 🛠 **Sohbet içi iki kişilik mini oyun.** XOX (tic-tac-toe) gibi basit bir oyun; sohbeti mesajlaşmanın ötesine taşır.
+6. 🛠 **Eşleşme yıldönümü.** "1 hafta oldu 🎉" gibi küçük kutlama anları; ilişkiye kişisel bir tarih hissi katar.
+7. 🛠 **Haftalık özet.** "Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi kural tabanlı, kişisel bir özet.
+8. 🛠 **Davet programı.** Arkadaşını davet et, ikiniz de ödül kazanın (bozdurulamaz promo jeton, kayıt hediyesiyle aynı mekanik — gerçek maliyeti yok).
+9. 🛠 **Paylaşılabilir anlar.** Eşleşme anını, profil kartını veya vibe kartını kendi şablonumuzla görsele dönüştürüp Instagram/WhatsApp'a paylaşma; dış servis yok.
+10. 🛠 **Odanı sergile.** Faz 16'daki dekore edilmiş odaların haftalık "en güzel odalar" galerisi; emek verilen bir şeyi paylaşma isteği doğal viral döngü yaratır.
+11. 🛠 **Kişisel bağlantı linki.** "Beni MeetPoint'te bul" — paylaşılınca profile/indirmeye yönlendiren basit bir bağlantı.
+
+## Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans
 
 **Amaç:** "Profesyonel ama basit." Yeni kullanıcının hiçbir yerde takılmaması.
 
-1. ✅ **İlk kullanım rehberi.** Jeton, istek, arama ücreti ve kazanç kısa ve görsel olarak anlatılır; ilk satın alma ve ilk aramada tek seferlik ipuçları.
-2. ✅ **Durum ekranları.** Boş, yükleniyor, çevrimdışı ve hata ekranlarının tamamı tutarlı ve yönlendirici.
-3. ✅ **Erişilebilirlik.** Ekran okuyucu etiketleri, yazı boyutu ölçekleme, renk kontrastı, dokunma alanları.
-4. ✅ **Performans.** Düşük segment Android'de açılış süresi, kaydırma akıcılığı, görsel önbellek, uygulama boyutu. ⏭ Gerçek cihazda ölçüm Faz 17'de.
-5. ✅ **Metin ve dil denetimi.** Türkçe ve İngilizce metinlerin tamamının tutarlılık ve anlaşılırlık kontrolü.
-6. ✅ **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
-7. ✅ **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
+1. 🛠 **İlk kullanım rehberi.** Jeton, istek, arama ücreti ve kazanç kısa ve görsel olarak anlatılır; ilk satın alma ve ilk aramada tek seferlik ipuçları.
+2. 🛠 **Durum ekranları.** Boş, yükleniyor, çevrimdışı ve hata ekranlarının tamamı tutarlı ve yönlendirici.
+3. 🛠 **Erişilebilirlik.** Ekran okuyucu etiketleri, yazı boyutu ölçekleme, renk kontrastı, dokunma alanları.
+4. 🛠 **Performans.** Düşük segment Android'de açılış süresi, kaydırma akıcılığı, görsel önbellek, uygulama boyutu.
+5. 🛠 **Metin ve dil denetimi.** Türkçe ve İngilizce metinlerin tamamının tutarlılık ve anlaşılırlık kontrolü.
+6. 🛠 **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
+7. 🛠 **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
 
-## Faz 17 · Dış süreçler ve yayın
+## Faz 19 · Dış süreçler ve yayın
 
 **Amaç:** Uygulama bittikten sonra, hepsi bir arada.
 
@@ -362,5 +347,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 | 13 Para akışı ve finans | 6–9 gün |
 | 14 Tüketici ve mağaza | 4–6 gün |
 | 15 Gerçek zamanlı kalite | 6–9 gün |
-| 16 Kullanım kolaylığı | 4–6 gün |
-| 17 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
+| 16 Kimlik, premium katman ve mağaza | 9–13 gün |
+| 17 Oyunlaştırma, alışkanlık ve organik büyüme | 8–12 gün |
+| 18 Kullanım kolaylığı | 4–6 gün |
+| 19 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |

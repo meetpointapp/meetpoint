@@ -95,27 +95,6 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
-## Kullanım kolaylığı, erişilebilirlik ve performans (Faz 16)
-
-- **İlk kullanım rehberi** (`app/lib/features/onboarding/intro_screen.dart`, `core/tips.dart`): profil kurulumundan sonra bir kez açılan tanıtım; Profil ekranından tekrar açılabilir. Cüzdanda her zaman erişilebilir "Jetonlar nasıl çalışır?" bilgi sayfası (`features/wallet/coins_info_sheet.dart`).
-- **Durum ekranları** (`core/ui.dart`, `features/home/home_shell.dart`): çevrimdışı şeridi (Socket.IO bağlantı olaylarına bağlı), hata ekranında çevrimdışı/gerçek hata ayrımı, tüm boş/yükleniyor durumları ortak `CenteredMessage`/`ListSkeleton` bileşenleriyle tutarlı.
-- **Erişilebilirlik:** ekran okuyucu etiketleri, en az 44×44 dokunma alanı, gradyan zeminlerde yeterli metin kontrastı.
-- **Performans:** küçük gösterimlerde sunucunun küçük boy fotoğrafı + bellek boyutu sınırlaması (`memCacheWidth/Height`), büyüyebilecek listelerde tembel (lazy) oluşturma.
-- **Metin ve dil denetimi** (`app/test/l10n_consistency_test.dart`): TR/EN anahtar kümesi eşitliği ve unutulmuş çeviri kontrolü kalıcı testte.
-- **Gizlilik dostu kullanım analitiği** (`server/src/analytics.ts`, rıza: `privacy/consents.ts`): kayıt→eşleşme→ilk mesaj→ilk satın alma hunisi, sadece rıza verenler için, panelde toplam sayı olarak (Finans → Kullanım hunisi).
-- **Uygulama içi geri bildirim:** mevcut destek talebi altyapısına eklenen "Öneri" kategorisi, Profil ekranından tek dokunuşla.
-- Arayüz turu: `tools/ui-tours/faz16.mjs`.
-
-## Gerçek zamanlı iletişim (Faz 15)
-
-- **Adil ücretlendirme** (`src/calls.ts`): kabulden sonra Agora'ya gerçek bağlanma `POST /calls/:id/joined` ile doğrulanır; bağlantı kurulmazsa (`mediaConfirmDeadline` dolarsa) ücret alınmaz. Kapanışta kalan saniyeler için orantılı kısmi dakika iadesi (`partialRefund` → `refundCallCharge`), hem ödeyenin hem alıcının olgunlaşmamış kazancının aynı oranda geri alınmasıyla.
-- **Jeton yenileme ve yeniden bağlanma** (`app/lib/features/call/call_media_agora.dart`): Agora jetonu süresi dolmadan yenilenir, ağ kalitesi göstergesi ve zayıf bağlantı uyarısı, koptuğunda otomatik yeniden katılma.
-- **Mesaj teslim garantisi** (`app/lib/features/chat/message_outbox.dart`, `src/routes/conversations.ts`): çevrimdışı kuyruk (diske yazılır) + `Idempotency-Key` ile çift gönderim önleme; sunucuda "iletildi" (`deliveredAt`) durumu "okundu"dan ayrı.
-- **Push güvenilirliği** (`src/notify.ts`): arama bildirimleri yüksek öncelikli veri-only; bildirime dokununca doğru ekrana derin bağlantı; rozet sayacı.
-- **Yerel gelen arama ekranı** (`app/lib/features/call/native_call_ui.dart`, `src/voip.ts`, iOS `AppDelegate.swift`): Android tam ekran bildirim, iOS CallKit + kendi yazdığımız APNs VoIP push gönderici (`flutter_callkit_incoming`). Gerçek cihazda doğrulama Faz 17'de.
-- **Arama itirazı** (`src/calls.ts` dispute fonksiyonları, `src/routes/adminFinance.ts`): arama geçmişinden "yanlış ücret alındı" bildirimi; panel → Finans → Arama itirazları; onayda kalan tutar arayana iade edilir.
-- Arayüz turu: `tools/ui-tours/faz15.mjs`.
-
 ## Tüketici ve destek (Faz 14)
 
 - **Satın alma öncesi onay** (`src/consumer/salesTerms.ts`): ön bilgilendirme (`/legal/preinfo`) + mesafeli satış (`/legal/distance-sales`) + cayma istisnası, ilk alımdan önce bir kez. Sürüm: `config.consumer.salesTermsVersion` (değiştirince herkese yeniden sorulur).
@@ -152,7 +131,7 @@ Veri envanteri: [docs/kvkk/veri-envanteri.md](docs/kvkk/veri-envanteri.md) (`npm
 - **Verilerimi indir:** ZIP (JSON + fotoğraflar + selfie), e-postayla tek kullanımlık bağlantı, 7 gün, ayda bir.
 - **Saklama ve imha** (`src/privacy/retention.ts`): saatlik; 2 yıl hareketsiz hesaplar (30 gün önce uyarı), kodlar, oturumlar, dosyalar. Her imha `DestructionLog`'da (değiştirilemez). Politika sayfası koddan üretilir: `/legal/retention`.
 - **Yönetim paneli → KVKK:** başvurular (30 gün süre takibi), ihlal kayıt defteri + etkilenenlere e-posta, imha kaydı.
-- Yasal metin taslakları `server/legal/` (aydınlatma, 4 açık rıza metni). Avukat onayı Faz 17'de.
+- Yasal metin taslakları `server/legal/` (aydınlatma, 4 açık rıza metni). Avukat onayı Faz 19'da.
 - Yayında `PUBLIC_URL` tanımlanmalı (indirme bağlantıları için).
 
 ## Güvenlik sertleştirme (Faz 10)
@@ -275,7 +254,7 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 - [x] **Faz 6 · Sesli ve görüntülü arama:** dakika başı ücret (sesli 15, görüntülü 30 jeton/dk), Agora altyapısı ve test modu, gelen/giden/görüşme ekranları, bulanık başlayan görüntü, arama içi hediyeler, arama sonrası puan ve sorun bildirimi, arama geçmişi, yönetimde arama istatistikleri
 - [x] **Faz 7 · Para çekme ve yayın hazırlığı:** manuel onaylı para çekme (IBAN/PayPal, min. $20, mavi tik şartı), yönetimde Ödemeler ve Hatalar sekmeleri, uygulama ve sunucu hata takibi, yayında eksik ayarla açılmayan sunucu, `.env.example`, yayın rehberi, mağaza metinleri (TR/EN), yasal taslak güncellemeleri, GitHub özel depo
 
-Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
+Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
 - [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
 - [x] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
@@ -284,9 +263,11 @@ Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17)
 - [x] **Faz 12 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, görsel moderasyon katmanı, arama ve sohbet güvenliği, kaldırma süreçleri
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
-- [x] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [x] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
-- [ ] **Faz 17 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
+- [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
+- [ ] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar + ziyaret (Sanalika esinli, statik), "Kendini Keşfet" vibe sistemi, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (MeetPoint+), mikro-etkileşimler
+- [ ] **Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme:** giriş serisi, sosyal cesaret yolculuğu, "Gelişimim" ekranı, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet, davet programı, paylaşılabilir anlar, oda galerisi, kişisel bağlantı linki
+- [ ] **Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
+- [ ] **Faz 19 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar
 
