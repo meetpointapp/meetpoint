@@ -131,7 +131,7 @@ Veri envanteri: [docs/kvkk/veri-envanteri.md](docs/kvkk/veri-envanteri.md) (`npm
 - **Verilerimi indir:** ZIP (JSON + fotoğraflar + selfie), e-postayla tek kullanımlık bağlantı, 7 gün, ayda bir.
 - **Saklama ve imha** (`src/privacy/retention.ts`): saatlik; 2 yıl hareketsiz hesaplar (30 gün önce uyarı), kodlar, oturumlar, dosyalar. Her imha `DestructionLog`'da (değiştirilemez). Politika sayfası koddan üretilir: `/legal/retention`.
 - **Yönetim paneli → KVKK:** başvurular (30 gün süre takibi), ihlal kayıt defteri + etkilenenlere e-posta, imha kaydı.
-- Yasal metin taslakları `server/legal/` (aydınlatma, 4 açık rıza metni). Avukat onayı Faz 17'de.
+- Yasal metin taslakları `server/legal/` (aydınlatma, 4 açık rıza metni). Avukat onayı Faz 18'de.
 - Yayında `PUBLIC_URL` tanımlanmalı (indirme bağlantıları için).
 
 ## Güvenlik sertleştirme (Faz 10)
@@ -254,7 +254,7 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 - [x] **Faz 6 · Sesli ve görüntülü arama:** dakika başı ücret (sesli 15, görüntülü 30 jeton/dk), Agora altyapısı ve test modu, gelen/giden/görüşme ekranları, bulanık başlayan görüntü, arama içi hediyeler, arama sonrası puan ve sorun bildirimi, arama geçmişi, yönetimde arama istatistikleri
 - [x] **Faz 7 · Para çekme ve yayın hazırlığı:** manuel onaylı para çekme (IBAN/PayPal, min. $20, mavi tik şartı), yönetimde Ödemeler ve Hatalar sekmeleri, uygulama ve sunucu hata takibi, yayında eksik ayarla açılmayan sunucu, `.env.example`, yayın rehberi, mağaza metinleri (TR/EN), yasal taslak güncellemeleri, GitHub özel depo
 
-Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
+Yayın öncesi seri: önce uygulama (Faz 8–17), dış işler en sonda (Faz 18). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
 - [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
 - [x] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
@@ -264,8 +264,9 @@ Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17)
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [ ] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
-- [ ] **Faz 17 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
+- [ ] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza, abonelik (MeetPoint+), mikro-etkileşimler
+- [ ] **Faz 17 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
+- [ ] **Faz 18 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar
 
