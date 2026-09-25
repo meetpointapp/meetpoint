@@ -264,7 +264,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–17), dış işler en sonda (Faz 18)
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [ ] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza, abonelik (MeetPoint+), mikro-etkileşimler
+- [ ] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar (Sanalika esinli, statik), günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza, abonelik (MeetPoint+), mikro-etkileşimler
 - [ ] **Faz 17 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 18 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 

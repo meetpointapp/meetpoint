@@ -280,11 +280,12 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 **Amaç:** Uygulamayı "sağlam bir Tinder/Bumble klonu" olmaktan çıkarıp kullanıcının kendi alanı gibi hissettirmesi; aynı zamanda jeton dışında yeni bir gelir katmanı eklemek — işletme maliyetini artırmadan (yapay zekâ/dış API yok, hepsi kendi sunucumuzda).
 
 1. 🛠 **Kişisel profil vitrini.** Profil kartına renk teması, arkaplan ve "şu an" rozeti gibi kişiselleştirme seçenekleri; profil gerçekten kendi alanın gibi hissettirir.
-2. 🛠 **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
-3. 🛠 **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
-4. 🛠 **Kozmetik mağaza.** Jetonla alınan profil çerçeveleri, temalar ve rozetler. Bu jetonlar kullanıcıdan kullanıcıya geçmediği için tamamı platform geliri — en yüksek marjlı özellik.
-5. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
-6. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
+2. 🛠 **Kendi odan ve avatar (Sanalika/Habbo esinli, hafif versiyon).** Dekore edilebilir statik bir profil odası (mobilya, duvar kağıdı) ve özelleştirilebilir çizgi avatar (fotoğraf yanında, sohbet balonlarında kullanılır). Gerçek zamanlı gezinme/çok oyunculu harita YOK (kapsam dışı bırakıldı — haftalar sürecek ayrı bir proje büyüklüğünde); sadece görsel kimlik ve kozmetik mağazanın yeni bir satış alanı.
+3. 🛠 **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
+4. 🛠 **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
+5. 🛠 **Kozmetik mağaza.** Jetonla alınan profil çerçeveleri, temalar, rozetler, oda mobilyaları ve avatar kıyafetleri. Bu jetonlar kullanıcıdan kullanıcıya geçmediği için tamamı platform geliri — en yüksek marjlı özellik.
+6. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
+7. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
 
 ## Faz 17 · Kullanım kolaylığı, erişilebilirlik ve performans
 
@@ -329,6 +330,6 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 | 13 Para akışı ve finans | 6–9 gün |
 | 14 Tüketici ve mağaza | 4–6 gün |
 | 15 Gerçek zamanlı kalite | 6–9 gün |
-| 16 Kimlik, premium katman ve mağaza | 6–9 gün |
+| 16 Kimlik, premium katman ve mağaza | 8–11 gün |
 | 17 Kullanım kolaylığı | 4–6 gün |
 | 18 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
