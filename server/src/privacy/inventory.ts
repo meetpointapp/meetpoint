@@ -80,9 +80,9 @@ export const INVENTORY: InventoryEntry[] = [
   },
   {
     category: 'Sesli ve görüntülü arama',
-    tables: ['Call', 'CallGift'],
-    data: 'Arama zamanı, süresi, ücreti, hediyeler, puanlama (ses/görüntü kaydedilmez)',
-    purpose: 'Arama hizmeti ve ücretlendirme',
+    tables: ['Call', 'CallGift', 'CallDispute'],
+    data: 'Arama zamanı, süresi, ücreti, hediyeler, puanlama, ücret itirazları ve incelemesi (ses/görüntü kaydedilmez)',
+    purpose: 'Arama hizmeti, ücretlendirme ve itiraz incelemesi',
     basis: ['sözleşme', 'yasal'],
     retention: 'Hesap süresince (finansal kayıtlar yasal süre boyunca)',
     recipients: 'Agora (yurt dışı: ses/görüntü aktarımı, sadece rıza verenler)',

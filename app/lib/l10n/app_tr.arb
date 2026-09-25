@@ -605,6 +605,7 @@
   "callEnded": "Arama bitti",
   "callEndedBalance": "Bakiye bittiği için arama sona erdi.",
   "callEndedDisconnect": "Bağlantı koptuğu için arama sona erdi.",
+  "callEndedConnectFailed": "Bağlantı kurulamadı, ücret alınmadı.",
   "callMissed": "Cevapsız arama",
   "callNoAnswer": "Cevap yok",
   "callDeclined": "Arama reddedildi",

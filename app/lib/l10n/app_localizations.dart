@@ -1790,6 +1790,12 @@ abstract class AppLocalizations {
   /// **'Bağlantı koptuğu için arama sona erdi.'**
   String get callEndedDisconnect;
 
+  /// No description provided for @callEndedConnectFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı kurulamadı, ücret alınmadı.'**
+  String get callEndedConnectFailed;
+
   /// No description provided for @callMissed.
   ///
   /// In tr, this message translates to:

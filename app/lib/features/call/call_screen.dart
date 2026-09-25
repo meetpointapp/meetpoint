@@ -93,6 +93,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     });
     try {
       await media.start(media: call.media, video: call.isVideo);
+      // Faz 15: adil ücretlendirme. Sunucu, iki taraf da kanala gerçekten katılana kadar (Agora
+      // ayarlıysa) ücretlendirmeyi askıda tutar; katılamazsa alınan ücret iade edilir.
+      unawaited(media.joined.then((_) => ref.read(apiProvider).confirmCallJoined(widget.callId)).catchError((_) {}));
     } catch (e) {
       debugPrint('media start failed: $e');
     }
@@ -815,6 +818,7 @@ class _CallSummaryState extends ConsumerState<_CallSummary> {
     final reasonText = switch (call.endReason) {
       'balance' => l.callEndedBalance,
       'disconnect' => l.callEndedDisconnect,
+      'connect_failed' => l.callEndedConnectFailed,
       _ => null,
     };
     final coins = call.totalCoins;

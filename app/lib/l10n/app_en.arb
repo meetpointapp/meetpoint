@@ -282,6 +282,7 @@
   "callEnded": "Call ended",
   "callEndedBalance": "The call ended because the balance ran out.",
   "callEndedDisconnect": "The call ended because the connection dropped.",
+  "callEndedConnectFailed": "The call couldn't connect, so you weren't charged.",
   "callMissed": "Missed call",
   "callNoAnswer": "No answer",
   "callDeclined": "Call declined",

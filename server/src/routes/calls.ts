@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { uid } from '../auth';
-import { acceptCall, callHistory, getCall, hangUp, rateCall, reportAndHangUp, sendGift, startCall } from '../calls';
+import { acceptCall, callHistory, confirmJoined, getCall, hangUp, rateCall, reportAndHangUp, sendGift, startCall } from '../calls';
 import { CALL_KINDS } from '../config';
 import { requestLimiter } from '../limits';
 import { REPORT_REASONS } from '../moderation/reports';
@@ -25,6 +25,11 @@ callsRouter.get('/calls/:id', async (req, res) => {
 
 callsRouter.post('/calls/:id/accept', async (req, res) => {
   res.json(await acceptCall(req.params.id, uid(req)));
+});
+
+// Ses/görüntü motoru Agora kanalına gerçekten katıldığında uygulama bunu çağırır (Faz 15: adil ücretlendirme)
+callsRouter.post('/calls/:id/joined', async (req, res) => {
+  res.json(await confirmJoined(req.params.id, uid(req)));
 });
 
 // Kapat / reddet / iptal: duruma göre sunucu karar verir

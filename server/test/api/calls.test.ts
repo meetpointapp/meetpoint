@@ -97,11 +97,22 @@ describe('Aramalar (Faz 6)', () => {
     check('caller got call:ended', callerSock.has('call:ended'));
     await sleep(3300);
     const fin = await call(caller.t, 'GET', `/calls/${callId}`);
-    check('no billing after end', fin.billedMinutes === 2 && fin.totalCoins === 30 && fin.giftCoins === 20);
-    check('caller final balance 750', (await bal(caller)) === 750);
+    check('no 3rd minute billed', fin.billedMinutes === 2 && fin.giftCoins === 20, `min=${fin.billedMinutes}`);
+    // Faz 15: kapatma tam dakika sınırında olmuyor, son ücretlendirilen dakikanın kullanılmayan
+    // kısmı saniye bazlı iade edilir. Minute 1 (15) her zaman tam kullanılmıştır; minute 2'nin (15)
+    // bir kısmı iade edilir, o yüzden totalCoins (15, 30] aralığında olmalı.
+    check('partial refund of last billed minute', fin.totalCoins > 15 && fin.totalCoins <= 30, `total=${fin.totalCoins}`);
+    const finalBal = await bal(caller);
+    check('caller final balance reflects partial refund', finalBal >= 750 && finalBal < 785, `bal=${finalBal} total=${fin.totalCoins}`);
     const cw = await call(callee.t, 'GET', '/wallet');
-    // Arayan bonus jetonlarıyla ödedi (500'lük paket bonusu + kayıt hediyesi): kazanç bozdurulamaz
-    check('callee earned 50 from bonus coins: spendable, not cashable', cw.balance === 100 && cw.cashable === 0 && cw.promoEarnings === 50, `bal=${cw.balance} cash=${cw.cashable} promo=${cw.promoEarnings}`);
+    // Arayan bonus jetonlarıyla ödedi (500'lük paket bonusu + kayıt hediyesi): kazanç bozdurulamaz.
+    // Faz 15: minute 2'nin iade edilen kısmı kadar (en fazla 15) azalmış olabilir; minute 1 (15) ve
+    // hediye (20) hiçbir zaman iade edilmez, o yüzden en az 35 kalmalıdır.
+    check(
+      'callee earned from bonus coins: spendable, not cashable',
+      cw.cashable === 0 && cw.promoEarnings >= 35 && cw.promoEarnings <= 50 && cw.balance === cw.promoEarnings + 50,
+      `bal=${cw.balance} cash=${cw.cashable} promo=${cw.promoEarnings}`,
+    );
 
     // --- Puanlama
     const r1 = await call(caller.t, 'POST', `/calls/${callId}/rate`, { rating: 5 });
@@ -129,7 +140,7 @@ describe('Aramalar (Faz 6)', () => {
     const c4 = await call(caller.t, 'POST', '/calls', { toId: callee.id, kind: 'VIDEO' });
     const can = await call(caller.t, 'POST', `/calls/${c4.id}/hangup`);
     check('caller hangup while ringing -> CANCELLED', can.status === 'CANCELLED');
-    check('no charge for unanswered calls', (await bal(caller)) === 750);
+    check('no charge for unanswered calls', (await bal(caller)) === finalBal);
 
     // --- Bakiye bitince arama biter: sadece 50 hediyesi olan kullanıcı, görüntülü 30/dk
     const poorCaller = await makeUser('Oya', 'female', 'male');

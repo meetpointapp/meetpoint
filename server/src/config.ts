@@ -97,6 +97,9 @@ export const callTiming = {
   billingSeconds: Number(process.env.CALL_BILLING_SECONDS ?? 60), // dakika uzunluğu
   ringSeconds: Number(process.env.CALL_RING_SECONDS ?? 45), // cevapsız sayılma süresi
   disconnectGraceSeconds: Number(process.env.CALL_DISCONNECT_GRACE_SECONDS ?? 20),
+  // Faz 15: Agora ayarlıysa, kabulden sonra iki taraf da gerçekten kanala bu süre içinde katılmalı;
+  // katılamazsa arama "bağlantı kurulamadı" sayılıp tüm ücret iade edilir.
+  mediaConfirmSeconds: Number(process.env.CALL_MEDIA_CONFIRM_SECONDS ?? 20),
 };
 
 // Şifre kuralı: yaygın şifre listesi her zaman; sızıntı veritabanı kontrolü (Have I Been Pwned) açıkken

@@ -39,11 +39,15 @@ async function submitKyc(u: TestUser, fullName: string, tcNo: string) {
 }
 
 // Ödeyen, arama + hediyelerle karşı tarafa kazanç geçirir. Promosyon jetonları (bonus) önce harcanır.
+// Kapatma tam dakika sınırında olmayabilir: son ücretlendirilen dakikanın kullanılmayan kısmı
+// saniye bazlı iade edilir (Faz 15). Bu yüzden dönen totalCoins gerçek harcanan miktardır.
 async function spendOn(payer: TestUser, earner: TestUser, diamonds: number) {
   const c = await call(payer.t, 'POST', '/calls', { toId: earner.id, kind: 'VIDEO' });
   await call(earner.t, 'POST', `/calls/${c.id}/accept`);
   for (let i = 0; i < diamonds; i++) await call(payer.t, 'POST', `/calls/${c.id}/gifts`, { giftId: 'diamond' });
   await call(payer.t, 'POST', `/calls/${c.id}/hangup`);
+  const info = await call(payer.t, 'GET', `/calls/${c.id}`);
+  return (info.totalCoins as number) + (info.giftCoins as number);
 }
 
 const wallet = (u: TestUser) => call(u.t, 'GET', '/wallet');
@@ -95,31 +99,40 @@ describe('Para akışı ve finans (Faz 13)', () => {
     const earner = await makeUser('Kazanan', 'female', 'male');
     // 1000 jeton + %50 ilk alım bonusu (500) + 50 kayıt hediyesi = 550 promosyon
     await hook({ id: `evt-p-${tag}`, type: 'NON_RENEWING_PURCHASE', app_user_id: buyer.id, product_id: 'coins_1000', transaction_id: `t-${tag}`, store: 'APP_STORE', price: 18.99 });
-    await spendOn(buyer, earner, 6); // 30 (1. dakika) + 1500 = 1530 → 550 promosyon + 980 satın alınmış
+    await spendOn(buyer, earner, 6); // 30 (1. dakika, ~980 satın alınmıştan) + 1500 = ~1530 → ~550 promosyon
     let w = await wallet(earner);
-    check('earner has maturing earnings', w.maturingEarnings === 980 && w.cashable === 0, `maturing=${w.maturingEarnings}`);
+    // Faz 15: kapanış tam dakika sınırında olmayabilir, son (bonustan ödenen) dakikanın kullanılmayan
+    // kısmı orantılı iade edilir; o yüzden 980 yerine ölçülen (980'e yakın) tutar kullanılır.
+    const cashableEarned = w.maturingEarnings as number;
+    check('earner has maturing earnings', cashableEarned >= 950 && cashableEarned <= 980 && w.cashable === 0, `maturing=${cashableEarned}`);
+    const buyerBalanceBeforeRefund = (await wallet(buyer)).balance as number;
 
     const r = await hook({ id: `evt-r-${tag}`, type: 'CANCELLATION', app_user_id: buyer.id, transaction_id: `t-${tag}` });
     check('refund processed', r.refunded === true);
     w = await wallet(earner);
-    // Kalan: 550 bozdurulamaz kazanç (bonustan) + 50 kayıt hediyesi
-    check('immature earnings reclaimed from earner', w.maturingEarnings === 0 && w.balance === 600, `balance=${w.balance}`);
+    // Kalan: bozdurulamaz kazanç (bonustan, refundCallCharge'ın dokunmadığı kısım) + 50 kayıt hediyesi
+    check('immature earnings reclaimed from earner', w.maturingEarnings === 0, `maturing=${w.maturingEarnings}`);
     const reclaimed = w.entries?.filter((e) => e.type === 'REFUND_CLAWBACK').reduce((a, e) => a + e.amount, 0);
-    check('reclaim visible in history (one entry per gift)', reclaimed === -980, `reclaimed=${reclaimed}`);
+    check('reclaim visible in history (one entry per gift)', reclaimed === -cashableEarned, `reclaimed=${reclaimed} expected=${-cashableEarned}`);
     const bw = await wallet(buyer);
-    // Alıcının kalan 20 satın alınmış jetonu + 500 bonus geri alınır: 20 − 20 − 500 = −500
-    check('buyer charged only the rest', bw.balance === -500, `buyer=${bw.balance}`);
+    // 1000 satın alınmış jetonun geri alınamayan (zaten olgunlaşmamış kazançtan geri alınan) kısmı + 500 bonus
+    const expectedBuyer = buyerBalanceBeforeRefund - (1000 - cashableEarned) - 500;
+    check('buyer charged only the rest', bw.balance === expectedBuyer, `buyer=${bw.balance} expected=${expectedBuyer}`);
 
     // Olgunlaşmış kazanç: iade gelse de geri alınmaz (bozdurulmuş olabilir; risk olgunlaşma süresiyle sınırlı)
     const buyer2 = await makeUser('Alici2', 'male', 'female');
     const earner2 = await makeUser('Kazanan2', 'female', 'male');
     await hook({ id: `evt-p2-${tag}`, type: 'NON_RENEWING_PURCHASE', app_user_id: buyer2.id, product_id: 'coins_1000', transaction_id: `t2-${tag}`, store: 'APP_STORE', price: 18.99 });
     await spendOn(buyer2, earner2, 6);
+    const cashableEarned2 = (await wallet(earner2)).maturingEarnings as number;
+    const buyer2BalanceBeforeRefund = (await wallet(buyer2)).balance as number;
     await ageEarnings(earner2.id);
     await hook({ id: `evt-r2-${tag}`, type: 'CANCELLATION', app_user_id: buyer2.id, transaction_id: `t2-${tag}` });
     const w2 = await wallet(earner2);
-    check('matured earnings untouched', w2.cashable === 980, `cashable=${w2.cashable}`);
-    check('buyer carries the debt', (await wallet(buyer2)).balance === -1480, `buyer2=${(await wallet(buyer2)).balance}`);
+    check('matured earnings untouched', w2.cashable === cashableEarned2, `cashable=${w2.cashable} expected=${cashableEarned2}`);
+    // Olgunlaşmış kazanç geri alınamadı: geri alınan = 0, buyer tüm 1000 + 500 bonusu üstlenir
+    const expectedBuyer2 = buyer2BalanceBeforeRefund - 1000 - 500;
+    check('buyer carries the debt', (await wallet(buyer2)).balance === expectedBuyer2, `buyer2=${(await wallet(buyer2)).balance} expected=${expectedBuyer2}`);
   });
 
   it('para çekme: risk işaretleri, stopaj, toplu EFT, ödeme belgesi ve yıllık döküm', async () => {

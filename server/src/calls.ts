@@ -7,7 +7,7 @@ import { HttpError, isBlockedEitherWay, prisma } from './db';
 import { notify } from './notify';
 import { emitToUser, isOnline, onUserOffline, onUserOnline } from './realtime';
 import { publicProfile } from './routes/profile';
-import { getBalance, transfer } from './wallet';
+import { getBalance, refundCallCharge, transfer } from './wallet';
 
 // Sesli/görüntülü arama yaşam döngüsü:
 //   RINGING → ACTIVE → ENDED   (normal)
@@ -62,7 +62,7 @@ export function callDto(call: CallWithUsers, viewerId: string) {
 const load = (id: string) => prisma.call.findUnique({ where: { id }, include: withUsers });
 
 // Canlı aramayı bitiren ortak alanlar: zamanlayıcı son tarihleri temizlenir
-const closed = { ringDeadline: null, nextBillingAt: null, callerGraceAt: null, calleeGraceAt: null };
+const closed = { ringDeadline: null, nextBillingAt: null, callerGraceAt: null, calleeGraceAt: null, mediaConfirmDeadline: null };
 
 async function transition(id: string, from: string[], data: Prisma.CallUpdateManyMutationInput) {
   const { count } = await prisma.call.updateMany({ where: { id, status: { in: from } }, data });
@@ -154,8 +154,18 @@ export async function acceptCall(id: string, userId: string) {
   if (!call || call.calleeId !== userId) throw new HttpError(404, 'not_found');
   await requireConsent(userId, 'overseas_transfer');
   const now = new Date();
-  // İlk dakika kabul anında alınır: ücret anı "şimdi"
-  if (!(await transition(id, ['RINGING'], { status: 'ACTIVE', answeredAt: now, ringDeadline: null, nextBillingAt: now }))) {
+  // İlk dakika kabul anında alınır: ücret anı "şimdi". Agora ayarlıysa, iki taraf da bu süre içinde
+  // kanala katılmazsa chargeDueMinute'ün aldığı ücret tamamen iade edilir (bkz. processCallDeadlines).
+  const mediaConfirmDeadline = agora.appId ? secondsFromNow(callTiming.mediaConfirmSeconds, now.getTime()) : null;
+  if (
+    !(await transition(id, ['RINGING'], {
+      status: 'ACTIVE',
+      answeredAt: now,
+      ringDeadline: null,
+      nextBillingAt: now,
+      mediaConfirmDeadline,
+    }))
+  ) {
     throw new HttpError(409, 'call_not_ringing');
   }
   if ((await chargeDueMinute(id, now)) === 'ended') throw new HttpError(402, 'caller_insufficient_balance');
@@ -165,10 +175,51 @@ export async function acceptCall(id: string, userId: string) {
   return { ...callDto(fresh, userId), media: mediaFor(id, 2) };
 }
 
-export async function endCall(id: string, reason: 'hangup' | 'balance' | 'disconnect' | 'server_restart') {
-  const ended = await transition(id, ['ACTIVE'], { status: 'ENDED', endReason: reason, endedAt: new Date(), ...closed });
+// Faz 15 · adil ücretlendirme: arama ödenmiş bir dakikanın ortasında biterse (hangup/disconnect),
+// o dakikanın kullanılmayan kısmı saniye bazlı orantılı iade edilir. Bağlantı hiç kurulamadıysa
+// (connect_failed) alınan ücretin tamamı iade edilir. Bakiye yetmezliğinde (balance) zaten tam
+// dakika ücretlendirilmişti, iade yok.
+function partialRefund(call: Pick<Call, 'ratePerMin' | 'nextBillingAt' | 'totalCoins'>, reason: string, now: Date) {
+  if (reason === 'connect_failed') return call.totalCoins;
+  if (reason === 'balance' || !call.nextBillingAt || call.nextBillingAt <= now) return 0;
+  const billingMs = callTiming.billingSeconds * 1000;
+  const unusedMs = call.nextBillingAt.getTime() - now.getTime();
+  return Math.round(call.ratePerMin * Math.min(1, unusedMs / billingMs));
+}
+
+export async function endCall(
+  id: string,
+  reason: 'hangup' | 'balance' | 'disconnect' | 'server_restart' | 'connect_failed',
+  now = new Date(),
+) {
+  // Satır kilidiyle tek işlemde yapılır: zamanlayıcının aynı anda bu dakikayı ücretlendirmesiyle
+  // yarışmasın (eski değeri okuyup yanlış iade hesaplamayı önler).
+  const ended = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT 1 FROM "Call" WHERE "id" = ${id} FOR UPDATE`;
+    const call = await tx.call.findUnique({ where: { id } });
+    if (!call || call.status !== 'ACTIVE') return false;
+    await tx.call.update({ where: { id }, data: { status: 'ENDED', endReason: reason, endedAt: now, ...closed } });
+    const refund = partialRefund(call, reason, now);
+    if (refund > 0) {
+      await refundCallCharge(tx, id, call.callerId, call.calleeId, refund);
+      await tx.call.update({ where: { id }, data: { totalCoins: { decrement: refund } } });
+    }
+    return true;
+  });
   if (ended) await broadcast(id, 'call:ended');
   return ended;
+}
+
+// Uygulama, ses/görüntü motoru Agora kanalına gerçekten katıldığını doğrulayınca çağırır
+// (simülasyon modunda da anında çağrılır). Agora ayarlıysa ve süre dolana kadar iki taraf da
+// katılmazsa arama processCallDeadlines tarafından "bağlantı kurulamadı" sayılıp ücret iade edilir.
+export async function confirmJoined(id: string, userId: string) {
+  const call = await prisma.call.findUnique({ where: { id } });
+  if (!call || (call.callerId !== userId && call.calleeId !== userId)) throw new HttpError(404, 'not_found');
+  if (call.status !== 'ACTIVE') return { ok: true };
+  const field = call.callerId === userId ? 'callerJoinedAt' : 'calleeJoinedAt';
+  if (!call[field]) await prisma.call.update({ where: { id }, data: { [field]: new Date() } });
+  return { ok: true };
 }
 
 async function missCall(id: string) {
@@ -276,6 +327,17 @@ export async function processCallDeadlines(now = new Date()) {
 
   const due = await prisma.call.findMany({ where: { status: 'ACTIVE', nextBillingAt: { lte: now } }, select: { id: true }, take: 500 });
   for (const { id } of due) await chargeDueMinute(id, now).catch((e) => console.error('chargeDueMinute', id, e));
+
+  // Adil ücretlendirme: Agora ayarlıysa, süre dolana kadar iki taraf da kanala katılmadıysa
+  // bağlantı hiç kurulamamış sayılır, arama biter ve alınan ücret tamamen iade edilir.
+  if (agora.appId) {
+    const unconfirmed = await prisma.call.findMany({
+      where: { status: 'ACTIVE', mediaConfirmDeadline: { lte: now }, OR: [{ callerJoinedAt: null }, { calleeJoinedAt: null }] },
+      select: { id: true },
+      take: 200,
+    });
+    for (const { id } of unconfirmed) await endCall(id, 'connect_failed', now).catch((e) => console.error('connect_failed', id, e));
+  }
 
   const away = await prisma.call.findMany({
     where: { status: { in: LIVE }, OR: [{ callerGraceAt: { lte: now } }, { calleeGraceAt: { lte: now } }] },

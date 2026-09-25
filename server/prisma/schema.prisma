@@ -95,6 +95,7 @@ model User {
   appeals        Appeal[]
   modFlags       ModerationFlag[]
   supportTickets SupportTicket[]
+  callDisputes   CallDispute[]
 
   profile Profile?
   photos  Photo[]
@@ -205,7 +206,7 @@ model WalletEntry {
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   amount         Int // pozitif = giriş, negatif = çıkış
-  type           String // PURCHASE | BONUS | GRANT | DEV_CREDIT | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | CLAWBACK | OPENING
+  type           String // PURCHASE | BONUS | GRANT | DEV_CREDIT | HOLD | REFUND | EARN | SPEND | CALL | GIFT | CASHOUT | CASHOUT_REFUND | CLAWBACK | CALL_REFUND | CALL_REFUND_CLAWBACK | OPENING
   // Kova değişimleri
   paid           Int      @default(0)
   promo          Int      @default(0)
@@ -333,10 +334,38 @@ model Call {
   callerGraceAt DateTime? // arayanın bağlantısı koptu: bu ana kadar dönmezse arama biter
   calleeGraceAt DateTime? // arananın bağlantısı koptu
 
+  // Faz 15: adil ücretlendirme. Agora ayarlıysa, iki taraf da gerçekten kanala katılana kadar
+  // mediaConfirmDeadline dolar dolmaz arama "bağlantı kurulamadı" sayılıp tüm ücret iade edilir.
+  callerJoinedAt       DateTime? // arayan Agora kanalına gerçekten katıldı
+  calleeJoinedAt       DateTime? // arayan Agora kanalına gerçekten katıldı
+  mediaConfirmDeadline DateTime?
+  disputeStatus        String        @default("") // "" | PENDING | APPROVED | REJECTED
+  disputes             CallDispute[]
+
   @@index([callerId, createdAt])
   @@index([calleeId, createdAt])
   @@index([status, ringDeadline])
   @@index([status, nextBillingAt])
+  @@index([status, mediaConfirmDeadline])
+}
+
+// Arama itirazı (Faz 15): kullanıcı geçmişten "bu arama için yanlış ücret alındı" der, panel inceler.
+// Onaylanırsa arayana iade edilir; alıcının olgunlaşmamış kazancı geri alınır (refundCallCharge).
+model CallDispute {
+  id         String    @id @default(cuid())
+  callId     String
+  call       Call      @relation(fields: [callId], references: [id], onDelete: Cascade)
+  userId     String // itirazı açan (arayan ya da alıcı olabilir, ama iade her zaman arayana gider)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason     String
+  status     String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  refunded   Int       @default(0) // onaylandıysa iade edilen jeton
+  adminNote  String    @default("")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([callId])
 }
 
 // Arama içi hediye: jetonun tamamı alıcıya geçer (EARN)

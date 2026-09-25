@@ -1072,6 +1072,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The call ended because the connection dropped.';
 
   @override
+  String get callEndedConnectFailed =>
+      'The call couldn\'t connect, so you weren\'t charged.';
+
+  @override
   String get callMissed => 'Missed call';
 
   @override

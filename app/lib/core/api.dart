@@ -357,6 +357,9 @@ class Api {
 
   Future<CallInfo> acceptCall(String id) async => CallInfo.fromJson(await _post('/calls/$id/accept'));
 
+  // Ses/görüntü motoru Agora kanalına gerçekten katıldığında çağrılır (Faz 15: adil ücretlendirme)
+  Future<void> confirmCallJoined(String id) => _post('/calls/$id/joined');
+
   // Çalarken arayan: iptal · aranan: ret · görüşmede: bitir
   Future<CallInfo> hangUp(String id) async => CallInfo.fromJson(await _post('/calls/$id/hangup'));
 

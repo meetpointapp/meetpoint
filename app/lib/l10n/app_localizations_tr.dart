@@ -1061,6 +1061,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get callEndedDisconnect => 'Bağlantı koptuğu için arama sona erdi.';
 
   @override
+  String get callEndedConnectFailed => 'Bağlantı kurulamadı, ücret alınmadı.';
+
+  @override
   String get callMissed => 'Cevapsız arama';
 
   @override

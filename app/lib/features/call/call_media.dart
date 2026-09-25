@@ -13,6 +13,10 @@ abstract class CallMediaEngine {
   // Karşı taraf kanala katıldı mı (görüntüsü hazır mı)
   ValueNotifier<bool> get remoteJoined;
 
+  // Kendi tarafımız Agora kanalına gerçekten katıldı mı (Faz 15: adil ücretlendirme sunucuya bununla
+  // bildirilir). Simülasyonda start() dönünce anında tamamlanır.
+  Future<void> get joined;
+
   Future<void> start({required CallMedia? media, required bool video});
   Future<void> setMuted(bool muted);
   Future<void> setCameraOn(bool on);
@@ -33,6 +37,8 @@ class _SimulatedMedia implements CallMediaEngine {
   final remoteJoined = ValueNotifier(true);
   @override
   bool get isReal => false;
+  @override
+  Future<void> get joined => Future.value();
   @override
   Future<void> start({required CallMedia? media, required bool video}) async {}
   @override

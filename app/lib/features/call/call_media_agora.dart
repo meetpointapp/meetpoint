@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -15,12 +17,18 @@ class _AgoraMedia implements CallMediaEngine {
   RtcEngine? _engine;
   String _channel = '';
   int? _remoteUid;
+  final _joined = Completer<void>();
 
   @override
   final remoteJoined = ValueNotifier(false);
 
   @override
   bool get isReal => true;
+
+  // Agora sunucusunun "kanala gerçekten katıldın" onayı (onJoinChannelSuccess); sadece istemcinin
+  // joinChannel() çağırması yetmez, bu olayı beklemek gerekir (Faz 15: adil ücretlendirme).
+  @override
+  Future<void> get joined => _joined.future;
 
   @override
   Future<void> start({required CallMedia? media, required bool video}) async {
@@ -35,6 +43,9 @@ class _AgoraMedia implements CallMediaEngine {
       channelProfile: ChannelProfileType.channelProfileCommunication,
     ));
     engine.registerEventHandler(RtcEngineEventHandler(
+      onJoinChannelSuccess: (_, _) {
+        if (!_joined.isCompleted) _joined.complete();
+      },
       onUserJoined: (_, uid, _) {
         _remoteUid = uid;
         remoteJoined.value = true;

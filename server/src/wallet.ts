@@ -149,6 +149,54 @@ export async function reclaimEarnings(tx: Tx, buyerId: string, coins: number, si
   return { reclaimed: coins - left, users: [...touched] };
 }
 
+// Arama ücretinin tamamını veya bir kısmını geri al (Faz 15: adil ücretlendirme). Her ücretlendirilen
+// dakika, arayanın cüzdanından TAM O DAKİKANIN kova karışımıyla (paid/promo/earned/earnedPromo)
+// düşülmüştü; iade de aynı karışımla tersine çevrilir — bonus jetonla ödenen bir dakikanın iadesi
+// yanlışlıkla "gerçek" (cashable'a yakın) jetona dönüşmez. Alıcıdan da aynı oranda (mümkün olduğunca)
+// geri alınır; en yeni ücretlendirilen dakikadan başlar. Karşı tarafın parası yoksa (zaten harcanmış)
+// elde ne kalmışsa o kadar geri alınır, fark WalletEntry.reclaimedCoins'te iz olarak kalır.
+export async function refundCallCharge(tx: Tx, callId: string, callerId: string, calleeId: string, refundCoins: number) {
+  if (refundCoins <= 0) return;
+  for (const id of [callerId, calleeId].sort()) await lockWallet(tx, id);
+  const debits = await tx.walletEntry.findMany({ where: { userId: callerId, type: 'CALL', note: `call:${callId}` }, orderBy: { createdAt: 'desc' } });
+  const credits = await tx.walletEntry.findMany({ where: { userId: calleeId, type: 'EARN', note: `call:${callId}` }, orderBy: { createdAt: 'desc' } });
+
+  let left = refundCoins;
+  for (let i = 0; i < debits.length && left > 0; i++) {
+    const d = debits[i];
+    const charged = -d.amount; // debit.amount negatiftir
+    if (charged <= 0) continue;
+    const take = Math.min(left, charged);
+    const frac = take / charged;
+
+    const refundBuckets: Buckets = {
+      paid: Math.round(-d.paid * frac),
+      promo: Math.round(-d.promo * frac),
+      earned: Math.round(-d.earned * frac),
+      earnedPromo: Math.round(-d.earnedPromo * frac),
+    };
+    // Bağımsız yuvarlamalar toplamı "take"ten sapabilir: farkı en büyük kovadan düzelt
+    const diff = take - total(refundBuckets);
+    if (diff !== 0) {
+      const biggest = BUCKETS.reduce((a, b) => (refundBuckets[b] > refundBuckets[a] ? b : a));
+      refundBuckets[biggest] += diff;
+    }
+    await credit(tx, callerId, refundBuckets, 'CALL_REFUND', { note: `call:${callId}`, counterpartyId: calleeId });
+
+    const e = credits[i];
+    if (e) {
+      const w = await getBuckets(calleeId, tx);
+      const takeEarned = Math.min(Math.round(e.earned * frac), e.earned - e.reclaimedCoins, Math.max(0, w.earned));
+      const takeEarnedPromo = Math.min(Math.round(e.earnedPromo * frac), Math.max(0, w.earnedPromo));
+      if (takeEarned > 0 || takeEarnedPromo > 0) {
+        await apply(tx, calleeId, { ...ZERO, earned: -takeEarned, earnedPromo: -takeEarnedPromo }, 'CALL_REFUND_CLAWBACK', { note: `call:${callId}`, counterpartyId: callerId });
+        if (takeEarned > 0) await tx.walletEntry.update({ where: { id: e.id }, data: { reclaimedCoins: { increment: takeEarned } } });
+      }
+    }
+    left -= take;
+  }
+}
+
 // Bloke edilen (HOLD) kaydın kova dağılımı. Kova sütunlarından önceki eski kayıtlar tamamen "paid" sayılır.
 export function heldBuckets(hold: Pick<WalletEntry, 'amount' | 'paid' | 'promo' | 'earned' | 'earnedPromo'>): Buckets {
   const b = negate(hold);
