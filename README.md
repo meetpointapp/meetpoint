@@ -95,6 +95,16 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## Gerçek zamanlı iletişim (Faz 15)
+
+- **Adil ücretlendirme** (`src/calls.ts`): kabulden sonra Agora'ya gerçek bağlanma `POST /calls/:id/joined` ile doğrulanır; bağlantı kurulmazsa (`mediaConfirmDeadline` dolarsa) ücret alınmaz. Kapanışta kalan saniyeler için orantılı kısmi dakika iadesi (`partialRefund` → `refundCallCharge`), hem ödeyenin hem alıcının olgunlaşmamış kazancının aynı oranda geri alınmasıyla.
+- **Jeton yenileme ve yeniden bağlanma** (`app/lib/features/call/call_media_agora.dart`): Agora jetonu süresi dolmadan yenilenir, ağ kalitesi göstergesi ve zayıf bağlantı uyarısı, koptuğunda otomatik yeniden katılma.
+- **Mesaj teslim garantisi** (`app/lib/features/chat/message_outbox.dart`, `src/routes/conversations.ts`): çevrimdışı kuyruk (diske yazılır) + `Idempotency-Key` ile çift gönderim önleme; sunucuda "iletildi" (`deliveredAt`) durumu "okundu"dan ayrı.
+- **Push güvenilirliği** (`src/notify.ts`): arama bildirimleri yüksek öncelikli veri-only; bildirime dokununca doğru ekrana derin bağlantı; rozet sayacı.
+- **Yerel gelen arama ekranı** (`app/lib/features/call/native_call_ui.dart`, `src/voip.ts`, iOS `AppDelegate.swift`): Android tam ekran bildirim, iOS CallKit + kendi yazdığımız APNs VoIP push gönderici (`flutter_callkit_incoming`). Gerçek cihazda doğrulama Faz 17'de.
+- **Arama itirazı** (`src/calls.ts` dispute fonksiyonları, `src/routes/adminFinance.ts`): arama geçmişinden "yanlış ücret alındı" bildirimi; panel → Finans → Arama itirazları; onayda kalan tutar arayana iade edilir.
+- Arayüz turu: `tools/ui-tours/faz15.mjs`.
+
 ## Tüketici ve destek (Faz 14)
 
 - **Satın alma öncesi onay** (`src/consumer/salesTerms.ts`): ön bilgilendirme (`/legal/preinfo`) + mesafeli satış (`/legal/distance-sales`) + cayma istisnası, ilk alımdan önce bir kez. Sürüm: `config.consumer.salesTermsVersion` (değiştirince herkese yeniden sorulur).
@@ -263,7 +273,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17)
 - [x] **Faz 12 · İçerik güvenliği, moderasyon ve 5651:** trafik logları, görsel moderasyon katmanı, arama ve sohbet güvenliği, kaldırma süreçleri
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
-- [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
+- [x] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
 - [ ] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 17 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 

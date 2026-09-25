@@ -31,6 +31,7 @@ Ekran görüntüleri `shots/` klasörüne düşer (git'e girmez). Kolaj: `node c
 | `badge.mjs` | Mavi tik görünümü |
 | `faz3.mjs` … `faz7.mjs` | İlgili fazın akışları |
 | `faz14.mjs`, `web14.mjs` | Satın alma onayı, bildirimler, yardım ve destek, panel Destek sekmesi, web sayfaları |
+| `faz15.mjs` | Arama + hemen kapatma (adil ücretlendirme), arama geçmişinden itiraz, sohbette mesaj gönderme |
 | `admin.mjs` | Yönetim paneli |
 | `icon.mjs` | Uygulama ikonunu üretir (`app/assets/icon`) |
 | `collage*.mjs` | Faz önizleme kolajları |

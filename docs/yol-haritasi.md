@@ -32,8 +32,8 @@ Her fazda en az 5 adım var. İşaretler:
 | 8 | Cinsel yönelim ve selfie için ayrı açık rıza yok | KVKK md. 6 özel nitelikli veri | 11 |
 | 9 | Koşullar sürümü değişince yeniden onay istenmiyor | Güncel koşulları kabul etmemiş kullanıcılar | 11 |
 | 10 | Kazanç anında çekilebiliyor | Alıcı mağazadan iade alırsa para kaybı (iade dolandırıcılığı) | 13 |
-| 11 | Agora jetonu 1 saat geçerli, yenilenmiyor | 1 saatten uzun aramalar kopar | 15 |
-| 12 | Uygulama kapalıyken gelen arama sadece bildirim olarak düşüyor | Aramaların çoğu kaçırılır | 15 |
+| 11 | ~~Agora jetonu 1 saat geçerli, yenilenmiyor~~ | ✅ Faz 15'te çözüldü (süresi dolmadan yenileme) | 15 |
+| 12 | ~~Uygulama kapalıyken gelen arama sadece bildirim olarak düşüyor~~ | ✅ Faz 15'te çözüldü (yerel arama ekranı, best-effort) | 15 |
 
 ### Faz 8'de bulunanlar
 
@@ -97,6 +97,29 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
 **Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
+
+### Faz 15'te bulunanlar
+
+Faz 15 tamamlandı. Sunucuda 134 test (32 dosya), uygulamada 46 test (6 dosya); tam takım temiz. Ayrıca arayüz turu `tools/ui-tours/faz15.mjs` (arama → hemen kapatma → itiraz açma → sohbet akışını gerçek bir tarayıcıda, derlenmiş web sürümüyle çalıştırır) sayfa hatası vermeden tamamlandı.
+
+**Kullanıcı kararları:** iOS CallKit/PushKit kodu bu ortamda derlenip Xcode'da çalıştırılamasa da yazıldı, gerçek cihaz doğrulaması Faz 17'ye bırakıldı; kısmi dakika iadesi saniye bazlı orantılı hesaplanır (sadece "tam dakikanın altı ücretsiz" değil); arama itirazı onaylanırsa iade arayana yapılır, alıcının henüz olgunlaşmamış kazancı geri alınır, olgunlaşmış kazanca dokunulmaz.
+
+**Yapılanlar:**
+- **Adil ücretlendirme:** `POST /calls/:id/joined` ile Agora'ya gerçekten bağlanma sunucuya bildirilir; Agora yapılandırılmışsa kabul sonrası bir bağlanma süresi tanınır, süre dolar da kimse bağlanmazsa çağrı ücretsiz `connect_failed` ile kapanır. Kapanışta kısmi dakikanın kalan saniyesi orantılı olarak iade edilir; iade hem arayanın ödediği kovalardan (jeton/promosyon/kazanç) aynı oranda düşülür hem de alıcının o çağrıdan gelen olgunlaşmamış kazancından aynı oranda geri alınır — böylece promosyon jetonuyla yapılan ödemelerde "kayıp jeton" oluşmuyor.
+- **Uzun ve kesintisiz aramalar:** Agora jetonu süresi dolmadan yenileniyor (`onTokenPrivilegeWillExpire` → `renewToken`); ağ kalitesi göstergesi ve zayıf bağlantı uyarısı; bağlantı koptuğunda otomatik yeniden katılma denemesi.
+- **Mesaj teslim garantisi:** Uygulama içi çevrimdışı kuyruk (`MessageOutbox`, diske yazılır), `Idempotency-Key` ile tekrar denemede çift gönderim yok, sunucu "iletildi" (`deliveredAt`) durumunu "okundu"dan ayrı tutuyor, sohbet balonunda gönderiliyor/iletildi/okundu/başarısız simgeleri.
+- **Push güvenilirliği:** Arama bildirimleri yüksek öncelikli ve veri-only (arka planda uyandırma), rozet sayacı sunucuda hesaplanıp gönderiliyor, bildirime dokununca doğru ekrana (sohbet, arama geçmişi, profil) derin bağlantı.
+- **Yerel gelen arama ekranı:** Android'de tam ekran gelen arama bildirimi, iOS'ta VoIP push (kendi yazdığımız APNs http/2 gönderici, ek paket gerekmedi) + CallKit/PushKit (`flutter_callkit_incoming`); kapalı/arka plandaki uygulamada da arama Firebase arka plan işleyicisiyle yakalanıyor.
+- **Arama itirazı:** Arama geçmişinden "yanlış ücret alındı" bildirimi (sadece biten aramada, sadece ücreti ödeyen taraf, aynı arama için tek sefer); yönetim panelinde Finans → Arama itirazları kuyruğu (bekleyen/onaylanan/reddedilen), onayda kalan tutar (daha önce otomatik iade edilmemiş kısım) arayana iade edilir, reddte gerekçe zorunlu.
+- **Emülatör/simülatör testleri:** Gerçek Android/iOS cihazı ve Xcode/emülatör bu bulut ortamında yok; bunun yerine `flutter build web --release` ile tam derleme + gerçek (headless) Chromium'da arayüz turu koşuldu. iOS native (Swift/CallKit/PushKit) kodu derlenip çalıştırılamadı, sadece yazıldı ve pub cache'teki gerçek paket kaynak koduna göre elden geçirildi; gerçek cihaz matrisi zaten planlandığı gibi Faz 17'de.
+
+**Bulunan hatalar (test yazılırken, testten önce):**
+- İlk tasarımda `refundCallCharge` iadeyi genel bir kovaya yazıp alıcıdan sadece "kazanç" kovasından geri alıyordu; ödeme promosyon jetonuyla yapılmışsa alıcının kazancı yanlış kovadan (veya hiç) geri alınmıyor, sistemden jeton "sızıyordu". Düzeltme: iade, orijinal ödemenin kova oranlarını birebir yansıtıyor.
+- `endCall` ile zamanlayıcının eşzamanlı dakika ücretlendirmesi arasında yarış durumu vardı; `endCall` artık satır kilidiyle (`SELECT ... FOR UPDATE`) bir işlemde çalışıyor.
+- Aynı arama için hem otomatik kısmi dakika iadesi hem de sonradan onaylanan bir itiraz iadesi tetiklenirse çift iade riski vardı; `WalletEntry`'ye `reclaimedCoins`/`reclaimedPromo`/`refundedCoins` alanları eklenerek her iade "kalan iade edilebilir tutar"ı hesaplıyor.
+- `flutter_callkit_incoming` paketinin README'si güncel değil (eski düz `Event`/`body` API'sini anlatıyor); gerçek 3.1.6 kaynağı `entities/entities.dart`'taki mühürlü `CallEvent` sınıflarını kullanıyor, `flutter analyze` bu farkı yakaladı ve koda göre düzeltildi.
+
+**Test ortamı notu:** Bu bulut ortamında `www.gstatic.com` (Flutter CanvasKit CDN'i) ve Google Fonts CDN'ine ağ erişimi kapalı; arayüz turu bu yüzden derlemeyi CanvasKit'in yerel `canvaskit/` klasörünü kullanacak şekilde (sadece test derlemesinde, kaynak kodda değil) ayarlayarak koşuldu. Ekran görüntülerinde bu nedenle bazı yazı tipleri yüklenemedi; gerçek kullanıcı ağında (veya kendi fontlarımız pakete gömülürse) bu sorun oluşmaz — Faz 16'da değerlendirilebilir.
 
 ### Faz 14'te bulunanlar
 
@@ -263,17 +286,17 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. ✅ **Bildirim tercihleri ve İYS uyumu.** Bildirim türü bazında açma/kapama; pazarlama iletileri için ayrı izin kaydı.
 7. ✅ **Mağaza form içerikleri.** Gizlilik etiketleri, Veri Güvenliği formu ve yaş derecelendirme cevapları (Faz 11 envanterinden); inceleme notu ve demo hesap.
 
-## Faz 15 · Gerçek zamanlı iletişimde üretim kalitesi
+## Faz 15 · Gerçek zamanlı iletişimde üretim kalitesi ✅
 
 **Amaç:** Arama ve mesajlaşmanın zayıf internette ve uygulama kapalıyken kusursuz çalışması; haksız ücret kesilmemesi.
 
-1. 🛠 **Yerel gelen arama ekranı.** iOS'ta CallKit ve PushKit, Android'de tam ekran bildirim; kapalı uygulamada da arama çalar.
-2. 🛠 **Adil ücretlendirme.** Agora sunucu olaylarıyla iki tarafın gerçekten bağlandığı doğrulanır. Bağlantı kurulmazsa ücret alınmaz. Kopmada net kısmi dakika kuralı.
-3. 🛠 **Uzun ve kesintisiz aramalar.** Agora jetonu yenileme, ağ değişiminde yeniden bağlanma, bağlantı kalitesi göstergesi.
-4. 🛠 **Mesaj teslim garantisi.** Çevrimdışı kuyruk, tekrar deneme, çift gönderim önleme, "iletildi" durumu, sıra garantisi.
-5. 🛠 **Push güvenilirliği.** Yüksek öncelik, bildirimden doğru ekrana derin bağlantı, rozet sayaçları.
-6. 🛠 **Arama itirazı.** Geçmişten hatalı ücret bildirimi, panelde inceleme ve jeton iadesi.
-7. 🛠 **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 17'de.
+1. ✅ **Yerel gelen arama ekranı.** iOS'ta CallKit ve PushKit, Android'de tam ekran bildirim; kapalı uygulamada da arama çalar. ⏭ Gerçek cihazda doğrulama Faz 17'de.
+2. ✅ **Adil ücretlendirme.** Agora sunucu olaylarıyla iki tarafın gerçekten bağlandığı doğrulanır. Bağlantı kurulmazsa ücret alınmaz. Kopmada net kısmi dakika kuralı.
+3. ✅ **Uzun ve kesintisiz aramalar.** Agora jetonu yenileme, ağ değişiminde yeniden bağlanma, bağlantı kalitesi göstergesi.
+4. ✅ **Mesaj teslim garantisi.** Çevrimdışı kuyruk, tekrar deneme, çift gönderim önleme, "iletildi" durumu, sıra garantisi.
+5. ✅ **Push güvenilirliği.** Yüksek öncelik, bildirimden doğru ekrana derin bağlantı, rozet sayaçları.
+6. ✅ **Arama itirazı.** Geçmişten hatalı ücret bildirimi, panelde inceleme ve jeton iadesi.
+7. ✅ **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 17'de.
 
 ## Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans
 
