@@ -57,6 +57,8 @@ class PublicProfile {
   final String avatarAccessoryId;
   // Faz 16: "Kendini Keşfet" vibe sistemi. '' = testi henüz tamamlamamış.
   final String vibeArchetypeId;
+  // Faz 16: günlük ruh hali. '' = paylaşmamış veya 24 saat dolmuş (sunucu hesaplar).
+  final String moodId;
 
   const PublicProfile({
     required this.id,
@@ -88,6 +90,7 @@ class PublicProfile {
     this.avatarOutfitId = '',
     this.avatarAccessoryId = '',
     this.vibeArchetypeId = '',
+    this.moodId = '',
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
@@ -124,16 +127,20 @@ class PublicProfile {
         avatarOutfitId: j['avatarOutfitId'] ?? '',
         avatarAccessoryId: j['avatarAccessoryId'] ?? '',
         vibeArchetypeId: j['vibeArchetypeId'] ?? '',
+        moodId: j['moodId'] ?? '',
       );
 }
 
 class MyProfile extends PublicProfile {
   final String interestedIn;
   final DateTime birthDate;
+  // Faz 16: günlük ruh hali. Sadece sahibine döner (başkası sadece moodId'yi görür).
+  final DateTime? moodExpiresAt;
 
   MyProfile.fromJson(Map<String, dynamic> j)
       : interestedIn = j['interestedIn'],
         birthDate = DateTime.parse(j['birthDate']),
+        moodExpiresAt = j['moodExpiresAt'] != null ? DateTime.parse(j['moodExpiresAt']).toLocal() : null,
         super(
           id: j['id'],
           verified: j['verified'] ?? false,
@@ -161,6 +168,7 @@ class MyProfile extends PublicProfile {
           avatarOutfitId: j['avatarOutfitId'] ?? '',
           avatarAccessoryId: j['avatarAccessoryId'] ?? '',
           vibeArchetypeId: j['vibeArchetypeId'] ?? '',
+          moodId: j['moodId'] ?? '',
         );
 }
 

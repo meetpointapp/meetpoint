@@ -170,6 +170,11 @@ model Profile {
   vibeAnswers     Json   @default("{}")
   vibeArchetypeId String @default("")
 
+  // Faz 16: günlük ruh hali. 24 saat sonra kendiliğinden "biter" (moodSetAt + MOOD_TTL_MS);
+  // ayrı bir temizlik işi yok, geçerliliği her okumada src/routes/profile.ts activeMood() hesaplar.
+  moodId    String    @default("")
+  moodSetAt DateTime?
+
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
   longitude  Float?

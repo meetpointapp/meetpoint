@@ -2309,4 +2309,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vibeFinish => 'Finish';
+
+  @override
+  String moodLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'happy': 'Happy',
+      'excited': 'Excited',
+      'relaxed': 'Relaxed',
+      'romantic': 'In love',
+      'tired': 'Tired',
+      'stressed': 'Stressed',
+      'grateful': 'Grateful',
+      'adventurous': 'Adventurous',
+      'lonely': 'Lonely',
+      'busy': 'Busy',
+      'hopeful': 'Hopeful',
+      'bored': 'Bored',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get moodSection => 'Your mood';
+
+  @override
+  String get moodTitle => 'How are you today?';
+
+  @override
+  String get moodPromptBanner =>
+      'How are you feeling today? Share it so your matches can see.';
+
+  @override
+  String get moodNotSet => 'You haven\'t shared your mood today.';
+
+  @override
+  String get moodClear => 'Remove';
+
+  @override
+  String get moodChange => 'Change';
 }

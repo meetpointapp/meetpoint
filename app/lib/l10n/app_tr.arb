@@ -1153,5 +1153,19 @@
   "vibeRetake": "Yeniden yap",
   "vibeNotTaken": "Henüz vibe testini tamamlamadın.",
   "vibeCompatTitle": "Uyum notu",
-  "vibeFinish": "Bitir"
+  "vibeFinish": "Bitir",
+  "moodLabel": "{id, select, happy{Mutlu} excited{Heyecanlı} relaxed{Sakin} romantic{Aşık} tired{Yorgun} stressed{Stresli} grateful{Minnettar} adventurous{Maceraperest} lonely{Yalnız} busy{Meşgul} hopeful{Umutlu} bored{Sıkılmış} other{{id}}}",
+  "@moodLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "moodSection": "Ruh halin",
+  "moodTitle": "Bugün nasılsın?",
+  "moodPromptBanner": "Bugün nasıl hissediyorsun? Paylaş, eşleştiklerin görsün.",
+  "moodNotSet": "Bugün ruh halini henüz paylaşmadın.",
+  "moodClear": "Kaldır",
+  "moodChange": "Değiştir"
 }

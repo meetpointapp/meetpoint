@@ -98,6 +98,13 @@ void main() {
       final withVibe = PublicProfile.fromJson({...profileJson(), 'vibeArchetypeId': 'ozgur_ruh'});
       expect(withVibe.vibeArchetypeId, 'ozgur_ruh');
     });
+
+    test('Faz 16 günlük ruh hali: eski yanıtta (alan yok) boş, yeni yanıtta ayrıştırılır', () {
+      final legacy = PublicProfile.fromJson(profileJson());
+      expect(legacy.moodId, '');
+      final withMood = PublicProfile.fromJson({...profileJson(), 'moodId': 'happy'});
+      expect(withMood.moodId, 'happy');
+    });
   });
 
   group('Vitrin kataloğu (Faz 16)', () {

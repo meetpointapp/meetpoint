@@ -278,6 +278,9 @@ class Api {
   Future<VibeResult> myVibe() async => VibeResult.fromJson(await _get('/me/vibe'));
   Future<String> saveVibe(Map<String, String> answers) async => (await _put('/me/vibe', answers))['archetypeId'];
 
+  Future<void> setMood(String moodId) => _put('/me/mood', {'moodId': moodId});
+  Future<void> clearMood() => _delete('/me/mood');
+
   // Keşfet
   Future<List<PublicProfile>> discover() async =>
       [for (final p in (await _get('/discover') as List)) PublicProfile.fromJson(p)];

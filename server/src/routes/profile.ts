@@ -16,6 +16,8 @@ import {
   LOOKING_FOR,
   MAX_INTERESTS,
   MAX_PROMPTS,
+  MOOD_TTL_MS,
+  MOODS,
   PROMPTS,
   ROOM_FLOORS,
   ROOM_GRID_H,
@@ -50,6 +52,15 @@ const upload = multer({
   fileFilter: (_req, file, cb) => cb(null, /^image\/(jpeg|png|webp|heic|heif)$/.test(file.mimetype)),
 });
 
+
+// Faz 16: günlük ruh hali. 24 saat sonra "biter" — burada okuma anında hesaplanır, ayrı bir
+// temizlik işi yok. moodExpiresAt sadece sahibine döner (başkası sadece geçerli moodId'yi görür).
+function activeMood(p: Pick<Profile, 'moodId' | 'moodSetAt'>): { moodId: string; moodExpiresAt: Date | null } {
+  if (!p.moodId || !p.moodSetAt) return { moodId: '', moodExpiresAt: null };
+  const expiresAt = new Date(p.moodSetAt.getTime() + MOOD_TTL_MS);
+  if (expiresAt <= new Date()) return { moodId: '', moodExpiresAt: null };
+  return { moodId: p.moodId, moodExpiresAt: expiresAt };
+}
 
 // viewer verilirse kullanıcıya olan yaklaşık mesafe (km) de eklenir; tam konum asla dönmez
 export function publicProfile(
@@ -91,6 +102,8 @@ export function publicProfile(
     avatarOutfitId: p.avatarOutfitId,
     avatarAccessoryId: p.avatarAccessoryId,
     vibeArchetypeId: p.vibeArchetypeId,
+    moodId: activeMood(p).moodId,
+    ...(opts.owner ? { moodExpiresAt: activeMood(p).moodExpiresAt } : {}),
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
       .filter((ph) => opts.owner || !ph.hiddenAt)
@@ -286,6 +299,20 @@ profileRouter.put('/me/vibe', requireNotRestricted, async (req, res) => {
   const archetypeId = computeArchetype(answers, p.interests as string[]);
   await prisma.profile.update({ where: { userId }, data: { vibeAnswers: answers, vibeArchetypeId: archetypeId } });
   res.json({ archetypeId });
+});
+
+// Faz 16: günlük ruh hali. Serbest metin yok, sadece küçük bir katalogdan seçim; 24 saatte kaybolur.
+const moodSchema = z.object({ moodId: z.enum(MOODS) });
+
+profileRouter.put('/me/mood', requireNotRestricted, async (req, res) => {
+  const { moodId } = moodSchema.parse(req.body);
+  await prisma.profile.update({ where: { userId: uid(req) }, data: { moodId, moodSetAt: new Date() } });
+  res.json({ ok: true });
+});
+
+profileRouter.delete('/me/mood', async (req, res) => {
+  await prisma.profile.update({ where: { userId: uid(req) }, data: { moodId: '', moodSetAt: null } });
+  res.json({ ok: true });
 });
 
 profileRouter.put('/me/locale', async (req, res) => {

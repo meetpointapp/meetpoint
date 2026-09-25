@@ -13,6 +13,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../profile/mood_widgets.dart';
 import '../profile/profile_widgets.dart';
 import '../profile/request_actions.dart';
 
@@ -288,7 +289,41 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           IconButton(onPressed: _openFilters, icon: const Icon(Icons.tune_rounded), tooltip: l.filters),
         ],
       ),
-      body: SafeArea(top: false, child: body),
+      body: SafeArea(top: false, child: Column(children: [const _MoodBanner(), Expanded(child: body)])),
+    );
+  }
+}
+
+// Faz 16: günlük ruh hali "günlük açılışı tetikler" — kaydırma ekranının en üstünde, ruh halini
+// bugün paylaşmamışsan kompakt bir davet çıkar; paylaşınca kaybolur.
+class _MoodBanner extends ConsumerWidget {
+  const _MoodBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final moodId = ref.watch(meProvider).value?.profile?.moodId ?? '';
+    if (moodId.isNotEmpty) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => showMoodSheet(context, ref),
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Brand.radius),
+            color: Brand.coral.withValues(alpha: 0.08),
+          ),
+          child: Row(children: [
+            const Text('💭', style: TextStyle(fontSize: 18)),
+            const SizedBox(width: 10),
+            Expanded(child: Text(l.moodPromptBanner, style: theme.textTheme.bodySmall)),
+            const Icon(Icons.chevron_right_rounded, size: 18),
+          ]),
+        ),
+      ),
     );
   }
 }

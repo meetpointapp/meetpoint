@@ -128,3 +128,20 @@ const roomItemEmoji = <String, String>{
   'picture': '🖼️',
 };
 List<String> get roomItemIds => roomItemEmoji.keys.toList();
+
+// Faz 16: günlük ruh hali. Serbest metin yok, sadece küçük bir katalog; 24 saatte kaybolur.
+const moodEmoji = <String, String>{
+  'happy': '😊',
+  'excited': '🤩',
+  'relaxed': '😌',
+  'romantic': '🥰',
+  'tired': '😴',
+  'stressed': '😣',
+  'grateful': '🙏',
+  'adventurous': '🤠',
+  'lonely': '🥺',
+  'busy': '🏃',
+  'hopeful': '🌱',
+  'bored': '🥱',
+};
+List<String> get moodIds => moodEmoji.keys.toList();

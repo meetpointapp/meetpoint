@@ -47,3 +47,11 @@ export const ROOM_ITEMS = ['sofa', 'bed', 'plant', 'lamp', 'tv', 'bookshelf', 't
 export const ROOM_GRID_W = 4;
 export const ROOM_GRID_H = 5;
 export const ROOM_MAX_ITEMS = 12;
+
+// Faz 16: günlük ruh hali. Serbest metin yok (moderasyon gerektirmez); 24 saatte kendiliğinden
+// kaybolur (bkz. src/routes/profile.ts activeMood()). Emoji uygulamada core/catalog.dart'ta.
+export const MOODS = [
+  'happy', 'excited', 'relaxed', 'romantic', 'tired', 'stressed',
+  'grateful', 'adventurous', 'lonely', 'busy', 'hopeful', 'bored',
+] as const;
+export const MOOD_TTL_MS = 24 * 60 * 60 * 1000;

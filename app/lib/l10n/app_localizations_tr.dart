@@ -2294,4 +2294,43 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get vibeFinish => 'Bitir';
+
+  @override
+  String moodLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'happy': 'Mutlu',
+      'excited': 'Heyecanlı',
+      'relaxed': 'Sakin',
+      'romantic': 'Aşık',
+      'tired': 'Yorgun',
+      'stressed': 'Stresli',
+      'grateful': 'Minnettar',
+      'adventurous': 'Maceraperest',
+      'lonely': 'Yalnız',
+      'busy': 'Meşgul',
+      'hopeful': 'Umutlu',
+      'bored': 'Sıkılmış',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get moodSection => 'Ruh halin';
+
+  @override
+  String get moodTitle => 'Bugün nasılsın?';
+
+  @override
+  String get moodPromptBanner =>
+      'Bugün nasıl hissediyorsun? Paylaş, eşleştiklerin görsün.';
+
+  @override
+  String get moodNotSet => 'Bugün ruh halini henüz paylaşmadın.';
+
+  @override
+  String get moodClear => 'Kaldır';
+
+  @override
+  String get moodChange => 'Değiştir';
 }

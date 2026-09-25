@@ -3734,6 +3734,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bitir'**
   String get vibeFinish;
+
+  /// No description provided for @moodLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, happy{Mutlu} excited{Heyecanlı} relaxed{Sakin} romantic{Aşık} tired{Yorgun} stressed{Stresli} grateful{Minnettar} adventurous{Maceraperest} lonely{Yalnız} busy{Meşgul} hopeful{Umutlu} bored{Sıkılmış} other{{id}}}'**
+  String moodLabel(String id);
+
+  /// No description provided for @moodSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh halin'**
+  String get moodSection;
+
+  /// No description provided for @moodTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün nasılsın?'**
+  String get moodTitle;
+
+  /// No description provided for @moodPromptBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün nasıl hissediyorsun? Paylaş, eşleştiklerin görsün.'**
+  String get moodPromptBanner;
+
+  /// No description provided for @moodNotSet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün ruh halini henüz paylaşmadın.'**
+  String get moodNotSet;
+
+  /// No description provided for @moodClear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldır'**
+  String get moodClear;
+
+  /// No description provided for @moodChange.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değiştir'**
+  String get moodChange;
 }
 
 class _AppLocalizationsDelegate

@@ -149,6 +149,14 @@ class _ProfileBody extends ConsumerWidget {
                     Text(l.activeNow, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
                   ]),
                 ],
+                if (p.moodId.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(moodEmoji[p.moodId] ?? '', style: const TextStyle(fontSize: 14)),
+                    const SizedBox(width: 6),
+                    Text(l.moodLabel(p.moodId), style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
+                  ]),
+                ],
               ]),
             ),
             // Kişisel profil vitrini: özel bir renk seçilmişse alt kenarda ince bir vurgu şeridi

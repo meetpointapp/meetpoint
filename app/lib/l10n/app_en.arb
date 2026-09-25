@@ -604,5 +604,12 @@
   "vibeRetake": "Retake the quiz",
   "vibeNotTaken": "You haven't taken the vibe quiz yet.",
   "vibeCompatTitle": "Compatibility note",
-  "vibeFinish": "Finish"
+  "vibeFinish": "Finish",
+  "moodLabel": "{id, select, happy{Happy} excited{Excited} relaxed{Relaxed} romantic{In love} tired{Tired} stressed{Stressed} grateful{Grateful} adventurous{Adventurous} lonely{Lonely} busy{Busy} hopeful{Hopeful} bored{Bored} other{{id}}}",
+  "moodSection": "Your mood",
+  "moodTitle": "How are you today?",
+  "moodPromptBanner": "How are you feeling today? Share it so your matches can see.",
+  "moodNotSet": "You haven't shared your mood today.",
+  "moodClear": "Remove",
+  "moodChange": "Change"
 }

@@ -10,6 +10,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import 'mood_widgets.dart';
 import 'profile_fields.dart';
 import 'profile_widgets.dart';
 import 'vibe_screen.dart';
@@ -151,6 +152,9 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 const SizedBox(height: 8),
                 _SectionTitle(l.vibeSection),
                 _VibeSummary(),
+                const SizedBox(height: 8),
+                _SectionTitle(l.moodSection),
+                _MoodSummary(),
               ]),
       ),
     );
@@ -215,10 +219,14 @@ class _VibeSummary extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final archetypeId = ref.watch(meProvider).value?.profile?.vibeArchetypeId ?? '';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      if (archetypeId.isNotEmpty)
-        VibeCard(archetypeId: archetypeId)
-      else
-        Text(l.vibeIntro, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      // Semantics(container: true): bir sonraki OutlinedButton'ın erişilebilirlik etiketine
+      // karışmasın diye kendi ayrı düğümünde kalır (bitişik metin+düğme birleştirilebiliyor).
+      Semantics(
+        container: true,
+        child: archetypeId.isNotEmpty
+            ? VibeCard(archetypeId: archetypeId)
+            : Text(l.vibeIntro, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      ),
       const SizedBox(height: 10),
       OutlinedButton(
         onPressed: () async {
@@ -226,6 +234,31 @@ class _VibeSummary extends ConsumerWidget {
           ref.invalidate(meProvider);
         },
         child: Text(archetypeId.isEmpty ? l.vibeStart : l.vibeRetake),
+      ),
+    ]);
+  }
+}
+
+// Faz 16: günlük ruh hali. ProfileDraft'ta yok (ayrı uçtan /me/mood ile kaydedilir, "Kaydet"
+// gerektirmez); en güncel durum için meProvider'ı doğrudan izler.
+class _MoodSummary extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final moodId = ref.watch(meProvider).value?.profile?.moodId ?? '';
+    return Row(children: [
+      Expanded(
+        // Semantics(container: true): "Değiştir" düğmesinin erişilebilirlik etiketine karışmasın
+        child: Semantics(
+          container: true,
+          child: moodId.isNotEmpty
+              ? MoodBadge(moodId: moodId)
+              : Text(l.moodNotSet, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        ),
+      ),
+      OutlinedButton(
+        onPressed: () => showMoodSheet(context, ref),
+        child: Text(moodId.isEmpty ? l.moodTitle : l.moodChange),
       ),
     ]);
   }
