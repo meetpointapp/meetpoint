@@ -265,7 +265,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19)
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [ ] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
 - [ ] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar (Sanalika esinli, statik), günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (MeetPoint+), mikro-etkileşimler
-- [ ] **Faz 17 · Oyunlaştırma ve alışkanlık:** giriş serisi, rozetler, sosyal seviye, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet
+- [ ] **Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme:** giriş serisi, rozetler, sosyal seviye, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet, davet programı, paylaşılabilir anlar, oda galerisi, kişisel bağlantı linki
 - [ ] **Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 19 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 

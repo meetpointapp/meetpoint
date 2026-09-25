@@ -287,9 +287,9 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. 🛠 **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden aylık abonelik ürünü (mevcut IAP altyapısına ek). Perkler (seni beğenenler her zaman açık, sınırsız geri alma, indirimli öne çıkarma vb.) ve fiyat, fazın başında karar sorularıyla netleşir.
 7. 🛠 **Cilalı mikro-etkileşimler.** Geçiş animasyonları, haptik geri bildirim, ses tasarımı; bu fazdaki ve var olan tüm akışlara uygulanır — en ucuz ama en gözle görülür "kalite" yatırımı.
 
-## Faz 17 · Oyunlaştırma ve alışkanlık
+## Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme
 
-**Amaç:** Uygulamayı "aç, kaydır, kapat" döngüsünden çıkarıp gerçek bir alışkanlığa dönüştürmek; hepsi kendi sunucumuzda, dış servis/API maliyeti olmadan.
+**Amaç:** Uygulamayı "aç, kaydır, kapat" döngüsünden çıkarıp gerçek bir alışkanlığa dönüştürmek; reklam bütçesi olmadan, kullanıcıların kendi isteğiyle paylaşarak büyümesi. Hepsi kendi sunucumuzda, dış servis/API maliyeti olmadan.
 
 1. 🛠 **Günlük giriş serisi (streak).** Art arda kaç gün açıldığı gösterilir; kırılma riski geri gelmeyi tetikler.
 2. 🛠 **Başarı rozetleri.** "İlk eşleşme", "İlk arama", "Profilini %100 tamamladın" gibi; ilerlemeyi somutlaştırır.
@@ -298,6 +298,10 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 5. 🛠 **Sohbet içi iki kişilik mini oyun.** XOX (tic-tac-toe) gibi basit bir oyun; sohbeti mesajlaşmanın ötesine taşır.
 6. 🛠 **Eşleşme yıldönümü.** "1 hafta oldu 🎉" gibi küçük kutlama anları; ilişkiye kişisel bir tarih hissi katar.
 7. 🛠 **Haftalık özet.** "Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi kural tabanlı, kişisel bir özet.
+8. 🛠 **Davet programı.** Arkadaşını davet et, ikiniz de ödül kazanın (bozdurulamaz promo jeton, kayıt hediyesiyle aynı mekanik — gerçek maliyeti yok).
+9. 🛠 **Paylaşılabilir anlar.** Eşleşme anını veya profil kartını kendi şablonumuzla görsele dönüştürüp Instagram/WhatsApp'a paylaşma; dış servis yok.
+10. 🛠 **Odanı sergile.** Faz 16'daki dekore edilmiş odaların haftalık "en güzel odalar" galerisi; emek verilen bir şeyi paylaşma isteği doğal viral döngü yaratır.
+11. 🛠 **Kişisel bağlantı linki.** "Beni MeetPoint'te bul" — paylaşılınca profile/indirmeye yönlendiren basit bir bağlantı.
 
 ## Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans
 
@@ -343,6 +347,6 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 | 14 Tüketici ve mağaza | 4–6 gün |
 | 15 Gerçek zamanlı kalite | 6–9 gün |
 | 16 Kimlik, premium katman ve mağaza | 8–11 gün |
-| 17 Oyunlaştırma ve alışkanlık | 5–8 gün |
+| 17 Oyunlaştırma, alışkanlık ve organik büyüme | 7–10 gün |
 | 18 Kullanım kolaylığı | 4–6 gün |
 | 19 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
