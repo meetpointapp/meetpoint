@@ -29,6 +29,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   CallInfo? _call;
   CallMediaEngine? _media;
   StreamSubscription<RealtimeEvent>? _sub;
+  StreamSubscription<void>? _tokenSub;
   Timer? _ticker;
   int _ticks = 0;
   bool _busy = false;
@@ -58,6 +59,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   @override
   void dispose() {
     _sub?.cancel();
+    _tokenSub?.cancel();
     _ticker?.cancel();
     _media?.dispose();
     super.dispose();
@@ -76,6 +78,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     setState(() => _call = next);
     if (next.status == CallStatus.active && (!wasActive || _media == null)) _startMedia(next);
     if (!next.isLive) {
+      _tokenSub?.cancel();
+      _tokenSub = null;
       _media?.dispose();
       _media = null;
       ref.invalidate(callHistoryProvider);
@@ -91,11 +95,23 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     media.remoteJoined.addListener(() {
       if (mounted) setState(() {});
     });
+    media.weakConnection.addListener(() {
+      if (mounted) setState(() {});
+    });
     try {
       await media.start(media: call.media, video: call.isVideo);
       // Faz 15: adil ücretlendirme. Sunucu, iki taraf da kanala gerçekten katılana kadar (Agora
       // ayarlıysa) ücretlendirmeyi askıda tutar; katılamazsa alınan ücret iade edilir.
       unawaited(media.joined.then((_) => ref.read(apiProvider).confirmCallJoined(widget.callId)).catchError((_) {}));
+      // Faz 15: uzun ve kesintisiz aramalar. Jeton süresi dolmadan sunucudan yenisi alınır.
+      _tokenSub = media.tokenExpiring.listen((_) async {
+        try {
+          final fresh = await ref.read(apiProvider).renewCallMediaToken(widget.callId);
+          if (fresh.token != null) await media.renewToken(fresh.token!);
+        } catch (e) {
+          debugPrint('token renewal failed: $e');
+        }
+      });
     } catch (e) {
       debugPrint('media start failed: $e');
     }
@@ -236,6 +252,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: _Banner(icon: Icons.hourglass_bottom_rounded, text: l.lowBalanceWarning),
+            ),
+          if (active && (media?.weakConnection.value ?? false))
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: _Banner(icon: Icons.signal_wifi_bad_rounded, text: l.weakConnectionWarning),
             ),
           Expanded(
             child: showVideo

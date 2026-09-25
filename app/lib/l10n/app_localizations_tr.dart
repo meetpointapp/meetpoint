@@ -1006,6 +1006,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bakiyen bir sonraki dakikaya yetmiyor, arama bu dakikanın sonunda bitecek.';
 
   @override
+  String get weakConnectionWarning =>
+      'Bağlantın zayıf, ses veya görüntü kesilebilir.';
+
+  @override
   String get videoBlurred => 'Güvenliğin için görüntü bulanık başlar';
 
   @override

@@ -17,6 +17,14 @@ abstract class CallMediaEngine {
   // bildirilir). Simülasyonda start() dönünce anında tamamlanır.
   Future<void> get joined;
 
+  // Faz 15: uzun ve kesintisiz aramalar. Jeton süresi dolmadan (~30 sn kala) tetiklenir; dinleyen
+  // taraf yeni jeton alıp renewToken'a vermeli. Simülasyonda hiç tetiklenmez.
+  Stream<void> get tokenExpiring;
+  Future<void> renewToken(String token);
+
+  // Bağlantı kalitesi zayıf mı (kullanıcıya uyarı göstermek için). Simülasyonda hep iyi.
+  ValueNotifier<bool> get weakConnection;
+
   Future<void> start({required CallMedia? media, required bool video});
   Future<void> setMuted(bool muted);
   Future<void> setCameraOn(bool on);
@@ -40,6 +48,12 @@ class _SimulatedMedia implements CallMediaEngine {
   @override
   Future<void> get joined => Future.value();
   @override
+  Stream<void> get tokenExpiring => const Stream.empty();
+  @override
+  Future<void> renewToken(String token) async {}
+  @override
+  final weakConnection = ValueNotifier(false);
+  @override
   Future<void> start({required CallMedia? media, required bool video}) async {}
   @override
   Future<void> setMuted(bool muted) async {}
@@ -50,7 +64,10 @@ class _SimulatedMedia implements CallMediaEngine {
   @override
   Future<void> setSpeaker(bool on) async {}
   @override
-  Future<void> dispose() async => remoteJoined.dispose();
+  Future<void> dispose() async {
+    remoteJoined.dispose();
+    weakConnection.dispose();
+  }
   @override
   Widget? remoteView() => null;
   @override

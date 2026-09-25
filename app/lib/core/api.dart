@@ -360,6 +360,9 @@ class Api {
   // Ses/görüntü motoru Agora kanalına gerçekten katıldığında çağrılır (Faz 15: adil ücretlendirme)
   Future<void> confirmCallJoined(String id) => _post('/calls/$id/joined');
 
+  // Jeton süresi dolmadan yenilenir (Faz 15: uzun ve kesintisiz aramalar)
+  Future<CallMedia> renewCallMediaToken(String id) async => CallMedia.fromJson(await _post('/calls/$id/media-token'));
+
   // Çalarken arayan: iptal · aranan: ret · görüşmede: bitir
   Future<CallInfo> hangUp(String id) async => CallInfo.fromJson(await _post('/calls/$id/hangup'));
 

@@ -1016,6 +1016,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your balance won\'t cover the next minute; the call will end when this minute is up.';
 
   @override
+  String get weakConnectionWarning =>
+      'Your connection is weak; audio or video may cut out.';
+
+  @override
   String get videoBlurred => 'For your safety, video starts blurred';
 
   @override

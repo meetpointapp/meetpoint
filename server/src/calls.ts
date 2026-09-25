@@ -39,6 +39,18 @@ function mediaFor(callId: string, uid: number) {
   return { appId: agora.appId, channel: callId, uid, token };
 }
 
+// Faz 15 · uzun ve kesintisiz aramalar: Agora jetonu 1 saat sonra geçersiz olur. Uygulama, jeton süresi
+// dolmadan (onTokenPrivilegeWillExpire) bunu çağırıp yeni jeton alır; arama sürerken kanaldan
+// düşmeden yenilenir.
+export async function renewMediaToken(id: string, userId: string) {
+  const call = await prisma.call.findUnique({ where: { id } });
+  if (!call || (call.callerId !== userId && call.calleeId !== userId)) throw new HttpError(404, 'not_found');
+  if (call.status !== 'ACTIVE') throw new HttpError(409, 'call_not_active');
+  const media = mediaFor(id, call.callerId === userId ? 1 : 2);
+  if (!media) throw new HttpError(409, 'no_media');
+  return media;
+}
+
 export function callDto(call: CallWithUsers, viewerId: string) {
   const outgoing = call.callerId === viewerId;
   return {

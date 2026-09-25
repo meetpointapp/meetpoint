@@ -575,7 +575,7 @@ class CallInfo {
   final CallKind kind;
   final bool outgoing;
   final CallStatus status;
-  final String endReason; // hangup | balance | disconnect | server_restart
+  final String endReason; // hangup | balance | disconnect | server_restart | connect_failed
   final int ratePerMin;
   final int billedMinutes;
   final int totalCoins;

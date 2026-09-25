@@ -34,7 +34,7 @@ String errorText(AppLocalizations l, Object error) {
     'already_viewed' => l.errAlreadyViewed,
     'busy' => l.errBusy,
     'already_in_call' => l.errAlreadyInCall,
-    'call_not_ringing' || 'call_not_active' => l.errCallGone,
+    'call_not_ringing' || 'call_not_active' || 'no_media' => l.errCallGone,
     'not_found' => l.errNotFound,
     'caller_insufficient_balance' => l.errCallerBalance,
     'verification_required' => l.errVerificationRequired,

@@ -265,6 +265,7 @@
   "spentCoins": "Spent: {count}",
   "earnedCoins": "Earned: {count}",
   "lowBalanceWarning": "Your balance won't cover the next minute; the call will end when this minute is up.",
+  "weakConnectionWarning": "Your connection is weak; audio or video may cut out.",
   "videoBlurred": "For your safety, video starts blurred",
   "revealVideo": "Show video",
   "waitingVideo": "Waiting for video…",

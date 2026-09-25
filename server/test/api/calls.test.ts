@@ -70,6 +70,12 @@ describe('Aramalar (Faz 6)', () => {
     check('caller got call:accepted', callerSock.has('call:accepted'));
     check('caller charged 15', (await bal(caller)) === 785);
 
+    // --- Jeton yenileme (Faz 15): simülasyon modunda yenilenecek gerçek jeton yok
+    const tokenSim = await call(callee.t, 'POST', `/calls/${callId}/media-token`);
+    check('media token renewal is a no-op without Agora (simulation)', tokenSim.http === 409 && tokenSim.error === 'no_media');
+    const tokenOutsider = await call(outsider.t, 'POST', `/calls/${callId}/media-token`);
+    check('outsider cannot renew media token', tokenOutsider.http === 404);
+
     // bir "dakika" (3 sn) daha: zamanlayıcı ikinci dakikayı almalı
     const mid = await waitFor(() => call(caller.t, 'GET', `/calls/${callId}`), (c) => c.billedMinutes >= 2);
     check('second minute billed', mid.billedMinutes === 2 && mid.totalCoins === 30, `min=${mid.billedMinutes}`);

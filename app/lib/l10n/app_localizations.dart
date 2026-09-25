@@ -1688,6 +1688,12 @@ abstract class AppLocalizations {
   /// **'Bakiyen bir sonraki dakikaya yetmiyor, arama bu dakikanın sonunda bitecek.'**
   String get lowBalanceWarning;
 
+  /// No description provided for @weakConnectionWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantın zayıf, ses veya görüntü kesilebilir.'**
+  String get weakConnectionWarning;
+
   /// No description provided for @videoBlurred.
   ///
   /// In tr, this message translates to:

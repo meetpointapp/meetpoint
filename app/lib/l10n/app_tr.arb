@@ -571,6 +571,7 @@
     }
   },
   "lowBalanceWarning": "Bakiyen bir sonraki dakikaya yetmiyor, arama bu dakikanın sonunda bitecek.",
+  "weakConnectionWarning": "Bağlantın zayıf, ses veya görüntü kesilebilir.",
   "videoBlurred": "Güvenliğin için görüntü bulanık başlar",
   "revealVideo": "Görüntüyü aç",
   "waitingVideo": "Görüntü bekleniyor…",
