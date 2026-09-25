@@ -1099,6 +1099,40 @@ class AppLocalizationsTr extends AppLocalizations {
   String get callBack => 'Geri ara';
 
   @override
+  String get disputeCall => 'Ücrete itiraz et';
+
+  @override
+  String get disputeCallTitle => 'Bu arama için itiraz';
+
+  @override
+  String get disputeCallHint =>
+      'Onaylanırsa alınan ücret iade edilir. Panel inceler, sonucu bildiriminden görürsün.';
+
+  @override
+  String get disputeWrongAmount => 'Yanlış tutar alındı';
+
+  @override
+  String get disputeNoConnection => 'Hiç bağlanamadık';
+
+  @override
+  String get disputeDisconnected => 'Bağlantı koptu ama ücretlendirildim';
+
+  @override
+  String get disputeOther => 'Diğer';
+
+  @override
+  String get disputeSent => 'İtirazın alındı, incelenecek.';
+
+  @override
+  String get disputePending => 'İtiraz inceleniyor';
+
+  @override
+  String get disputeApproved => 'İtiraz onaylandı, iade edildi';
+
+  @override
+  String get disputeRejected => 'İtiraz reddedildi';
+
+  @override
   String missedCallFrom(String name) {
     return 'Cevapsız arama: $name';
   }
@@ -1224,6 +1258,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errAlreadyRated => 'Bu görüşmeyi zaten puanladın.';
+
+  @override
+  String get errAlreadyDisputed => 'Bu arama için zaten itiraz açtın.';
 
   @override
   String get errPayoutProcessed => 'Bu talep zaten işleme alınmış.';

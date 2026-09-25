@@ -149,12 +149,16 @@ export async function reclaimEarnings(tx: Tx, buyerId: string, coins: number, si
   return { reclaimed: coins - left, users: [...touched] };
 }
 
-// Arama ücretinin tamamını veya bir kısmını geri al (Faz 15: adil ücretlendirme). Her ücretlendirilen
-// dakika, arayanın cüzdanından TAM O DAKİKANIN kova karışımıyla (paid/promo/earned/earnedPromo)
-// düşülmüştü; iade de aynı karışımla tersine çevrilir — bonus jetonla ödenen bir dakikanın iadesi
-// yanlışlıkla "gerçek" (cashable'a yakın) jetona dönüşmez. Alıcıdan da aynı oranda (mümkün olduğunca)
-// geri alınır; en yeni ücretlendirilen dakikadan başlar. Karşı tarafın parası yoksa (zaten harcanmış)
-// elde ne kalmışsa o kadar geri alınır, fark WalletEntry.reclaimedCoins'te iz olarak kalır.
+// Arama ücretinin tamamını veya bir kısmını geri al (Faz 15: adil ücretlendirme + arama itirazı).
+// Aynı arama için birden fazla kez çağrılabilir (önce otomatik kısmi dakika iadesi, sonra
+// onaylanan bir itiraz gibi): her dakikanın NE KADARI zaten iade edildiği WalletEntry.refundedCoins
+// / reclaimedCoins / reclaimedPromo'da tutulur, aynı jeton iki kez iade edilmez.
+//
+// Her ücretlendirilen dakika, arayanın cüzdanından TAM O DAKİKANIN kova karışımıyla
+// (paid/promo/earned/earnedPromo) düşülmüştü; iade de aynı karışımla tersine çevrilir — bonus
+// jetonla ödenen bir dakikanın iadesi yanlışlıkla "gerçek" (cashable'a yakın) jetona dönüşmez.
+// Alıcıdan da aynı oranda (mümkün olduğunca) geri alınır; en yeni ücretlendirilen dakikadan
+// başlar. Karşı tarafın parası yoksa (zaten harcanmış) elde ne kalmışsa o kadar geri alınır.
 export async function refundCallCharge(tx: Tx, callId: string, callerId: string, calleeId: string, refundCoins: number) {
   if (refundCoins <= 0) return;
   for (const id of [callerId, calleeId].sort()) await lockWallet(tx, id);
@@ -164,7 +168,7 @@ export async function refundCallCharge(tx: Tx, callId: string, callerId: string,
   let left = refundCoins;
   for (let i = 0; i < debits.length && left > 0; i++) {
     const d = debits[i];
-    const charged = -d.amount; // debit.amount negatiftir
+    const charged = -d.amount - d.refundedCoins; // bu dakikanın DAHA ÖNCE iade edilmemiş kısmı
     if (charged <= 0) continue;
     const take = Math.min(left, charged);
     const frac = take / charged;
@@ -182,15 +186,19 @@ export async function refundCallCharge(tx: Tx, callId: string, callerId: string,
       refundBuckets[biggest] += diff;
     }
     await credit(tx, callerId, refundBuckets, 'CALL_REFUND', { note: `call:${callId}`, counterpartyId: calleeId });
+    await tx.walletEntry.update({ where: { id: d.id }, data: { refundedCoins: { increment: take } } });
 
     const e = credits[i];
     if (e) {
       const w = await getBuckets(calleeId, tx);
       const takeEarned = Math.min(Math.round(e.earned * frac), e.earned - e.reclaimedCoins, Math.max(0, w.earned));
-      const takeEarnedPromo = Math.min(Math.round(e.earnedPromo * frac), Math.max(0, w.earnedPromo));
+      const takeEarnedPromo = Math.min(Math.round(e.earnedPromo * frac), e.earnedPromo - e.reclaimedPromo, Math.max(0, w.earnedPromo));
       if (takeEarned > 0 || takeEarnedPromo > 0) {
         await apply(tx, calleeId, { ...ZERO, earned: -takeEarned, earnedPromo: -takeEarnedPromo }, 'CALL_REFUND_CLAWBACK', { note: `call:${callId}`, counterpartyId: callerId });
-        if (takeEarned > 0) await tx.walletEntry.update({ where: { id: e.id }, data: { reclaimedCoins: { increment: takeEarned } } });
+        await tx.walletEntry.update({
+          where: { id: e.id },
+          data: { reclaimedCoins: { increment: Math.max(0, takeEarned) }, reclaimedPromo: { increment: Math.max(0, takeEarnedPromo) } },
+        });
       }
     }
     left -= take;

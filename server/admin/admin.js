@@ -39,6 +39,8 @@ const ERRORS = {
   rate_required: 'USD/TL kurunu gir (veya Finans → Ekonomi\'de varsayılan kur tanımla).',
   tc_in_use: 'Bu TC ile başka bir hesap doğrulanmış.',
   banned: 'Bu hesap yasaklı.',
+  call_not_ended: 'Arama henüz bitmemiş.',
+  already_disputed: 'Bu arama için zaten itiraz açılmış.',
 };
 const errText = (err) => ERRORS[err.message] || `Hata: ${err.message}`;
 
@@ -48,6 +50,12 @@ const REASONS = {
   harassment: 'Taciz',
   scam: 'Dolandırıcılık',
   underage: '18 yaş altı',
+  other: 'Diğer',
+};
+const DISPUTE_REASONS = {
+  wrong_amount: 'Yanlış tutar alındı',
+  no_connection: 'Hiç bağlanamadılar',
+  disconnected: 'Bağlantı koptu ama ücretlendirilmiş',
   other: 'Diğer',
 };
 const POSES = {
@@ -826,8 +834,8 @@ document.querySelectorAll('#tab-finance .seg-btn').forEach((btn) =>
 );
 
 function loadFinance() {
-  ['kyc', 'economy', 'report'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
-  return { kyc: loadKyc, economy: loadEconomy, report: loadReport }[finView]();
+  ['kyc', 'disputes', 'economy', 'report'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
+  return { kyc: loadKyc, disputes: loadDisputes, economy: loadEconomy, report: loadReport }[finView]();
 }
 
 async function loadKyc() {
@@ -865,6 +873,58 @@ $('#kyc').addEventListener('click', async (e) => {
     await api('POST', `/admin/api/finance/kyc/${t.dataset.kyc}/decide`, { approve, note });
     toast(approve ? 'Kimlik onaylandı' : 'Başvuru reddedildi');
     loadKyc();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+// ---------- Arama itirazları (Faz 15) ----------
+let disputeStatus = 'PENDING';
+document.querySelectorAll('[data-dispute-status]').forEach((btn) =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-dispute-status]').forEach((b) => b.classList.toggle('active', b === btn));
+    disputeStatus = btn.dataset.disputeStatus;
+    loadDisputes();
+  }),
+);
+
+async function loadDisputes() {
+  const list = await api('GET', `/admin/api/finance/disputes?status=${disputeStatus}`);
+  if (disputeStatus === 'PENDING') $('#count-disputes').textContent = list.length || '';
+  $('#disputes').innerHTML = list.length
+    ? list
+        .map((d) => {
+          const c = d.call;
+          const statusPill = { PENDING: '', APPROVED: '<span class="pill green">İade edildi</span>', REJECTED: '<span class="pill red">Reddedildi</span>' }[d.status];
+          return `<div class="card item"><div class="item-head">
+        <div><span class="item-title">${esc(d.filedBy?.displayName || d.filedBy?.email || '?')}</span>
+          <span class="muted">itiraz etti · aradığı: ${esc(c.user?.displayName || '?')} · ${esc(DISPUTE_REASONS[d.reason] || d.reason)} · ${c.kind === 'VIDEO' ? 'Görüntülü' : 'Sesli'} · ${c.billedMinutes} dk · ${c.totalCoins.toLocaleString('tr-TR')} jeton</span>
+          ${statusPill}</div>
+        <div class="muted">${fmtDate(d.createdAt)}</div></div>
+        ${d.adminNote ? `<div class="small muted">Not: ${esc(d.adminNote)}</div>` : ''}
+        ${d.refunded ? `<div class="small">İade: <b>${d.refunded.toLocaleString('tr-TR')}</b> jeton</div>` : ''}
+        ${
+          d.status === 'PENDING'
+            ? `<div class="actions"><button class="btn green" data-dispute="${esc(d.id)}" data-approve="1">Onayla ve iade et</button>
+          <button class="btn red" data-dispute="${esc(d.id)}" data-approve="0">Reddet</button></div>`
+            : ''
+        }</div>`;
+        })
+        .join('')
+    : '<div class="card empty">Bekleyen itiraz yok 🎉</div>';
+}
+
+$('#disputes').addEventListener('click', async (e) => {
+  const t = e.target.closest('button[data-dispute]');
+  if (!t) return;
+  const approve = t.dataset.approve === '1';
+  const note = prompt(approve ? 'Not (isteğe bağlı):' : 'Red sebebi (en az birkaç kelime):', approve ? '' : 'Kayıtlar incelendi, ücret doğru');
+  if (note === null) return;
+  if (!approve && note.trim().length < 3) return toast('Red için bir sebep yaz');
+  try {
+    const r = await api('POST', `/admin/api/finance/disputes/${t.dataset.dispute}/resolve`, { approve, note });
+    toast(approve ? `Onaylandı, ${r.refund} jeton iade edildi` : 'İtiraz reddedildi');
+    loadDisputes();
   } catch (err) {
     toast(errText(err));
   }

@@ -1,7 +1,21 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { uid } from '../auth';
-import { acceptCall, callHistory, confirmJoined, getCall, hangUp, rateCall, renewMediaToken, reportAndHangUp, sendGift, startCall } from '../calls';
+import {
+  acceptCall,
+  callHistory,
+  confirmJoined,
+  DISPUTE_REASONS,
+  fileCallDispute,
+  getCall,
+  hangUp,
+  myCallDisputes,
+  rateCall,
+  renewMediaToken,
+  reportAndHangUp,
+  sendGift,
+  startCall,
+} from '../calls';
 import { CALL_KINDS } from '../config';
 import { requestLimiter } from '../limits';
 import { REPORT_REASONS } from '../moderation/reports';
@@ -58,4 +72,14 @@ callsRouter.post('/calls/:id/rate', async (req, res) => {
     .parse(req.body);
   await rateCall(req.params.id, uid(req), rating, reportReason);
   res.json({ ok: true });
+});
+
+// Arama itirazı: geçmişten "bu arama için yanlış ücret alındı" bildirimi (Faz 15)
+callsRouter.post('/calls/:id/dispute', async (req, res) => {
+  const { reason, note } = z.object({ reason: z.enum(DISPUTE_REASONS), note: z.string().trim().max(500).default('') }).parse(req.body);
+  res.status(201).json(await fileCallDispute(req.params.id, uid(req), reason, note));
+});
+
+callsRouter.get('/me/disputes', async (req, res) => {
+  res.json(await myCallDisputes(uid(req)));
 });

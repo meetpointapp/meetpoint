@@ -385,6 +385,10 @@ class Api {
 
   Future<List<CallInfo>> calls() async => [for (final c in (await _get('/calls') as List)) CallInfo.fromJson(c)];
 
+  // Arama itirazı: geçmişten "bu arama için yanlış ücret alındı" bildirimi (Faz 15)
+  Future<void> disputeCall(String id, String reason, {String note = ''}) =>
+      _post('/calls/$id/dispute', {'reason': reason, 'note': note});
+
   // Hediye gönder; kalan bakiyeyi döndürür
   Future<int> sendGift(String callId, String giftId) async =>
       (await _post('/calls/$callId/gifts', {'giftId': giftId}))['balance'] as int;

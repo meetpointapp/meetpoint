@@ -212,6 +212,7 @@
         <div class="toolbar">
           <div class="seg">
             <button data-fin="kyc" class="seg-btn active">Kimlik doğrulama</button>
+            <button data-fin="disputes" class="seg-btn">Arama itirazları <span id="count-disputes" class="count"></span></button>
             <button data-fin="economy" class="seg-btn">Ekonomi</button>
             <button data-fin="report" class="seg-btn">Aylık rapor</button>
           </div>
@@ -219,6 +220,17 @@
         <div id="fin-kyc">
           <p class="muted">Belgedeki ad-soyad ve TC son 4 hanesi başvuruyla aynı mı, belge okunaklı ve geçerli mi? Belge görüntüleme işlem kaydına yazılır. Reddedilen başvurunun belgesi silinir.</p>
           <div id="kyc" class="list"></div>
+        </div>
+        <div id="fin-disputes" class="hidden">
+          <p class="muted">Kullanıcı "yanlış ücret alındı" dedi. Onaylanırsa aramanın kalan ücreti arayana iade edilir, alıcının kazancı (olgunlaşmadıysa) geri alınır.</p>
+          <div class="toolbar">
+            <div class="seg">
+              <button data-dispute-status="PENDING" class="seg-btn active">Bekleyen</button>
+              <button data-dispute-status="APPROVED" class="seg-btn">Onaylanan</button>
+              <button data-dispute-status="REJECTED" class="seg-btn">Reddedilen</button>
+            </div>
+          </div>
+          <div id="disputes" class="list"></div>
         </div>
         <div id="fin-economy" class="hidden">
           <p class="muted">Oranlar ondalık (0.15 = %15). Değiştirmeyi sadece süper yönetici yapabilir; her değişiklik işlem kaydına yazılır. Kırmızı paket: o mağaza payında zarar ediyor (satılan her jeton bozdurulursa).</p>

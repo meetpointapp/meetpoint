@@ -49,6 +49,7 @@ String errorText(AppLocalizations l, Object error) {
     'already_rated' => l.errAlreadyRated,
     'store_unavailable' => l.errStoreUnavailable,
     'call_not_ended' || 'invalid_gift' => l.errCallGone,
+    'already_disputed' => l.errAlreadyDisputed,
     'password_too_common' => l.errPasswordTooCommon,
     'password_breached' => l.errPasswordBreached,
     'password_same' => l.errPasswordSame,

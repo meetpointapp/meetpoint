@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/formatters.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
@@ -94,7 +95,15 @@ class _CallTile extends ConsumerWidget {
                 color: call.outgoing ? theme.colorScheme.onSurfaceVariant : const Color(0xFF1FA463),
               ),
             ),
+            if (call.disputeStatus.isNotEmpty) _DisputeBadge(status: call.disputeStatus),
           ]),
+        if (call.outgoing && !call.isLive && call.totalCoins > 0 && call.disputeStatus.isEmpty)
+          IconButton(
+            tooltip: l.disputeCall,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.receipt_long_outlined, size: 20),
+            onPressed: () => _openDispute(context, ref, call),
+          ),
         if (user != null)
           IconButton(
             tooltip: l.callBack,
@@ -106,9 +115,64 @@ class _CallTile extends ConsumerWidget {
     );
   }
 
+  Future<void> _openDispute(BuildContext context, WidgetRef ref, CallInfo call) async {
+    final l = AppLocalizations.of(context);
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(l.disputeCallTitle, style: Theme.of(ctx).textTheme.titleMedium),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Text(l.disputeCallHint, style: Theme.of(ctx).textTheme.bodySmall),
+          ),
+          for (final (id, label) in [
+            ('wrong_amount', l.disputeWrongAmount),
+            ('no_connection', l.disputeNoConnection),
+            ('disconnected', l.disputeDisconnected),
+            ('other', l.disputeOther),
+          ])
+            ListTile(title: Text(label), onTap: () => Navigator.pop(ctx, id)),
+        ]),
+      ),
+    );
+    if (reason == null || !context.mounted) return;
+    try {
+      await ref.read(apiProvider).disputeCall(call.id, reason);
+      ref.invalidate(callHistoryProvider);
+      if (context.mounted) showSnack(context, l.disputeSent);
+    } catch (e) {
+      if (context.mounted) showSnack(context, errorText(l, e));
+    }
+  }
+
   String _when(AppLocalizations l, DateTime t) {
     final now = DateTime.now();
     final sameDay = t.year == now.year && t.month == now.month && t.day == now.day;
     return sameDay ? DateFormat.Hm(l.localeName).format(t) : DateFormat.MMMd(l.localeName).add_Hm().format(t);
+  }
+}
+
+// Faz 15: itiraz durumu (bekliyor / onaylandı / reddedildi)
+class _DisputeBadge extends StatelessWidget {
+  const _DisputeBadge({required this.status});
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final (text, color) = switch (status) {
+      'PENDING' => (l.disputePending, Brand.gold),
+      'APPROVED' => (l.disputeApproved, const Color(0xFF1FA463)),
+      _ => (l.disputeRejected, Theme.of(context).colorScheme.error),
+    };
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Text(text, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: color)),
+    );
   }
 }

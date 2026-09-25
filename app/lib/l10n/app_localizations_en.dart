@@ -1111,6 +1111,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get callBack => 'Call back';
 
   @override
+  String get disputeCall => 'Dispute charge';
+
+  @override
+  String get disputeCallTitle => 'Dispute this call';
+
+  @override
+  String get disputeCallHint =>
+      'If approved, the charge is refunded. Our team reviews it; you\'ll see the outcome here.';
+
+  @override
+  String get disputeWrongAmount => 'Wrong amount charged';
+
+  @override
+  String get disputeNoConnection => 'We never connected';
+
+  @override
+  String get disputeDisconnected =>
+      'Connection dropped but I was still charged';
+
+  @override
+  String get disputeOther => 'Other';
+
+  @override
+  String get disputeSent => 'Your dispute was received and will be reviewed.';
+
+  @override
+  String get disputePending => 'Dispute under review';
+
+  @override
+  String get disputeApproved => 'Dispute approved, refunded';
+
+  @override
+  String get disputeRejected => 'Dispute rejected';
+
+  @override
   String missedCallFrom(String name) {
     return 'Missed call: $name';
   }
@@ -1235,6 +1270,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errAlreadyRated => 'You\'ve already rated this call.';
+
+  @override
+  String get errAlreadyDisputed =>
+      'You\'ve already filed a dispute for this call.';
 
   @override
   String get errPayoutProcessed => 'This request has already been processed.';

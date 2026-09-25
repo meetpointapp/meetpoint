@@ -68,6 +68,8 @@ export function callDto(call: CallWithUsers, viewerId: string) {
     createdAt: call.createdAt,
     answeredAt: call.answeredAt,
     endedAt: call.endedAt,
+    // Sadece arayan itiraz açabilir (Faz 15); alıcı için her zaman boş
+    disputeStatus: outgoing ? call.disputeStatus : '',
     user: publicProfile(outgoing ? call.callee : call.caller),
   };
 }
@@ -411,3 +413,75 @@ export async function closeLegacyCalls() {
   });
   await prisma.call.updateMany({ where: { status: 'RINGING', ringDeadline: null }, data: { status: 'MISSED', endedAt: new Date(), ...closed } });
 }
+
+// --- Faz 15 · arama itirazı: geçmişten 'bu arama için yanlış ücret alındı' bildirimi, panelde
+// inceleme ve onaylanırsa iade. İade her zaman arayana gider (ücretlendirilen taraf); alıcının
+// bu aramadan gelen kazancı henüz olgunlaşmamışsa (mümkün olduğunca) geri alınır (refundCallCharge).
+
+export const DISPUTE_REASONS = ['wrong_amount', 'no_connection', 'disconnected', 'other'] as const;
+export type DisputeReason = (typeof DISPUTE_REASONS)[number];
+
+export async function fileCallDispute(callId: string, userId: string, reason: DisputeReason, note: string) {
+  const call = await prisma.call.findUnique({ where: { id: callId } });
+  if (!call || call.callerId !== userId) throw new HttpError(404, 'not_found');
+  if (LIVE.includes(call.status)) throw new HttpError(409, 'call_not_ended');
+  if (call.disputeStatus) throw new HttpError(409, 'already_disputed');
+  const dispute = await prisma.$transaction(async (tx) => {
+    const d = await tx.callDispute.create({ data: { callId, userId, reason, adminNote: note } });
+    await tx.call.update({ where: { id: callId }, data: { disputeStatus: 'PENDING' } });
+    return d;
+  });
+  return { ok: true, id: dispute.id };
+}
+
+export async function myCallDisputes(userId: string) {
+  const list = await prisma.callDispute.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } });
+  return list.map((d) => ({ id: d.id, callId: d.callId, reason: d.reason, status: d.status, refunded: d.refunded, createdAt: d.createdAt, resolvedAt: d.resolvedAt }));
+}
+
+export async function listCallDisputes(status: 'PENDING' | 'APPROVED' | 'REJECTED') {
+  const list = await prisma.callDispute.findMany({
+    where: { status },
+    orderBy: { createdAt: status === 'PENDING' ? 'asc' : 'desc' },
+    take: 100,
+    include: { call: { include: withUsers }, user: { include: { profile: true } } },
+  });
+  return list.map((d) => ({
+    id: d.id,
+    reason: d.reason,
+    status: d.status,
+    refunded: d.refunded,
+    adminNote: d.adminNote,
+    createdAt: d.createdAt,
+    resolvedAt: d.resolvedAt,
+    // İtirazı açan (arayan/ücretlendirilen taraf) — panelde kime iade edileceği bu
+    filedBy: { id: d.user.id, email: d.user.email, displayName: d.user.profile?.displayName ?? '' },
+    call: callDto(d.call, d.userId),
+  }));
+}
+
+// Onaylanırsa: aramanın (henüz iade edilmemiş) tüm ücreti arayana iade edilir, alıcıdan (mümkün
+// olduğunca) geri alınır. Aynı arama daha önce kısmen iade edildiyse (Faz 15 madde 2) üzerine
+// eklenmez — WalletEntry.refundedCoins zaten iade edilen kısmı hatırlar.
+export async function resolveCallDispute(disputeId: string, approve: boolean, adminNote: string) {
+  const dispute = await prisma.callDispute.findUnique({ where: { id: disputeId }, include: { call: true } });
+  if (!dispute || dispute.status !== 'PENDING') throw new HttpError(404, 'not_found');
+  const refund = approve ? dispute.call.totalCoins : 0;
+  await prisma.$transaction(async (tx) => {
+    if (refund > 0) {
+      await refundCallCharge(tx, dispute.callId, dispute.call.callerId, dispute.call.calleeId, refund);
+      await tx.call.update({ where: { id: dispute.callId }, data: { totalCoins: { decrement: refund } } });
+    }
+    await tx.callDispute.update({
+      where: { id: disputeId },
+      data: { status: approve ? 'APPROVED' : 'REJECTED', refunded: refund, adminNote, resolvedAt: new Date() },
+    });
+    await tx.call.update({ where: { id: dispute.callId }, data: { disputeStatus: approve ? 'APPROVED' : 'REJECTED' } });
+  });
+  if (refund > 0) {
+    emitToUser(dispute.call.callerId, 'wallet:updated', {});
+    emitToUser(dispute.call.calleeId, 'wallet:updated', {});
+  }
+  return { ok: true, refund };
+}
+

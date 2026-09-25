@@ -216,8 +216,14 @@ model WalletEntry {
   note           String   @default("")
   // Transferde karşı taraf: kazancın kimden geldiği (iade olunca kazancın geri alınabilmesi için)
   counterpartyId String?
-  // Bu kazançtan iade nedeniyle geri alınan jeton
+  // Bu kazançtan (earned kovası) iade nedeniyle geri alınan jeton
   reclaimedCoins Int      @default(0)
+  // Bu kazançtan (earnedPromo kovası) arama iadesi nedeniyle geri alınan jeton (reclaimedCoins'ten
+  // ayrı: o alan sadece bozdurulabilir "earned" kovasının olgunlaşma hesabında kullanılıyor)
+  reclaimedPromo Int      @default(0)
+  // Bu ücretlendirmeden (arama dakikası) arayana zaten iade edilen jeton — aynı dakika iki kez
+  // iade edilmesin diye (kısmi iade + sonradan onaylanan itiraz gibi art arda gelebilir)
+  refundedCoins  Int      @default(0)
   createdAt      DateTime @default(now())
 
   @@index([userId, createdAt])

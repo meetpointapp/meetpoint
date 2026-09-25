@@ -618,6 +618,8 @@ class CallInfo {
   final DateTime? endedAt;
   final PublicProfile? user; // karşı taraf
   final CallMedia? media; // sadece kabul yanıtında/olayında gelir
+  // Faz 15: arama itirazı. "" | PENDING | APPROVED | REJECTED. Sadece arayan (ücretlendirilen taraf) açabilir.
+  final String disputeStatus;
 
   const CallInfo({
     required this.id,
@@ -635,6 +637,7 @@ class CallInfo {
     this.endedAt,
     this.user,
     this.media,
+    this.disputeStatus = '',
   });
 
   bool get isLive => status == CallStatus.ringing || status == CallStatus.active;
@@ -660,6 +663,7 @@ class CallInfo {
         endedAt: j['endedAt'] == null ? null : _date(j['endedAt']),
         user: j['user'] == null ? null : PublicProfile.fromJson(j['user']),
         media: j['media'] == null ? null : CallMedia.fromJson(j['media']),
+        disputeStatus: j['disputeStatus'] ?? '',
       );
 }
 

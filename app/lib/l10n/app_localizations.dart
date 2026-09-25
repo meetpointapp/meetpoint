@@ -1862,6 +1862,72 @@ abstract class AppLocalizations {
   /// **'Geri ara'**
   String get callBack;
 
+  /// No description provided for @disputeCall.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücrete itiraz et'**
+  String get disputeCall;
+
+  /// No description provided for @disputeCallTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu arama için itiraz'**
+  String get disputeCallTitle;
+
+  /// No description provided for @disputeCallHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onaylanırsa alınan ücret iade edilir. Panel inceler, sonucu bildiriminden görürsün.'**
+  String get disputeCallHint;
+
+  /// No description provided for @disputeWrongAmount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanlış tutar alındı'**
+  String get disputeWrongAmount;
+
+  /// No description provided for @disputeNoConnection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hiç bağlanamadık'**
+  String get disputeNoConnection;
+
+  /// No description provided for @disputeDisconnected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı koptu ama ücretlendirildim'**
+  String get disputeDisconnected;
+
+  /// No description provided for @disputeOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get disputeOther;
+
+  /// No description provided for @disputeSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtirazın alındı, incelenecek.'**
+  String get disputeSent;
+
+  /// No description provided for @disputePending.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtiraz inceleniyor'**
+  String get disputePending;
+
+  /// No description provided for @disputeApproved.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtiraz onaylandı, iade edildi'**
+  String get disputeApproved;
+
+  /// No description provided for @disputeRejected.
+  ///
+  /// In tr, this message translates to:
+  /// **'İtiraz reddedildi'**
+  String get disputeRejected;
+
   /// No description provided for @missedCallFrom.
   ///
   /// In tr, this message translates to:
@@ -2077,6 +2143,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu görüşmeyi zaten puanladın.'**
   String get errAlreadyRated;
+
+  /// No description provided for @errAlreadyDisputed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu arama için zaten itiraz açtın.'**
+  String get errAlreadyDisputed;
 
   /// No description provided for @errPayoutProcessed.
   ///

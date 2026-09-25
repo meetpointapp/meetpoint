@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { requireRole } from '../auth';
 import { adminEmailOf, audit } from '../audit';
+import { listCallDisputes, resolveCallDispute } from '../calls';
 import { HttpError, prisma } from '../db';
 import { decryptField } from '../fieldCrypto';
 import { decideKyc, kycDocument, kycView } from '../finance/kyc';
@@ -160,6 +161,20 @@ adminFinanceRouter.get('/payouts/:id/receipt', FIN, async (req, res) => {
 <tr><td>İşlem / dekont no</td><td>${esc(p.reference)}</td></tr>
 <tr><td>Belge no</td><td>${esc(p.id)}</td></tr>
 </table></body></html>`);
+});
+
+// ---------- Arama itirazları (Faz 15)
+adminFinanceRouter.get('/disputes', FIN, async (req, res) => {
+  const { status } = z.object({ status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).default('PENDING') }).parse(req.query);
+  res.json(await listCallDisputes(status));
+});
+
+adminFinanceRouter.post('/disputes/:id/resolve', FIN, async (req, res) => {
+  const { approve, note } = z.object({ approve: z.boolean(), note: z.string().trim().max(300).default('') }).parse(req.body);
+  if (!approve && note.length < 3) throw new HttpError(400, 'validation');
+  const result = await resolveCallDispute(req.params.id, approve, note);
+  await audit(req, approve ? 'dispute.approve' : 'dispute.reject', 'call_dispute', req.params.id, { note, refund: result.refund });
+  res.json(result);
 });
 
 // ---------- Aylık finans raporu
