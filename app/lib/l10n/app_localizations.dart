@@ -3776,6 +3776,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Değiştir'**
   String get moodChange;
+
+  /// No description provided for @interestGroupName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, coffee{Kahve Tutkunları} travel{Gezginler} music{Müzik Aşıkları} concerts{Konser Tutkunları} movies{Sinema Severler} series{Dizi Bağımlıları} books{Kitap Kurtları} photography{Fotoğraf Avcıları} art{Sanatseverler} cooking{Mutfak Ustaları} foodie{Lezzet Avcıları} wine{Şarap Meraklıları} fitness{Fitness Tutkunları} yoga{Yoga Sevenler} running{Koşucular} cycling{Bisikletçiler} hiking{Doğa Yürüyüşçüleri} camping{Kamp Sevenler} football{Futbol Tutkunları} basketball{Basketbol Tutkunları} gaming{Oyun Tutkunları} tech{Teknoloji Meraklıları} fashion{Moda Takipçileri} dancing{Dans Sevenler} pets{Evcil Hayvan Severler} nature{Doğa Aşıkları} beach{Deniz Sevenler} meditation{Meditasyon Sevenler} anime{Anime Severler} volunteering{Gönüllüler} other{{id}}}'**
+  String interestGroupName(String id);
+
+  /// No description provided for @interestGroupMemberCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} kişi'**
+  String interestGroupMemberCount(int count);
+
+  /// No description provided for @interestGroupsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgi alanına göre keşfet'**
+  String get interestGroupsTitle;
+
+  /// No description provided for @interestGroupEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu an bu grupta uygun kimse yok.'**
+  String get interestGroupEmpty;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../profile/profile_widgets.dart';
 
 // Seni beğenenler: kilitliyken sayı + bulanık önizleme, açıkken geri beğen/geç
 class LikesScreen extends ConsumerStatefulWidget {
@@ -97,7 +98,7 @@ class _LikesScreenState extends ConsumerState<LikesScreen> {
               childAspectRatio: 3 / 4.4,
             ),
             itemCount: info.users.length,
-            itemBuilder: (_, i) => _LikeCard(
+            itemBuilder: (_, i) => LikeActionCard(
               profile: info.users[i],
               onPass: () => _respond(info.users[i], false),
               onLike: () => _respond(info.users[i], true),
@@ -142,90 +143,3 @@ class _LockedGrid extends StatelessWidget {
       );
 }
 
-class _LikeCard extends StatelessWidget {
-  const _LikeCard({required this.profile, required this.onPass, required this.onLike});
-  final PublicProfile profile;
-  final VoidCallback onPass;
-  final VoidCallback onLike;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = profile;
-    return GestureDetector(
-      onTap: () => context.push('/user/${p.id}'),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(Brand.radius),
-        child: Stack(fit: StackFit.expand, children: [
-          NetPhoto(p.coverThumbUrl, width: 240, height: 240),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.center,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black87],
-              ),
-            ),
-          ),
-          if (p.superLikedMe)
-            const Positioned(top: 8, left: 8, child: _SuperBadge()),
-          Positioned(
-            left: 10,
-            right: 10,
-            bottom: 10,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              NameWithBadge('${p.displayName}, ${p.age}',
-                  verified: p.verified,
-                  onPhoto: true,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-              const SizedBox(height: 8),
-              Row(children: [
-                Expanded(child: _MiniButton(icon: Icons.close_rounded, color: Brand.nope, onTap: onPass)),
-                const SizedBox(width: 8),
-                Expanded(child: _MiniButton(icon: Icons.favorite_rounded, gradient: true, onTap: onLike)),
-              ]),
-            ]),
-          ),
-        ]),
-      ),
-    );
-  }
-}
-
-class _SuperBadge extends StatelessWidget {
-  const _SuperBadge();
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: const ShapeDecoration(shape: StadiumBorder(), color: Color(0xFF2F80ED)),
-        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.star_rounded, color: Colors.white, size: 14),
-        ]),
-      );
-}
-
-class _MiniButton extends StatelessWidget {
-  const _MiniButton({required this.icon, required this.onTap, this.color, this.gradient = false});
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color? color;
-  final bool gradient;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-        decoration: ShapeDecoration(
-          shape: const StadiumBorder(),
-          gradient: gradient ? Brand.gradient : null,
-          color: gradient ? null : Colors.white,
-        ),
-        child: Material(
-          type: MaterialType.transparency,
-          shape: const StadiumBorder(),
-          child: InkWell(
-            customBorder: const StadiumBorder(),
-            onTap: onTap,
-            child: SizedBox(height: 34, child: Icon(icon, size: 20, color: gradient ? Colors.white : color)),
-          ),
-        ),
-      );
-}

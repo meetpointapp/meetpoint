@@ -2348,4 +2348,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moodChange => 'Change';
+
+  @override
+  String interestGroupName(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'coffee': 'Coffee Lovers',
+      'travel': 'Travelers',
+      'music': 'Music Lovers',
+      'concerts': 'Concert Goers',
+      'movies': 'Movie Buffs',
+      'series': 'Series Bingers',
+      'books': 'Bookworms',
+      'photography': 'Photo Enthusiasts',
+      'art': 'Art Lovers',
+      'cooking': 'Home Cooks',
+      'foodie': 'Foodies',
+      'wine': 'Wine Lovers',
+      'fitness': 'Fitness Enthusiasts',
+      'yoga': 'Yogis',
+      'running': 'Runners',
+      'cycling': 'Cyclists',
+      'hiking': 'Hikers',
+      'camping': 'Campers',
+      'football': 'Football Fans',
+      'basketball': 'Basketball Fans',
+      'gaming': 'Gamers',
+      'tech': 'Tech Enthusiasts',
+      'fashion': 'Fashion Followers',
+      'dancing': 'Dancers',
+      'pets': 'Pet Lovers',
+      'nature': 'Nature Lovers',
+      'beach': 'Beach Lovers',
+      'meditation': 'Meditators',
+      'anime': 'Anime Fans',
+      'volunteering': 'Volunteers',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String interestGroupMemberCount(int count) {
+    return '$count people';
+  }
+
+  @override
+  String get interestGroupsTitle => 'Discover by interest';
+
+  @override
+  String get interestGroupEmpty => 'No one available in this group right now.';
 }

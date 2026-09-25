@@ -185,6 +185,20 @@ class VibeResult {
   bool get completed => archetypeId.isNotEmpty;
 }
 
+// Faz 16: "İlgi alanı bazlı keşif". Ortak ilgiye göre bir vitrin: kaç uygun aday var ve
+// önizlemede gösterilecek birkaç kullanıcı kimliği.
+class InterestGroup {
+  final String interestId;
+  final int count;
+  final List<String> previewUserIds;
+  const InterestGroup({required this.interestId, required this.count, this.previewUserIds = const []});
+  factory InterestGroup.fromJson(Map<String, dynamic> j) => InterestGroup(
+        interestId: j['interestId'],
+        count: j['count'],
+        previewUserIds: [for (final id in (j['previewUserIds'] as List? ?? const [])) id as String],
+      );
+}
+
 // Kayıt sihirbazında ve profil düzenlemede kullanılan değiştirilebilir taslak
 class ProfileDraft {
   String displayName = '';

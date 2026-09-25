@@ -32,6 +32,12 @@ final callHistoryProvider = FutureProvider.autoDispose<List<CallInfo>>((ref) => 
 
 final likesProvider = FutureProvider<LikesInfo>((ref) => ref.watch(apiProvider).likes());
 
+// Faz 16: ilgi alanı bazlı keşif — gruplar ve bir grubun üyeleri
+final interestGroupsProvider = FutureProvider.autoDispose<List<InterestGroup>>((ref) => ref.watch(apiProvider).discoverGroups());
+final interestGroupMembersProvider = FutureProvider.autoDispose.family<List<PublicProfile>, String>(
+  (ref, interestId) => ref.watch(apiProvider).discoverGroupMembers(interestId),
+);
+
 // Okunmamış toplam mesaj sayısı (alt menü rozeti için)
 final unreadCountProvider = Provider<int>((ref) =>
     ref.watch(conversationsProvider).value?.fold<int>(0, (sum, c) => sum + c.unreadCount) ?? 0);

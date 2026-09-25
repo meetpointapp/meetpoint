@@ -611,5 +611,9 @@
   "moodPromptBanner": "How are you feeling today? Share it so your matches can see.",
   "moodNotSet": "You haven't shared your mood today.",
   "moodClear": "Remove",
-  "moodChange": "Change"
+  "moodChange": "Change",
+  "interestGroupName": "{id, select, coffee{Coffee Lovers} travel{Travelers} music{Music Lovers} concerts{Concert Goers} movies{Movie Buffs} series{Series Bingers} books{Bookworms} photography{Photo Enthusiasts} art{Art Lovers} cooking{Home Cooks} foodie{Foodies} wine{Wine Lovers} fitness{Fitness Enthusiasts} yoga{Yogis} running{Runners} cycling{Cyclists} hiking{Hikers} camping{Campers} football{Football Fans} basketball{Basketball Fans} gaming{Gamers} tech{Tech Enthusiasts} fashion{Fashion Followers} dancing{Dancers} pets{Pet Lovers} nature{Nature Lovers} beach{Beach Lovers} meditation{Meditators} anime{Anime Fans} volunteering{Volunteers} other{{id}}}",
+  "interestGroupMemberCount": "{count} people",
+  "interestGroupsTitle": "Discover by interest",
+  "interestGroupEmpty": "No one available in this group right now."
 }

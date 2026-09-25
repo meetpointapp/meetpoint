@@ -289,8 +289,63 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           IconButton(onPressed: _openFilters, icon: const Icon(Icons.tune_rounded), tooltip: l.filters),
         ],
       ),
-      body: SafeArea(top: false, child: Column(children: [const _MoodBanner(), Expanded(child: body)])),
+      body: SafeArea(
+        top: false,
+        child: Column(children: [const _MoodBanner(), const _GroupsStrip(), Expanded(child: body)]),
+      ),
     );
+  }
+}
+
+// Faz 16: "İlgi alanı bazlı keşif" — salt kaydırma yerine ortak ilgiye göre vitrinler; kaydırma
+// destesinin üstünde yatay bir şerit olarak göze çarpar, dokununca ızgara halinde grup açılır.
+class _GroupsStrip extends ConsumerWidget {
+  const _GroupsStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groups = ref.watch(interestGroupsProvider);
+    final list = groups.value;
+    if (list == null || list.isEmpty) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        child: Text(l.interestGroupsTitle, style: theme.textTheme.titleSmall),
+      ),
+      SizedBox(
+        height: 92,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: list.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 10),
+          itemBuilder: (_, i) {
+            final g = list[i];
+            return GestureDetector(
+              onTap: () => context.push('/discover/groups/${g.interestId}'),
+              child: Container(
+                width: 132,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Brand.radius),
+                  color: Brand.coral.withValues(alpha: 0.08),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Text(interestEmoji[g.interestId] ?? '', style: const TextStyle(fontSize: 22)),
+                  const SizedBox(height: 6),
+                  Text(l.interestGroupName(g.interestId),
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelLarge),
+                  Text(l.interestGroupMemberCount(g.count),
+                      style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                ]),
+              ),
+            );
+          },
+        ),
+      ),
+    ]);
   }
 }
 

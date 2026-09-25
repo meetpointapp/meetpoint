@@ -2333,4 +2333,53 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get moodChange => 'Değiştir';
+
+  @override
+  String interestGroupName(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'coffee': 'Kahve Tutkunları',
+      'travel': 'Gezginler',
+      'music': 'Müzik Aşıkları',
+      'concerts': 'Konser Tutkunları',
+      'movies': 'Sinema Severler',
+      'series': 'Dizi Bağımlıları',
+      'books': 'Kitap Kurtları',
+      'photography': 'Fotoğraf Avcıları',
+      'art': 'Sanatseverler',
+      'cooking': 'Mutfak Ustaları',
+      'foodie': 'Lezzet Avcıları',
+      'wine': 'Şarap Meraklıları',
+      'fitness': 'Fitness Tutkunları',
+      'yoga': 'Yoga Sevenler',
+      'running': 'Koşucular',
+      'cycling': 'Bisikletçiler',
+      'hiking': 'Doğa Yürüyüşçüleri',
+      'camping': 'Kamp Sevenler',
+      'football': 'Futbol Tutkunları',
+      'basketball': 'Basketbol Tutkunları',
+      'gaming': 'Oyun Tutkunları',
+      'tech': 'Teknoloji Meraklıları',
+      'fashion': 'Moda Takipçileri',
+      'dancing': 'Dans Sevenler',
+      'pets': 'Evcil Hayvan Severler',
+      'nature': 'Doğa Aşıkları',
+      'beach': 'Deniz Sevenler',
+      'meditation': 'Meditasyon Sevenler',
+      'anime': 'Anime Severler',
+      'volunteering': 'Gönüllüler',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String interestGroupMemberCount(int count) {
+    return '$count kişi';
+  }
+
+  @override
+  String get interestGroupsTitle => 'İlgi alanına göre keşfet';
+
+  @override
+  String get interestGroupEmpty => 'Şu an bu grupta uygun kimse yok.';
 }

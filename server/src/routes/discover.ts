@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { recordFunnelStage } from '../analytics';
 import { birthdayForAge } from '../age';
+import { INTERESTS } from '../catalog';
 import { requireNotRestricted } from '../moderation/sanctions';
 import { uid } from '../auth';
 import { economy } from '../config';
@@ -25,13 +26,18 @@ export const discoverRouter = Router();
 const DECK_SIZE = 20;
 const KM_PER_DEG_LAT = 111.32;
 
-discoverRouter.get('/discover', async (req, res) => {
-  const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
-  const my = me.profile;
-  if (!my) throw new HttpError(400, 'profile_required');
-  // Eşleştirme cinsel yönelim verisini işler: açık rıza olmadan keşfet kullanılamaz
-  if (!hasConsent(me, 'special_category')) throw new HttpError(403, 'consent_required', { kind: 'special_category' });
-
+// /discover ve /discover/groups/:interestId aynı uygunluk kurallarını paylaşır: daha önce
+// kaydırılmamış, engel olmayan, cinsiyet tercihi karşılıklı uyan, yaş/mesafe filtresine giren,
+// e-postası doğrulanmış ve en az bir görünür fotoğrafı olan kullanıcılar.
+function eligibilityFilter(my: {
+  latitude: number | null;
+  longitude: number | null;
+  filterMaxKm: number;
+  filterMinAge: number;
+  filterMaxAge: number;
+  interestedIn: string;
+  gender: string;
+}) {
   const hasLoc = my.latitude != null && my.longitude != null;
   const lat = my.latitude ?? 0;
   const lng = my.longitude ?? 0;
@@ -54,6 +60,17 @@ discoverRouter.get('/discover', async (req, res) => {
           AND ${km} <= ${maxKm}))`
       : Prisma.empty;
   const genderFilter = my.interestedIn === 'everyone' ? Prisma.empty : Prisma.sql`AND p."gender" = ${my.interestedIn}`;
+  return { km, distanceFilter, genderFilter };
+}
+
+discoverRouter.get('/discover', async (req, res) => {
+  const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
+  const my = me.profile;
+  if (!my) throw new HttpError(400, 'profile_required');
+  // Eşleştirme cinsel yönelim verisini işler: açık rıza olmadan keşfet kullanılamaz
+  if (!hasConsent(me, 'special_category')) throw new HttpError(403, 'consent_required', { kind: 'special_category' });
+
+  const { km, distanceFilter, genderFilter } = eligibilityFilter(my);
 
   const rows = await prisma.$queryRaw<{ id: string; superLikedMe: boolean }[]>`
     SELECT u."id",
@@ -81,6 +98,87 @@ discoverRouter.get('/discover', async (req, res) => {
   const byId = new Map(users.map((u) => [u.id, u]));
   const deck = rows.filter((r) => byId.has(r.id)).map((r) => ({ ...publicProfile(byId.get(r.id)!, my)!, superLikedMe: r.superLikedMe }));
   res.json(await withOnlineMany(deck));
+});
+
+// Faz 16: salt kaydırma yerine ortak ilgiye göre vitrinler ("kahve tutkunları", "gezginler").
+// Kendi seçtiğin ilgi alanlarından (yoksa en popüler ilgi alanlarından), /discover ile aynı
+// uygunluk kurallarına giren en az bir aday bulunanlar gösterilir — daha sosyal, kaydırma
+// hissinden uzak bir keşif biçimi.
+const GROUP_PREVIEW = 6; // grup listesinde gösterilecek küçük önizleme sayısı
+const GROUP_MEMBERS = 30; // bir grubu açınca gösterilecek en fazla üye sayısı
+
+discoverRouter.get('/discover/groups', async (req, res) => {
+  const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
+  const my = me.profile;
+  if (!my) throw new HttpError(400, 'profile_required');
+  if (!hasConsent(me, 'special_category')) throw new HttpError(403, 'consent_required', { kind: 'special_category' });
+
+  const { km, distanceFilter, genderFilter } = eligibilityFilter(my);
+  // Önce kendi ilgi alanların, yeterli grup çıkmazsa geri kalan kataloğun tamamıyla tamamlanır
+  const myInterests = (my.interests as string[]) ?? [];
+  const candidateInterests = [...new Set([...myInterests, ...INTERESTS])];
+
+  const groups: { interestId: string; count: number; previewUserIds: string[] }[] = [];
+  for (const interestId of candidateInterests) {
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT u."id"
+      FROM "User" u
+      JOIN "Profile" p ON p."userId" = u."id"
+      WHERE u."id" <> ${me.id}
+        AND u."bannedAt" IS NULL
+        AND u."deletionRequestedAt" IS NULL
+        AND u."consentSpecialAt" IS NOT NULL
+        AND u."emailVerifiedAt" IS NOT NULL
+        AND EXISTS (SELECT 1 FROM "Photo" ph WHERE ph."userId" = u."id" AND ph."hiddenAt" IS NULL)
+        AND p."interests" @> ${JSON.stringify([interestId])}::jsonb
+        ${genderFilter}
+        AND p."interestedIn" IN ('everyone', ${my.gender})
+        AND p."birthDate" <= ${birthdayForAge(my.filterMinAge)} AND p."birthDate" > ${birthdayForAge(my.filterMaxAge + 1)}
+        AND NOT EXISTS (SELECT 1 FROM "Swipe" s WHERE s."fromId" = ${me.id} AND s."toId" = u."id")
+        AND NOT EXISTS (SELECT 1 FROM "Block" b WHERE (b."fromId" = u."id" AND b."toId" = ${me.id}) OR (b."fromId" = ${me.id} AND b."toId" = u."id"))
+        ${distanceFilter}
+      ORDER BY ${km} ASC NULLS LAST, u."createdAt" DESC
+      LIMIT ${GROUP_PREVIEW}`;
+    if (rows.length > 0) groups.push({ interestId, count: rows.length, previewUserIds: rows.map((r) => r.id) });
+    if (groups.length >= 8) break;
+  }
+  res.json(groups);
+});
+
+discoverRouter.get('/discover/groups/:interestId', async (req, res) => {
+  const interestId = req.params.interestId;
+  if (!(INTERESTS as readonly string[]).includes(interestId)) throw new HttpError(404, 'not_found');
+  const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
+  const my = me.profile;
+  if (!my) throw new HttpError(400, 'profile_required');
+  if (!hasConsent(me, 'special_category')) throw new HttpError(403, 'consent_required', { kind: 'special_category' });
+
+  const { km, distanceFilter, genderFilter } = eligibilityFilter(my);
+  const rows = await prisma.$queryRaw<{ id: string; superLikedMe: boolean }[]>`
+    SELECT u."id",
+      EXISTS (SELECT 1 FROM "Swipe" s WHERE s."fromId" = u."id" AND s."toId" = ${me.id} AND s."direction" = 'superlike') AS "superLikedMe"
+    FROM "User" u
+    JOIN "Profile" p ON p."userId" = u."id"
+    WHERE u."id" <> ${me.id}
+      AND u."bannedAt" IS NULL
+      AND u."deletionRequestedAt" IS NULL
+      AND u."consentSpecialAt" IS NOT NULL
+      AND u."emailVerifiedAt" IS NOT NULL
+      AND EXISTS (SELECT 1 FROM "Photo" ph WHERE ph."userId" = u."id" AND ph."hiddenAt" IS NULL)
+      AND p."interests" @> ${JSON.stringify([interestId])}::jsonb
+      ${genderFilter}
+      AND p."interestedIn" IN ('everyone', ${my.gender})
+      AND p."birthDate" <= ${birthdayForAge(my.filterMinAge)} AND p."birthDate" > ${birthdayForAge(my.filterMaxAge + 1)}
+      AND NOT EXISTS (SELECT 1 FROM "Swipe" s WHERE s."fromId" = ${me.id} AND s."toId" = u."id")
+      AND NOT EXISTS (SELECT 1 FROM "Block" b WHERE (b."fromId" = u."id" AND b."toId" = ${me.id}) OR (b."fromId" = ${me.id} AND b."toId" = u."id"))
+      ${distanceFilter}
+    ORDER BY ${km} ASC NULLS LAST, u."createdAt" DESC
+    LIMIT ${GROUP_MEMBERS}`;
+
+  const users = await prisma.user.findMany({ where: { id: { in: rows.map((r) => r.id) } }, include: { profile: true, photos: true } });
+  const byId = new Map(users.map((u) => [u.id, u]));
+  const members = rows.filter((r) => byId.has(r.id)).map((r) => ({ ...publicProfile(byId.get(r.id)!, my)!, superLikedMe: r.superLikedMe }));
+  res.json(await withOnlineMany(members));
 });
 
 discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, res) => {

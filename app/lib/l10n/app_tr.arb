@@ -1167,5 +1167,23 @@
   "moodPromptBanner": "Bugün nasıl hissediyorsun? Paylaş, eşleştiklerin görsün.",
   "moodNotSet": "Bugün ruh halini henüz paylaşmadın.",
   "moodClear": "Kaldır",
-  "moodChange": "Değiştir"
+  "moodChange": "Değiştir",
+  "interestGroupName": "{id, select, coffee{Kahve Tutkunları} travel{Gezginler} music{Müzik Aşıkları} concerts{Konser Tutkunları} movies{Sinema Severler} series{Dizi Bağımlıları} books{Kitap Kurtları} photography{Fotoğraf Avcıları} art{Sanatseverler} cooking{Mutfak Ustaları} foodie{Lezzet Avcıları} wine{Şarap Meraklıları} fitness{Fitness Tutkunları} yoga{Yoga Sevenler} running{Koşucular} cycling{Bisikletçiler} hiking{Doğa Yürüyüşçüleri} camping{Kamp Sevenler} football{Futbol Tutkunları} basketball{Basketbol Tutkunları} gaming{Oyun Tutkunları} tech{Teknoloji Meraklıları} fashion{Moda Takipçileri} dancing{Dans Sevenler} pets{Evcil Hayvan Severler} nature{Doğa Aşıkları} beach{Deniz Sevenler} meditation{Meditasyon Sevenler} anime{Anime Severler} volunteering{Gönüllüler} other{{id}}}",
+  "@interestGroupName": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "interestGroupMemberCount": "{count} kişi",
+  "@interestGroupMemberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "interestGroupsTitle": "İlgi alanına göre keşfet",
+  "interestGroupEmpty": "Şu an bu grupta uygun kimse yok."
 }

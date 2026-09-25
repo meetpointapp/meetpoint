@@ -285,6 +285,12 @@ class Api {
   Future<List<PublicProfile>> discover() async =>
       [for (final p in (await _get('/discover') as List)) PublicProfile.fromJson(p)];
 
+  // Faz 16: salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar
+  Future<List<InterestGroup>> discoverGroups() async =>
+      [for (final g in (await _get('/discover/groups') as List)) InterestGroup.fromJson(g)];
+  Future<List<PublicProfile>> discoverGroupMembers(String interestId) async =>
+      [for (final p in (await _get('/discover/groups/$interestId') as List)) PublicProfile.fromJson(p)];
+
   // direction: like | pass | superlike (süper beğeni jetonla)
   Future<({bool match, String? conversationId})> swipe(String toId, String direction) async {
     final r = await _post('/swipes', {'toId': toId, 'direction': direction});

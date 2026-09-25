@@ -186,6 +186,20 @@ void main() {
     });
   });
 
+  group('İlgi alanı bazlı keşif (Faz 16)', () {
+    test('InterestGroup ayrıştırma', () {
+      final g = InterestGroup.fromJson({'interestId': 'coffee', 'count': 4, 'previewUserIds': ['u1', 'u2']});
+      expect(g.interestId, 'coffee');
+      expect(g.count, 4);
+      expect(g.previewUserIds, ['u1', 'u2']);
+    });
+
+    test('previewUserIds eksikse boş liste olur', () {
+      final g = InterestGroup.fromJson({'interestId': 'travel', 'count': 0});
+      expect(g.previewUserIds, isEmpty);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));
