@@ -166,6 +166,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 IconButton(
                   onPressed: _index == 0 ? () => ref.read(sessionProvider.notifier).logout() : _back,
                   icon: Icon(_index == 0 ? Icons.close_rounded : Icons.arrow_back_rounded),
+                  tooltip: _index == 0 ? l.logout : l.back,
                 ),
                 Expanded(
                   child: ClipRRect(

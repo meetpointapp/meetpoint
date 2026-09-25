@@ -134,6 +134,7 @@ export const privacy = {
     selfie: '2026-09-24',
     marketing: '2026-09-25',
     marketing_push: '2026-09-25',
+    analytics: '2026-09-25',
   },
   // Yurt dışı aktarım için ayrı rıza iste ("off": standart sözleşme yeterli görülürse kapatılır, herkes izinli sayılır)
   overseasConsentRequired: process.env.OVERSEAS_CONSENT !== 'off',

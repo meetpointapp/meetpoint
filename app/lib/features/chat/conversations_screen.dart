@@ -32,16 +32,19 @@ class ConversationsScreen extends ConsumerWidget {
           ref.invalidate(conversationsProvider);
           await ref.read(conversationsProvider.future);
         },
-        child: ListView(children: [
-          const _LikesYouTile(),
+        // Konuşma sayısı büyüyebilir: liste ekranda görünen kadarını oluşturur (lazy builder)
+        child: CustomScrollView(physics: const AlwaysScrollableScrollPhysics(), slivers: [
+          const SliverToBoxAdapter(child: _LikesYouTile()),
           ...convs.when(
-            loading: () => [const SizedBox(height: 400, child: ListSkeleton(rows: 5))],
+            loading: () => [const SliverToBoxAdapter(child: SizedBox(height: 400, child: ListSkeleton(rows: 5)))],
             error: (e, _) => [
-              SizedBox(height: 400, child: ErrorRetry(error: e, onRetry: () => ref.invalidate(conversationsProvider))),
+              SliverToBoxAdapter(
+                child: SizedBox(height: 400, child: ErrorRetry(error: e, onRetry: () => ref.invalidate(conversationsProvider))),
+              ),
             ],
             data: (list) => list.isEmpty
-                ? [SizedBox(height: 360, child: CenteredMessage(icon: Icons.forum_outlined, text: l.noChats))]
-                : [for (final c in list) _ConversationTile(c)],
+                ? [SliverToBoxAdapter(child: SizedBox(height: 360, child: CenteredMessage(icon: Icons.forum_outlined, text: l.noChats)))]
+                : [SliverList.builder(itemCount: list.length, itemBuilder: (_, i) => _ConversationTile(list[i]))],
           ),
         ]),
       ),

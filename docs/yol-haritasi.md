@@ -98,6 +98,27 @@ Madde madde denetim: [guvenlik-denetimi.md](guvenlik-denetimi.md).
 **Açık kalan (bilinçli):** Uygulamaya Turnstile bileşeni anahtar alınınca eklenecek (sunucu hazır); anahtar döndürme betiği Faz 13'te.
 **Sonradan bulunan:** Faz 10'daki sıkı CSP yasal metin sayfalarının stilini engelliyordu; Faz 11 başında düzeltildi (sayfaya özel CSP + test).
 
+### Faz 16'da bulunanlar
+
+Faz 16 tamamlandı. Sunucuda 138 test (33 dosya), uygulamada 50 test (7 dosya); tam takım temiz. Arayüz turu `tools/ui-tours/faz16.mjs` (ilk kullanım rehberi → cüzdan bilgi sayfası → çevrimdışı şeridi → gizlilik/analitik anahtarı → geri bildirim girişi) sayfa hatası vermeden tamamlandı.
+
+**Bu fazda soru sorulmadan (Claude kararı) verilen tasarım kararları:** Kullanım analitiği rızası varsayılan kapalı ve sadece Gizlilik ayarlarından açılıyor (kayıt sırasında sorulmuyor); bu yüzden "kayıt oldu" sayısı gerçek kayıt sayısından azdır — bilinçli bir seçim (gerçek isteğe bağlılık, kayda zorlama yok). Rıza verildiğinde o ana kadar zaten ulaşılmış aşamalar (ör. daha önce eşleşmişse) bir kerelik geriye dönük işaretleniyor; bu yeni bir izleme değil, uygulamanın zaten işlevi için tuttuğu verinin bir özeti. Uygulama içi geri bildirim, ayrı bir sistem kurmak yerine Faz 14'teki destek talebi altyapısına "Öneri" adlı yeni bir kategori eklenerek karşılandı. Cüzdan ekranındaki "jetonlar nasıl çalışır" bilgisi her zaman bir bilgi simgesinden açılabiliyor (tek seferlik değil, sürekli erişilebilir).
+
+**Yapılanlar:**
+- **İlk kullanım rehberi:** profil kurulumundan sonra bir kez açılan 4 sayfalık tanıtım (keşfet, istek, jetonlar, kazanç); Profil ekranından "Nasıl çalışır?" ile her zaman tekrar açılabilir. Cüzdan ekranında her zaman erişilebilir "Jetonlar nasıl çalışır?" bilgi sayfası (istek/arama ücretleri, kazanç ve olgunlaşma). İlk aramada, mevcut ücret onay penceresine adil ücretlendirme güvencesini hatırlatan tek seferlik bir satır eklendi.
+- **Durum ekranları:** anlık bağlantı kopunca üstte "çevrimdışısın" şeridi (Socket.IO `disconnect`/`connect` olaylarına bağlı); hata ekranı artık çevrimdışı ("bağlantı yok" simgesi) ile gerçek sunucu hatalarını (genel hata simgesi) görsel olarak ayırıyor; cüzdan geçmişi boş durumu ve para çekme ekranının yükleniyor durumu diğer ekranlarla tutarlı hale getirildi (paylaşılan `CenteredMessage`/`ListSkeleton`).
+- **Erişilebilirlik:** 5 simge-bandonlu düğmeye ekran okuyucu etiketi (şifre göster/gizle, profil kurulumunda geri/çıkış, bir tanıtım sorusunu kaldırma) eklendi; keşfetteki küçük dokunma alanları (profil bilgi düğmesi 38×38→44×44, süper beğeni/istek düğmeleri 46→48) büyütüldü; cüzdan ve para çekme kartlarındaki gradyan zemin üstü soluk (white70) yazılar okunabilirlik için tam beyaza çevrildi; sistemin yazı boyutu ölçeklemesini kısıtlayan bir kod bulunmadı (zaten doğru).
+- **Performans:** küçük gösterimlerde (avatar, eşleşme kartı, fotoğraf düzenleme ızgarası) tam çözünürlük yerine sunucunun ürettiği küçük boy fotoğraf + bellekte boyut sınırlama (`memCacheWidth/Height`) kullanılacak şekilde değiştirildi; sohbet listesi büyüyebilecek veriyi artık ekranda görünen kadarını oluşturan tembel (lazy) bir liste ile çiziyor; `main.dart`'taki tek gerçek gecikme adayı (Firebase başlatma) gerekli ve bilinçli (arka plan bildirim işleyicisi runApp'ten önce kaydedilmeli) olduğu için değiştirilmedi.
+- **Metin ve dil denetimi:** TR/EN dosyaları arasında anahtar kümesi karşılaştırması artık kalıcı bir teste bağlandı (561/561 anahtar eşleşiyor, sadece marka adı/birim gibi 5 bilinçli istisna dışında hiçbir metin iki dilde birebir aynı değil); yer tutucu/"TODO" kalıntısı bulunamadı.
+- **Gizlilik dostu kullanım analitiği:** yeni "analytics" açık rızası (varsayılan kapalı), yeni `AnalyticsEvent` tablosu (kullanıcı başına aşama başına en fazla bir satır, hesap silinince kullanıcıyla birlikte silinir), kayıt/eşleşme/ilk mesaj/ilk satın alma anlarına best-effort kanca; panelde Finans → Kullanım hunisi (sadece toplam sayılar, finans rolü görür). KVKK envanterine ve saklama/imha metnine eklendi.
+- **Uygulama içi geri bildirim:** Profil ekranında tek dokunuşla "Öneri" kategorisi seçili açılan destek talebi; panelde mevcut destek kuyruğunda "Öneri" etiketiyle görünür.
+
+**Bulunan tutarsızlıklar (test yazılırken, testten önce):** cüzdan geçmişi boş durumu ve para çekme yükleme göstergesi diğer ekranlardan farklı bileşen kullanıyordu; hata ekranı her zaman "bulut kapalı" simgesi gösteriyordu (bağlantı sorunu olmayan hatalarda bile yanıltıcı); 5 simge düğmesinde ekran okuyucu etiketi eksikti; keşfetteki bilgi düğmesi önerilen 44×44 dokunma alanının altındaydı.
+
+**Test ortamı notu:** Faz 15'teki gibi bu ortamda Google Fonts ve CanvasKit CDN'lerine erişim kapalı (ekran görüntülerinde bazı yazılar bu yüzden görünmüyor, işlevsellik etkilenmiyor). Çevrimdışı şeridini test etmek için tarayıcının ağını tamamen kesmek (Playwright `setOffline`) güvenilir sonuç vermedi (zaten açık olan WebSocket'i kapatmıyor); gerçek WebSocket nesnesinin doğrudan kapatılması (`ws.close()`) ile güvenilir şekilde doğrulandı.
+
+**Açık notlar (Faz 17):** ⏭ Gerçek Android/iOS cihazında açılış süresi, kaydırma akıcılığı ve APK/IPA boyutu ölçümü (bu ortamda Android SDK/emülatör yok); erişilebilirlik denetimi TalkBack/VoiceOver ile gerçek ekran okuyucuda tekrar doğrulanmalı.
+
 ### Faz 15'te bulunanlar
 
 Faz 15 tamamlandı. Sunucuda 134 test (32 dosya), uygulamada 46 test (6 dosya); tam takım temiz. Ayrıca arayüz turu `tools/ui-tours/faz15.mjs` (arama → hemen kapatma → itiraz açma → sohbet akışını gerçek bir tarayıcıda, derlenmiş web sürümüyle çalıştırır) sayfa hatası vermeden tamamlandı.
@@ -298,17 +319,17 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. ✅ **Arama itirazı.** Geçmişten hatalı ücret bildirimi, panelde inceleme ve jeton iadesi.
 7. ✅ **Emülatör ve simülatör testleri.** ⏭ Gerçek cihaz matrisi Faz 17'de.
 
-## Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans
+## Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans ✅
 
 **Amaç:** "Profesyonel ama basit." Yeni kullanıcının hiçbir yerde takılmaması.
 
-1. 🛠 **İlk kullanım rehberi.** Jeton, istek, arama ücreti ve kazanç kısa ve görsel olarak anlatılır; ilk satın alma ve ilk aramada tek seferlik ipuçları.
-2. 🛠 **Durum ekranları.** Boş, yükleniyor, çevrimdışı ve hata ekranlarının tamamı tutarlı ve yönlendirici.
-3. 🛠 **Erişilebilirlik.** Ekran okuyucu etiketleri, yazı boyutu ölçekleme, renk kontrastı, dokunma alanları.
-4. 🛠 **Performans.** Düşük segment Android'de açılış süresi, kaydırma akıcılığı, görsel önbellek, uygulama boyutu.
-5. 🛠 **Metin ve dil denetimi.** Türkçe ve İngilizce metinlerin tamamının tutarlılık ve anlaşılırlık kontrolü.
-6. 🛠 **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
-7. 🛠 **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
+1. ✅ **İlk kullanım rehberi.** Jeton, istek, arama ücreti ve kazanç kısa ve görsel olarak anlatılır; ilk satın alma ve ilk aramada tek seferlik ipuçları.
+2. ✅ **Durum ekranları.** Boş, yükleniyor, çevrimdışı ve hata ekranlarının tamamı tutarlı ve yönlendirici.
+3. ✅ **Erişilebilirlik.** Ekran okuyucu etiketleri, yazı boyutu ölçekleme, renk kontrastı, dokunma alanları.
+4. ✅ **Performans.** Düşük segment Android'de açılış süresi, kaydırma akıcılığı, görsel önbellek, uygulama boyutu. ⏭ Gerçek cihazda ölçüm Faz 17'de.
+5. ✅ **Metin ve dil denetimi.** Türkçe ve İngilizce metinlerin tamamının tutarlılık ve anlaşılırlık kontrolü.
+6. ✅ **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
+7. ✅ **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
 
 ## Faz 17 · Dış süreçler ve yayın
 

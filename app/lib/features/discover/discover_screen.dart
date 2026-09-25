@@ -241,7 +241,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             _RoundButton(
               icon: Icons.star_rounded,
               color: _superBlue,
-              size: 46,
+              size: 48,
               tooltip: l.superLike,
               onTap: () => _controller.swipe(CardSwiperDirection.top),
             ),
@@ -249,7 +249,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             _RoundButton(
               icon: Icons.mail_rounded,
               color: Brand.gold,
-              size: 46,
+              size: 48,
               tooltip: l.messageRequest,
               onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message),
             ),
@@ -485,9 +485,10 @@ class _InfoButton extends StatelessWidget {
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: onTap,
-            child: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white, size: 22),
+            child: const SizedBox(
+              width: 44,
+              height: 44,
+              child: Center(child: Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white, size: 22)),
             ),
           ),
         ),
@@ -695,7 +696,10 @@ class _MatchOverlay extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 3),
               boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 16)],
             ),
-            child: ClipRRect(borderRadius: BorderRadius.circular(15), child: NetPhoto(p?.coverUrl)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: NetPhoto(p?.coverThumbUrl, width: 130, height: 170),
+            ),
           ),
         );
 

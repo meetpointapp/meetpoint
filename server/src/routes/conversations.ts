@@ -1,6 +1,7 @@
 import type { Message } from '@prisma/client';
 import { Router } from 'express';
 import multer from 'multer';
+import { recordFunnelStage } from '../analytics';
 import { sanitizePrivatePhoto } from '../images';
 import { privateStore, randomKey } from '../storage';
 import { z } from 'zod';
@@ -149,6 +150,7 @@ async function deliver(conversationId: string, me: string, otherId: string, data
   const dto = messageDto(message);
   emitToUser(otherId, 'message:new', dto);
   void notify(otherId, 'message', me, data.kind === 'photo' ? '📷' : data.body.slice(0, 120), { conversationId });
+  await recordFunnelStage(me, 'FIRST_MESSAGE').catch(() => {});
   return dto;
 }
 

@@ -12,11 +12,19 @@ import { HttpError, prisma } from '../db';
 // selfie            Mavi tik için selfie. Geri alınınca saklanan selfie'ler silinir.
 // marketing         Kampanya ve duyuru e-postaları (İYS'ye EPOSTA kanalı olarak bildirilir).
 // marketing_push    Kampanya ve duyuru bildirimleri (push). E-postadan ayrı izin.
+// analytics         Gizlilik dostu kullanım hunisi (Faz 16): kayıt→eşleşme→ilk mesaj→ilk satın alma.
+//                   Üçüncü taraf analitik değil, kendi sunucumuzda; rıza yoksa hiçbir satır yazılmaz.
 
-export const CONSENT_KINDS = ['special_category', 'overseas_transfer', 'selfie', 'marketing', 'marketing_push'] as const;
+export const CONSENT_KINDS = ['special_category', 'overseas_transfer', 'selfie', 'marketing', 'marketing_push', 'analytics'] as const;
 export type ConsentKind = (typeof CONSENT_KINDS)[number];
 
-type ConsentField = 'consentSpecialAt' | 'consentOverseasAt' | 'consentSelfieAt' | 'consentMarketingAt' | 'consentMarketingPushAt';
+type ConsentField =
+  | 'consentSpecialAt'
+  | 'consentOverseasAt'
+  | 'consentSelfieAt'
+  | 'consentMarketingAt'
+  | 'consentMarketingPushAt'
+  | 'consentAnalyticsAt';
 
 const FIELD: Record<ConsentKind, keyof Pick<User, ConsentField>> = {
   special_category: 'consentSpecialAt',
@@ -24,6 +32,7 @@ const FIELD: Record<ConsentKind, keyof Pick<User, ConsentField>> = {
   selfie: 'consentSelfieAt',
   marketing: 'consentMarketingAt',
   marketing_push: 'consentMarketingPushAt',
+  analytics: 'consentAnalyticsAt',
 };
 
 type Tx = Prisma.TransactionClient;
@@ -78,6 +87,7 @@ export function consentState(user: User) {
     selfie: user.consentSelfieAt !== null,
     marketing: user.consentMarketingAt !== null,
     marketing_push: user.consentMarketingPushAt !== null,
+    analytics: user.consentAnalyticsAt !== null,
     overseasConsentRequired: privacy.overseasConsentRequired,
   };
 }

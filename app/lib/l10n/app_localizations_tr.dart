@@ -1867,6 +1867,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get supportCatBug => 'Hata bildir';
 
   @override
+  String get supportCatSuggestion => 'Öneri';
+
+  @override
   String get supportCatOther => 'Diğer';
 
   @override
@@ -1937,4 +1940,94 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errTicketClosed => 'Bu talep kapandı. Yeni bir talep açabilirsin.';
+
+  @override
+  String get howItWorks => 'Nasıl çalışır?';
+
+  @override
+  String get nextStep => 'İleri';
+
+  @override
+  String get introPage1Title => 'Keşfet';
+
+  @override
+  String get introPage1Body =>
+      'Profilleri kaydırarak keşfet. Sağa kaydır: beğen. Sola kaydır: geç.';
+
+  @override
+  String get introPage2Title => 'İstek gönder';
+
+  @override
+  String get introPage2Body =>
+      'Bir profille konuşmak için mesaj, sesli ya da görüntülü arama isteği gönder. Kabul edilirse sohbet açılır.';
+
+  @override
+  String get introPage3Title => 'Jetonlar';
+
+  @override
+  String get introPage3Body =>
+      'İstekler ve aramalar jetonla ücretlendirilir. Aramalar dakika başına, sadece karşı taraf gerçekten bağlandığında ücretlendirilir.';
+
+  @override
+  String get introPage4Title => 'Kazanç';
+
+  @override
+  String introPage4Body(int days) {
+    return 'Biri seninle konuşmak için jeton harcarsa payın cüzdanına kazanç olarak eklenir; $days gün sonra paraya çevirebilirsin.';
+  }
+
+  @override
+  String get coinsInfoTitle => 'Jetonlar nasıl çalışır?';
+
+  @override
+  String get coinsInfoRequestsTitle => 'İstek ücretleri';
+
+  @override
+  String get coinsInfoCallsTitle => 'Arama ücretleri';
+
+  @override
+  String get coinsInfoCallsBody =>
+      'Dakika başına ücretlendirilir; karşı taraf gerçekten bağlanmazsa ücret alınmaz.';
+
+  @override
+  String get coinsInfoEarnTitle => 'Kazanç';
+
+  @override
+  String coinsInfoEarnBody(int days) {
+    return 'Biri seninle konuşmak için jeton harcarsa payın cüzdanına kazanç olarak eklenir; $days gün sonra paraya çevirebilirsin.';
+  }
+
+  @override
+  String get coinsInfoPromoBody =>
+      'Bonus ve hediye jetonlarıyla ödenen tutarlardan gelen kazanç uygulamada harcanabilir, paraya çevrilemez.';
+
+  @override
+  String get callFairBillingTip =>
+      'İlk aramandır: karşı taraf gerçekten bağlanmazsa ücret alınmaz, kesintide kalan saniye orantılı iade edilir.';
+
+  @override
+  String get offlineBanner => 'Çevrimdışısın, yeniden bağlanılıyor…';
+
+  @override
+  String get back => 'Geri';
+
+  @override
+  String get showPassword => 'Şifreyi göster';
+
+  @override
+  String get hidePassword => 'Şifreyi gizle';
+
+  @override
+  String get consentAnalyticsTitle => 'Kullanım analitiği';
+
+  @override
+  String get consentAnalyticsText =>
+      'Kayıt, eşleşme, ilk mesaj ve ilk satın alma gibi kilometre taşlarının anonim sayılarla kendi sunucumuzda tutulması (uygulamayı iyileştirmek için); üçüncü tarafa gitmez.';
+
+  @override
+  String get sendFeedback => 'Öneri ve hata bildir';
+
+  @override
+  String get sendFeedbackHint =>
+      'Fikrini paylaş ya da karşılaştığın bir sorunu anlat';
 }

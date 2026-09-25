@@ -266,7 +266,7 @@ class _PhotoGridFieldState extends ConsumerState<PhotoGridField> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: Stack(fit: StackFit.expand, children: [
-                NetPhoto(photos[i].url),
+                NetPhoto(photos[i].thumbUrl, width: 160, height: 160),
                 if (photos[i].underReview)
                   Positioned(
                     right: 6,
@@ -397,6 +397,7 @@ class PromptsEditor extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded, size: 20),
+                    tooltip: l.remove,
                     onPressed: () {
                       draft.prompts = draft.prompts.where((x) => x.id != p.id).toList();
                       onChanged();

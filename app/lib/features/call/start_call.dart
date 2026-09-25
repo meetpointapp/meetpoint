@@ -7,6 +7,7 @@ import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../core/tips.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../privacy/consent_widgets.dart';
@@ -27,6 +28,9 @@ Future<void> startCallFlow(BuildContext context, WidgetRef ref, PublicProfile pr
     return;
   }
   if (rate == null || !context.mounted) return;
+  // İlk arama: adil ücretlendirme güvencesini bir kez hatırlat (sonraki aramalarda tekrar gösterilmez)
+  final firstCall = await TipsStore.consumeFirstTime('call_fair_billing_tip');
+  if (!context.mounted) return;
 
   final ok = await showDialog<bool>(
     context: context,
@@ -39,6 +43,10 @@ Future<void> startCallFlow(BuildContext context, WidgetRef ref, PublicProfile pr
         Text(profile.displayName, style: Theme.of(ctx).textTheme.titleMedium),
         const SizedBox(height: 12),
         Text(l.startCallInfo(rate!), textAlign: TextAlign.center),
+        if (firstCall) ...[
+          const SizedBox(height: 8),
+          Text(l.callFairBillingTip, textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+        ],
         const SizedBox(height: 8),
         // Arama öncesi kurallar hatırlatması
         Text(l.callRulesReminder, textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodySmall),

@@ -19,6 +19,7 @@ const TITLES: Record<string, Record<string, string>> = {
   'consent-overseas': { tr: 'Açık Rıza: Yurt Dışına Aktarım', en: 'Explicit Consent: Transfer Abroad' },
   'consent-selfie': { tr: "Açık Rıza: Doğrulama Selfie'si", en: 'Explicit Consent: Verification Selfie' },
   'consent-marketing': { tr: 'Ticari Elektronik İleti İzni', en: 'Marketing Emails' },
+  'consent-analytics': { tr: 'Açık Rıza: Kullanım Analitiği', en: 'Explicit Consent: Usage Analytics' },
   retention: { tr: 'Kişisel Veri Saklama ve İmha Politikası', en: 'Data Retention and Deletion Policy' },
   safety: { tr: 'Güvenlik Merkezi', en: 'Safety Center' },
   community: { tr: 'Topluluk Kuralları', en: 'Community Rules' },
@@ -36,7 +37,17 @@ const versionOf = (doc: string) =>
     ? config.termsVersion
     : doc === 'privacy' || doc === 'retention'
       ? config.privacyVersion
-      : privacy.consentVersions[({ 'consent-special': 'special_category', 'consent-overseas': 'overseas_transfer', 'consent-selfie': 'selfie', 'consent-marketing': 'marketing' } as const)[doc as 'consent-special']];
+      : privacy.consentVersions[
+          (
+            {
+              'consent-special': 'special_category',
+              'consent-overseas': 'overseas_transfer',
+              'consent-selfie': 'selfie',
+              'consent-marketing': 'marketing',
+              'consent-analytics': 'analytics',
+            } as const
+          )[doc as 'consent-special']
+        ];
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 

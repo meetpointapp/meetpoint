@@ -51,6 +51,7 @@ class Realtime {
 
 const _events = [
   'connect',
+  'disconnect',
   'match',
   'superlike',
   'request:new',

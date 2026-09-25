@@ -1883,6 +1883,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportCatBug => 'Report a bug';
 
   @override
+  String get supportCatSuggestion => 'Suggestion';
+
+  @override
   String get supportCatOther => 'Other';
 
   @override
@@ -1953,4 +1956,94 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errTicketClosed =>
       'This request is closed. You can open a new one.';
+
+  @override
+  String get howItWorks => 'How it works';
+
+  @override
+  String get nextStep => 'Next';
+
+  @override
+  String get introPage1Title => 'Discover';
+
+  @override
+  String get introPage1Body =>
+      'Swipe through profiles. Swipe right: like. Swipe left: pass.';
+
+  @override
+  String get introPage2Title => 'Send a request';
+
+  @override
+  String get introPage2Body =>
+      'Send a message, voice or video call request to talk to someone. If they accept, a chat opens.';
+
+  @override
+  String get introPage3Title => 'Coins';
+
+  @override
+  String get introPage3Body =>
+      'Requests and calls are paid with coins. Calls are billed per minute, only once the other side actually connects.';
+
+  @override
+  String get introPage4Title => 'Earnings';
+
+  @override
+  String introPage4Body(int days) {
+    return 'When someone spends coins to talk to you, your share is added to your wallet as earnings; you can cash it out after $days days.';
+  }
+
+  @override
+  String get coinsInfoTitle => 'How coins work';
+
+  @override
+  String get coinsInfoRequestsTitle => 'Request prices';
+
+  @override
+  String get coinsInfoCallsTitle => 'Call rates';
+
+  @override
+  String get coinsInfoCallsBody =>
+      'Billed per minute; nothing is charged if the other side never actually connects.';
+
+  @override
+  String get coinsInfoEarnTitle => 'Earnings';
+
+  @override
+  String coinsInfoEarnBody(int days) {
+    return 'When someone spends coins to talk to you, your share is added to your wallet as earnings; you can cash it out after $days days.';
+  }
+
+  @override
+  String get coinsInfoPromoBody =>
+      'Earnings from bonus and gift coins can be spent in the app, but can\'t be cashed out.';
+
+  @override
+  String get callFairBillingTip =>
+      'This is your first call: nothing is charged if the other side never actually connects, and any leftover seconds from a dropped call are refunded proportionally.';
+
+  @override
+  String get offlineBanner => 'You\'re offline, reconnecting…';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get consentAnalyticsTitle => 'Usage analytics';
+
+  @override
+  String get consentAnalyticsText =>
+      'Keeping anonymous counts of milestones (registration, match, first message, first purchase) on our own server to improve the app; never shared with a third party.';
+
+  @override
+  String get sendFeedback => 'Send feedback';
+
+  @override
+  String get sendFeedbackHint =>
+      'Share an idea or tell us about a problem you ran into';
 }

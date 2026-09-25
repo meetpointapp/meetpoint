@@ -167,6 +167,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               suffixIcon: IconButton(
                 icon: Icon(_show ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                 onPressed: () => setState(() => _show = !_show),
+                tooltip: _show ? l.hidePassword : l.showPassword,
               ),
             ),
             onChanged: (_) => setState(() {}),

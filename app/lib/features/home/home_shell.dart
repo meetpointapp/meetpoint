@@ -12,9 +12,11 @@ import '../../core/providers.dart';
 import '../../core/push.dart';
 import '../../core/session.dart';
 import '../../core/store.dart';
+import '../../core/tips.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../moderation/sanction_dialogs.dart';
+import '../onboarding/intro_screen.dart';
 import '../../router.dart';
 
 // Alt menülü ana iskelet. Anlık olaylara göre listeleri tazeler ve uygulama
@@ -30,6 +32,8 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   StreamSubscription<RealtimeEvent>? _sub;
   StreamSubscription<CallEvent?>? _callKitSub;
+  // Anlık bağlantı kopunca üstte ince bir çevrimdışı şeridi gösterilir (Faz 16: durum ekranları)
+  bool _offline = false;
 
   @override
   void initState() {
@@ -46,8 +50,19 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // Mağaza hesabını kullanıcıya bağla (satın almalar bu kimlikle webhook'a düşer)
     final userId = ref.read(sessionProvider).value?.userId;
     if (userId != null) CoinStore.instance.login(userId);
-    // Görülmemiş uyarı/kısıt varsa açılışta göster (itiraz seçeneğiyle)
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkSanction());
+    // Görülmemiş uyarı/kısıt varsa açılışta göster (itiraz seçeneğiyle); ardından, ilk kez
+    // buradaysa (ve kısıt yoksa) kısa "nasıl çalışır" tanıtımı (Faz 16)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _checkSanction();
+      await _maybeShowIntro();
+    });
+  }
+
+  Future<void> _maybeShowIntro() async {
+    if (!mounted) return;
+    final first = await TipsStore.consumeFirstTime('intro_v1');
+    if (!first || !mounted) return;
+    await showIntro(context);
   }
 
   Future<void> _onCallKitEvent(CallEvent? event) async {
@@ -97,6 +112,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Future<void> _onEvent(RealtimeEvent event) async {
     final l = AppLocalizations.of(context);
     switch (event.name) {
+      case 'disconnect':
+        if (mounted) setState(() => _offline = true);
+      case 'connect':
+        if (mounted && _offline) setState(() => _offline = false);
       case 'request:new':
       case 'request:updated':
         ref.invalidate(requestsProvider(true));
@@ -154,7 +173,25 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         Badge(isLabelVisible: count > 0, label: Text('$count'), child: Icon(icon));
 
     return Scaffold(
-      body: widget.shell,
+      body: Column(children: [
+        if (_offline)
+          Material(
+            color: Theme.of(context).colorScheme.errorContainer,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.wifi_off_rounded, size: 16, color: Theme.of(context).colorScheme.onErrorContainer),
+                  const SizedBox(width: 8),
+                  Text(l.offlineBanner,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer, fontSize: 13)),
+                ]),
+              ),
+            ),
+          ),
+        Expanded(child: widget.shell),
+      ]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: widget.shell.currentIndex,
         onDestinationSelected: (i) => widget.shell.goBranch(i, initialLocation: i == widget.shell.currentIndex),

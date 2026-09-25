@@ -834,8 +834,8 @@ document.querySelectorAll('#tab-finance .seg-btn').forEach((btn) =>
 );
 
 function loadFinance() {
-  ['kyc', 'disputes', 'economy', 'report'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
-  return { kyc: loadKyc, disputes: loadDisputes, economy: loadEconomy, report: loadReport }[finView]();
+  ['kyc', 'disputes', 'economy', 'report', 'funnel'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
+  return { kyc: loadKyc, disputes: loadDisputes, economy: loadEconomy, report: loadReport, funnel: loadFunnel }[finView]();
 }
 
 async function loadKyc() {
@@ -1017,6 +1017,19 @@ async function loadReport() {
   $('#report').innerHTML = `<div class="stats">${cards
     .map(([l, v, a]) => `<div class="card stat ${a ? 'alert' : ''}"><div class="value">${esc(v)}</div><div class="label">${esc(l)}</div></div>`)
     .join('')}</div><p class="muted small">Satış tutarları mağazanın bildirdiği USD karşılığıdır; KDV ve mağaza payı ayarlardaki oranlarla tahmin edilir, kesin tutar mağaza ödeme raporundan alınır.</p>`;
+}
+
+const FUNNEL_LABELS = { REGISTERED: 'Kayıt oldu', MATCHED: 'Eşleşti', FIRST_MESSAGE: 'İlk mesajı gönderdi', FIRST_PURCHASE: 'İlk satın almayı yaptı' };
+
+async function loadFunnel() {
+  const r = await api('GET', '/admin/api/finance/funnel');
+  const base = r.funnel[0]?.count || 0;
+  const cards = r.funnel.map(
+    ({ stage, count }) => `<div class="card stat"><div class="value">${count}</div><div class="label">${esc(FUNNEL_LABELS[stage] || stage)}</div>
+      ${base > 0 ? `<div class="muted small">%${Math.round((count / base) * 100)}</div>` : ''}</div>`,
+  );
+  $('#funnel').innerHTML = `<div class="stats">${cards.join('')}</div>
+    <p class="muted small">Analitik rızası veren kullanıcı sayısı: ${r.consented}. Yüzdeler "Kayıt oldu" aşamasına göredir.</p>`;
 }
 
 $('#report-load').addEventListener('click', () => loadReport().catch((e) => toast(errText(e))));
@@ -1422,7 +1435,7 @@ async function loadAudit(more = false) {
 }
 
 // ---------- Destek ----------
-const SUPPORT_CATS = { coins: 'Jeton', calls: 'Arama', cashout: 'Para çekme', safety: 'Güvenlik', account: 'Hesap', bug: 'Hata', other: 'Diğer' };
+const SUPPORT_CATS = { coins: 'Jeton', calls: 'Arama', cashout: 'Para çekme', safety: 'Güvenlik', account: 'Hesap', bug: 'Hata', suggestion: 'Öneri', other: 'Diğer' };
 const TICKET_STATUS = { OPEN: ['Yanıt bekliyor', 'red'], ANSWERED: ['Kullanıcıda', 'blue'], CLOSED: ['Kapalı', ''] };
 const RELATED = { purchase: 'Satın alma', payout: 'Para çekme', call: 'Arama', wallet: 'Cüzdan hareketi' };
 let supView = 'tickets';

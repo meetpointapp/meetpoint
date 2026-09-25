@@ -41,6 +41,7 @@ model User {
   consentSelfieAt        DateTime? // mavi tik selfie'si
   consentMarketingAt     DateTime? // kampanya ve duyuru iletişimi (e-posta)
   consentMarketingPushAt DateTime? // kampanya ve duyuru bildirimleri (push)
+  consentAnalyticsAt     DateTime? // gizlilik dostu kullanım analitiği (Faz 16): kayıt→eşleşme→mesaj→satın alma hunisi
 
   // Tüketici (Faz 14): kabul edilen ön bilgilendirme + mesafeli satış sözleşmesi + cayma hakkı istisnası sürümü.
   // Boş veya eski sürümse uygulama satın almadan önce yeniden onay ister.
@@ -77,25 +78,26 @@ model User {
   boostedUntil       DateTime? // öne çıkarma bitişi
   likesUnlockedUntil DateTime? // "seni beğenenler" erişimi bitişi
 
-  emailCodes     EmailCode[]
-  verifications  VerificationRequest[]
-  devices        Device[]
-  purchases      Purchase[]
-  callsMade      Call[]                @relation("CallCaller")
-  callsReceived  Call[]                @relation("CallCallee")
-  giftsSent      CallGift[]            @relation("GiftFrom")
-  giftsReceived  CallGift[]            @relation("GiftTo")
-  payouts        Payout[]
-  sessions       Session[]
-  consents       Consent[]
-  dataExports    DataExport[]
-  dsrRequests    DsrRequest[]
-  sanctions      Sanction[]
-  kycSubmissions KycSubmission[]
-  appeals        Appeal[]
-  modFlags       ModerationFlag[]
-  supportTickets SupportTicket[]
-  callDisputes   CallDispute[]
+  emailCodes      EmailCode[]
+  verifications   VerificationRequest[]
+  devices         Device[]
+  purchases       Purchase[]
+  callsMade       Call[]                @relation("CallCaller")
+  callsReceived   Call[]                @relation("CallCallee")
+  giftsSent       CallGift[]            @relation("GiftFrom")
+  giftsReceived   CallGift[]            @relation("GiftTo")
+  payouts         Payout[]
+  sessions        Session[]
+  consents        Consent[]
+  dataExports     DataExport[]
+  dsrRequests     DsrRequest[]
+  sanctions       Sanction[]
+  kycSubmissions  KycSubmission[]
+  appeals         Appeal[]
+  modFlags        ModerationFlag[]
+  supportTickets  SupportTicket[]
+  callDisputes    CallDispute[]
+  analyticsEvents AnalyticsEvent[]
 
   profile Profile?
   photos  Photo[]
@@ -374,6 +376,20 @@ model CallDispute {
 
   @@index([status, createdAt])
   @@index([callId])
+}
+
+// Faz 16: gizlilik dostu kullanım hunisi (kayıt → eşleşme → ilk mesaj → ilk satın alma).
+// Sadece "analytics" rızası verilmiş kullanıcılar için, aşama başına en fazla bir satır (ilk
+// ulaşma anı); hesap silinince kullanıcıyla birlikte silinir, üçüncü bir tarafa gitmez.
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String // REGISTERED | MATCHED | FIRST_MESSAGE | FIRST_PURCHASE
+  createdAt DateTime @default(now())
+
+  @@unique([userId, kind])
+  @@index([kind, createdAt])
 }
 
 // Arama içi hediye: jetonun tamamı alıcıya geçer (EARN)

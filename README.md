@@ -95,6 +95,17 @@ Ayarlar `server/src/config.ts` dosyasında.
 - **Hesap silme:** Şifreyle onaylanır. Bekleyen istekler iade edilir; fotoğraflar ve selfie'ler de silinir.
 - **Hız sınırları** (`src/limits.ts`): giriş, kayıt ve kod denemesi IP başına; mesaj, istek, kaydırma ve şikayet kullanıcı başına sınırlı. Geliştirmede IP sınırları 25 kat gevşektir.
 
+## Kullanım kolaylığı, erişilebilirlik ve performans (Faz 16)
+
+- **İlk kullanım rehberi** (`app/lib/features/onboarding/intro_screen.dart`, `core/tips.dart`): profil kurulumundan sonra bir kez açılan tanıtım; Profil ekranından tekrar açılabilir. Cüzdanda her zaman erişilebilir "Jetonlar nasıl çalışır?" bilgi sayfası (`features/wallet/coins_info_sheet.dart`).
+- **Durum ekranları** (`core/ui.dart`, `features/home/home_shell.dart`): çevrimdışı şeridi (Socket.IO bağlantı olaylarına bağlı), hata ekranında çevrimdışı/gerçek hata ayrımı, tüm boş/yükleniyor durumları ortak `CenteredMessage`/`ListSkeleton` bileşenleriyle tutarlı.
+- **Erişilebilirlik:** ekran okuyucu etiketleri, en az 44×44 dokunma alanı, gradyan zeminlerde yeterli metin kontrastı.
+- **Performans:** küçük gösterimlerde sunucunun küçük boy fotoğrafı + bellek boyutu sınırlaması (`memCacheWidth/Height`), büyüyebilecek listelerde tembel (lazy) oluşturma.
+- **Metin ve dil denetimi** (`app/test/l10n_consistency_test.dart`): TR/EN anahtar kümesi eşitliği ve unutulmuş çeviri kontrolü kalıcı testte.
+- **Gizlilik dostu kullanım analitiği** (`server/src/analytics.ts`, rıza: `privacy/consents.ts`): kayıt→eşleşme→ilk mesaj→ilk satın alma hunisi, sadece rıza verenler için, panelde toplam sayı olarak (Finans → Kullanım hunisi).
+- **Uygulama içi geri bildirim:** mevcut destek talebi altyapısına eklenen "Öneri" kategorisi, Profil ekranından tek dokunuşla.
+- Arayüz turu: `tools/ui-tours/faz16.mjs`.
+
 ## Gerçek zamanlı iletişim (Faz 15)
 
 - **Adil ücretlendirme** (`src/calls.ts`): kabulden sonra Agora'ya gerçek bağlanma `POST /calls/:id/joined` ile doğrulanır; bağlantı kurulmazsa (`mediaConfirmDeadline` dolarsa) ücret alınmaz. Kapanışta kalan saniyeler için orantılı kısmi dakika iadesi (`partialRefund` → `refundCallCharge`), hem ödeyenin hem alıcının olgunlaşmamış kazancının aynı oranda geri alınmasıyla.
@@ -274,7 +285,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–16), dış işler en sonda (Faz 17)
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [x] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [ ] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
+- [x] **Faz 16 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 17 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar

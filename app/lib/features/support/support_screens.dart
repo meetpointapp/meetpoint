@@ -30,6 +30,7 @@ String supportCategoryLabel(AppLocalizations l, SupportCategory c) => switch (c)
       SupportCategory.safety => l.supportCatSafety,
       SupportCategory.account => l.supportCatAccount,
       SupportCategory.bug => l.supportCatBug,
+      SupportCategory.suggestion => l.supportCatSuggestion,
       SupportCategory.other => l.supportCatOther,
     };
 

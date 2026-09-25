@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { backfillFunnelStages } from '../analytics';
 import { uid } from '../auth';
 import { privacy } from '../config';
 import { HttpError, prisma } from '../db';
@@ -30,6 +31,10 @@ privacyRouter.put('/me/consents', async (req, res) => {
     .parse(req.body);
   const userId = uid(req);
   await prisma.$transaction((tx) => recordConsent(tx, userId, kind, granted, source, String(req.ip ?? '')));
+
+  // Analitik rızası yeni verildi: o ana kadar zaten ulaşılmış aşamaları bir kerelik işaretle
+  // (ayar ekranından ender çağrılır, gecikmeye duyarlı değil: yanıttan önce beklenir)
+  if (kind === 'analytics' && granted) await backfillFunnelStages(userId).catch(() => {});
 
   if (kind === 'selfie' && !granted) {
     const requests = await prisma.verificationRequest.findMany({ where: { userId, selfiePath: { not: '' } } });

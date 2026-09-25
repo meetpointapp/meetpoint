@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { recordFunnelStage } from './analytics';
 import { economy } from './config';
 import { prisma } from './db';
 import { emitToUser } from './realtime';
@@ -57,7 +58,10 @@ export async function creditPurchase(input: PurchaseInput): Promise<{ credited: 
       if (bonus > 0) await credit(tx, input.userId, { promo: bonus }, 'BONUS', { note: `first_purchase:${purchase.id}` });
       return { credited: true, coins: pack.coins, bonus };
     });
-    if (result.credited) emitToUser(input.userId, 'wallet:updated', { coins: result.coins, bonus: result.bonus });
+    if (result.credited) {
+      emitToUser(input.userId, 'wallet:updated', { coins: result.coins, bonus: result.bonus });
+      await recordFunnelStage(input.userId, 'FIRST_PURCHASE').catch(() => {});
+    }
     return result;
   } catch (e) {
     // Aynı işlem eşzamanlı iki kez geldiyse benzersizlik kısıtı yakalar

@@ -13,6 +13,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../support/support_screens.dart';
+import 'coins_info_sheet.dart';
 import 'sales_terms_sheet.dart';
 
 // Mağazanın yerel fiyatları (mağaza bağlı değilse boş: referans USD gösterilir)
@@ -85,7 +86,16 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     final prices = ref.watch(localPricesProvider).value ?? const {};
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.navWallet)),
+      appBar: AppBar(title: Text(l.navWallet), actions: [
+        IconButton(
+          tooltip: l.coinsInfoTitle,
+          icon: const Icon(Icons.info_outline_rounded),
+          onPressed: () {
+            final w = wallet.value;
+            if (w != null) showCoinsInfo(context, w);
+          },
+        ),
+      ]),
       body: wallet.when(
         loading: () => const ListSkeleton(rows: 5),
         error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(walletProvider)),
@@ -129,7 +139,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               const SizedBox(height: 24),
               Text(l.history, style: theme.textTheme.titleMedium),
               if (w.entries.isEmpty)
-                Padding(padding: const EdgeInsets.symmetric(vertical: 24), child: Center(child: Text(l.noHistory)))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: CenteredMessage(icon: Icons.receipt_long_outlined, text: l.noHistory),
+                )
               else
                 for (final e in w.entries) _EntryTile(entry: e),
             ]),
@@ -166,7 +179,8 @@ class _BalanceCard extends StatelessWidget {
                 '${l.coins(wallet.cashable)} ≈ \$${wallet.cashableUsd.toStringAsFixed(2)}',
                 style: theme.textTheme.titleMedium?.copyWith(color: onCard, fontWeight: FontWeight.w700),
               ),
-              Text(l.cashableInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+              // Küçük yazı + renkli zemin: okunabilirlik için tam beyaz (Faz 16: kontrast)
+              Text(l.cashableInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
               // Olgunlaşan kazanç: iade süresi dolunca bozdurulabilir
               if (wallet.maturingEarnings > 0 && wallet.nextMatureAt != null) ...[
                 const SizedBox(height: 6),

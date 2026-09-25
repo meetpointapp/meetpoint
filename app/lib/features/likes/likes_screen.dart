@@ -156,7 +156,7 @@ class _LikeCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Brand.radius),
         child: Stack(fit: StackFit.expand, children: [
-          NetPhoto(p.coverUrl),
+          NetPhoto(p.coverThumbUrl, width: 240, height: 240),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(

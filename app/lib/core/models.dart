@@ -816,7 +816,8 @@ enum ConsentKind {
   overseasTransfer('overseas_transfer', 'consent-overseas'),
   selfie('selfie', 'consent-selfie'),
   marketing('marketing', 'consent-marketing'),
-  marketingPush('marketing_push', 'consent-marketing');
+  marketingPush('marketing_push', 'consent-marketing'),
+  analytics('analytics', 'consent-analytics');
 
   const ConsentKind(this.api, this.doc);
   final String api; // sunucudaki adı
@@ -831,6 +832,7 @@ class ConsentState {
   final bool selfie;
   final bool marketing;
   final bool marketingPush;
+  final bool analytics;
   // false ise yurt dışı aktarım için ayrı rıza sorulmaz (standart sözleşme yeterli görülmüş)
   final bool overseasConsentRequired;
 
@@ -840,6 +842,7 @@ class ConsentState {
     this.selfie = false,
     this.marketing = false,
     this.marketingPush = false,
+    this.analytics = false,
     this.overseasConsentRequired = true,
   });
 
@@ -849,6 +852,7 @@ class ConsentState {
         ConsentKind.selfie => selfie,
         ConsentKind.marketing => marketing,
         ConsentKind.marketingPush => marketingPush,
+        ConsentKind.analytics => analytics,
       };
 
   factory ConsentState.fromJson(Map<String, dynamic> j) => ConsentState(
@@ -857,6 +861,7 @@ class ConsentState {
         selfie: j['selfie'] == true,
         marketing: j['marketing'] == true,
         marketingPush: j['marketing_push'] == true,
+        analytics: j['analytics'] == true,
         overseasConsentRequired: j['overseasConsentRequired'] != false,
       );
 }
@@ -957,7 +962,7 @@ class SalesTerms {
 
 // ---------- Destek ----------
 
-enum SupportCategory { coins, calls, cashout, safety, account, bug, other }
+enum SupportCategory { coins, calls, cashout, safety, account, bug, suggestion, other }
 
 enum TicketStatus { open, answered, closed }
 

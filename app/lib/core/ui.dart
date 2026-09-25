@@ -138,9 +138,14 @@ IconData requestKindIcon(RequestKind k) => switch (k) {
     };
 
 class NetPhoto extends StatelessWidget {
-  const NetPhoto(this.url, {super.key, this.fit = BoxFit.cover});
+  // width/height (mantıksal piksel, gösterileceği kutunun boyutu): verilirse görsel bu boyuta göre
+  // bellekte küçük tutulur (memCacheWidth/Height) — küçük bir avatar için tam çözünürlük
+  // görseli belleğe almayı önler. Tam ekran/kart gibi gerçekten büyük gösterimlerde boş bırakılır.
+  const NetPhoto(this.url, {super.key, this.fit = BoxFit.cover, this.width, this.height});
   final String? url;
   final BoxFit fit;
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -149,9 +154,12 @@ class NetPhoto extends StatelessWidget {
       child: Icon(Icons.person_rounded, size: 48, color: Theme.of(context).colorScheme.outline),
     );
     if (url == null) return placeholder;
+    final dpr = MediaQuery.devicePixelRatioOf(context);
     return CachedNetworkImage(
       imageUrl: mediaUrl(url!),
       fit: fit,
+      memCacheWidth: width == null ? null : (width! * dpr).round(),
+      memCacheHeight: height == null ? null : (height! * dpr).round(),
       placeholder: (_, _) => placeholder,
       errorWidget: (_, _, _) => placeholder,
     );
@@ -165,7 +173,10 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipOval(
-        child: SizedBox.square(dimension: radius * 2, child: NetPhoto(profile?.coverThumbUrl)),
+        child: SizedBox.square(
+          dimension: radius * 2,
+          child: NetPhoto(profile?.coverThumbUrl, width: radius * 2, height: radius * 2),
+        ),
       );
 }
 
@@ -325,17 +336,21 @@ class ProfileSkeleton extends StatelessWidget {
       );
 }
 
-// AsyncValue için ortak yükleniyor/hata görünümü
+// AsyncValue için ortak yükleniyor/hata görünümü. Bağlantı yokken ("network") ve sunucunun
+// gerçek bir hata döndürdüğü durumlar (ör. yetersiz bakiye) görsel olarak ayrılır (Faz 16:
+// boş/yükleniyor/çevrimdışı/hata durumlarının tutarlı olması).
 class ErrorRetry extends StatelessWidget {
   const ErrorRetry({super.key, required this.error, required this.onRetry});
   final Object error;
   final VoidCallback onRetry;
 
+  bool get _offline => error is ApiException && (error as ApiException).code == 'network';
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return CenteredMessage(
-      icon: Icons.cloud_off_rounded,
+      icon: _offline ? Icons.wifi_off_rounded : Icons.error_outline_rounded,
       text: errorText(l, error),
       action: FilledButton.tonal(onPressed: onRetry, child: Text(l.refresh)),
     );

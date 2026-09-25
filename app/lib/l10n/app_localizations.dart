@@ -3207,6 +3207,12 @@ abstract class AppLocalizations {
   /// **'Hata bildir'**
   String get supportCatBug;
 
+  /// No description provided for @supportCatSuggestion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öneri'**
+  String get supportCatSuggestion;
+
   /// No description provided for @supportCatOther.
   ///
   /// In tr, this message translates to:
@@ -3338,6 +3344,162 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu talep kapandı. Yeni bir talep açabilirsin.'**
   String get errTicketClosed;
+
+  /// No description provided for @howItWorks.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasıl çalışır?'**
+  String get howItWorks;
+
+  /// No description provided for @nextStep.
+  ///
+  /// In tr, this message translates to:
+  /// **'İleri'**
+  String get nextStep;
+
+  /// No description provided for @introPage1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet'**
+  String get introPage1Title;
+
+  /// No description provided for @introPage1Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilleri kaydırarak keşfet. Sağa kaydır: beğen. Sola kaydır: geç.'**
+  String get introPage1Body;
+
+  /// No description provided for @introPage2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstek gönder'**
+  String get introPage2Title;
+
+  /// No description provided for @introPage2Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir profille konuşmak için mesaj, sesli ya da görüntülü arama isteği gönder. Kabul edilirse sohbet açılır.'**
+  String get introPage2Body;
+
+  /// No description provided for @introPage3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Jetonlar'**
+  String get introPage3Title;
+
+  /// No description provided for @introPage3Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstekler ve aramalar jetonla ücretlendirilir. Aramalar dakika başına, sadece karşı taraf gerçekten bağlandığında ücretlendirilir.'**
+  String get introPage3Body;
+
+  /// No description provided for @introPage4Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazanç'**
+  String get introPage4Title;
+
+  /// No description provided for @introPage4Body.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biri seninle konuşmak için jeton harcarsa payın cüzdanına kazanç olarak eklenir; {days} gün sonra paraya çevirebilirsin.'**
+  String introPage4Body(int days);
+
+  /// No description provided for @coinsInfoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Jetonlar nasıl çalışır?'**
+  String get coinsInfoTitle;
+
+  /// No description provided for @coinsInfoRequestsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstek ücretleri'**
+  String get coinsInfoRequestsTitle;
+
+  /// No description provided for @coinsInfoCallsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arama ücretleri'**
+  String get coinsInfoCallsTitle;
+
+  /// No description provided for @coinsInfoCallsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dakika başına ücretlendirilir; karşı taraf gerçekten bağlanmazsa ücret alınmaz.'**
+  String get coinsInfoCallsBody;
+
+  /// No description provided for @coinsInfoEarnTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazanç'**
+  String get coinsInfoEarnTitle;
+
+  /// No description provided for @coinsInfoEarnBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biri seninle konuşmak için jeton harcarsa payın cüzdanına kazanç olarak eklenir; {days} gün sonra paraya çevirebilirsin.'**
+  String coinsInfoEarnBody(int days);
+
+  /// No description provided for @coinsInfoPromoBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bonus ve hediye jetonlarıyla ödenen tutarlardan gelen kazanç uygulamada harcanabilir, paraya çevrilemez.'**
+  String get coinsInfoPromoBody;
+
+  /// No description provided for @callFairBillingTip.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk aramandır: karşı taraf gerçekten bağlanmazsa ücret alınmaz, kesintide kalan saniye orantılı iade edilir.'**
+  String get callFairBillingTip;
+
+  /// No description provided for @offlineBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çevrimdışısın, yeniden bağlanılıyor…'**
+  String get offlineBanner;
+
+  /// No description provided for @back.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri'**
+  String get back;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreyi göster'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreyi gizle'**
+  String get hidePassword;
+
+  /// No description provided for @consentAnalyticsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım analitiği'**
+  String get consentAnalyticsTitle;
+
+  /// No description provided for @consentAnalyticsText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt, eşleşme, ilk mesaj ve ilk satın alma gibi kilometre taşlarının anonim sayılarla kendi sunucumuzda tutulması (uygulamayı iyileştirmek için); üçüncü tarafa gitmez.'**
+  String get consentAnalyticsText;
+
+  /// No description provided for @sendFeedback.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öneri ve hata bildir'**
+  String get sendFeedback;
+
+  /// No description provided for @sendFeedbackHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fikrini paylaş ya da karşılaştığın bir sorunu anlat'**
+  String get sendFeedbackHint;
 }
 
 class _AppLocalizationsDelegate

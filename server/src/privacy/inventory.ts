@@ -153,6 +153,15 @@ export const INVENTORY: InventoryEntry[] = [
     recipients: 'Yetkili adli ve idari makamlar (talep hâlinde)',
   },
   {
+    category: 'Kullanım analitiği',
+    tables: ['AnalyticsEvent'],
+    data: 'Kayıt/eşleşme/ilk mesaj/ilk satın alma aşamalarına ulaşılan an (aşama başına en fazla bir kayıt, ayrıntılı davranış izlenmez)',
+    purpose: 'Uygulamanın kullanım hunisinin (dönüşüm oranlarının) ölçülmesi ve iyileştirilmesi',
+    basis: ['rıza'],
+    retention: 'Rıza geri alınana veya hesap silinene kadar; üçüncü tarafa aktarılmaz',
+    recipients: 'Aktarılmaz (sadece kendi sunucumuz, toplu sayı olarak panelde)',
+  },
+  {
     category: 'Moderasyon',
     tables: ['Sanction', 'Appeal', 'ModerationFlag', 'LegalRequest'],
     data: 'Yaptırımlar ve gerekçeleri, itirazlar, otomatik güvenlik işaretleri, resmi talepler ve yapılan işlemler',

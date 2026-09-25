@@ -983,6 +983,7 @@
   "supportCatSafety": "Güvenlik",
   "supportCatAccount": "Hesap",
   "supportCatBug": "Hata bildir",
+  "supportCatSuggestion": "Öneri",
   "supportCatOther": "Diğer",
   "notificationsTitle": "Bildirimler",
   "notifyTypesTitle": "Bildirim türleri",
@@ -1004,5 +1005,45 @@
   "requiredNotificationsNote": "Ödeme, destek yanıtı ve güvenlik bildirimleri hesabınla ilgili olduğu için her zaman gönderilir.",
   "errSalesTermsRequired": "Satın almadan önce satış koşullarını onaylaman gerekiyor.",
   "errSupportLimit": "Çok fazla açık talebin var. Önce mevcut taleplerinden birini kapat.",
-  "errTicketClosed": "Bu talep kapandı. Yeni bir talep açabilirsin."
+  "errTicketClosed": "Bu talep kapandı. Yeni bir talep açabilirsin.",
+  "howItWorks": "Nasıl çalışır?",
+  "nextStep": "İleri",
+  "introPage1Title": "Keşfet",
+  "introPage1Body": "Profilleri kaydırarak keşfet. Sağa kaydır: beğen. Sola kaydır: geç.",
+  "introPage2Title": "İstek gönder",
+  "introPage2Body": "Bir profille konuşmak için mesaj, sesli ya da görüntülü arama isteği gönder. Kabul edilirse sohbet açılır.",
+  "introPage3Title": "Jetonlar",
+  "introPage3Body": "İstekler ve aramalar jetonla ücretlendirilir. Aramalar dakika başına, sadece karşı taraf gerçekten bağlandığında ücretlendirilir.",
+  "introPage4Title": "Kazanç",
+  "introPage4Body": "Biri seninle konuşmak için jeton harcarsa payın cüzdanına kazanç olarak eklenir; {days} gün sonra paraya çevirebilirsin.",
+  "@introPage4Body": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "coinsInfoTitle": "Jetonlar nasıl çalışır?",
+  "coinsInfoRequestsTitle": "İstek ücretleri",
+  "coinsInfoCallsTitle": "Arama ücretleri",
+  "coinsInfoCallsBody": "Dakika başına ücretlendirilir; karşı taraf gerçekten bağlanmazsa ücret alınmaz.",
+  "coinsInfoEarnTitle": "Kazanç",
+  "coinsInfoEarnBody": "Biri seninle konuşmak için jeton harcarsa payın cüzdanına kazanç olarak eklenir; {days} gün sonra paraya çevirebilirsin.",
+  "@coinsInfoEarnBody": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "coinsInfoPromoBody": "Bonus ve hediye jetonlarıyla ödenen tutarlardan gelen kazanç uygulamada harcanabilir, paraya çevrilemez.",
+  "callFairBillingTip": "İlk aramandır: karşı taraf gerçekten bağlanmazsa ücret alınmaz, kesintide kalan saniye orantılı iade edilir.",
+  "offlineBanner": "Çevrimdışısın, yeniden bağlanılıyor…",
+  "back": "Geri",
+  "showPassword": "Şifreyi göster",
+  "hidePassword": "Şifreyi gizle",
+  "consentAnalyticsTitle": "Kullanım analitiği",
+  "consentAnalyticsText": "Kayıt, eşleşme, ilk mesaj ve ilk satın alma gibi kilometre taşlarının anonim sayılarla kendi sunucumuzda tutulması (uygulamayı iyileştirmek için); üçüncü tarafa gitmez.",
+  "sendFeedback": "Öneri ve hata bildir",
+  "sendFeedbackHint": "Fikrini paylaş ya da karşılaştığın bir sorunu anlat"
 }

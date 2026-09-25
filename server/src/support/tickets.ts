@@ -13,7 +13,7 @@ import { privateStore, randomKey } from '../storage';
 // Durum: OPEN (sıra bizde) → ANSWERED (sıra kullanıcıda) → kullanıcı yazarsa tekrar OPEN; CLOSED son.
 // dueAt: sıradaki yanıtın hedef zamanı (ilk yanıt ve kullanıcının her yeni mesajı için 48 saat).
 
-export const SUPPORT_CATEGORIES = ['coins', 'calls', 'cashout', 'safety', 'account', 'bug', 'other'] as const;
+export const SUPPORT_CATEGORIES = ['coins', 'calls', 'cashout', 'safety', 'account', 'bug', 'suggestion', 'other'] as const;
 export const RELATED_TYPES = ['purchase', 'payout', 'call', 'wallet'] as const;
 export type SupportCategory = (typeof SUPPORT_CATEGORIES)[number];
 export type RelatedType = (typeof RELATED_TYPES)[number];

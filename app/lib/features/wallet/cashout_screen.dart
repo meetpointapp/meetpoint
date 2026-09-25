@@ -43,7 +43,7 @@ class _CashoutScreenState extends ConsumerState<CashoutScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(l.cashout)),
       body: wallet.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ListSkeleton(rows: 4),
         error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(walletProvider)),
         data: (w) {
           final rules = w.cashout;
@@ -120,13 +120,14 @@ class _AvailableCard extends StatelessWidget {
           CoinAmount(wallet.cashable, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 8),
+        // Küçük yazı + renkli zemin: okunabilirlik için tam beyaz (Faz 16: kontrast)
         Text(l.cashoutMinInfo(rules.minCoins, rules.usdOf(rules.minCoins)),
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
         if (wallet.promoEarnings > 0) ...[
           const SizedBox(height: 10),
           Text(l.promoEarnings(wallet.promoEarnings),
               style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
-          Text(l.promoEarningsInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70)),
+          Text(l.promoEarningsInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
         ],
       ]),
     );

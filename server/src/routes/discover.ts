@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
+import { recordFunnelStage } from '../analytics';
 import { birthdayForAge } from '../age';
 import { requireNotRestricted } from '../moderation/sanctions';
 import { uid } from '../auth';
@@ -131,5 +132,7 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
   });
   emitToUser(toId, 'match', { conversationId: conversation.id, userId: me });
   void notify(toId, 'match', me, undefined, { conversationId: conversation.id });
+  await recordFunnelStage(me, 'MATCHED').catch(() => {});
+  await recordFunnelStage(toId, 'MATCHED').catch(() => {});
   res.json({ match: true, conversationId: conversation.id });
 });

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { funnelReport } from '../analytics';
 import { requireRole } from '../auth';
 import { adminEmailOf, audit } from '../audit';
 import { listCallDisputes, resolveCallDispute } from '../calls';
@@ -189,4 +190,9 @@ adminFinanceRouter.get('/report', FIN, async (req, res) => {
     return res.type('text/csv; charset=utf-8').send(`﻿${reportCsv(r)}`);
   }
   res.json(r);
+});
+
+// ---------- Kullanım hunisi (Faz 16): kayıt → eşleşme → ilk mesaj → ilk satın alma
+adminFinanceRouter.get('/funnel', FIN, async (_req, res) => {
+  res.json(await funnelReport());
 });

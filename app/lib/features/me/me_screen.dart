@@ -10,6 +10,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../onboarding/intro_screen.dart';
 import '../support/support_screens.dart';
 
 // Profil tamamlama yüzdesi: fotoğraf, soru ve temel bilgiler eşleşmeyi artırır
@@ -160,6 +161,21 @@ class MeScreen extends ConsumerWidget {
                       await context.push('/help');
                       ref.invalidate(supportInboxProvider);
                     },
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
+                    leading: const Icon(Icons.feedback_outlined),
+                    title: Text(l.sendFeedback),
+                    subtitle: Text(l.sendFeedbackHint),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => openNewTicket(context, category: SupportCategory.suggestion),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
+                    leading: const Icon(Icons.tips_and_updates_outlined),
+                    title: Text(l.howItWorks),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => showIntro(context),
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(

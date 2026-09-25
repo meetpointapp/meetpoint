@@ -148,6 +148,16 @@ describe('Faz 14: tüketici ve destek', () => {
     check('regular user blocked from panel', (await call(u.t, 'GET', '/admin/api/support/tickets')).http === 403);
   });
 
+  // Faz 16: uygulama içi geri bildirim, mevcut destek talebi altyapısını "suggestion" kategorisiyle kullanır
+  it('destek: öneri kategorisi (uygulama içi geri bildirim)', async () => {
+    const u = await registerVerified(`feedback${uniqueTag()}@test.com`);
+    const t = await openTicket(u.t, { category: 'suggestion', subject: 'Fikrim var', body: 'Keşfette filtre olarak boy eklenebilir mi?' });
+    check('öneri talebi açılır', t.http === 201);
+    const fin = await makeAdmin('finance');
+    const detail = await call(fin.t, 'GET', `/admin/api/support/tickets/${t.id}`);
+    check('panelde öneri kategorisiyle görünür', detail.category === 'suggestion');
+  });
+
   it('yardım merkezi: herkese açık, değerler ayarlardan, arama, panelden düzenleme', async () => {
     const r = await (await fetch(`${B}/help/articles?lang=tr`)).json();
     check('default FAQ loaded', r.categories.length === 5 && r.categories.every((c: { articles: unknown[] }) => c.articles.length > 0));

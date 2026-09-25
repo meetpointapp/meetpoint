@@ -143,6 +143,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 suffixIcon: IconButton(
                                   icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined),
                                   onPressed: () => setState(() => _obscure = !_obscure),
+                                  tooltip: _obscure ? l.showPassword : l.hidePassword,
                                 ),
                               ),
                               validator: (v) => (v == null || v.length < 8) ? l.passwordHint : null,

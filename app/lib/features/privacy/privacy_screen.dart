@@ -45,6 +45,7 @@ class PrivacyScreen extends ConsumerWidget {
                 ConsentKind.selfie,
                 ConsentKind.marketing,
                 ConsentKind.marketingPush,
+                ConsentKind.analytics,
               ].indexed) ...[
                 if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
                 _ConsentSwitch(kind: k, value: c.of(k)),
@@ -114,7 +115,7 @@ class _ConsentSwitchState extends ConsumerState<_ConsentSwitch> {
       ConsentKind.specialCategory => l.revokeSpecialWarning,
       ConsentKind.overseasTransfer => l.revokeOverseasWarning,
       ConsentKind.selfie => l.revokeSelfieWarning,
-      ConsentKind.marketing || ConsentKind.marketingPush => null,
+      ConsentKind.marketing || ConsentKind.marketingPush || ConsentKind.analytics => null,
     };
     if (!granted && warning != null) {
       final ok = await showDialog<bool>(
@@ -152,6 +153,7 @@ class _ConsentSwitchState extends ConsumerState<_ConsentSwitch> {
       ConsentKind.selfie => (l.consentSelfieTitle, l.consentSelfieText),
       ConsentKind.marketing => (l.consentMarketingTitle, l.consentMarketingText),
       ConsentKind.marketingPush => (l.consentMarketingPushTitle, l.consentMarketingPushText),
+      ConsentKind.analytics => (l.consentAnalyticsTitle, l.consentAnalyticsText),
     };
     return SwitchListTile(
       value: widget.value,

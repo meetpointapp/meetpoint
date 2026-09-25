@@ -59,6 +59,7 @@ Future<bool> askConsent(BuildContext context, WidgetRef ref, ConsentKind kind, {
     ConsentKind.specialCategory => (l.consentSpecialTitle, l.consentSpecialAsk),
     ConsentKind.marketing => (l.consentMarketingTitle, l.consentMarketingText),
     ConsentKind.marketingPush => (l.consentMarketingPushTitle, l.consentMarketingPushText),
+    ConsentKind.analytics => (l.consentAnalyticsTitle, l.consentAnalyticsText),
   };
   final locale = ref.read(localeProvider).languageCode;
   final ok = await showDialog<bool>(

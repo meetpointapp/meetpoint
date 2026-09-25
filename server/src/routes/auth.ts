@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { recordFunnelStage } from '../analytics';
 import { currentSession, requireAuth, uid } from '../auth';
 import { consumeCode, issueCode } from '../codes';
 import { HttpError, prisma } from '../db';
@@ -107,6 +108,7 @@ authRouter.post('/verify-email', codeLimiter, requireAuth, async (req, res) => {
   await prisma.user.update({ where: { id: userId }, data: { emailVerifiedAt: new Date() } });
   // Kayıt hediyesi: doğrulanmış hesaplara bir kez (sahte hesap çiftliğine karşı doğrulamaya bağlı)
   await grantSignupBonus(userId);
+  await recordFunnelStage(userId, 'REGISTERED').catch(() => {});
   res.json({ ok: true });
 });
 
