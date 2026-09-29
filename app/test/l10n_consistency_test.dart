@@ -15,6 +15,7 @@ const _identicalAllowed = {
   'avatarSection', // "Avatar": iki dilde de aynı kelime
   'bonusCoins', // "+{count} bonus": "bonus" kelimesi TR'de de kullanılıyor
   'premiumTitle', // "MeetPoint+": marka/ürün adı, çevrilmez
+  'milestoneCountShort', // "{n}/9": sadece sayı
 };
 
 Map<String, dynamic> _readArb(String path) => json.decode(File(path).readAsStringSync()) as Map<String, dynamic>;

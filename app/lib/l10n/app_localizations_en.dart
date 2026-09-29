@@ -1950,6 +1950,34 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get achievementsTitle => 'Social courage journey';
+
+  @override
+  String get trackIletisim => 'Communication';
+
+  @override
+  String get trackBaglanti => 'Connection';
+
+  @override
+  String get trackKimlik => 'Identity';
+
+  @override
+  String milestoneCountShort(int n) {
+    return '$n/9';
+  }
+
+  @override
+  String milestoneBadgeTooltip(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n milestones completed',
+      one: '1 milestone completed',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get quietHoursTitle => 'Quiet hours';
 
   @override

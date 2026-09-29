@@ -3291,6 +3291,42 @@ abstract class AppLocalizations {
   /// **'En uzun serin: {n} gün'**
   String streakLongest(int n);
 
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal cesaret yolculuğu'**
+  String get achievementsTitle;
+
+  /// No description provided for @trackIletisim.
+  ///
+  /// In tr, this message translates to:
+  /// **'İletişim'**
+  String get trackIletisim;
+
+  /// No description provided for @trackBaglanti.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı'**
+  String get trackBaglanti;
+
+  /// No description provided for @trackKimlik.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kimlik'**
+  String get trackKimlik;
+
+  /// No description provided for @milestoneCountShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n}/9'**
+  String milestoneCountShort(int n);
+
+  /// No description provided for @milestoneBadgeTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} kademe tamamlandı'**
+  String milestoneBadgeTooltip(int n);
+
   /// No description provided for @quietHoursTitle.
   ///
   /// In tr, this message translates to:

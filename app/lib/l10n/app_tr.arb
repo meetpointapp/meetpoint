@@ -1018,6 +1018,26 @@
       }
     }
   },
+  "achievementsTitle": "Sosyal cesaret yolculuğu",
+  "trackIletisim": "İletişim",
+  "trackBaglanti": "Bağlantı",
+  "trackKimlik": "Kimlik",
+  "milestoneCountShort": "{n}/9",
+  "@milestoneCountShort": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "milestoneBadgeTooltip": "{n} kademe tamamlandı",
+  "@milestoneBadgeTooltip": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "quietHoursTitle": "Sessiz saatler",
   "quietHoursHint": "Bu saatlerde aramalar dışında bildirim gelmez.",
   "quietHours": "Sessiz saatleri aç",

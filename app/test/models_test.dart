@@ -258,6 +258,42 @@ void main() {
     });
   });
 
+  group('Sosyal cesaret yolculuğu (Faz 17)', () {
+    test('Achievements.fromJson: üç izi ayrıştırır, eksik iz varsayılan (tier 0) olur', () {
+      final j = {
+        'iletisim': {
+          'tier': 1,
+          'milestones': [
+            {'id': 'first_message', 'done': true},
+            {'id': 'week_long_chat', 'done': false},
+            {'id': 'first_icebreaker', 'done': false},
+          ],
+        },
+        'baglanti': {'tier': 0, 'milestones': []},
+        // 'kimlik' kasten eksik bırakıldı
+      };
+      final a = Achievements.fromJson(j);
+      expect(a.of(AchievementTrack.iletisim).tier, 1);
+      expect(a.of(AchievementTrack.iletisim).milestones.first.id, 'first_message');
+      expect(a.of(AchievementTrack.iletisim).milestones.first.done, isTrue);
+      expect(a.of(AchievementTrack.baglanti).tier, 0);
+      expect(a.of(AchievementTrack.kimlik).tier, 0); // eksik iz → varsayılan TrackState
+      expect(a.totalTier, 1);
+    });
+
+    test('PublicProfile.milestoneCount: eski yanıtta (alan yok) 0, yeni yanıtta ayrıştırılır', () {
+      final legacy = PublicProfile.fromJson({
+        'id': 'u1', 'displayName': 'A', 'age': 20, 'gender': 'male', 'bio': '', 'city': '', 'country': '', 'photos': [],
+      });
+      expect(legacy.milestoneCount, 0);
+      final withCount = PublicProfile.fromJson({
+        'id': 'u1', 'displayName': 'A', 'age': 20, 'gender': 'male', 'bio': '', 'city': '', 'country': '', 'photos': [],
+        'milestoneCount': 5,
+      });
+      expect(withCount.milestoneCount, 5);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

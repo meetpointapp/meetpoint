@@ -63,6 +63,8 @@ class PublicProfile {
   // döner (chatBubbleThemeId/chatBackgroundThemeId → MyProfile'da).
   final String frameId;
   final String badgeId;
+  // Faz 17: "Sosyal cesaret yolculuğu" — toplam açılan kademe sayısı (0-9), herkese görünür.
+  final int milestoneCount;
 
   const PublicProfile({
     required this.id,
@@ -97,6 +99,7 @@ class PublicProfile {
     this.moodId = '',
     this.frameId = '',
     this.badgeId = '',
+    this.milestoneCount = 0,
   });
 
   String? get coverUrl => photos.isEmpty ? null : photos.first.url;
@@ -136,6 +139,7 @@ class PublicProfile {
         moodId: j['moodId'] ?? '',
         frameId: j['frameId'] ?? '',
         badgeId: j['badgeId'] ?? '',
+        milestoneCount: j['milestoneCount'] ?? 0,
       );
 }
 
@@ -442,6 +446,8 @@ class Me {
   final Sanction? pendingSanction;
   // Faz 17: günlük giriş serisi
   final Streak streak;
+  // Faz 17: "Sosyal cesaret yolculuğu"
+  final Achievements achievements;
 
   const Me({
     required this.id,
@@ -462,6 +468,7 @@ class Me {
     this.restrictedUntil,
     this.pendingSanction,
     this.streak = const Streak(),
+    this.achievements = const Achievements(),
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -483,6 +490,7 @@ class Me {
         restrictedUntil: j['restrictedUntil'] == null ? null : _date(j['restrictedUntil']),
         pendingSanction: j['pendingSanction'] == null ? null : Sanction.fromJson(j['pendingSanction']),
         streak: j['streak'] == null ? const Streak() : Streak.fromJson(j['streak']),
+        achievements: j['achievements'] == null ? const Achievements() : Achievements.fromJson(j['achievements']),
       );
 }
 
@@ -492,6 +500,38 @@ class Streak {
   final int longest;
   const Streak({this.current = 0, this.longest = 0});
   factory Streak.fromJson(Map<String, dynamic> j) => Streak(current: j['current'] ?? 0, longest: j['longest'] ?? 0);
+}
+
+// Faz 17: "Sosyal cesaret yolculuğu". Üç iz (İletişim/Bağlantı/Kimlik), her biri 3 kademe
+// (bronz/gümüş/altın) — kimlikler ve sıra server/src/achievements.ts ile birebir eşleşmeli.
+enum AchievementTrack { iletisim, baglanti, kimlik }
+
+class Milestone {
+  final String id;
+  final bool done;
+  const Milestone({required this.id, required this.done});
+  factory Milestone.fromJson(Map<String, dynamic> j) => Milestone(id: j['id'], done: j['done'] ?? false);
+}
+
+class TrackState {
+  final int tier; // 0-3
+  final List<Milestone> milestones;
+  const TrackState({this.tier = 0, this.milestones = const []});
+  factory TrackState.fromJson(Map<String, dynamic> j) => TrackState(
+        tier: j['tier'] ?? 0,
+        milestones: [for (final m in (j['milestones'] as List? ?? const [])) Milestone.fromJson(m)],
+      );
+}
+
+class Achievements {
+  final Map<AchievementTrack, TrackState> tracks;
+  const Achievements({this.tracks = const {}});
+  TrackState of(AchievementTrack t) => tracks[t] ?? const TrackState();
+  int get totalTier => AchievementTrack.values.fold(0, (sum, t) => sum + of(t).tier);
+  factory Achievements.fromJson(Map<String, dynamic> j) => Achievements(tracks: {
+        for (final t in AchievementTrack.values)
+          if (j[t.name] != null) t: TrackState.fromJson(j[t.name]),
+      });
 }
 
 enum RequestKind { message, voice, video }

@@ -158,6 +158,10 @@ class _ProfileBody extends ConsumerWidget {
                     Text(l.moodLabel(p.moodId), style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
                   ]),
                 ],
+                if (p.milestoneCount > 0) ...[
+                  const SizedBox(height: 6),
+                  MilestoneBadge(p.milestoneCount, onPhoto: true),
+                ],
               ]),
             ),
             // Kişisel profil vitrini: özel bir renk seçilmişse alt kenarda ince bir vurgu şeridi

@@ -130,6 +130,8 @@ class MeScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               _StreakCard(streak: m.streak),
               const SizedBox(height: 16),
+              _JourneyCard(achievements: m.achievements),
+              const SizedBox(height: 16),
               Card(
                 child: Column(children: [
                   ListTile(
@@ -384,6 +386,50 @@ class _StreakCard extends StatelessWidget {
         ),
         title: Text(l.streakDays(streak.current), style: theme.textTheme.titleSmall),
         subtitle: streak.longest > streak.current ? Text(l.streakLongest(streak.longest)) : null,
+      ),
+    );
+  }
+}
+
+// Faz 17: "Sosyal cesaret yolculuğu" — üç izdeki kademe durumu. Ayrıntılı bir "Gelişimim" ekranı
+// (bir sonraki adım önerisi, açılan ödüller) ayrı bir görevde eklenir; bu sadece özet.
+const _tierColors = [Color(0xFFCD7F32), Color(0xFFC0C0C0), Color(0xFFFFD700)]; // bronz, gümüş, altın
+
+class _JourneyCard extends StatelessWidget {
+  const _JourneyCard({required this.achievements});
+  final Achievements achievements;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final tracks = {
+      AchievementTrack.iletisim: l.trackIletisim,
+      AchievementTrack.baglanti: l.trackBaglanti,
+      AchievementTrack.kimlik: l.trackKimlik,
+    };
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(l.achievementsTitle, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 12),
+          for (final entry in tracks.entries) ...[
+            Row(children: [
+              Expanded(child: Text(entry.value, style: theme.textTheme.bodyMedium)),
+              for (var i = 0; i < 3; i++)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Icon(
+                    Icons.circle,
+                    size: 12,
+                    color: i < achievements.of(entry.key).tier ? _tierColors[i] : theme.colorScheme.outlineVariant,
+                  ),
+                ),
+            ]),
+            if (entry.key != AchievementTrack.kimlik) const SizedBox(height: 10),
+          ],
+        ]),
       ),
     );
   }

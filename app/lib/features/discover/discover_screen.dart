@@ -530,6 +530,7 @@ class _ProfileCardState extends State<_ProfileCard> {
                       _Meta(icon: Icons.place_outlined, text: p.location),
                     if (p.lookingFor.isNotEmpty)
                       _Meta(emoji: lookingForEmoji[p.lookingFor], text: l.lookingForLabel(p.lookingFor)),
+                    if (p.milestoneCount > 0) MilestoneBadge(p.milestoneCount, onPhoto: true),
                   ]),
                   if (interests.isNotEmpty) ...[
                     const SizedBox(height: 10),

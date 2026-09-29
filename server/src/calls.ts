@@ -1,5 +1,6 @@
 import { RtcRole, RtcTokenBuilder } from 'agora-token';
 import type { Call, Photo, Prisma, Profile, User } from '@prisma/client';
+import { unlockMilestone } from './achievements';
 import { agora, callTiming, economy, type CallKind } from './config';
 import { fileReport } from './moderation/reports';
 import { hasConsent, requireConsent } from './privacy/consents';
@@ -246,7 +247,14 @@ export async function confirmJoined(id: string, userId: string) {
   if (!call || (call.callerId !== userId && call.calleeId !== userId)) throw new HttpError(404, 'not_found');
   if (call.status !== 'ACTIVE') return { ok: true };
   const field = call.callerId === userId ? 'callerJoinedAt' : 'calleeJoinedAt';
-  if (!call[field]) await prisma.call.update({ where: { id }, data: { [field]: new Date() } });
+  if (!call[field]) {
+    const updated = await prisma.call.update({ where: { id }, data: { [field]: new Date() } });
+    // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi (her iki taraf da gerçekten bağlanınca)
+    if (updated.callerJoinedAt && updated.calleeJoinedAt) {
+      await unlockMilestone(updated.callerId, 'first_call');
+      await unlockMilestone(updated.calleeId, 'first_call');
+    }
+  }
   return { ok: true };
 }
 

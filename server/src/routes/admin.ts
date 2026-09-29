@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { unlockMilestone } from '../achievements';
 import { type AdminRole, requireRole, uid } from '../auth';
 import { adminEmailOf, audit } from '../audit';
 import { LEVELS, applySanction, revokeSanction } from '../moderation/sanctions';
@@ -354,6 +355,8 @@ adminRouter.post('/verifications/:id/:decision', requireRole(...MOD), async (req
     }),
   ]);
   await audit(req, `verification.${decision}`, 'user', v.userId, { verificationId: v.id, note });
+  // Faz 17: "Sosyal cesaret yolculuğu" — Kimlik izi
+  if (approved) await unlockMilestone(v.userId, 'verified');
   res.json({ ok: true });
 });
 

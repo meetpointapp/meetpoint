@@ -145,6 +145,10 @@ class LikeActionCard extends StatelessWidget {
                   onPhoto: true,
                   badgeId: p.badgeId,
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+              if (p.milestoneCount > 0) ...[
+                const SizedBox(height: 4),
+                MilestoneBadge(p.milestoneCount, onPhoto: true),
+              ],
               const SizedBox(height: 8),
               Row(children: [
                 Expanded(child: MiniButton(icon: Icons.close_rounded, color: Brand.nope, onTap: onPass)),

@@ -129,6 +129,36 @@ class NameWithBadge extends StatelessWidget {
       ]);
 }
 
+// Faz 17: "Sosyal cesaret yolculuğu" — herkese görünen toplam kademe rozeti (profilde, keşfet
+// kartında). Ayrıntılı iz/kademe kırılımı sadece sahibine (MeScreen) gösterilir.
+class MilestoneBadge extends StatelessWidget {
+  const MilestoneBadge(this.count, {super.key, this.onPhoto = false});
+  final int count;
+  final bool onPhoto;
+
+  @override
+  Widget build(BuildContext context) {
+    if (count <= 0) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    return Tooltip(
+      message: l.milestoneBadgeTooltip(count),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: ShapeDecoration(
+          shape: const StadiumBorder(),
+          color: onPhoto ? Colors.black.withValues(alpha: 0.45) : Brand.gold.withValues(alpha: 0.14),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.military_tech_rounded, size: 14, color: onPhoto ? Brand.gold : Brand.gold),
+          const SizedBox(width: 4),
+          Text(l.milestoneCountShort(count),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: onPhoto ? Colors.white : null)),
+        ]),
+      ),
+    );
+  }
+}
+
 void showSnack(BuildContext context, String text, {SnackBarAction? action}) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()

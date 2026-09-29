@@ -1916,6 +1916,28 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get achievementsTitle => 'Sosyal cesaret yolculuğu';
+
+  @override
+  String get trackIletisim => 'İletişim';
+
+  @override
+  String get trackBaglanti => 'Bağlantı';
+
+  @override
+  String get trackKimlik => 'Kimlik';
+
+  @override
+  String milestoneCountShort(int n) {
+    return '$n/9';
+  }
+
+  @override
+  String milestoneBadgeTooltip(int n) {
+    return '$n kademe tamamlandı';
+  }
+
+  @override
   String get quietHoursTitle => 'Sessiz saatler';
 
   @override

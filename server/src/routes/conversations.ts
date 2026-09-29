@@ -2,6 +2,7 @@ import type { Message } from '@prisma/client';
 import { Router } from 'express';
 import multer from 'multer';
 import { recordFunnelStage } from '../analytics';
+import { unlockMilestone } from '../achievements';
 import { sanitizePrivatePhoto } from '../images';
 import { privateStore, randomKey } from '../storage';
 import { z } from 'zod';
@@ -151,6 +152,16 @@ async function deliver(conversationId: string, me: string, otherId: string, data
   emitToUser(otherId, 'message:new', dto);
   void notify(otherId, 'message', me, data.kind === 'photo' ? '📷' : data.body.slice(0, 120), { conversationId });
   await recordFunnelStage(me, 'FIRST_MESSAGE').catch(() => {});
+  // Faz 17: "Sosyal cesaret yolculuğu" — İletişim izi
+  await unlockMilestone(me, 'first_message');
+  const [first, senders] = await Promise.all([
+    prisma.message.findFirst({ where: { conversationId }, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
+    prisma.message.findMany({ where: { conversationId }, distinct: ['senderId'], select: { senderId: true } }),
+  ]);
+  if (first && senders.length === 2 && Date.now() - first.createdAt.getTime() >= 7 * 86_400_000) {
+    await unlockMilestone(me, 'week_long_chat');
+    await unlockMilestone(otherId, 'week_long_chat');
+  }
   return dto;
 }
 

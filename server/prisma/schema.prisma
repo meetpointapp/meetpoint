@@ -197,6 +197,10 @@ model Profile {
   chatBubbleThemeId     String @default("")
   chatBackgroundThemeId String @default("")
 
+  // Faz 17: "Sosyal cesaret yolculuğu" — açılan kademe kimlikleri (src/achievements.ts). Her biri
+  // bir kez açılır, kademe sırası TRACK_MILESTONES'teki sırayla belirlenir (kalıcı, geri alınmaz).
+  milestones Json @default("[]") // ["first_message", "first_match", ...]
+
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
   longitude  Float?

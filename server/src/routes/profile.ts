@@ -49,6 +49,7 @@ import { reviewNewPhoto } from '../moderation/detect';
 import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { sendStreakReminders, touchStreak } from '../streak';
+import { checkProfileComplete, tracksState, unlockMilestone } from '../achievements';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
 
@@ -117,6 +118,9 @@ export function publicProfile(
     // sahibinin kendi görünümünü etkilediği için başkasına döndürülmez.
     frameId: p.frameId,
     badgeId: p.badgeId,
+    // Faz 17: "Sosyal cesaret yolculuğu" — toplam açılan kademe sayısı (0-9), keşfet kartında ve
+    // profilde görünen güncel rozet. Ayrıntılı iz/kademe kırılımı sadece sahibine (GET /me) gider.
+    milestoneCount: (p.milestones as string[]).length,
     ...(opts.owner ? { chatBubbleThemeId: p.chatBubbleThemeId, chatBackgroundThemeId: p.chatBackgroundThemeId } : {}),
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
@@ -156,6 +160,8 @@ profileRouter.get('/me', async (req, res) => {
     premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
     // Faz 17: günlük giriş serisi
     streak: { current: streak.current, longest: streak.longest },
+    // Faz 17: "Sosyal cesaret yolculuğu" — üç izin ayrıntılı kademe durumu
+    achievements: tracksState(user.profile?.milestones ?? []),
     hasLocation: user.profile?.latitude != null,
     filters: user.profile
       ? { minAge: user.profile.filterMinAge, maxAge: user.profile.filterMaxAge, maxKm: user.profile.filterMaxKm }
@@ -311,6 +317,8 @@ profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
       await prisma.profile.update({ where: { userId }, data: { vibeArchetypeId: archetypeId } });
     }
   }
+  // Faz 17: "Sosyal cesaret yolculuğu" — Kimlik izi
+  await checkProfileComplete(userId, saved);
   res.json({ ok: true });
 });
 
@@ -333,6 +341,8 @@ profileRouter.put('/me/vibe', requireNotRestricted, async (req, res) => {
   const p = await prisma.profile.findUniqueOrThrow({ where: { userId } });
   const archetypeId = computeArchetype(answers, p.interests as string[]);
   await prisma.profile.update({ where: { userId }, data: { vibeAnswers: answers, vibeArchetypeId: archetypeId } });
+  // Faz 17: "Sosyal cesaret yolculuğu" — Kimlik izi
+  await unlockMilestone(userId, 'vibe_done');
   res.json({ archetypeId });
 });
 
@@ -467,5 +477,7 @@ profileRouter.get('/users/:id/room', async (req, res) => {
   }
   const user = await prisma.user.findUnique({ where: { id: target }, include: { profile: true } });
   if (!user?.profile || user.bannedAt || user.deletionRequestedAt) throw new HttpError(404, 'not_found');
+  // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi (kendi odana bakmak sayılmaz)
+  if (target !== me) await unlockMilestone(me, 'first_room_visit');
   res.json({ ...roomDto(user.profile), displayName: user.profile.displayName });
 });

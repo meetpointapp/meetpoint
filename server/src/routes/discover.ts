@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 import { recordFunnelStage } from '../analytics';
+import { unlockMilestone } from '../achievements';
 import { birthdayForAge } from '../age';
 import { INTERESTS } from '../catalog';
 import { requireNotRestricted } from '../moderation/sanctions';
@@ -229,5 +230,8 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
   void notify(toId, 'match', me, undefined, { conversationId: conversation.id });
   await recordFunnelStage(me, 'MATCHED').catch(() => {});
   await recordFunnelStage(toId, 'MATCHED').catch(() => {});
+  // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi
+  await unlockMilestone(me, 'first_match');
+  await unlockMilestone(toId, 'first_match');
   res.json({ match: true, conversationId: conversation.id });
 });
