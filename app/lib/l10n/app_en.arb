@@ -705,5 +705,9 @@
   "referralHaveCode": "Have an invite code?",
   "referralCodeHint": "Invite code",
   "referralApply": "Apply",
-  "referralApplied": "Code applied!"
+  "referralApplied": "Code applied!",
+  "shareButton": "Share",
+  "shareMatchTitle": "It's a match! 💕",
+  "shareMatchWith": "with {name}",
+  "shareProfileTagline": "My MeetPoint profile"
 }

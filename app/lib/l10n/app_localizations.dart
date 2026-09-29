@@ -4340,6 +4340,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kod uygulandı!'**
   String get referralApplied;
+
+  /// No description provided for @shareButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get shareButton;
+
+  /// No description provided for @shareMatchTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleştik! 💕'**
+  String get shareMatchTitle;
+
+  /// No description provided for @shareMatchWith.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile'**
+  String shareMatchWith(String name);
+
+  /// No description provided for @shareProfileTagline.
+  ///
+  /// In tr, this message translates to:
+  /// **'MeetPoint\'te profilim'**
+  String get shareProfileTagline;
 }
 
 class _AppLocalizationsDelegate

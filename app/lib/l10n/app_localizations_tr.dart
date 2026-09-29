@@ -2769,4 +2769,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get referralApplied => 'Kod uygulandı!';
+
+  @override
+  String get shareButton => 'Paylaş';
+
+  @override
+  String get shareMatchTitle => 'Eşleştik! 💕';
+
+  @override
+  String shareMatchWith(String name) {
+    return '$name ile';
+  }
+
+  @override
+  String get shareProfileTagline => 'MeetPoint\'te profilim';
 }

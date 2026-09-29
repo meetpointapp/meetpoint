@@ -7,6 +7,8 @@ import '../../core/catalog.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
+import '../../core/share_card.dart';
+import '../../core/share_templates.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
@@ -237,13 +239,25 @@ class _VibeSummary extends ConsumerWidget {
             : Text(l.vibeIntro, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
       ),
       const SizedBox(height: 10),
-      OutlinedButton(
-        onPressed: () async {
-          await context.push<String>('/vibe');
-          ref.invalidate(meProvider);
-        },
-        child: Text(archetypeId.isEmpty ? l.vibeStart : l.vibeRetake),
-      ),
+      Row(children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () async {
+              await context.push<String>('/vibe');
+              ref.invalidate(meProvider);
+            },
+            child: Text(archetypeId.isEmpty ? l.vibeStart : l.vibeRetake),
+          ),
+        ),
+        if (archetypeId.isNotEmpty) ...[
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: l.shareButton,
+            icon: const Icon(Icons.ios_share_rounded),
+            onPressed: () => shareCardImage(context, card: vibeShareCard(l, archetypeId)),
+          ),
+        ],
+      ]),
     ]);
   }
 }

@@ -6,6 +6,8 @@ import '../../core/catalog.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
+import '../../core/share_card.dart';
+import '../../core/share_templates.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
@@ -117,7 +119,7 @@ class _ProfileBody extends ConsumerWidget {
         foregroundColor: Colors.white,
         backgroundColor: theme.colorScheme.surface,
         leading: const _CircleBack(),
-        actions: [if (!isMe) _SafetyMenu(profile: p)],
+        actions: [if (isMe) _ShareProfileButton(profile: p) else _SafetyMenu(profile: p)],
         flexibleSpace: FlexibleSpaceBar(
           background: Stack(fit: StackFit.expand, children: [
             NetPhoto(p.coverUrl),
@@ -190,6 +192,26 @@ class _CircleBack extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
       );
+}
+
+// Faz 17 madde 9: paylaşılabilir anlar — kendi profil kartını görsele dönüştürüp paylaş
+class _ShareProfileButton extends StatelessWidget {
+  const _ShareProfileButton({required this.profile});
+  final PublicProfile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: IconButton.filled(
+        style: IconButton.styleFrom(backgroundColor: Colors.black38, foregroundColor: Colors.white),
+        icon: const Icon(Icons.ios_share_rounded, size: 20),
+        tooltip: l.shareButton,
+        onPressed: () => shareCardImage(context, card: profileShareCard(l, profile)),
+      ),
+    );
+  }
 }
 
 // Alttaki kompakt istek çubuğu: büyük mesaj isteği + küçük arama butonları

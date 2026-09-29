@@ -1397,5 +1397,16 @@
   "referralHaveCode": "Davet kodun var mı?",
   "referralCodeHint": "Davet kodu",
   "referralApply": "Uygula",
-  "referralApplied": "Kod uygulandı!"
+  "referralApplied": "Kod uygulandı!",
+  "shareButton": "Paylaş",
+  "shareMatchTitle": "Eşleştik! 💕",
+  "shareMatchWith": "{name} ile",
+  "@shareMatchWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shareProfileTagline": "MeetPoint'te profilim"
 }

@@ -6,6 +6,8 @@ import '../l10n/app_localizations.dart';
 import 'fx.dart';
 import 'models.dart';
 import 'providers.dart';
+import 'share_card.dart';
+import 'share_templates.dart';
 import 'theme.dart';
 import 'ui.dart';
 
@@ -101,10 +103,17 @@ class MatchOverlay extends StatelessWidget {
             const SizedBox(height: 28),
             GradientButton(label: l.sendMessage, icon: Icons.chat_bubble_rounded, onPressed: onChat),
             const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l.keepSwiping, style: const TextStyle(color: Colors.white70)),
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l.keepSwiping, style: const TextStyle(color: Colors.white70)),
+              ),
+              TextButton.icon(
+                onPressed: () => shareCardImage(context, card: matchShareCard(l, me, other), text: '${l.shareMatchTitle} ${l.shareMatchWith(other.displayName)}'),
+                icon: const Icon(Icons.ios_share_rounded, size: 18, color: Colors.white70),
+                label: Text(l.shareButton, style: const TextStyle(color: Colors.white70)),
+              ),
+            ]),
           ]),
         ),
       ),

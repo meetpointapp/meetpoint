@@ -2834,4 +2834,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get referralApplied => 'Code applied!';
+
+  @override
+  String get shareButton => 'Share';
+
+  @override
+  String get shareMatchTitle => 'It\'s a match! 💕';
+
+  @override
+  String shareMatchWith(String name) {
+    return 'with $name';
+  }
+
+  @override
+  String get shareProfileTagline => 'My MeetPoint profile';
 }
