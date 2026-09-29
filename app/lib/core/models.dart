@@ -409,17 +409,48 @@ class RoomInfo {
   final String floorId;
   final List<RoomItem> items;
   final String displayName; // sadece ziyarette dolu
-  const RoomInfo({this.wallpaperId = '', this.floorId = '', this.items = const [], this.displayName = ''});
+  // Faz 17 madde 10: "Odanı sergile" — açıksa oda, bağlantısı olmayanlara da haftalık galeride görünür
+  final bool showcaseOptIn;
+  const RoomInfo({this.wallpaperId = '', this.floorId = '', this.items = const [], this.displayName = '', this.showcaseOptIn = false});
   factory RoomInfo.fromJson(Map<String, dynamic> j) => RoomInfo(
         wallpaperId: j['wallpaperId'] ?? '',
         floorId: j['floorId'] ?? '',
         items: [for (final i in (j['items'] as List? ?? const [])) RoomItem.fromJson(i)],
         displayName: j['displayName'] ?? '',
+        showcaseOptIn: j['showcaseOptIn'] ?? false,
       );
-  Map<String, dynamic> toJson() => {'wallpaperId': wallpaperId, 'floorId': floorId, 'items': [for (final i in items) i.toJson()]};
+  Map<String, dynamic> toJson() =>
+      {'wallpaperId': wallpaperId, 'floorId': floorId, 'items': [for (final i in items) i.toJson()], 'showcaseOptIn': showcaseOptIn};
 
-  RoomInfo copyWith({String? wallpaperId, String? floorId, List<RoomItem>? items}) =>
-      RoomInfo(wallpaperId: wallpaperId ?? this.wallpaperId, floorId: floorId ?? this.floorId, items: items ?? this.items);
+  RoomInfo copyWith({String? wallpaperId, String? floorId, List<RoomItem>? items, bool? showcaseOptIn}) => RoomInfo(
+        wallpaperId: wallpaperId ?? this.wallpaperId,
+        floorId: floorId ?? this.floorId,
+        items: items ?? this.items,
+        showcaseOptIn: showcaseOptIn ?? this.showcaseOptIn,
+      );
+}
+
+// Faz 17 madde 10: haftalık "en güzel odalar" galerisi — sergilemeyi açık bırakan kullanıcılar
+class RoomShowcaseEntry {
+  final String userId;
+  final String displayName;
+  final String wallpaperId;
+  final String floorId;
+  final List<RoomItem> items;
+  const RoomShowcaseEntry({
+    required this.userId,
+    required this.displayName,
+    this.wallpaperId = '',
+    this.floorId = '',
+    this.items = const [],
+  });
+  factory RoomShowcaseEntry.fromJson(Map<String, dynamic> j) => RoomShowcaseEntry(
+        userId: j['userId'],
+        displayName: j['displayName'] ?? '',
+        wallpaperId: j['wallpaperId'] ?? '',
+        floorId: j['floorId'] ?? '',
+        items: [for (final i in (j['items'] as List? ?? const [])) RoomItem.fromJson(i)],
+      );
 }
 
 class Me {

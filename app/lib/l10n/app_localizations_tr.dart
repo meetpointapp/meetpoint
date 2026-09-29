@@ -2311,6 +2311,20 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.';
 
   @override
+  String get roomShowcaseOptIn => 'Odamı sergile';
+
+  @override
+  String get roomShowcaseOptInHint =>
+      'Açarsan bağlantın olmayan kişiler de haftalık \"en güzel odalar\" galerisinde odanı görebilir.';
+
+  @override
+  String get roomShowcaseTitle => 'Bu haftanın öne çıkan odaları';
+
+  @override
+  String get roomShowcaseEmpty =>
+      'Bu hafta henüz sergilenen bir oda yok. İlk olmak ister misin?';
+
+  @override
   String get roomVisit => 'Odasını gör';
 
   @override

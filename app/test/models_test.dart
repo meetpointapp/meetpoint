@@ -436,6 +436,47 @@ void main() {
     });
   });
 
+  group('Odanı sergile (Faz 17)', () {
+    test('RoomInfo.fromJson: showcaseOptIn ayrıştırılır', () {
+      final r = RoomInfo.fromJson({
+        'wallpaperId': 'ocean',
+        'floorId': 'wood',
+        'items': [
+          {'itemId': 'sofa', 'x': 0, 'y': 0},
+        ],
+        'showcaseOptIn': true,
+      });
+      expect(r.showcaseOptIn, isTrue);
+      expect(r.items.single.itemId, 'sofa');
+    });
+
+    test('RoomInfo.fromJson: showcaseOptIn yoksa varsayılan false', () {
+      final r = RoomInfo.fromJson({'wallpaperId': '', 'floorId': '', 'items': []});
+      expect(r.showcaseOptIn, isFalse);
+    });
+
+    test('RoomInfo.copyWith: showcaseOptIn güncellenebilir', () {
+      const r = RoomInfo(showcaseOptIn: false);
+      final updated = r.copyWith(showcaseOptIn: true);
+      expect(updated.showcaseOptIn, isTrue);
+    });
+
+    test('RoomShowcaseEntry.fromJson', () {
+      final e = RoomShowcaseEntry.fromJson({
+        'userId': 'u1',
+        'displayName': 'Ayşe',
+        'wallpaperId': 'sunset',
+        'floorId': 'tile',
+        'items': [
+          {'itemId': 'bed', 'x': 0, 'y': 0},
+          {'itemId': 'lamp', 'x': 1, 'y': 0},
+        ],
+      });
+      expect(e.displayName, 'Ayşe');
+      expect(e.items.length, 2);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

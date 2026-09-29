@@ -3897,6 +3897,30 @@ abstract class AppLocalizations {
   /// **'Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.'**
   String get roomItemsHint;
 
+  /// No description provided for @roomShowcaseOptIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odamı sergile'**
+  String get roomShowcaseOptIn;
+
+  /// No description provided for @roomShowcaseOptInHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açarsan bağlantın olmayan kişiler de haftalık \"en güzel odalar\" galerisinde odanı görebilir.'**
+  String get roomShowcaseOptInHint;
+
+  /// No description provided for @roomShowcaseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu haftanın öne çıkan odaları'**
+  String get roomShowcaseTitle;
+
+  /// No description provided for @roomShowcaseEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta henüz sergilenen bir oda yok. İlk olmak ister misin?'**
+  String get roomShowcaseEmpty;
+
   /// No description provided for @roomVisit.
   ///
   /// In tr, this message translates to:

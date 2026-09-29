@@ -2354,6 +2354,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pick an item, then tap an empty spot on the grid. Tapping a placed item removes it.';
 
   @override
+  String get roomShowcaseOptIn => 'Showcase my room';
+
+  @override
+  String get roomShowcaseOptInHint =>
+      'If you turn this on, people you\'re not connected with can see your room in the weekly \"best rooms\" gallery.';
+
+  @override
+  String get roomShowcaseTitle => 'This week\'s featured rooms';
+
+  @override
+  String get roomShowcaseEmpty =>
+      'No rooms showcased this week yet. Want to be the first?';
+
+  @override
   String get roomVisit => 'See their room';
 
   @override

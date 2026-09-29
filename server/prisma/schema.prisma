@@ -185,6 +185,10 @@ model Profile {
   roomWallpaperId String @default("")
   roomFloorId     String @default("")
   roomItems       Json   @default("[]")
+  // Faz 17 madde 10: "Odanı sergile" — haftalık "en güzel odalar" galerisi. Varsayılan kapalı: oda
+  // normalde sadece bağlantılı kişilere açık, galeride görünmek açık bir tercih gerektirir.
+  roomShowcaseOptIn Boolean  @default(false)
+  roomUpdatedAt     DateTime?
 
   // Faz 16: "Kendini Keşfet" vibe sistemi. answers: { [soruId]: seçenekId } — src/vibe.ts.
   // Tüm sorular cevaplanmadan archetypeId boş kalır. Profil güncellendikçe (ör. ilgi alanı

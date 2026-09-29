@@ -464,11 +464,14 @@ const roomSchema = z.object({
     .max(ROOM_MAX_ITEMS)
     .default([])
     .refine((items) => new Set(items.map((i) => `${i.x},${i.y}`)).size === items.length, 'duplicate_position'),
+  // Faz 17 madde 10: "Odanı sergile" — açıksa oda, haftalık galeride bağlantısı olmayanlara da görünür
+  showcaseOptIn: z.boolean().default(false),
 });
-const roomDto = (p: Pick<Profile, 'roomWallpaperId' | 'roomFloorId' | 'roomItems'>) => ({
+const roomDto = (p: Pick<Profile, 'roomWallpaperId' | 'roomFloorId' | 'roomItems' | 'roomShowcaseOptIn'>) => ({
   wallpaperId: p.roomWallpaperId,
   floorId: p.roomFloorId,
   items: p.roomItems as { itemId: string; x: number; y: number }[],
+  showcaseOptIn: p.roomShowcaseOptIn,
 });
 
 profileRouter.get('/me/room', async (req, res) => {
@@ -482,23 +485,65 @@ profileRouter.put('/me/room', requireNotRestricted, async (req, res) => {
   for (const item of data.items) assertOwned(owned, item.itemId, STORE_ROOM_ITEMS);
   await prisma.profile.update({
     where: { userId: uid(req) },
-    data: { roomWallpaperId: data.wallpaperId, roomFloorId: data.floorId, roomItems: data.items },
+    data: {
+      roomWallpaperId: data.wallpaperId,
+      roomFloorId: data.floorId,
+      roomItems: data.items,
+      roomShowcaseOptIn: data.showcaseOptIn,
+      roomUpdatedAt: new Date(),
+    },
   });
   res.json({ ok: true });
 });
 
-// Ziyaret: sadece bağlantın olan (bir konuşmanız olan) kişilerin odasını görebilirsin, salt görüntüleme
+// Faz 17 madde 10: "Odanı sergile" — son 7 günde güncellenmiş, sergilemeyi açık bırakmış odalardan
+// en çok eşyalı 10 tanesi (kural tabanlı "en güzel": emek = eşya sayısı, yapay zekâ yok).
+profileRouter.get('/rooms/showcase', async (req, res) => {
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const me = uid(req);
+  const profiles = await prisma.profile.findMany({
+    where: {
+      roomShowcaseOptIn: true,
+      roomUpdatedAt: { gte: since },
+      user: {
+        bannedAt: null,
+        deletionRequestedAt: null,
+        NOT: { OR: [{ blocksGiven: { some: { toId: me } } }, { blocksReceived: { some: { fromId: me } } }] },
+      },
+    },
+    select: { userId: true, displayName: true, roomWallpaperId: true, roomFloorId: true, roomItems: true },
+  });
+  const ranked = profiles
+    .map((p) => ({ ...p, itemCount: (p.roomItems as unknown[]).length }))
+    .filter((p) => p.itemCount > 0)
+    .sort((a, b) => b.itemCount - a.itemCount)
+    .slice(0, 10);
+  res.json(
+    ranked.map((p) => ({
+      userId: p.userId,
+      displayName: p.displayName,
+      wallpaperId: p.roomWallpaperId,
+      floorId: p.roomFloorId,
+      items: p.roomItems,
+    })),
+  );
+});
+
+// Ziyaret: bağlantın olan (bir konuşmanız olan) kişilerin odasını, veya galeri için sergilemeyi
+// açık bırakmış herkesin odasını salt görüntüleme ile görebilirsin.
 profileRouter.get('/users/:id/room', async (req, res) => {
   const me = uid(req);
   const target = req.params.id;
-  if (target !== me) {
-    if (await isBlockedEitherWay(me, target)) throw new HttpError(404, 'not_found');
-    const [userAId, userBId] = orderedPair(me, target);
-    const conv = await prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } } });
-    if (!conv) throw new HttpError(403, 'not_connected');
-  }
   const user = await prisma.user.findUnique({ where: { id: target }, include: { profile: true } });
   if (!user?.profile || user.bannedAt || user.deletionRequestedAt) throw new HttpError(404, 'not_found');
+  if (target !== me) {
+    if (await isBlockedEitherWay(me, target)) throw new HttpError(404, 'not_found');
+    if (!user.profile.roomShowcaseOptIn) {
+      const [userAId, userBId] = orderedPair(me, target);
+      const conv = await prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } } });
+      if (!conv) throw new HttpError(403, 'not_connected');
+    }
+  }
   // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi (kendi odana bakmak sayılmaz)
   if (target !== me) await unlockMilestone(me, 'first_room_visit');
   res.json({ ...roomDto(user.profile), displayName: user.profile.displayName });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/catalog.dart';
 import '../../core/models.dart';
@@ -13,8 +14,8 @@ import '../../l10n/app_localizations.dart';
 // sabit bir ızgaraya yerleştirilmiş eşyalar. Eşleştiğin/bağlantılı olduğun kişi salt görüntüleme
 // ile ziyaret edebilir (server: /users/:id/room, bağlantı yoksa 403 not_connected).
 
-class _RoomCanvas extends StatelessWidget {
-  const _RoomCanvas({required this.room, this.selected, this.onCellTap});
+class RoomCanvas extends StatelessWidget {
+  const RoomCanvas({super.key, required this.room, this.selected, this.onCellTap});
   final RoomInfo room;
   final String? selected; // düzenlemede: yerleştirilecek eşya; null = salt görüntüleme
   final void Function(int x, int y)? onCellTap;
@@ -121,13 +122,18 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
     final room = _room;
     return Scaffold(
       appBar: AppBar(title: Text(l.roomEditTitle), actions: [
+        IconButton(
+          tooltip: l.roomShowcaseTitle,
+          icon: const Icon(Icons.emoji_events_outlined),
+          onPressed: () => context.push('/rooms/showcase'),
+        ),
         if (_dirty)
           TextButton(onPressed: _saving ? null : _save, child: _saving ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2)) : Text(l.save)),
       ]),
       body: room == null
           ? const Center(child: CircularProgressIndicator())
           : ListView(padding: const EdgeInsets.all(16), children: [
-              _RoomCanvas(room: room, selected: _selectedItem, onCellTap: _tapCell),
+              RoomCanvas(room: room, selected: _selectedItem, onCellTap: _tapCell),
               const SizedBox(height: 16),
               Text(l.roomItemsHint, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               const SizedBox(height: 10),
@@ -157,6 +163,19 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
                   _dirty = true;
                 });
               }),
+              const SizedBox(height: 24),
+              Card(
+                child: SwitchListTile(
+                  secondary: const Icon(Icons.emoji_events_outlined),
+                  title: Text(l.roomShowcaseOptIn),
+                  subtitle: Text(l.roomShowcaseOptInHint),
+                  value: room.showcaseOptIn,
+                  onChanged: (v) => setState(() {
+                    _room = room.copyWith(showcaseOptIn: v);
+                    _dirty = true;
+                  }),
+                ),
+              ),
             ]),
     );
   }
@@ -194,7 +213,7 @@ class RoomVisitScreen extends ConsumerWidget {
       body: room.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(userRoomProvider(userId))),
-        data: (r) => Padding(padding: const EdgeInsets.all(16), child: _RoomCanvas(room: r)),
+        data: (r) => Padding(padding: const EdgeInsets.all(16), child: RoomCanvas(room: r)),
       ),
     );
   }
