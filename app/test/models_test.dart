@@ -393,6 +393,24 @@ void main() {
     });
   });
 
+  group('Haftalık özet (Faz 17)', () {
+    test('WeeklyDigest.fromJson: etkinlik varsa hasActivity true', () {
+      final d = WeeklyDigest.fromJson({
+        'newMatches': 2,
+        'longestChat': {'conversationId': 'c1', 'otherUserId': 'u2', 'otherName': 'Ayşe', 'messageCount': 5},
+      });
+      expect(d.newMatches, 2);
+      expect(d.longestChat?.otherName, 'Ayşe');
+      expect(d.hasActivity, isTrue);
+    });
+
+    test('WeeklyDigest.fromJson: etkinlik yoksa hasActivity false', () {
+      final d = WeeklyDigest.fromJson({'newMatches': 0, 'longestChat': null});
+      expect(d.longestChat, isNull);
+      expect(d.hasActivity, isFalse);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

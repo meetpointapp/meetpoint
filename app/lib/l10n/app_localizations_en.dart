@@ -2755,4 +2755,23 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get weeklyDigestTitle => 'This week';
+
+  @override
+  String weeklyDigestMatches(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n new matches',
+      one: '1 new match',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String weeklyDigestLongestChat(String name) {
+    return 'Longest chat: $name';
+  }
 }

@@ -4238,6 +4238,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{n} yıl oldu 🎉'**
   String matchAnniversaryYears(int n);
+
+  /// No description provided for @weeklyDigestTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta'**
+  String get weeklyDigestTitle;
+
+  /// No description provided for @weeklyDigestMatches.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} yeni eşleşme'**
+  String weeklyDigestMatches(int n);
+
+  /// No description provided for @weeklyDigestLongestChat.
+  ///
+  /// In tr, this message translates to:
+  /// **'En uzun sohbetin {name} ile'**
+  String weeklyDigestLongestChat(String name);
 }
 
 class _AppLocalizationsDelegate

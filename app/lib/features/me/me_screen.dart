@@ -32,6 +32,12 @@ int profileCompletion(PublicProfile p) {
   return score.clamp(0, 100);
 }
 
+// Faz 17 madde 7: haftalık özet — GET /me'nin parçası değil (daha ağır, daha seyrek istenen bir
+// hesaplama), bu yüzden ayrı bir provider ile isteniyor (journeyNextStep ile aynı yaklaşım).
+final weeklyDigestProvider = FutureProvider.autoDispose<WeeklyDigest>(
+  (ref) => ref.watch(apiProvider).weeklyDigest(),
+);
+
 class MeScreen extends ConsumerWidget {
   const MeScreen({super.key});
 
@@ -174,6 +180,8 @@ class MeScreen extends ConsumerWidget {
                 _StreakCard(streak: m.streak),
                 const SizedBox(height: 16),
                 _JourneyCard(achievements: m.achievements),
+                const SizedBox(height: 16),
+                const _WeeklyDigestCard(),
                 const SizedBox(height: 16),
                 Card(
                   child: Column(
@@ -587,6 +595,39 @@ class _JourneyCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// Faz 17 madde 7: haftalık özet. Etkinlik yoksa (yeni eşleşme ve mesajlaşma yoksa) hiç gösterilmez —
+// her hafta boş bir "0 eşleşme" kartı görmek can sıkıcı olurdu.
+class _WeeklyDigestCard extends ConsumerWidget {
+  const _WeeklyDigestCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final digest = ref.watch(weeklyDigestProvider).value;
+    if (digest == null || !digest.hasActivity) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        leading: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Brand.coral.withValues(alpha: 0.14),
+          ),
+          child: const Icon(Icons.insights_rounded, color: Brand.coral),
+        ),
+        title: Text(
+          digest.newMatches > 0 ? l.weeklyDigestMatches(digest.newMatches) : l.weeklyDigestTitle,
+          style: theme.textTheme.titleSmall,
+        ),
+        subtitle: digest.longestChat != null ? Text(l.weeklyDigestLongestChat(digest.longestChat!.otherName)) : null,
       ),
     );
   }

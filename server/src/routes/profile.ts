@@ -50,6 +50,7 @@ import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { sendStreakReminders, touchStreak } from '../streak';
 import { checkProfileComplete, nextStepHint, tracksState, unlockMilestone } from '../achievements';
+import { weeklyDigest } from '../weeklyDigest';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
 
@@ -334,6 +335,11 @@ const vibeAnswersSchema = z.record(z.string(), z.string()).refine(
 // sadece o ekrana özel, daha az sık istenen veri: bağlam duyarlı "sıradaki adım" önerisi.
 profileRouter.get('/me/journey', async (req, res) => {
   res.json({ nextStepHint: await nextStepHint(uid(req)) });
+});
+
+// Faz 17 madde 7: haftalık özet ("Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi)
+profileRouter.get('/me/weekly-digest', async (req, res) => {
+  res.json(await weeklyDigest(uid(req)));
 });
 
 profileRouter.get('/me/vibe', async (req, res) => {

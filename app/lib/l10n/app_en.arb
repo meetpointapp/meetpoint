@@ -688,5 +688,8 @@
   "matchAnniversaryOneMonth": "1 month since you matched! 🎉",
   "matchAnniversaryThreeMonths": "3 months since you matched! 🎉",
   "matchAnniversarySixMonths": "6 months since you matched! 🎉",
-  "matchAnniversaryYears": "{n, plural, =1{1 year since you matched! 🎉} other{{n} years since you matched! 🎉}}"
+  "matchAnniversaryYears": "{n, plural, =1{1 year since you matched! 🎉} other{{n} years since you matched! 🎉}}",
+  "weeklyDigestTitle": "This week",
+  "weeklyDigestMatches": "{n, plural, =1{1 new match} other{{n} new matches}}",
+  "weeklyDigestLongestChat": "Longest chat: {name}"
 }

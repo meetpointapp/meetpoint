@@ -2709,4 +2709,17 @@ class AppLocalizationsTr extends AppLocalizations {
   String matchAnniversaryYears(int n) {
     return '$n yıl oldu 🎉';
   }
+
+  @override
+  String get weeklyDigestTitle => 'Bu hafta';
+
+  @override
+  String weeklyDigestMatches(int n) {
+    return '$n yeni eşleşme';
+  }
+
+  @override
+  String weeklyDigestLongestChat(String name) {
+    return 'En uzun sohbetin $name ile';
+  }
 }

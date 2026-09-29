@@ -1352,5 +1352,22 @@
         "type": "int"
       }
     }
+  },
+  "weeklyDigestTitle": "Bu hafta",
+  "weeklyDigestMatches": "{n} yeni eşleşme",
+  "@weeklyDigestMatches": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "weeklyDigestLongestChat": "En uzun sohbetin {name} ile",
+  "@weeklyDigestLongestChat": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

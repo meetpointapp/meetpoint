@@ -539,6 +539,32 @@ class NextStepHint {
       );
 }
 
+// Faz 17 madde 7: haftalık özet ("Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi)
+class LongestChat {
+  final String conversationId;
+  final String otherUserId;
+  final String otherName;
+  final int messageCount;
+  const LongestChat({required this.conversationId, required this.otherUserId, required this.otherName, required this.messageCount});
+  factory LongestChat.fromJson(Map<String, dynamic> j) => LongestChat(
+        conversationId: j['conversationId'],
+        otherUserId: j['otherUserId'],
+        otherName: j['otherName'],
+        messageCount: j['messageCount'],
+      );
+}
+
+class WeeklyDigest {
+  final int newMatches;
+  final LongestChat? longestChat;
+  const WeeklyDigest({required this.newMatches, this.longestChat});
+  bool get hasActivity => newMatches > 0 || longestChat != null;
+  factory WeeklyDigest.fromJson(Map<String, dynamic> j) => WeeklyDigest(
+        newMatches: j['newMatches'] ?? 0,
+        longestChat: j['longestChat'] == null ? null : LongestChat.fromJson(j['longestChat']),
+      );
+}
+
 class Achievements {
   final Map<AchievementTrack, TrackState> tracks;
   const Achievements({this.tracks = const {}});

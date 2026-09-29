@@ -288,6 +288,9 @@ class Api {
   Future<void> setMood(String moodId) => _put('/me/mood', {'moodId': moodId});
   Future<void> clearMood() => _delete('/me/mood');
 
+  // Faz 17 madde 7: haftalık özet
+  Future<WeeklyDigest> weeklyDigest() async => WeeklyDigest.fromJson(await _get('/me/weekly-digest'));
+
   // Faz 16: kozmetik mağaza
   Future<List<StoreItem>> storeItems() async =>
       [for (final i in (await _get('/store/items') as List)) StoreItem.fromJson(i)];
