@@ -1,8 +1,9 @@
-import type { Message } from '@prisma/client';
+import type { IcebreakerGame, Message } from '@prisma/client';
 import { Router } from 'express';
 import multer from 'multer';
 import { recordFunnelStage } from '../analytics';
 import { unlockMilestone } from '../achievements';
+import { THIS_OR_THAT_PROMPTS } from '../catalog';
 import { sanitizePrivatePhoto } from '../images';
 import { privateStore, randomKey } from '../storage';
 import { z } from 'zod';
@@ -217,4 +218,85 @@ conversationsRouter.get('/messages/:id/photo', async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.type(msg.photoPath.endsWith('.webp') ? 'image/webp' : 'image/jpeg').send(data);
   emitToUser(msg.senderId, 'message:viewed', { id: msg.id, conversationId: msg.conversationId });
+});
+
+// Faz 17: sohbet içi buz kırıcı mini oyunlar ("2 doğru 1 yalan", "bu mu o mu"). Mesajlardan ayrı
+// bir tabloda (IcebreakerGame): "2 doğru 1 yalan"da hangi ifadenin yalan olduğu, cevaplayan tahmin
+// edene kadar sadece başlatana döner — Message'ın aksine burada tarafa göre maskelenmiş veri var.
+function icebreakerDto(g: IcebreakerGame, viewerId: string) {
+  const revealed = g.answeredAt !== null || g.starterId === viewerId;
+  return {
+    id: g.id,
+    conversationId: g.conversationId,
+    kind: g.kind,
+    starterId: g.starterId,
+    promptId: g.promptId,
+    statements: g.statements,
+    lieIndex: revealed ? g.lieIndex : null,
+    starterChoice: g.starterChoice,
+    responderId: g.responderId,
+    responderChoice: g.responderChoice,
+    answeredAt: g.answeredAt,
+    createdAt: g.createdAt,
+  };
+}
+
+const startIcebreakerSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('this_or_that'), promptId: z.enum(THIS_OR_THAT_PROMPTS), choice: z.enum(['a', 'b']) }),
+  z.object({
+    kind: z.literal('two_truths'),
+    statements: z.array(z.string().trim().min(1).max(200)).length(3),
+    lieIndex: z.number().int().min(0).max(2),
+  }),
+]);
+
+conversationsRouter.post('/conversations/:id/icebreaker', requireNotRestricted, messageLimiter, async (req, res) => {
+  const me = uid(req);
+  const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
+  if (await isBlockedEitherWay(me, otherId)) throw new HttpError(403, 'blocked');
+  const body = startIcebreakerSchema.parse(req.body);
+  // Serbest metin (2 doğru 1 yalan) iletişim bilgisi içeremez — normal mesajdan farklı olarak
+  // burada uyarmak yerine doğrudan reddedilir (oyun içeriği, bir uyarı akışı yok)
+  if (body.kind === 'two_truths' && body.statements.some((s) => contactInfo(s).length > 0)) {
+    throw new HttpError(400, 'validation');
+  }
+  const game = await prisma.icebreakerGame.create({
+    data:
+      body.kind === 'this_or_that'
+        ? { conversationId: conv.id, starterId: me, kind: 'this_or_that', promptId: body.promptId, starterChoice: body.choice }
+        : { conversationId: conv.id, starterId: me, kind: 'two_truths', statements: body.statements, lieIndex: body.lieIndex },
+  });
+  const dto = icebreakerDto(game, otherId);
+  emitToUser(otherId, 'icebreaker:new', dto);
+  void notify(otherId, 'message', me, '🎲', { conversationId: conv.id });
+  res.status(201).json(icebreakerDto(game, me));
+});
+
+conversationsRouter.get('/conversations/:id/icebreaker', async (req, res) => {
+  const me = uid(req);
+  const { conv } = await getOwnConversation(String(req.params.id), me);
+  const games = await prisma.icebreakerGame.findMany({ where: { conversationId: conv.id }, orderBy: { createdAt: 'asc' } });
+  res.json(games.map((g) => icebreakerDto(g, me)));
+});
+
+conversationsRouter.post('/conversations/:id/icebreaker/:gameId/answer', requireNotRestricted, async (req, res) => {
+  const me = uid(req);
+  const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
+  const game = await prisma.icebreakerGame.findUnique({ where: { id: String(req.params.gameId) } });
+  if (!game || game.conversationId !== conv.id) throw new HttpError(404, 'not_found');
+  if (game.starterId === me) throw new HttpError(400, 'validation');
+  if (game.answeredAt) throw new HttpError(400, 'validation');
+  const { choice } = z.object({ choice: z.string() }).parse(req.body);
+  if (game.kind === 'this_or_that' && !['a', 'b'].includes(choice)) throw new HttpError(400, 'validation');
+  if (game.kind === 'two_truths' && !['0', '1', '2'].includes(choice)) throw new HttpError(400, 'validation');
+
+  const updated = await prisma.icebreakerGame.update({
+    where: { id: game.id },
+    data: { responderId: me, responderChoice: choice, answeredAt: new Date() },
+  });
+  // Faz 17: "Sosyal cesaret yolculuğu" — İletişim izi, altın kademe (bir tur tamamlanınca her iki tarafta da)
+  await unlockMilestone(game.starterId, 'first_icebreaker');
+  await unlockMilestone(me, 'first_icebreaker');
+  emitToUser(otherId, 'icebreaker:answered', icebreakerDto(updated, otherId));
+  res.json(icebreakerDto(updated, me));
 });

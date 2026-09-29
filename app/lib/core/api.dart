@@ -464,6 +464,22 @@ class Api {
     return ChatMessage.fromJson(await _post('/conversations/$conversationId/photos', form));
   }
 
+  // Faz 17: sohbet içi buz kırıcı mini oyunlar
+  Future<List<IcebreakerGame>> icebreakerGames(String conversationId) async => [
+        for (final g in (await _get('/conversations/$conversationId/icebreaker') as List)) IcebreakerGame.fromJson(g),
+      ];
+
+  Future<IcebreakerGame> startThisOrThat(String conversationId, String promptId, String choice) async =>
+      IcebreakerGame.fromJson(await _post(
+          '/conversations/$conversationId/icebreaker', {'kind': 'this_or_that', 'promptId': promptId, 'choice': choice}));
+
+  Future<IcebreakerGame> startTwoTruths(String conversationId, List<String> statements, int lieIndex) async =>
+      IcebreakerGame.fromJson(await _post('/conversations/$conversationId/icebreaker',
+          {'kind': 'two_truths', 'statements': statements, 'lieIndex': lieIndex}));
+
+  Future<IcebreakerGame> answerIcebreaker(String conversationId, String gameId, String choice) async =>
+      IcebreakerGame.fromJson(await _post('/conversations/$conversationId/icebreaker/$gameId/answer', {'choice': choice}));
+
   // Fotoğrafı aç (sadece bir kez); baytlar bellekte gösterilir, cihaza kaydedilmez
   Future<Uint8List> openPhoto(String messageId) async {
     final data = await _send((o) => _dio.get<List<int>>('/messages/$messageId/photo',

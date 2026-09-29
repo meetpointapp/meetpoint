@@ -1538,6 +1538,126 @@ abstract class AppLocalizations {
   /// **'Fotoğraf gönder'**
   String get sendPhoto;
 
+  /// No description provided for @icebreakerButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Buz kırıcı oyun'**
+  String get icebreakerButton;
+
+  /// No description provided for @icebreakerSheetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir buz kırıcı seç'**
+  String get icebreakerSheetTitle;
+
+  /// No description provided for @icebreakerThisOrThat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu mu o mu?'**
+  String get icebreakerThisOrThat;
+
+  /// No description provided for @icebreakerThisOrThatHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir soru seç, seçimini yap — karşı taraf da seçince ikiniz de görürsünüz.'**
+  String get icebreakerThisOrThatHint;
+
+  /// No description provided for @icebreakerTwoTruths.
+  ///
+  /// In tr, this message translates to:
+  /// **'2 doğru 1 yalan'**
+  String get icebreakerTwoTruths;
+
+  /// No description provided for @icebreakerTwoTruthsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 ifade yaz, biri yalan olsun. Karşı taraf hangisinin yalan olduğunu tahmin etsin.'**
+  String get icebreakerTwoTruthsHint;
+
+  /// No description provided for @icebreakerStatementHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n}. ifade'**
+  String icebreakerStatementHint(int n);
+
+  /// No description provided for @icebreakerPickLie.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangisi yalan? (dokunarak işaretle)'**
+  String get icebreakerPickLie;
+
+  /// No description provided for @icebreakerSend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönder'**
+  String get icebreakerSend;
+
+  /// No description provided for @icebreakerWaitingForAnswer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevap bekleniyor…'**
+  String get icebreakerWaitingForAnswer;
+
+  /// No description provided for @icebreakerYourTurnThisOrThat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sen hangisini seçerdin?'**
+  String get icebreakerYourTurnThisOrThat;
+
+  /// No description provided for @icebreakerYourTurnTwoTruths.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangisi yalan sence?'**
+  String get icebreakerYourTurnTwoTruths;
+
+  /// No description provided for @icebreakerYouChose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sen: {choice}'**
+  String icebreakerYouChose(String choice);
+
+  /// No description provided for @icebreakerTheyChose.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}: {choice}'**
+  String icebreakerTheyChose(String name, String choice);
+
+  /// No description provided for @icebreakerCorrectGuess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğru tahmin! 🎉'**
+  String get icebreakerCorrectGuess;
+
+  /// No description provided for @icebreakerWrongGuess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanlış tahmin — yalan buymuş:'**
+  String get icebreakerWrongGuess;
+
+  /// No description provided for @icebreakerSameAnswer.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkiniz de aynı şeyi seçtiniz! 🎉'**
+  String get icebreakerSameAnswer;
+
+  /// No description provided for @icebreakerDifferentAnswer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Farklı seçtiniz, ilginç 👀'**
+  String get icebreakerDifferentAnswer;
+
+  /// No description provided for @thisOrThatOptionA.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, sea_or_mountain{Deniz} coffee_or_tea{Kahve} morning_or_night{Sabah insanı} city_or_nature{Şehir} book_or_movie{Kitap} summer_or_winter{Yaz} planned_or_spontaneous{Planlı} home_or_travel{Evde kalmak} other{{id}}}'**
+  String thisOrThatOptionA(String id);
+
+  /// No description provided for @thisOrThatOptionB.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, sea_or_mountain{Dağ} coffee_or_tea{Çay} morning_or_night{Gece kuşu} city_or_nature{Doğa} book_or_movie{Film} summer_or_winter{Kış} planned_or_spontaneous{Spontane} home_or_travel{Seyahat} other{{id}}}'**
+  String thisOrThatOptionB(String id);
+
   /// No description provided for @newMessageFrom.
   ///
   /// In tr, this message translates to:

@@ -71,8 +71,8 @@ export const INVENTORY: InventoryEntry[] = [
   },
   {
     category: 'Mesajlar',
-    tables: ['Message'],
-    data: 'Mesaj metni, tek seferlik fotoğraf, okunma zamanı',
+    tables: ['Message', 'IcebreakerGame'],
+    data: 'Mesaj metni, tek seferlik fotoğraf, okunma zamanı, sohbet içi buz kırıcı mini oyun içeriği ve cevapları',
     purpose: 'İletişim hizmeti',
     basis: ['sözleşme'],
     retention: `Hesap süresince; tek seferlik fotoğraf ilk açılışta, açılmazsa ${g.unopenedViewOnceDays} günde silinir`,

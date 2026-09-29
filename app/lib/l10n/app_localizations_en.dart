@@ -917,6 +917,102 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendPhoto => 'Send photo';
 
   @override
+  String get icebreakerButton => 'Icebreaker game';
+
+  @override
+  String get icebreakerSheetTitle => 'Pick an icebreaker';
+
+  @override
+  String get icebreakerThisOrThat => 'This or that?';
+
+  @override
+  String get icebreakerThisOrThatHint =>
+      'Pick a question and your answer — you\'ll both see each other\'s pick once they answer.';
+
+  @override
+  String get icebreakerTwoTruths => 'Two truths, one lie';
+
+  @override
+  String get icebreakerTwoTruthsHint =>
+      'Write 3 statements, one a lie. They\'ll guess which one.';
+
+  @override
+  String icebreakerStatementHint(int n) {
+    return 'Statement $n';
+  }
+
+  @override
+  String get icebreakerPickLie => 'Which one is the lie? (tap to mark)';
+
+  @override
+  String get icebreakerSend => 'Send';
+
+  @override
+  String get icebreakerWaitingForAnswer => 'Waiting for their answer…';
+
+  @override
+  String get icebreakerYourTurnThisOrThat => 'Which would you pick?';
+
+  @override
+  String get icebreakerYourTurnTwoTruths =>
+      'Which one do you think is the lie?';
+
+  @override
+  String icebreakerYouChose(String choice) {
+    return 'You: $choice';
+  }
+
+  @override
+  String icebreakerTheyChose(String name, String choice) {
+    return '$name: $choice';
+  }
+
+  @override
+  String get icebreakerCorrectGuess => 'Correct guess! 🎉';
+
+  @override
+  String get icebreakerWrongGuess => 'Wrong guess — the lie was:';
+
+  @override
+  String get icebreakerSameAnswer => 'You both picked the same thing! 🎉';
+
+  @override
+  String get icebreakerDifferentAnswer =>
+      'You picked differently, interesting 👀';
+
+  @override
+  String thisOrThatOptionA(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'sea_or_mountain': 'Sea',
+      'coffee_or_tea': 'Coffee',
+      'morning_or_night': 'Morning person',
+      'city_or_nature': 'City',
+      'book_or_movie': 'Book',
+      'summer_or_winter': 'Summer',
+      'planned_or_spontaneous': 'Planned',
+      'home_or_travel': 'Staying home',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String thisOrThatOptionB(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'sea_or_mountain': 'Mountains',
+      'coffee_or_tea': 'Tea',
+      'morning_or_night': 'Night owl',
+      'city_or_nature': 'Nature',
+      'book_or_movie': 'Movie',
+      'summer_or_winter': 'Winter',
+      'planned_or_spontaneous': 'Spontaneous',
+      'home_or_travel': 'Traveling',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String newMessageFrom(String name, String text) {
     return '$name: $text';
   }

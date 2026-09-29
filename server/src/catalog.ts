@@ -14,6 +14,13 @@ export const PROMPTS = [
 ] as const;
 
 export const LOOKING_FOR = ['relationship', 'casual', 'friendship', 'chat', 'unsure'] as const;
+
+// Faz 17: sohbet içi buz kırıcı — "bu mu o mu". Sabit bir katalog (serbest metin yok, moderasyon
+// gerekmez); her ikisinin A/B seçenek metinleri app/lib/l10n/*.arb'de.
+export const THIS_OR_THAT_PROMPTS = [
+  'sea_or_mountain', 'coffee_or_tea', 'morning_or_night', 'city_or_nature',
+  'book_or_movie', 'summer_or_winter', 'planned_or_spontaneous', 'home_or_travel',
+] as const;
 export const EDUCATION = ['high_school', 'bachelor', 'master', 'phd'] as const;
 export const HABIT = ['no', 'sometimes', 'yes'] as const;
 export const ZODIAC = [

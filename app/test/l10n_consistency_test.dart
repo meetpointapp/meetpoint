@@ -16,6 +16,7 @@ const _identicalAllowed = {
   'bonusCoins', // "+{count} bonus": "bonus" kelimesi TR'de de kullanılıyor
   'premiumTitle', // "MeetPoint+": marka/ürün adı, çevrilmez
   'milestoneCountShort', // "{n}/9": sadece sayı
+  'icebreakerTheyChose', // "{name}: {choice}": newMessageFrom ile aynı biçim, içerik değil
 };
 
 Map<String, dynamic> _readArb(String path) => json.decode(File(path).readAsStringSync()) as Map<String, dynamic>;

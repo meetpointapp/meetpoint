@@ -29,6 +29,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
   List<ChatMessage>? _messages;
+  List<IcebreakerGame> _games = [];
   Object? _error;
   StreamSubscription<RealtimeEvent>? _sub;
   bool _sending = false;
@@ -85,15 +86,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         _typingTimer = Timer(const Duration(seconds: 3), () {
           if (mounted) setState(() => _otherTyping = false);
         });
+      case 'icebreaker:new':
+        final g = IcebreakerGame.fromJson(data);
+        if (!_games.any((x) => x.id == g.id)) setState(() => _games = [..._games, g]);
+      case 'icebreaker:answered':
+        final g = IcebreakerGame.fromJson(data);
+        setState(() => _games = [for (final x in _games) x.id == g.id ? g : x]);
     }
   }
 
   Future<void> _load() async {
     try {
-      final list = await ref.read(apiProvider).messages(_id);
+      final api = ref.read(apiProvider);
+      final list = await api.messages(_id);
+      // Buz kırıcı oyunlar mesajlarla aynı önceliğe sahip değil: yüklenemezse sessizce boş kalır
+      final games = await api.icebreakerGames(_id).catchError((_) => <IcebreakerGame>[]);
       if (mounted) {
         setState(() {
           _messages = list;
+          _games = games;
           _hasOlder = list.length == Api.messagePageSize;
         });
       }
@@ -238,6 +249,87 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     await _run(() => ref.read(apiProvider).sendPhoto(_id, file));
   }
 
+  // Faz 17: sohbet içi buz kırıcı mini oyunlar
+  Future<void> _openIcebreakerSheet() async {
+    final l = AppLocalizations.of(context);
+    final kind = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            child: Align(alignment: Alignment.centerLeft, child: Text(l.icebreakerSheetTitle, style: Theme.of(ctx).textTheme.titleMedium)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.compare_arrows_rounded, color: Brand.coral),
+            title: Text(l.icebreakerThisOrThat),
+            subtitle: Text(l.icebreakerThisOrThatHint),
+            onTap: () => Navigator.pop(ctx, 'this_or_that'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.theater_comedy_rounded, color: Brand.coral),
+            title: Text(l.icebreakerTwoTruths),
+            subtitle: Text(l.icebreakerTwoTruthsHint),
+            onTap: () => Navigator.pop(ctx, 'two_truths'),
+          ),
+          const SizedBox(height: 8),
+        ]),
+      ),
+    );
+    if (!mounted || kind == null) return;
+    if (kind == 'this_or_that') {
+      await _startThisOrThatFlow();
+    } else {
+      await _startTwoTruthsFlow();
+    }
+  }
+
+  Future<void> _startThisOrThatFlow() async {
+    final picked = await showModalBottomSheet<(String, String)>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => _ThisOrThatPicker(),
+    );
+    if (!mounted || picked == null) return;
+    final (promptId, choice) = picked;
+    try {
+      final game = await ref.read(apiProvider).startThisOrThat(_id, promptId, choice);
+      Fx.tap();
+      setState(() => _games = [..._games, game]);
+      ref.invalidate(conversationsProvider);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
+    }
+  }
+
+  Future<void> _startTwoTruthsFlow() async {
+    final picked = await showModalBottomSheet<(List<String>, int)>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => const _TwoTruthsComposer(),
+    );
+    if (!mounted || picked == null) return;
+    final (statements, lieIndex) = picked;
+    try {
+      final game = await ref.read(apiProvider).startTwoTruths(_id, statements, lieIndex);
+      Fx.tap();
+      setState(() => _games = [..._games, game]);
+      ref.invalidate(conversationsProvider);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
+    }
+  }
+
+  Future<void> _answerIcebreaker(IcebreakerGame game, String choice) async {
+    try {
+      final updated = await ref.read(apiProvider).answerIcebreaker(_id, game.id, choice);
+      Fx.success();
+      setState(() => _games = [for (final g in _games) g.id == updated.id ? updated : g]);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
+    }
+  }
+
   Future<void> _openPhoto(ChatMessage m) async {
     final l = AppLocalizations.of(context);
     try {
@@ -305,30 +397,46 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ? ErrorRetry(error: _error!, onRetry: _load)
                 : messages == null
                     ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        reverse: true,
-                        padding: const EdgeInsets.all(12),
-                        // Liste ters: en üstteki (en eski) öğeye gelince önceki sayfa istenir
-                        itemCount: messages.length + (_hasOlder ? 1 : 0),
-                        itemBuilder: (_, i) {
-                          if (i == messages.length) {
-                            WidgetsBinding.instance.addPostFrameCallback((_) => _loadOlder());
-                            return const Padding(
-                              padding: EdgeInsets.all(12),
-                              child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+                    : Builder(builder: (context) {
+                        // Faz 17: buz kırıcı oyunlar, mesajlarla aynı zaman çizelgesinde (oluşturulma
+                        // zamanına göre) birleştirilir — sohbetin gerçek bir parçası gibi görünür.
+                        final timeline = <Object>[...messages, ..._games]
+                          ..sort((a, b) => (a is ChatMessage ? a.createdAt : (a as IcebreakerGame).createdAt)
+                              .compareTo(b is ChatMessage ? b.createdAt : (b as IcebreakerGame).createdAt));
+                        return ListView.builder(
+                          reverse: true,
+                          padding: const EdgeInsets.all(12),
+                          // Liste ters: en üstteki (en eski) öğeye gelince önceki sayfa istenir
+                          itemCount: timeline.length + (_hasOlder ? 1 : 0),
+                          itemBuilder: (_, i) {
+                            if (i == timeline.length) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) => _loadOlder());
+                              return const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+                              );
+                            }
+                            final entry = timeline[timeline.length - 1 - i];
+                            if (entry is IcebreakerGame) {
+                              return _IcebreakerBubble(
+                                game: entry,
+                                mine: entry.starterId == myId,
+                                otherName: other?.displayName ?? '',
+                                onAnswer: (c) => _answerIcebreaker(entry, c),
+                              );
+                            }
+                            final m = entry as ChatMessage;
+                            return _Bubble(
+                              message: m,
+                              mine: m.senderId == myId,
+                              locale: l.localeName,
+                              bubbleColor: myBubbleColor,
+                              onOpenPhoto: () => _openPhoto(m),
+                              onRetry: m.failed ? () => _retry(m) : null,
                             );
-                          }
-                          final m = messages[messages.length - 1 - i];
-                          return _Bubble(
-                            message: m,
-                            mine: m.senderId == myId,
-                            locale: l.localeName,
-                            bubbleColor: myBubbleColor,
-                            onOpenPhoto: () => _openPhoto(m),
-                            onRetry: m.failed ? () => _retry(m) : null,
-                          );
-                        },
-                      ),
+                          },
+                        );
+                      }),
           ),
         ),
         SafeArea(
@@ -340,6 +448,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 tooltip: l.sendPhoto,
                 onPressed: _sending ? null : _sendPhoto,
                 icon: const Icon(Icons.add_photo_alternate_outlined),
+              ),
+              IconButton(
+                tooltip: l.icebreakerButton,
+                onPressed: _openIcebreakerSheet,
+                icon: const Icon(Icons.casino_outlined),
               ),
               Expanded(
                 child: TextField(
@@ -471,6 +584,219 @@ class _Bubble extends StatelessWidget {
         ]),
       ),
     ]);
+  }
+}
+
+// Faz 17: sohbet içi buz kırıcı mini oyun balonu. Üç durum: ben başlattım ve bekliyorum, karşı
+// taraf başlattı ve benim cevaplamam gerekiyor, oyun cevaplandı (sonuç görünür).
+class _IcebreakerBubble extends StatelessWidget {
+  const _IcebreakerBubble({required this.game, required this.mine, required this.otherName, required this.onAnswer});
+  final IcebreakerGame game;
+  final bool mine; // ben mi başlattım
+  final String otherName;
+  final ValueChanged<String> onAnswer;
+
+  String _choiceLabel(AppLocalizations l, String choice) {
+    if (game.isThisOrThat) return choice == 'a' ? l.thisOrThatOptionA(game.promptId) : l.thisOrThatOptionB(game.promptId);
+    final i = int.tryParse(choice);
+    return i == null || i >= game.statements.length ? choice : game.statements[i];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    Widget body;
+    if (!game.answered && !mine) {
+      // Karşı taraf başlattı, sıra bende
+      body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(game.isThisOrThat ? l.icebreakerYourTurnThisOrThat : l.icebreakerYourTurnTwoTruths,
+            style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 10),
+        if (game.isThisOrThat)
+          Row(children: [
+            Expanded(child: OutlinedButton(onPressed: () => onAnswer('a'), child: Text(l.thisOrThatOptionA(game.promptId)))),
+            const SizedBox(width: 8),
+            Expanded(child: OutlinedButton(onPressed: () => onAnswer('b'), child: Text(l.thisOrThatOptionB(game.promptId)))),
+          ])
+        else
+          for (final (i, s) in game.statements.indexed)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: OutlinedButton(
+                onPressed: () => onAnswer('$i'),
+                style: OutlinedButton.styleFrom(alignment: Alignment.centerLeft),
+                child: Text(s, overflow: TextOverflow.ellipsis),
+              ),
+            ),
+      ]);
+    } else if (!game.answered && mine) {
+      // Ben başlattım, cevap bekleniyor
+      body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (game.isThisOrThat)
+          Text(l.icebreakerYouChose(_choiceLabel(l, game.starterChoice)), style: theme.textTheme.bodyMedium)
+        else
+          for (final s in game.statements) Text('• $s', style: theme.textTheme.bodyMedium),
+        const SizedBox(height: 6),
+        Text(l.icebreakerWaitingForAnswer, style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+      ]);
+    } else {
+      // Cevaplandı: sonucu göster
+      final starterLabel = game.isThisOrThat ? _choiceLabel(l, game.starterChoice) : null;
+      final responderLabel = _choiceLabel(l, game.responderChoice ?? '');
+      body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (game.isThisOrThat) ...[
+          Text(l.icebreakerYouChose(mine ? starterLabel! : responderLabel), style: theme.textTheme.bodyMedium),
+          Text(l.icebreakerTheyChose(otherName, mine ? responderLabel : starterLabel!), style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 6),
+          Text(
+            game.starterChoice == game.responderChoice ? l.icebreakerSameAnswer : l.icebreakerDifferentAnswer,
+            style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700, color: Brand.coral),
+          ),
+        ] else ...[
+          for (final (i, s) in game.statements.indexed)
+            Text(
+              i == game.lieIndex ? '🤥 $s' : '✓ $s',
+              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: i == game.lieIndex ? FontWeight.w700 : null),
+            ),
+          const SizedBox(height: 6),
+          Text(
+            (int.tryParse(game.responderChoice ?? '') == game.lieIndex) ? l.icebreakerCorrectGuess : l.icebreakerWrongGuess,
+            style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700, color: Brand.coral),
+          ),
+        ],
+      ]);
+    }
+
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.82),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Brand.coral.withValues(alpha: 0.25)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.casino_rounded, size: 16, color: Brand.coral),
+            const SizedBox(width: 6),
+            Text(game.isThisOrThat ? l.icebreakerThisOrThat : l.icebreakerTwoTruths,
+                style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800, color: Brand.coral)),
+          ]),
+          const SizedBox(height: 10),
+          body,
+        ]),
+      ),
+    );
+  }
+}
+
+// Faz 17: "bu mu o mu" başlatma — katalogdan bir soru seç, kendi cevabını seç
+class _ThisOrThatPicker extends StatelessWidget {
+  const _ThisOrThatPicker();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return SafeArea(
+      child: ListView(shrinkWrap: true, padding: const EdgeInsets.fromLTRB(16, 16, 16, 24), children: [
+        Text(l.icebreakerThisOrThat, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 12),
+        for (final id in thisOrThatPromptIds)
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, (id, 'a')),
+                    child: Text(l.thisOrThatOptionA(id), overflow: TextOverflow.ellipsis),
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('/')),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, (id, 'b')),
+                    child: Text(l.thisOrThatOptionB(id), overflow: TextOverflow.ellipsis),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+      ]),
+    );
+  }
+}
+
+// Faz 17: "2 doğru 1 yalan" oluşturma — 3 ifade yaz, birini yalan olarak işaretle
+class _TwoTruthsComposer extends StatefulWidget {
+  const _TwoTruthsComposer();
+  @override
+  State<_TwoTruthsComposer> createState() => _TwoTruthsComposerState();
+}
+
+class _TwoTruthsComposerState extends State<_TwoTruthsComposer> {
+  final _controllers = List.generate(3, (_) => TextEditingController());
+  int _lieIndex = 0;
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final valid = _controllers.every((c) => c.text.trim().isNotEmpty);
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.viewInsetsOf(context).bottom + 24),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(l.icebreakerTwoTruths, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(l.icebreakerPickLie, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 12),
+          RadioGroup<int>(
+            groupValue: _lieIndex,
+            onChanged: (v) => setState(() => _lieIndex = v!),
+            child: Column(children: [
+              for (final (i, c) in _controllers.indexed)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(children: [
+                    Radio<int>(value: i),
+                    Expanded(
+                      child: TextField(
+                        controller: c,
+                        maxLength: 200,
+                        decoration: InputDecoration(hintText: l.icebreakerStatementHint(i + 1)),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                  ]),
+                ),
+            ]),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: GradientButton(
+              label: l.icebreakerSend,
+              onPressed: valid ? () => Navigator.pop(context, ([for (final c in _controllers) c.text.trim()], _lieIndex)) : null,
+            ),
+          ),
+        ]),
+      ),
+    );
   }
 }
 

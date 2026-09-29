@@ -466,6 +466,50 @@
   "photoSent": "Gönderildi",
   "viewOnceHint": "Fotoğraf bir kez açılabilir, sonra silinir.",
   "sendPhoto": "Fotoğraf gönder",
+  "icebreakerButton": "Buz kırıcı oyun",
+  "icebreakerSheetTitle": "Bir buz kırıcı seç",
+  "icebreakerThisOrThat": "Bu mu o mu?",
+  "icebreakerThisOrThatHint": "Bir soru seç, seçimini yap — karşı taraf da seçince ikiniz de görürsünüz.",
+  "icebreakerTwoTruths": "2 doğru 1 yalan",
+  "icebreakerTwoTruthsHint": "3 ifade yaz, biri yalan olsun. Karşı taraf hangisinin yalan olduğunu tahmin etsin.",
+  "icebreakerStatementHint": "{n}. ifade",
+  "@icebreakerStatementHint": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "icebreakerPickLie": "Hangisi yalan? (dokunarak işaretle)",
+  "icebreakerSend": "Gönder",
+  "icebreakerWaitingForAnswer": "Cevap bekleniyor…",
+  "icebreakerYourTurnThisOrThat": "Sen hangisini seçerdin?",
+  "icebreakerYourTurnTwoTruths": "Hangisi yalan sence?",
+  "icebreakerYouChose": "Sen: {choice}",
+  "@icebreakerYouChose": {
+    "placeholders": {
+      "choice": {
+        "type": "String"
+      }
+    }
+  },
+  "icebreakerTheyChose": "{name}: {choice}",
+  "@icebreakerTheyChose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "choice": {
+        "type": "String"
+      }
+    }
+  },
+  "icebreakerCorrectGuess": "Doğru tahmin! 🎉",
+  "icebreakerWrongGuess": "Yanlış tahmin — yalan buymuş:",
+  "icebreakerSameAnswer": "İkiniz de aynı şeyi seçtiniz! 🎉",
+  "icebreakerDifferentAnswer": "Farklı seçtiniz, ilginç 👀",
+  "thisOrThatOptionA": "{id, select, sea_or_mountain{Deniz} coffee_or_tea{Kahve} morning_or_night{Sabah insanı} city_or_nature{Şehir} book_or_movie{Kitap} summer_or_winter{Yaz} planned_or_spontaneous{Planlı} home_or_travel{Evde kalmak} other{{id}}}",
+  "thisOrThatOptionB": "{id, select, sea_or_mountain{Dağ} coffee_or_tea{Çay} morning_or_night{Gece kuşu} city_or_nature{Doğa} book_or_movie{Film} summer_or_winter{Kış} planned_or_spontaneous{Spontane} home_or_travel{Seyahat} other{{id}}}",
   "newMessageFrom": "{name}: {text}",
   "@newMessageFrom": {
     "placeholders": {

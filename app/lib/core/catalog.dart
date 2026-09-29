@@ -245,3 +245,10 @@ String milestoneRewardEmojiOf(String milestoneId) {
   final id = milestoneRewardId[milestoneId] ?? '';
   return storeBadgeEmoji[id] ?? storeRoomItemEmoji[id] ?? '';
 }
+
+// Faz 17: sohbet içi buz kırıcı — "bu mu o mu" katalogu. Kimlikler server/src/catalog.ts
+// THIS_OR_THAT_PROMPTS ile birebir eşleşmeli; A/B seçenek metinleri l10n'de (thisOrThatOptionA/B).
+const thisOrThatPromptIds = [
+  'sea_or_mountain', 'coffee_or_tea', 'morning_or_night', 'city_or_nature',
+  'book_or_movie', 'summer_or_winter', 'planned_or_spontaneous', 'home_or_travel',
+];

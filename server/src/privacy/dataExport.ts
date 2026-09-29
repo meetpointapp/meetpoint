@@ -54,10 +54,11 @@ async function collect(userId: string) {
       supportTickets: { orderBy: { createdAt: 'asc' }, include: { messages: { orderBy: { createdAt: 'asc' } } } },
     },
   });
-  const [wallet, conversations, messages, calls, gifts, blocks, reports, devices] = await Promise.all([
+  const [wallet, conversations, messages, icebreakers, calls, gifts, blocks, reports, devices] = await Promise.all([
     prisma.walletEntry.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
     prisma.conversation.findMany({ where: { OR: [{ userAId: userId }, { userBId: userId }] } }),
     prisma.message.findMany({ where: { senderId: userId }, orderBy: { createdAt: 'asc' } }),
+    prisma.icebreakerGame.findMany({ where: { OR: [{ starterId: userId }, { responderId: userId }] }, orderBy: { createdAt: 'asc' } }),
     prisma.call.findMany({ where: { OR: [{ callerId: userId }, { calleeId: userId }] }, orderBy: { createdAt: 'asc' } }),
     prisma.callGift.findMany({ where: { OR: [{ fromId: userId }, { toId: userId }] } }),
     prisma.block.findMany({ where: { fromId: userId } }),
@@ -103,6 +104,16 @@ async function collect(userId: string) {
       body: m.kind === 'photo' ? '(tek seferlik fotoğraf)' : m.body,
       createdAt: m.createdAt,
       readAt: m.readAt,
+    })),
+    icebreakerGames: icebreakers.map((g) => ({
+      conversationId: g.conversationId,
+      kind: g.kind,
+      role: g.starterId === userId ? 'starter' : 'responder',
+      promptId: g.promptId,
+      statements: g.statements,
+      choice: g.starterId === userId ? g.starterChoice : g.responderChoice,
+      createdAt: g.createdAt,
+      answeredAt: g.answeredAt,
     })),
     wallet: wallet.map(({ amount, type, note, createdAt }) => ({ amount, type, note, createdAt })),
     purchases: u.purchases.map(({ store, productId, coins, bonusCoins, priceUsd, currency, status, createdAt }) => ({

@@ -907,6 +907,100 @@ class AppLocalizationsTr extends AppLocalizations {
   String get sendPhoto => 'Fotoğraf gönder';
 
   @override
+  String get icebreakerButton => 'Buz kırıcı oyun';
+
+  @override
+  String get icebreakerSheetTitle => 'Bir buz kırıcı seç';
+
+  @override
+  String get icebreakerThisOrThat => 'Bu mu o mu?';
+
+  @override
+  String get icebreakerThisOrThatHint =>
+      'Bir soru seç, seçimini yap — karşı taraf da seçince ikiniz de görürsünüz.';
+
+  @override
+  String get icebreakerTwoTruths => '2 doğru 1 yalan';
+
+  @override
+  String get icebreakerTwoTruthsHint =>
+      '3 ifade yaz, biri yalan olsun. Karşı taraf hangisinin yalan olduğunu tahmin etsin.';
+
+  @override
+  String icebreakerStatementHint(int n) {
+    return '$n. ifade';
+  }
+
+  @override
+  String get icebreakerPickLie => 'Hangisi yalan? (dokunarak işaretle)';
+
+  @override
+  String get icebreakerSend => 'Gönder';
+
+  @override
+  String get icebreakerWaitingForAnswer => 'Cevap bekleniyor…';
+
+  @override
+  String get icebreakerYourTurnThisOrThat => 'Sen hangisini seçerdin?';
+
+  @override
+  String get icebreakerYourTurnTwoTruths => 'Hangisi yalan sence?';
+
+  @override
+  String icebreakerYouChose(String choice) {
+    return 'Sen: $choice';
+  }
+
+  @override
+  String icebreakerTheyChose(String name, String choice) {
+    return '$name: $choice';
+  }
+
+  @override
+  String get icebreakerCorrectGuess => 'Doğru tahmin! 🎉';
+
+  @override
+  String get icebreakerWrongGuess => 'Yanlış tahmin — yalan buymuş:';
+
+  @override
+  String get icebreakerSameAnswer => 'İkiniz de aynı şeyi seçtiniz! 🎉';
+
+  @override
+  String get icebreakerDifferentAnswer => 'Farklı seçtiniz, ilginç 👀';
+
+  @override
+  String thisOrThatOptionA(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'sea_or_mountain': 'Deniz',
+      'coffee_or_tea': 'Kahve',
+      'morning_or_night': 'Sabah insanı',
+      'city_or_nature': 'Şehir',
+      'book_or_movie': 'Kitap',
+      'summer_or_winter': 'Yaz',
+      'planned_or_spontaneous': 'Planlı',
+      'home_or_travel': 'Evde kalmak',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String thisOrThatOptionB(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'sea_or_mountain': 'Dağ',
+      'coffee_or_tea': 'Çay',
+      'morning_or_night': 'Gece kuşu',
+      'city_or_nature': 'Doğa',
+      'book_or_movie': 'Film',
+      'summer_or_winter': 'Kış',
+      'planned_or_spontaneous': 'Spontane',
+      'home_or_travel': 'Seyahat',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String newMessageFrom(String name, String text) {
     return '$name: $text';
   }

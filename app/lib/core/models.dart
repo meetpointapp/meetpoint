@@ -756,6 +756,56 @@ class ChatMessage {
       );
 }
 
+// Faz 17: sohbet içi buz kırıcı mini oyunlar ("bu mu o mu" | "2 doğru 1 yalan"). lieIndex,
+// cevaplanana kadar sadece başlatana döner (sunucu maskeler) — bu yüzden null olabilir.
+class IcebreakerGame {
+  final String id;
+  final String conversationId;
+  final String kind; // this_or_that | two_truths
+  final String starterId;
+  final String promptId; // this_or_that
+  final List<String> statements; // two_truths
+  final int? lieIndex; // two_truths (maskelenmiş olabilir)
+  final String starterChoice; // this_or_that: a | b
+  final String? responderId;
+  final String? responderChoice; // this_or_that: a|b; two_truths: "0".."2"
+  final DateTime createdAt;
+  final DateTime? answeredAt;
+
+  const IcebreakerGame({
+    required this.id,
+    required this.conversationId,
+    required this.kind,
+    required this.starterId,
+    this.promptId = '',
+    this.statements = const [],
+    this.lieIndex,
+    this.starterChoice = '',
+    this.responderId,
+    this.responderChoice,
+    required this.createdAt,
+    this.answeredAt,
+  });
+
+  bool get answered => answeredAt != null;
+  bool get isThisOrThat => kind == 'this_or_that';
+
+  factory IcebreakerGame.fromJson(Map<String, dynamic> j) => IcebreakerGame(
+        id: j['id'],
+        conversationId: j['conversationId'],
+        kind: j['kind'],
+        starterId: j['starterId'],
+        promptId: j['promptId'] ?? '',
+        statements: [for (final s in (j['statements'] as List? ?? const [])) s as String],
+        lieIndex: j['lieIndex'],
+        starterChoice: j['starterChoice'] ?? '',
+        responderId: j['responderId'],
+        responderChoice: j['responderChoice'],
+        createdAt: _date(j['createdAt']),
+        answeredAt: j['answeredAt'] == null ? null : _date(j['answeredAt']),
+      );
+}
+
 class Conversation {
   final String id;
   final String origin;

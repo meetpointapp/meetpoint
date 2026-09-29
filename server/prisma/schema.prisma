@@ -318,6 +318,7 @@ model Conversation {
   origin    String // MATCH | REQUEST
   createdAt DateTime  @default(now())
   messages  Message[]
+  icebreakers IcebreakerGame[]
 
   @@unique([userAId, userBId])
   @@index([userBId]) // "sohbetlerim": userAId eşleşmesi benzersiz indeksle, userBId bununla
@@ -340,6 +341,33 @@ model Message {
   deliveredAt    DateTime?
   readAt         DateTime?
   createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+// Faz 17: sohbet içi buz kırıcı mini oyunlar ("2 doğru 1 yalan", "bu mu o mu"). Mesajlardan ayrı
+// bir tabloda: iki_doğru_bir_yalanın hangisi yalan olduğu (lieIndex), cevaplayan tahmin edene
+// kadar API yanıtından çıkarılır (src/routes/icebreaker.ts) — Message modelinin aksine, burada
+// taraflara farklı (maskelenmiş) veri döner.
+model IcebreakerGame {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  starterId      String
+  kind           String // this_or_that | two_truths
+  // this_or_that: THIS_OR_THAT_PROMPTS kimliği. two_truths: kullanılmaz ("").
+  promptId       String       @default("")
+  // two_truths: [ifade1, ifade2, ifade3] (serbest metin, moderasyon var). this_or_that: [].
+  statements     Json         @default("[]")
+  // two_truths: hangi ifadenin yalan olduğu (0-2) — cevaplanana kadar sadece başlatana döner.
+  lieIndex       Int?
+  // this_or_that: başlatanın seçimi ('a' | 'b').
+  starterChoice  String       @default("")
+  responderId    String?
+  // this_or_that: cevaplayanın seçimi ('a' | 'b'). two_truths: tahmin edilen ifade sırası ("0"-"2").
+  responderChoice String?
+  createdAt      DateTime     @default(now())
+  answeredAt     DateTime?
 
   @@index([conversationId, createdAt])
 }

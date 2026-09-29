@@ -303,6 +303,62 @@ void main() {
     });
   });
 
+  group('Sohbet içi buz kırıcı mini oyunlar (Faz 17)', () {
+    test('IcebreakerGame.fromJson: "bu mu o mu" alanlarını ayrıştırır', () {
+      final g = IcebreakerGame.fromJson({
+        'id': 'g1',
+        'conversationId': 'c1',
+        'kind': 'this_or_that',
+        'starterId': 'u1',
+        'promptId': 'coffee_or_tea',
+        'statements': [],
+        'lieIndex': null,
+        'starterChoice': 'a',
+        'responderId': null,
+        'responderChoice': null,
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'answeredAt': null,
+      });
+      expect(g.isThisOrThat, isTrue);
+      expect(g.answered, isFalse);
+      expect(g.starterChoice, 'a');
+    });
+
+    test('IcebreakerGame.fromJson: "2 doğru 1 yalan" cevaplanmadan önce lieIndex null olabilir (maskeleme)', () {
+      final g = IcebreakerGame.fromJson({
+        'id': 'g2',
+        'conversationId': 'c1',
+        'kind': 'two_truths',
+        'starterId': 'u1',
+        'statements': ['a', 'b', 'c'],
+        'lieIndex': null,
+        'createdAt': '2026-01-01T00:00:00.000Z',
+      });
+      expect(g.isThisOrThat, isFalse);
+      expect(g.statements, ['a', 'b', 'c']);
+      expect(g.lieIndex, isNull);
+      expect(g.answered, isFalse);
+    });
+
+    test('IcebreakerGame.fromJson: cevaplandıktan sonra lieIndex ve responderChoice dolu', () {
+      final g = IcebreakerGame.fromJson({
+        'id': 'g3',
+        'conversationId': 'c1',
+        'kind': 'two_truths',
+        'starterId': 'u1',
+        'statements': ['a', 'b', 'c'],
+        'lieIndex': 2,
+        'responderId': 'u2',
+        'responderChoice': '1',
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'answeredAt': '2026-01-01T00:05:00.000Z',
+      });
+      expect(g.answered, isTrue);
+      expect(g.lieIndex, 2);
+      expect(g.responderChoice, '1');
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

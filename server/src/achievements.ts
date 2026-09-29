@@ -10,8 +10,8 @@ export type Track = (typeof TRACKS)[number];
 
 // Sıra önemli: bir izdeki N'inci kademe = bu dizideki N'inci kimlik tamamlandığında açılır.
 export const TRACK_MILESTONES: Record<Track, readonly string[]> = {
-  // "first_icebreaker" Faz 17 madde 4 (buz kırıcı mini oyunlar) inşa edilince tetiklenecek —
-  // o zamana kadar bu izin altın kademesi doğal olarak açılmaz (özellik henüz yok).
+  // "first_icebreaker": sohbet içi buz kırıcı mini oyun bir tur tamamlanınca (başlat + cevapla)
+  // her iki tarafta da açılır — bkz. src/routes/conversations.ts icebreaker/:gameId/answer.
   iletisim: ['first_message', 'week_long_chat', 'first_icebreaker'],
   baglanti: ['first_match', 'first_room_visit', 'first_call'],
   kimlik: ['profile_complete', 'verified', 'vibe_done'],

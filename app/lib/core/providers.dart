@@ -74,6 +74,8 @@ const _events = [
   'message:read',
   'message:viewed',
   'message:delivered',
+  'icebreaker:new',
+  'icebreaker:answered',
   'typing',
   'wallet:updated',
   'call:incoming',
