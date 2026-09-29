@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/catalog.dart';
+import '../../core/celebration.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -26,9 +27,9 @@ class _InterestGroupScreenState extends ConsumerState<InterestGroupScreen> {
     try {
       final r = await ref.read(apiProvider).swipe(p.id, like ? 'like' : 'pass');
       ref.invalidate(interestGroupMembersProvider(widget.interestId));
-      if (r.match) {
+      if (r.match && mounted) {
         ref.invalidate(conversationsProvider);
-        if (mounted) showSnack(context, l.newMatchWith(p.displayName));
+        showMatchCelebration(context, ref, other: p, conversationId: r.conversationId!);
       }
     } catch (e) {
       if (mounted) showSnack(context, errorText(l, e));

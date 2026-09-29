@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meetpoint/core/fx.dart';
 import 'package:meetpoint/core/theme.dart';
 import 'package:meetpoint/core/ui.dart';
 
@@ -38,6 +39,35 @@ void main() {
       expect(find.text('+30'), findsOneWidget);
       expect(find.text('-90'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
+    });
+  });
+
+  // Faz 16: cilalı mikro-etkileşimler — bakiye 0'dan sayarak akıp doğru değerde oturuyor mu
+  group('AnimatedCoinAmount', () {
+    testWidgets('animasyon bitince doğru değeri gösterir', (tester) async {
+      await tester.pumpWidget(_wrap(const AnimatedCoinAmount(120)));
+      expect(find.text('0'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.text('120'), findsOneWidget);
+    });
+
+    testWidgets('değer değişince yeni değere akar', (tester) async {
+      await tester.pumpWidget(_wrap(const AnimatedCoinAmount(50)));
+      await tester.pumpAndSettle();
+      expect(find.text('50'), findsOneWidget);
+      await tester.pumpWidget(_wrap(const AnimatedCoinAmount(80)));
+      await tester.pumpAndSettle();
+      expect(find.text('80'), findsOneWidget);
+    });
+  });
+
+  // Faz 16: cilalı mikro-etkileşimler — haptik/ses en iyi çaba: platform kanalı yoksa
+  // (test ortamı gibi) sessizce yutulmalı, hiçbir zaman fırlatmamalı
+  group('Fx', () {
+    test('tap/success/celebrate hiçbir zaman fırlatmaz', () {
+      expect(Fx.tap, returnsNormally);
+      expect(Fx.success, returnsNormally);
+      expect(Fx.celebrate, returnsNormally);
     });
   });
 }

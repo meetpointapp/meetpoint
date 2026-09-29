@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/api.dart';
 import '../../core/catalog.dart';
+import '../../core/fx.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -31,6 +32,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
       await ref.read(apiProvider).purchaseItem(item.id);
       ref.invalidate(storeItemsProvider);
       ref.invalidate(walletProvider);
+      Fx.success();
       if (mounted) showSnack(context, l.storePurchased);
     } catch (e) {
       if (!mounted) return;

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/api.dart';
+import '../../core/celebration.dart';
+import '../../core/fx.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -30,6 +32,7 @@ class _LikesScreenState extends ConsumerState<LikesScreen> {
       ref.invalidate(likesProvider);
       ref.invalidate(walletProvider);
       ref.invalidate(meProvider);
+      Fx.success();
     } catch (e) {
       if (!mounted) return;
       final low = e is ApiException && e.code == 'insufficient_balance';
@@ -45,12 +48,9 @@ class _LikesScreenState extends ConsumerState<LikesScreen> {
     try {
       final r = await ref.read(apiProvider).swipe(p.id, like ? 'like' : 'pass');
       ref.invalidate(likesProvider);
-      if (r.match) {
+      if (r.match && mounted) {
         ref.invalidate(conversationsProvider);
-        if (mounted) {
-          showSnack(context, l.newMatchWith(p.displayName));
-          context.push('/chat/${r.conversationId}');
-        }
+        showMatchCelebration(context, ref, other: p, conversationId: r.conversationId!);
       }
     } catch (e) {
       if (mounted) showSnack(context, errorText(l, e));

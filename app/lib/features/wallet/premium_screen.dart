@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/config.dart';
+import '../../core/fx.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
 import '../../core/store.dart';
@@ -54,7 +55,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
       ref.invalidate(meProvider);
       final subscribed = (await ref.read(meProvider.future)).premiumUntil != null;
       // "Seni beğenenler" abonelikle her zaman açık olur — önbellekteki kilitli sonuç güncellenmeli
-      if (subscribed) ref.invalidate(likesProvider);
+      if (subscribed) {
+        ref.invalidate(likesProvider);
+        Fx.success();
+      }
       if (mounted && subscribed) showSnack(context, l.premiumSubscribed);
     } on StoreUnavailable {
       if (mounted) showSnack(context, l.errStoreUnavailable);

@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/api.dart';
 import '../../core/catalog.dart';
+import '../../core/fx.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -215,6 +216,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final text = _input.text.trim();
     final myId = ref.read(sessionProvider).value?.userId;
     if (text.isEmpty || myId == null) return;
+    Fx.tap();
     _input.clear();
     final outbox = ref.read(messageOutboxProvider);
     final key = await outbox.enqueue(_id, text);

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'fx.dart';
+
 // MeetPoint marka kimliği: sıcak mercan -> turuncu gradyan, Inter yazı tipi,
 // yuvarlak köşeler ve dolgulu (çerçevesiz) alanlarla sade, kompakt bir görünüm.
 abstract final class Brand {
@@ -143,7 +145,12 @@ class GradientButton extends StatelessWidget {
           shape: const StadiumBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: enabled ? onPressed : null,
+            onTap: enabled
+                ? () {
+                    Fx.tap();
+                    onPressed!();
+                  }
+                : null,
             child: SizedBox(
               height: 52,
               child: Center(

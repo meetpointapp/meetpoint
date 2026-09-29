@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/api.dart';
+import '../../core/fx.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
@@ -64,7 +65,10 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       ref.invalidate(walletProvider);
       ref.invalidate(meProvider);
       final after = (await ref.read(walletProvider.future)).balance;
-      if (mounted && after > before) showSnack(context, l.purchaseDone(after - before));
+      if (after > before) {
+        Fx.success();
+        if (mounted) showSnack(context, l.purchaseDone(after - before));
+      }
     } on StoreUnavailable {
       if (mounted) showSnack(context, l.errStoreUnavailable);
     } on ApiException catch (e) {
@@ -191,7 +195,7 @@ class _BalanceCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(l.balance, style: theme.textTheme.titleSmall?.copyWith(color: onCard)),
         const SizedBox(height: 4),
-        CoinAmount(wallet.balance,
+        AnimatedCoinAmount(wallet.balance,
             style: theme.textTheme.displaySmall?.copyWith(color: onCard, fontWeight: FontWeight.w800)),
         const Divider(color: Colors.white38, height: 28),
         Row(children: [

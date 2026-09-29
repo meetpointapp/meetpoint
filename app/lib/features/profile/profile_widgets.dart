@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/catalog.dart';
+import '../../core/fx.dart';
 import '../../core/models.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
@@ -190,7 +191,10 @@ class MiniButton extends StatelessWidget {
           shape: const StadiumBorder(),
           child: InkWell(
             customBorder: const StadiumBorder(),
-            onTap: onTap,
+            onTap: () {
+              Fx.tap();
+              onTap();
+            },
             child: SizedBox(height: 34, child: Icon(icon, size: 20, color: gradient ? Colors.white : color)),
           ),
         ),

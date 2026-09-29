@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/api.dart';
 import '../../core/catalog.dart';
+import '../../core/celebration.dart';
+import '../../core/fx.dart';
 import '../../core/location.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
@@ -73,7 +74,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       CardSwiperDirection.top => 'superlike',
       _ => 'pass',
     };
-    HapticFeedback.lightImpact();
+    Fx.tap();
     final profile = _cards![index];
     try {
       final r = await ref.read(apiProvider).swipe(profile.id, action);
@@ -86,8 +87,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       if (r.match) {
         ref.invalidate(conversationsProvider);
         ref.invalidate(likesProvider);
-        HapticFeedback.mediumImpact();
-        _showMatch(profile, r.conversationId!);
+        showMatchCelebration(context, ref, other: profile, conversationId: r.conversationId!);
       }
       return true;
     } catch (e) {
@@ -155,38 +155,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       await ref.read(apiProvider).boost();
       ref.invalidate(meProvider);
       ref.invalidate(walletProvider);
+      Fx.success();
     } catch (e) {
       if (!mounted) return;
       final low = e is ApiException && e.code == 'insufficient_balance';
       showSnack(context, errorText(l, e),
           action: low ? SnackBarAction(label: l.topUp, onPressed: () => context.go('/wallet')) : null);
     }
-  }
-
-  void _showMatch(PublicProfile other, String conversationId) {
-    final me = ref.read(meProvider).value?.profile;
-    showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'match',
-      barrierColor: Colors.black87,
-      transitionDuration: const Duration(milliseconds: 350),
-      pageBuilder: (ctx, _, _) => _MatchOverlay(
-        me: me,
-        other: other,
-        onChat: () {
-          Navigator.pop(ctx);
-          context.push('/chat/$conversationId');
-        },
-      ),
-      transitionBuilder: (_, anim, _, child) => FadeTransition(
-        opacity: anim,
-        child: ScaleTransition(
-          scale: Tween(begin: 0.85, end: 1.0).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutBack)),
-          child: child,
-        ),
-      ),
-    );
   }
 
   @override
@@ -778,77 +753,4 @@ class _DeckSkeleton extends StatelessWidget {
           child: SkeletonBox(height: double.infinity, radius: 24),
         ),
       );
-}
-
-// Eşleşme ekranı: iki fotoğraf üst üste, ortada kalp
-class _MatchOverlay extends StatelessWidget {
-  const _MatchOverlay({required this.me, required this.other, required this.onChat});
-  final PublicProfile? me;
-  final PublicProfile other;
-  final VoidCallback onChat;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-
-    Widget photo(PublicProfile? p, double angle) => Transform.rotate(
-          angle: angle,
-          child: Container(
-            width: 130,
-            height: 170,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white, width: 3),
-              boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 16)],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: NetPhoto(p?.coverThumbUrl, width: 130, height: 170),
-            ),
-          ),
-        );
-
-    return Material(
-      type: MaterialType.transparency,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            ShaderMask(
-              shaderCallback: (r) => Brand.gradient.createShader(r),
-              blendMode: BlendMode.srcIn,
-              child: Text(l.itsAMatch,
-                  style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w900, color: Colors.white)),
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              height: 190,
-              width: 280,
-              child: Stack(alignment: Alignment.center, children: [
-                Positioned(left: 0, top: 0, bottom: 0, child: Center(child: photo(me, -0.12))),
-                Positioned(right: 0, top: 0, bottom: 0, child: Center(child: photo(other, 0.12))),
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
-                  child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 28),
-                ),
-              ]),
-            ),
-            const SizedBox(height: 24),
-            Text(l.matchBody(other.displayName),
-                textAlign: TextAlign.center, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white70)),
-            const SizedBox(height: 28),
-            GradientButton(label: l.sendMessage, icon: Icons.chat_bubble_rounded, onPressed: onChat),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l.keepSwiping, style: const TextStyle(color: Colors.white70)),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
 }

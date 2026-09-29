@@ -121,7 +121,7 @@ class MeScreen extends ConsumerWidget {
                   height: 52,
                   child: OutlinedButton(
                     onPressed: () => context.go('/wallet'),
-                    child: CoinAmount(m.balance, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                    child: AnimatedCoinAmount(m.balance, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                   ),
                 ),
               ]),

@@ -288,6 +288,23 @@ class CoinAmount extends StatelessWidget {
   }
 }
 
+// Faz 16: cilalı mikro-etkileşim — bakiye değiştiğinde rakam aniden değişmek yerine sayarak
+// akar (0'dan başlayıp ilk açılışta da yumuşakça belirir). Sadece görsel; değeri her zaman
+// doğru gösterir, animasyon bittiğinde de.
+class AnimatedCoinAmount extends StatelessWidget {
+  const AnimatedCoinAmount(this.amount, {super.key, this.style});
+  final int amount;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<int>(
+        tween: IntTween(begin: 0, end: amount),
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+        builder: (_, value, _) => CoinAmount(value, style: style),
+      );
+}
+
 // Boş durum: gradyan halka içinde simge + kısa açıklama
 class CenteredMessage extends StatelessWidget {
   const CenteredMessage({super.key, required this.icon, required this.text, this.action});
