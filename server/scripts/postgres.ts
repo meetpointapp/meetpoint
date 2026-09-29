@@ -24,6 +24,9 @@ export async function startPostgres(o: PgOptions) {
     user: PG_USER,
     password: PG_PASSWORD,
     persistent: o.persistent,
+    // Konteyner içinde root olarak çalışırken postgres kendi kullanıcısını ister; embedded-postgres
+    // bunu (varsa) kullanır, yoksa oluşturur ve veri dizinini ona devreder.
+    createPostgresUser: true,
     // Windows'un Türkçe yerel ayar adı ("Turkish_Türkiye.1254") ASCII dışı karakter içerdiği için
     // initdb reddediyor: nötr C yerel ayarı + UTF-8. Veri Türkçe karakterleri sorunsuz saklar.
     initdbFlags: ['--locale=C', '--encoding=UTF8'],

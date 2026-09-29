@@ -100,6 +100,23 @@ Uygulamayı "sağlam bir Tinder/Bumble klonu" olmaktan çıkarıp kullanıcını
 - **Cilalı mikro-etkileşimler** (`app/lib/core/fx.dart`, `app/lib/core/celebration.dart`): haptik geri bildirim + kısa üretilmiş ses efektleri (sık dokunuşlarda sadece haptik, seyrek onaylarda haptik+ses, eşleşmede güçlü haptik+kutlama); eşleşme kutlaması artık kaydırma dışında "seni beğenenler" ve "ilgi alanı keşfi" akışlarında da aynı kalitede; cüzdan bakiyesi sayarak akıyor (`AnimatedCoinAmount`, `core/ui.dart`).
 - Arayüz turu: `tools/ui-tours/faz16b.mjs` (`faz16.mjs` adı fazlar yeniden numaralandırılmadan önce eski Faz 16'ya — bugünkü Faz 18'e — verildiği için `b` eki kullanıldı).
 
+## Oyunlaştırma, alışkanlık ve organik büyüme (Faz 17)
+
+Uygulamayı "aç, kaydır, kapat" döngüsünden çıkarıp gerçek bir alışkanlığa dönüştürmek; reklam bütçesi olmadan, kullanıcıların kendi isteğiyle paylaşarak büyümesi. Hepsi kendi sunucumuzda, dış servis/API maliyeti olmadan.
+
+- **Günlük giriş serisi (streak)** (`server/src/streak.ts`; `app/lib/features/discover/discover_screen.dart`): art arda kaç gün açıldığı sunucuda hesaplanır, keşfet ekranındaki alev rozetinde gösterilir.
+- **Sosyal cesaret yolculuğu** (`server/src/achievements.ts`; `app/lib/features/me/journey_screen.dart`): İletişim/Bağlantı/Kimlik izlerinde bronz/gümüş/altın kademeler, her kademe kozmetik mağazadan ücretsiz bir oda/avatar ödülü açar; kademe rozeti profilde ve keşfet kartında da görünür; kademe atlama Faz 16'daki mikro-etkileşimlerle aynı kalitede kutlanır.
+- **"Gelişimim" ekranı** (`app/lib/features/me/journey_screen.dart`): vibe kartı, üç izdeki kademeler, açılan ödüller ve kural tabanlı "sıradaki adım" ipucu tek ekranda.
+- **Sohbet içi buz kırıcı mini oyunlar** (`server/src/routes/conversations.ts`, `server/src/catalog.ts`: `THIS_OR_THAT_PROMPTS`; `app/lib/features/chat/chat_screen.dart`): "2 doğru 1 yalan" ve "bu mu o mu", Socket.IO üzerinden anlık senkronize, sohbet zaman çizelgesine mesajlarla iç içe yerleşir.
+- **Sohbet içi iki kişilik mini oyun — XOX** (`server/src/routes/conversations.ts`: `/conversations/:id/tictactoe`; `app/lib/features/chat/chat_screen.dart`: `_TicTacToeBubble`): sırayla hamle, kazanan/berabere tespiti ve anlık senkronizasyon sunucuda.
+- **Eşleşme yıldönümü** (`app/lib/features/chat/chat_screen.dart`: `matchAnniversaryDays`): 1 hafta, 1/3/6 ay ve yıl dönümlerinde sohbet ekranında kutlama şeridi.
+- **Haftalık özet** (`server/src/weeklyDigest.ts`; `app/lib/features/me/me_screen.dart`: `_WeeklyDigestCard`): bu haftaki yeni eşleşme sayısı ve en uzun sohbet; "Me" ekranında yalnızca etkinlik varsa görünür.
+- **Davet programı** (`server/src/referral.ts`; `app/lib/features/me/referral_screen.dart`, `app/lib/features/auth/verify_email_screen.dart`): benzersiz davet kodu, e-posta doğrulanmadan önce girilebilir; doğrulama tamamlanınca her iki taraf da bozdurulamaz promo jeton kazanır (kayıt hediyesiyle aynı mekanik).
+- **Paylaşılabilir anlar** (`app/lib/core/share_card.dart`, `app/lib/core/share_templates.dart`): eşleşme, profil ve vibe kartlarını marka şablonuyla çevrimdışı görsele dönüştürüp cihazın yerel paylaşım sayfasından paylaşma; dış servis yok. Yalnızca iOS/Android'de çalışır (`dart:io`/`path_provider` gerektirir), web'de kapsam dışı.
+- **Odanı sergile** (`server/src/routes/profile.ts`: `/rooms/showcase`; `app/lib/features/profile/room_showcase_screen.dart`): oda düzenleyicisinde isteğe bağlı bir anahtar (varsayılan kapalı) ile odanı herkese açık vitrine dahil edersin; son 7 günde güncellenen en çok eşyalı 10 oda galeride listelenir, engelli/engelleyen kullanıcılar her durumda filtrelenir.
+- **Kişisel bağlantı linki** (`server/src/routes/personalLink.ts`: `GET /u/:code`): davet programındaki aynı kodu kullanan herkese açık bir HTML sayfası, mağaza bağlantısına yönlendirir.
+- Arayüz turu: `tools/ui-tours/faz17.mjs`.
+
 ## Kullanım kolaylığı, erişilebilirlik ve performans (Faz 18)
 
 - **İlk kullanım rehberi** (`app/lib/features/onboarding/intro_screen.dart`, `core/tips.dart`): profil kurulumundan sonra bir kez açılan tanıtım; Profil ekranından tekrar açılabilir. Cüzdanda her zaman erişilebilir "Jetonlar nasıl çalışır?" bilgi sayfası (`features/wallet/coins_info_sheet.dart`).
@@ -300,7 +317,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19)
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [x] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
 - [x] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar + ziyaret (Sanalika esinli, statik), "Kendini Keşfet" vibe sistemi, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (MeetPoint+), mikro-etkileşimler
-- [ ] **Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme:** giriş serisi, sosyal cesaret yolculuğu, "Gelişimim" ekranı, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet, davet programı, paylaşılabilir anlar, oda galerisi, kişisel bağlantı linki
+- [x] **Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme:** giriş serisi, sosyal cesaret yolculuğu, "Gelişimim" ekranı, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet, davet programı, paylaşılabilir anlar, oda galerisi, kişisel bağlantı linki
 - [x] **Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 19 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 

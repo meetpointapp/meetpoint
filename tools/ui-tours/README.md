@@ -34,6 +34,7 @@ Ekran görüntüleri `shots/` klasörüne düşer (git'e girmez). Kolaj: `node c
 | `faz15.mjs` | Arama + hemen kapatma (adil ücretlendirme), arama geçmişinden itiraz, sohbette mesaj gönderme |
 | `faz16.mjs` | İlk kullanım rehberi, cüzdan bilgi sayfası, çevrimdışı şeridi, gizlilik/analitik anahtarı, geri bildirim girişi (adı fazlar yeniden numaralandırılmadan önce alındı — bugünkü Faz 18 içeriği) |
 | `faz16b.mjs` | Faz 16 (Kimlik, premium katman ve mağaza): profil vitrini, oda dekorasyonu + ziyaret, vibe testi, günlük ruh hali, ilgi alanı grupları, kozmetik mağaza satın alma, MeetPoint+ abonelik, eşleşme kutlaması |
+| `faz17.mjs` | Faz 17 (Oyunlaştırma, alışkanlık ve organik büyüme): günlük giriş serisi, ilk eşleşme kutlaması + paylaşım, sohbet içi buz kırıcı oyun ve XOX, eşleşme yıldönümü, "Gelişimim" ekranı, haftalık özet, davet programı + kişisel bağlantı linki, vibe/profil paylaşım kartları, oda vitrini anahtarı + galeri |
 | `admin.mjs` | Yönetim paneli |
 | `icon.mjs` | Uygulama ikonunu üretir (`app/assets/icon`) |
 | `collage*.mjs` | Faz önizleme kolajları |
