@@ -440,6 +440,8 @@ class Me {
   // Moderasyon: kısıt bitişi ve henüz gösterilmemiş son yaptırım
   final DateTime? restrictedUntil;
   final Sanction? pendingSanction;
+  // Faz 17: günlük giriş serisi
+  final Streak streak;
 
   const Me({
     required this.id,
@@ -459,6 +461,7 @@ class Me {
     this.legalUpdates = const [],
     this.restrictedUntil,
     this.pendingSanction,
+    this.streak = const Streak(),
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -479,7 +482,16 @@ class Me {
         legalUpdates: [for (final d in (j['legalUpdates'] as List? ?? const [])) d as String],
         restrictedUntil: j['restrictedUntil'] == null ? null : _date(j['restrictedUntil']),
         pendingSanction: j['pendingSanction'] == null ? null : Sanction.fromJson(j['pendingSanction']),
+        streak: j['streak'] == null ? const Streak() : Streak.fromJson(j['streak']),
       );
+}
+
+// Faz 17: günlük giriş serisi (streak). Kullanıcının yerel gününe göre sunucuda hesaplanır.
+class Streak {
+  final int current;
+  final int longest;
+  const Streak({this.current = 0, this.longest = 0});
+  factory Streak.fromJson(Map<String, dynamic> j) => Streak(current: j['current'] ?? 0, longest: j['longest'] ?? 0);
 }
 
 enum RequestKind { message, voice, video }
@@ -1256,7 +1268,7 @@ class HelpCategory {
 
 // ---------- Bildirim tercihleri ----------
 
-enum NotifyType { message, match, request, call, like }
+enum NotifyType { message, match, request, call, like, streak }
 
 class NotificationPrefs {
   final Map<NotifyType, bool> prefs;

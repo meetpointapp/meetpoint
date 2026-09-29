@@ -1914,6 +1914,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifyLikes => 'Super likes';
 
   @override
+  String get notifyStreak => 'Streak reminders';
+
+  @override
+  String streakTooltip(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n-day login streak',
+      one: '1-day login streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String streakDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n-day streak',
+      one: '1-day streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String streakLongest(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Longest streak: $n days',
+      one: 'Longest streak: 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get quietHoursTitle => 'Quiet hours';
 
   @override

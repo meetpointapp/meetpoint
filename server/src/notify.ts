@@ -11,13 +11,20 @@ if (firebaseServiceAccount && fs.existsSync(firebaseServiceAccount)) {
   messaging = getMessaging();
 }
 
-type Kind = 'match' | 'message' | 'request' | 'superlike' | 'call' | 'payout' | 'support';
+type Kind = 'match' | 'message' | 'request' | 'superlike' | 'call' | 'payout' | 'support' | 'streak_risk';
 
 // Kullanıcının türe göre kapatabildiği bildirimler (Profil › Bildirimler). Ödeme ve destek yanıtı
 // hesapla ilgili zorunlu bildirimlerdir, kapatılamaz.
-export const NOTIFY_PREFS = ['message', 'match', 'request', 'call', 'like'] as const;
+export const NOTIFY_PREFS = ['message', 'match', 'request', 'call', 'like', 'streak'] as const;
 export type NotifyPref = (typeof NOTIFY_PREFS)[number];
-const PREF_OF: Partial<Record<Kind, NotifyPref>> = { message: 'message', match: 'match', request: 'request', call: 'call', superlike: 'like' };
+const PREF_OF: Partial<Record<Kind, NotifyPref>> = {
+  message: 'message',
+  match: 'match',
+  request: 'request',
+  call: 'call',
+  superlike: 'like',
+  streak_risk: 'streak',
+};
 
 type PrefUser = { notifyPrefs: unknown; quietStart: number | null; quietEnd: number | null; tzOffsetMin: number };
 
@@ -58,6 +65,8 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
         ? { title: 'Ödemen gönderildi 💸', body: 'Para çekme talebin ödendi. Hesabına geçmesi birkaç gün sürebilir.' }
         : { title: 'Para çekme talebi', body: 'Talebin reddedildi, jetonların bakiyene geri eklendi.' },
     support: (_n, subject) => ({ title: 'Destek yanıtı 💬', body: subject ? `Talebine yanıt geldi: ${subject}` : 'Destek talebine yanıt geldi.' }),
+    // Faz 17: günlük giriş serisi. "extra" = mevcut seri sayısı (src/streak.ts)
+    streak_risk: (_n, days) => ({ title: 'Serin tehlikede! 🔥', body: `${days} günlük serini bugün kaybetme, MeetPoint'i aç.` }),
   },
   en: {
     match: (n) => ({ title: "It's a match! 💞", body: `You and ${n} liked each other. Say hi!` }),
@@ -70,6 +79,7 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
         ? { title: 'Payout sent 💸', body: 'Your cash-out was paid. It may take a few days to reach your account.' }
         : { title: 'Cash-out request', body: 'Your request was declined and the coins are back in your balance.' },
     support: (_n, subject) => ({ title: 'Support reply 💬', body: subject ? `New reply to: ${subject}` : 'Your support request has a new reply.' }),
+    streak_risk: (_n, days) => ({ title: 'Your streak is at risk! 🔥', body: `Don't lose your ${days}-day streak — open MeetPoint today.` }),
   },
 };
 
@@ -91,6 +101,8 @@ function routeFor(kind: Kind, data: Record<string, string>): string | undefined 
       return '/requests';
     case 'payout':
       return '/wallet';
+    case 'streak_risk':
+      return '/discover';
   }
 }
 

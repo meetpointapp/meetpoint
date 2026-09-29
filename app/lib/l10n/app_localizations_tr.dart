@@ -1898,6 +1898,24 @@ class AppLocalizationsTr extends AppLocalizations {
   String get notifyLikes => 'Süper beğeniler';
 
   @override
+  String get notifyStreak => 'Seri hatırlatmaları';
+
+  @override
+  String streakTooltip(int n) {
+    return '$n günlük giriş serisi';
+  }
+
+  @override
+  String streakDays(int n) {
+    return '$n günlük seri';
+  }
+
+  @override
+  String streakLongest(int n) {
+    return 'En uzun serin: $n gün';
+  }
+
+  @override
   String get quietHoursTitle => 'Sessiz saatler';
 
   @override

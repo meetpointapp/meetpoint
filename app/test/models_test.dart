@@ -238,6 +238,26 @@ void main() {
     });
   });
 
+  group('Günlük giriş serisi (Faz 17)', () {
+    test('Me.streak: eski yanıtta (alan yok) varsayılan 0/0, yeni yanıtta ayrıştırılır', () {
+      final legacy = Me.fromJson({'id': 'u1', 'email': 'a@b.com', 'locale': 'tr', 'balance': 0, 'cashable': 0});
+      expect(legacy.streak.current, 0);
+      expect(legacy.streak.longest, 0);
+
+      final withStreak = Me.fromJson({
+        'id': 'u1', 'email': 'a@b.com', 'locale': 'tr', 'balance': 0, 'cashable': 0,
+        'streak': {'current': 4, 'longest': 9},
+      });
+      expect(withStreak.streak.current, 4);
+      expect(withStreak.streak.longest, 9);
+    });
+
+    test('Streak.fromJson: eksik alanlar 0 olur', () {
+      expect(Streak.fromJson({}).current, 0);
+      expect(Streak.fromJson({}).longest, 0);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

@@ -7,6 +7,7 @@ import { processPendingExports } from './privacy/dataExport';
 import { runRetention } from './privacy/retention';
 import { cleanupIdempotencyKeys } from './idempotency';
 import { expireStaleRequests } from './requestService';
+import { sendStreakReminders } from './streak';
 
 // Zamanlayıcı: zamanı gelen işleri veritabanından okuyup işler (arama ücretleri, cevapsız aramalar,
 // bağlantı kopmaları, süresi dolan istekler, eski hız sınırı kayıtları).
@@ -77,6 +78,8 @@ async function tick() {
     // KVKK: "verilerimi indir" talepleri ve saklama süresi dolan verilerin imhası
     await periodic('dataExports', Math.max(cfg.tickMs, 2_000), processPendingExports);
     await periodic('retention', retention.intervalMs, runRetention);
+    // Faz 17: günlük giriş serisi — kırılma riski taşıyan kullanıcılara hatırlatma
+    await periodic('streakReminders', 30 * 60_000, () => sendStreakReminders());
   } catch (e) {
     console.error('[zamanlayıcı]', e);
     // Lider bağlantısında hata: liderliği bırak (kilit veritabanı tarafında da düşer)

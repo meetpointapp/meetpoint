@@ -246,6 +246,19 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       appBar: AppBar(
         title: const BrandLogo(size: 26),
         actions: [
+          // Faz 17: günlük giriş serisi — her açılışta ilk göze çarpan yer
+          if (me != null && me.streak.current > 0)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Tooltip(
+                message: l.streakTooltip(me.streak.current),
+                child: Chip(
+                  avatar: const Icon(Icons.local_fire_department_rounded, color: Brand.orange, size: 18),
+                  label: Text('${me.streak.current}'),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
           if (boostLeft > 0)
             Padding(
               padding: const EdgeInsets.only(right: 4),

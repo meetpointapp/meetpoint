@@ -3267,6 +3267,30 @@ abstract class AppLocalizations {
   /// **'Süper beğeniler'**
   String get notifyLikes;
 
+  /// No description provided for @notifyStreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seri hatırlatmaları'**
+  String get notifyStreak;
+
+  /// No description provided for @streakTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} günlük giriş serisi'**
+  String streakTooltip(int n);
+
+  /// No description provided for @streakDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} günlük seri'**
+  String streakDays(int n);
+
+  /// No description provided for @streakLongest.
+  ///
+  /// In tr, this message translates to:
+  /// **'En uzun serin: {n} gün'**
+  String streakLongest(int n);
+
   /// No description provided for @quietHoursTitle.
   ///
   /// In tr, this message translates to:

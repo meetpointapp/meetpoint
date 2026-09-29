@@ -993,6 +993,31 @@
   "notifyRequests": "Mesaj istekleri",
   "notifyCalls": "Aramalar",
   "notifyLikes": "Süper beğeniler",
+  "notifyStreak": "Seri hatırlatmaları",
+  "streakTooltip": "{n} günlük giriş serisi",
+  "@streakTooltip": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "streakDays": "{n} günlük seri",
+  "@streakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "streakLongest": "En uzun serin: {n} gün",
+  "@streakLongest": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "quietHoursTitle": "Sessiz saatler",
   "quietHoursHint": "Bu saatlerde aramalar dışında bildirim gelmez.",
   "quietHours": "Sessiz saatleri aç",

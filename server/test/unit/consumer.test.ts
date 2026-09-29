@@ -45,7 +45,7 @@ describe('sessiz saatler', () => {
 
   it('tercih durumu: varsayılan hepsi açık, sessiz saat önerisi 23:00-08:00', () => {
     const s = notifyPrefsState(user(null, null, { match: false }));
-    expect(s.prefs).toEqual({ message: true, match: false, request: true, call: true, like: true });
+    expect(s.prefs).toEqual({ message: true, match: false, request: true, call: true, like: true, streak: true });
     expect(s.quietHours).toEqual({ enabled: false, start: 1380, end: 480 });
   });
 });

@@ -83,6 +83,13 @@ model User {
   // src/routes/revenuecat.ts RENEWAL/EXPIRATION olaylarıyla güncellenir.
   premiumUntil DateTime?
 
+  // Faz 17: günlük giriş serisi (streak). Kullanıcının yerel gününe göre (tzOffsetMin) hesaplanır,
+  // UTC değil — bkz. src/streak.ts. lastStreakDate/streakReminderDate 'YYYY-MM-DD' biçiminde.
+  currentStreak      Int     @default(0)
+  longestStreak      Int     @default(0)
+  lastStreakDate     String?
+  streakReminderDate String? // aynı yerel günde birden fazla "serini kaybetme" bildirimi gitmesin
+
   emailCodes      EmailCode[]
   verifications   VerificationRequest[]
   devices         Device[]

@@ -48,6 +48,7 @@ import { getBalance, getCashable } from '../wallet';
 import { reviewNewPhoto } from '../moderation/detect';
 import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
+import { sendStreakReminders, touchStreak } from '../streak';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
 
@@ -139,6 +140,9 @@ profileRouter.get('/me', async (req, res) => {
     where: { id: uid(req) },
     include: { profile: true, photos: true },
   });
+  // Faz 17: her açılışta (bu uç çekildiğinde) günlük giriş serisi güncellenir — aynı yerel günde
+  // tekrar çağrılırsa etkisi olmaz.
+  const streak = await touchStreak(user.id, user.tzOffsetMin);
   res.json({
     id: user.id,
     email: user.email,
@@ -150,6 +154,8 @@ profileRouter.get('/me', async (req, res) => {
     likesUnlockedUntil: user.likesUnlockedUntil && user.likesUnlockedUntil > new Date() ? user.likesUnlockedUntil : null,
     // Faz 16: MeetPoint+ abonelik durumu (gerçek para, RevenueCat)
     premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
+    // Faz 17: günlük giriş serisi
+    streak: { current: streak.current, longest: streak.longest },
     hasLocation: user.profile?.latitude != null,
     filters: user.profile
       ? { minAge: user.profile.filterMinAge, maxAge: user.profile.filterMaxAge, maxKm: user.profile.filterMaxKm }
@@ -341,6 +347,16 @@ profileRouter.put('/me/mood', requireNotRestricted, async (req, res) => {
 
 profileRouter.delete('/me/mood', async (req, res) => {
   await prisma.profile.update({ where: { userId: uid(req) }, data: { moodId: '', moodSetAt: null } });
+  res.json({ ok: true });
+});
+
+// GEÇİCİ (test): Faz 17 günlük seri — zamanlayıcının kırılma riski hatırlatma işini hemen
+// çalıştırır (gerçek akışta scheduler.ts'te periyodiktir). Testte saati simüle edebilmek için
+// `now` gönderilebilir. Yayında bu uç kapalıdır.
+profileRouter.post('/dev/streak-reminders', async (req, res) => {
+  if (config.isProduction) throw new HttpError(404, 'not_found');
+  const { now } = z.object({ now: z.coerce.date().optional() }).parse(req.body ?? {});
+  await sendStreakReminders(now);
   res.json({ ok: true });
 });
 

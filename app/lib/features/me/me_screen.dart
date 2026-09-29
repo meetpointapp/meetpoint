@@ -128,6 +128,8 @@ class MeScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               _VerificationCard(status: m.verificationStatus),
               const SizedBox(height: 16),
+              _StreakCard(streak: m.streak),
+              const SizedBox(height: 16),
               Card(
                 child: Column(children: [
                   ListTile(
@@ -357,6 +359,31 @@ class _VerificationCard extends StatelessWidget {
         subtitle: subtitle == null ? null : Text(subtitle),
         trailing: actionable ? const Icon(Icons.chevron_right_rounded) : null,
         onTap: actionable ? () => context.push('/verify-profile') : null,
+      ),
+    );
+  }
+}
+
+// Faz 17: günlük giriş serisi — güncel seri ve şimdiye kadarki en uzun seri
+class _StreakCard extends StatelessWidget {
+  const _StreakCard({required this.streak});
+  final Streak streak;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        leading: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.orange.withValues(alpha: 0.14)),
+          child: const Icon(Icons.local_fire_department_rounded, color: Brand.orange),
+        ),
+        title: Text(l.streakDays(streak.current), style: theme.textTheme.titleSmall),
+        subtitle: streak.longest > streak.current ? Text(l.streakLongest(streak.longest)) : null,
       ),
     );
   }
