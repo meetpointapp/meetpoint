@@ -448,6 +448,8 @@ class Me {
   final Streak streak;
   // Faz 17: "Sosyal cesaret yolculuğu"
   final Achievements achievements;
+  // Faz 17 madde 8: davet programı — kendi davet kodu (eski hesaplarda null olabilir)
+  final String? referralCode;
 
   const Me({
     required this.id,
@@ -469,6 +471,7 @@ class Me {
     this.pendingSanction,
     this.streak = const Streak(),
     this.achievements = const Achievements(),
+    this.referralCode,
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -491,6 +494,7 @@ class Me {
         pendingSanction: j['pendingSanction'] == null ? null : Sanction.fromJson(j['pendingSanction']),
         streak: j['streak'] == null ? const Streak() : Streak.fromJson(j['streak']),
         achievements: j['achievements'] == null ? const Achievements() : Achievements.fromJson(j['achievements']),
+        referralCode: j['referralCode'],
       );
 }
 
@@ -563,6 +567,15 @@ class WeeklyDigest {
         newMatches: j['newMatches'] ?? 0,
         longestChat: j['longestChat'] == null ? null : LongestChat.fromJson(j['longestChat']),
       );
+}
+
+// Faz 17 madde 8: davet programı — kendi kodu zaten Me.referralCode'da; burada sadece ağır kısım.
+class ReferralStats {
+  final int totalReferred;
+  final int totalEarnedCoins;
+  const ReferralStats({this.totalReferred = 0, this.totalEarnedCoins = 0});
+  factory ReferralStats.fromJson(Map<String, dynamic> j) =>
+      ReferralStats(totalReferred: j['totalReferred'] ?? 0, totalEarnedCoins: j['totalEarnedCoins'] ?? 0);
 }
 
 class Achievements {

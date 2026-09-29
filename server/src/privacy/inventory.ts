@@ -26,7 +26,7 @@ export const INVENTORY: InventoryEntry[] = [
   {
     category: 'Kimlik ve iletişim',
     tables: ['User'],
-    data: 'E-posta, dil, kayıt tarihi, onaylanan metin sürümleri (satış metinleri dahil), rıza durumları, bildirim tercihleri ve sessiz saatler, son etkinlik',
+    data: 'E-posta, dil, kayıt tarihi, onaylanan metin sürümleri (satış metinleri dahil), rıza durumları, bildirim tercihleri ve sessiz saatler, son etkinlik, davet kodu ve kimin daveti üzerine katıldığı',
     purpose: 'Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı',
     basis: ['sözleşme', 'yasal'],
     retention: `Hesap süresince; silme talebinden ${g.deletionGraceDays} gün sonra veya ${Math.round(g.inactiveDays / 365)} yıl hareketsizlikte silinir`,

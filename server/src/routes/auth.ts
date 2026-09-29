@@ -7,6 +7,7 @@ import { HttpError, prisma } from '../db';
 import { authLimiter, codeLimiter, refreshLimiter } from '../limits';
 import { assertNotLocked, assertPasswordAllowed, clearLoginFailures, hashPassword, recordLoginFailure, verifyPassword } from '../passwords';
 import { grantSignupBonus } from '../purchases';
+import { grantReferralBonus, redeemReferralCode, uniqueReferralCode } from '../referral';
 import { appealToken, latestBan } from '../moderation/sanctions';
 import { restoreIfPendingDeletion } from '../privacy/accounts';
 import { acceptLegal, recordConsent } from '../privacy/consents';
@@ -42,7 +43,13 @@ authRouter.post('/register', authLimiter, async (req, res) => {
   const passwordHash = await hashPassword(data.password);
   const user = await prisma.$transaction(async (tx) => {
     const u = await tx.user.create({
-      data: { email: data.email, passwordHash, locale: data.locale ?? 'tr', registeredDeviceId: deviceId },
+      data: {
+        email: data.email,
+        passwordHash,
+        locale: data.locale ?? 'tr',
+        registeredDeviceId: deviceId,
+        referralCode: await uniqueReferralCode(tx),
+      },
     });
     const ip = String(req.ip ?? '');
     await acceptLegal(tx, u.id, 'register', ip);
@@ -108,7 +115,18 @@ authRouter.post('/verify-email', codeLimiter, requireAuth, async (req, res) => {
   await prisma.user.update({ where: { id: userId }, data: { emailVerifiedAt: new Date() } });
   // Kayıt hediyesi: doğrulanmış hesaplara bir kez (sahte hesap çiftliğine karşı doğrulamaya bağlı)
   await grantSignupBonus(userId);
+  // Faz 17 madde 8: davet programı — bir kod uygulanmışsa her iki tarafa da bonus (aynı gerekçeyle)
+  await grantReferralBonus(userId);
   await recordFunnelStage(userId, 'REGISTERED').catch(() => {});
+  res.json({ ok: true });
+});
+
+// Faz 17 madde 8: davet programı — kod, tam olarak e-posta doğrulanmadan ÖNCE uygulanabilmeli
+// (bonus doğrulama anında hesaplanır), bu yüzden requireVerifiedEmail'in devreye girdiği /me/*
+// altında değil, burada (sadece requireAuth) yaşıyor.
+authRouter.post('/referral-code', requireAuth, async (req, res) => {
+  const { code } = z.object({ code: z.string().trim().min(1).max(20) }).parse(req.body);
+  await redeemReferralCode(uid(req), code);
   res.json({ ok: true });
 });
 

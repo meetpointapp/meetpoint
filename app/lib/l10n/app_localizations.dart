@@ -1736,6 +1736,18 @@ abstract class AppLocalizations {
   /// **'Bu fotoğraf zaten açıldı.'**
   String get errAlreadyViewed;
 
+  /// No description provided for @errReferralInvalidCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu davet kodu geçersiz.'**
+  String get errReferralInvalidCode;
+
+  /// No description provided for @errReferralAlreadyRedeemed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zaten bir davet kodu kullandın.'**
+  String get errReferralAlreadyRedeemed;
+
   /// No description provided for @mostPopular.
   ///
   /// In tr, this message translates to:
@@ -4256,6 +4268,78 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'En uzun sohbetin {name} ile'**
   String weeklyDigestLongestChat(String name);
+
+  /// No description provided for @referralTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşını davet et'**
+  String get referralTitle;
+
+  /// No description provided for @referralMenuHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodunu paylaş, ikiniz de kazanın'**
+  String get referralMenuHint;
+
+  /// No description provided for @referralExplain.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşını kendi davet koduyla davet et. Katılıp e-postasını doğruladığında ikiniz de bonus jeton kazanırsınız.'**
+  String get referralExplain;
+
+  /// No description provided for @referralYourCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Senin davet koden'**
+  String get referralYourCode;
+
+  /// No description provided for @referralCopyCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodu kopyala'**
+  String get referralCopyCode;
+
+  /// No description provided for @referralCodeCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod kopyalandı'**
+  String get referralCodeCopied;
+
+  /// No description provided for @referralTotalReferred.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} arkadaşını davet ettin'**
+  String referralTotalReferred(int n);
+
+  /// No description provided for @referralTotalEarned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam {n} jeton kazandın'**
+  String referralTotalEarned(int n);
+
+  /// No description provided for @referralHaveCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Davet kodun var mı?'**
+  String get referralHaveCode;
+
+  /// No description provided for @referralCodeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Davet kodu'**
+  String get referralCodeHint;
+
+  /// No description provided for @referralApply.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygula'**
+  String get referralApply;
+
+  /// No description provided for @referralApplied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod uygulandı!'**
+  String get referralApplied;
 }
 
 class _AppLocalizationsDelegate

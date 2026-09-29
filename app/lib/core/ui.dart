@@ -79,6 +79,8 @@ String errorText(AppLocalizations l, Object error) {
     'not_connected' => l.roomNotConnected,
     'item_not_owned' => l.errItemNotOwned,
     'already_owned' => l.errAlreadyOwned,
+    'invalid_code' => l.errReferralInvalidCode,
+    'already_redeemed' => l.errReferralAlreadyRedeemed,
     _ => l.errGeneric,
   };
 }

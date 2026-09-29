@@ -1045,6 +1045,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errAlreadyViewed => 'Bu fotoğraf zaten açıldı.';
 
   @override
+  String get errReferralInvalidCode => 'Bu davet kodu geçersiz.';
+
+  @override
+  String get errReferralAlreadyRedeemed => 'Zaten bir davet kodu kullandın.';
+
+  @override
   String get mostPopular => 'En popüler';
 
   @override
@@ -2722,4 +2728,45 @@ class AppLocalizationsTr extends AppLocalizations {
   String weeklyDigestLongestChat(String name) {
     return 'En uzun sohbetin $name ile';
   }
+
+  @override
+  String get referralTitle => 'Arkadaşını davet et';
+
+  @override
+  String get referralMenuHint => 'Kodunu paylaş, ikiniz de kazanın';
+
+  @override
+  String get referralExplain =>
+      'Arkadaşını kendi davet koduyla davet et. Katılıp e-postasını doğruladığında ikiniz de bonus jeton kazanırsınız.';
+
+  @override
+  String get referralYourCode => 'Senin davet koden';
+
+  @override
+  String get referralCopyCode => 'Kodu kopyala';
+
+  @override
+  String get referralCodeCopied => 'Kod kopyalandı';
+
+  @override
+  String referralTotalReferred(int n) {
+    return '$n arkadaşını davet ettin';
+  }
+
+  @override
+  String referralTotalEarned(int n) {
+    return 'Toplam $n jeton kazandın';
+  }
+
+  @override
+  String get referralHaveCode => 'Davet kodun var mı?';
+
+  @override
+  String get referralCodeHint => 'Davet kodu';
+
+  @override
+  String get referralApply => 'Uygula';
+
+  @override
+  String get referralApplied => 'Kod uygulandı!';
 }

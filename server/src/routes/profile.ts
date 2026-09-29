@@ -50,6 +50,7 @@ import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { sendStreakReminders, touchStreak } from '../streak';
 import { checkProfileComplete, nextStepHint, tracksState, unlockMilestone } from '../achievements';
+import { referralStats } from '../referral';
 import { weeklyDigest } from '../weeklyDigest';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
@@ -161,6 +162,8 @@ profileRouter.get('/me', async (req, res) => {
     premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
     // Faz 17: günlük giriş serisi
     streak: { current: streak.current, longest: streak.longest },
+    // Faz 17 madde 8: davet programı — kendi kodu (eski hesaplarda null olabilir)
+    referralCode: user.referralCode,
     // Faz 17: "Sosyal cesaret yolculuğu" — üç izin ayrıntılı kademe durumu
     achievements: tracksState(user.profile?.milestones ?? []),
     hasLocation: user.profile?.latitude != null,
@@ -340,6 +343,13 @@ profileRouter.get('/me/journey', async (req, res) => {
 // Faz 17 madde 7: haftalık özet ("Bu hafta 3 yeni eşleşme, en uzun sohbetin X ile" gibi)
 profileRouter.get('/me/weekly-digest', async (req, res) => {
   res.json(await weeklyDigest(uid(req)));
+});
+
+// Faz 17 madde 8: davet programı — özet (kendi kodu zaten GET /me'de; burada sadece ağır kısım).
+// Kod uygulama (POST /me/referral/redeem) burada DEĞİL, src/routes/auth.ts'te: bu router
+// requireVerifiedEmail'den sonra çalışır, ama kod tam olarak doğrulamadan ÖNCE uygulanabilmeli.
+profileRouter.get('/me/referral', async (req, res) => {
+  res.json(await referralStats(uid(req)));
 });
 
 profileRouter.get('/me/vibe', async (req, res) => {

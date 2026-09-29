@@ -1057,6 +1057,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errAlreadyViewed => 'This photo has already been opened.';
 
   @override
+  String get errReferralInvalidCode => 'That invite code isn\'t valid.';
+
+  @override
+  String get errReferralAlreadyRedeemed =>
+      'You\'ve already used an invite code.';
+
+  @override
   String get mostPopular => 'Most popular';
 
   @override
@@ -2774,4 +2781,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String weeklyDigestLongestChat(String name) {
     return 'Longest chat: $name';
   }
+
+  @override
+  String get referralTitle => 'Invite a friend';
+
+  @override
+  String get referralMenuHint => 'Share your code, you both earn';
+
+  @override
+  String get referralExplain =>
+      'Invite a friend with your own code. Once they join and verify their email, you both earn bonus coins.';
+
+  @override
+  String get referralYourCode => 'Your invite code';
+
+  @override
+  String get referralCopyCode => 'Copy code';
+
+  @override
+  String get referralCodeCopied => 'Code copied';
+
+  @override
+  String referralTotalReferred(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'You\'ve invited $n friends',
+      one: 'You\'ve invited 1 friend',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String referralTotalEarned(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'You\'ve earned $n coins in total',
+      one: 'You\'ve earned 1 coin in total',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get referralHaveCode => 'Have an invite code?';
+
+  @override
+  String get referralCodeHint => 'Invite code';
+
+  @override
+  String get referralApply => 'Apply';
+
+  @override
+  String get referralApplied => 'Code applied!';
 }

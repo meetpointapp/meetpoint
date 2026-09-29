@@ -273,6 +273,8 @@
   "view": "View",
   "errAlreadyBoosted": "Your profile is already boosted.",
   "errAlreadyViewed": "This photo has already been opened.",
+  "errReferralInvalidCode": "That invite code isn't valid.",
+  "errReferralAlreadyRedeemed": "You've already used an invite code.",
   "mostPopular": "Most popular",
   "firstPurchaseBanner": "{pct}% bonus coins on your first purchase!",
   "bonusCoins": "+{count} bonus",
@@ -691,5 +693,17 @@
   "matchAnniversaryYears": "{n, plural, =1{1 year since you matched! 🎉} other{{n} years since you matched! 🎉}}",
   "weeklyDigestTitle": "This week",
   "weeklyDigestMatches": "{n, plural, =1{1 new match} other{{n} new matches}}",
-  "weeklyDigestLongestChat": "Longest chat: {name}"
+  "weeklyDigestLongestChat": "Longest chat: {name}",
+  "referralTitle": "Invite a friend",
+  "referralMenuHint": "Share your code, you both earn",
+  "referralExplain": "Invite a friend with your own code. Once they join and verify their email, you both earn bonus coins.",
+  "referralYourCode": "Your invite code",
+  "referralCopyCode": "Copy code",
+  "referralCodeCopied": "Code copied",
+  "referralTotalReferred": "{n, plural, =1{You've invited 1 friend} other{You've invited {n} friends}}",
+  "referralTotalEarned": "{n, plural, =1{You've earned 1 coin in total} other{You've earned {n} coins in total}}",
+  "referralHaveCode": "Have an invite code?",
+  "referralCodeHint": "Invite code",
+  "referralApply": "Apply",
+  "referralApplied": "Code applied!"
 }

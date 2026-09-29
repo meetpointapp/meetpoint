@@ -40,6 +40,7 @@ const internalCodes = {
   'already_resolved': 'sadece yönetim paneli',
   'cannot_sanction_staff': 'sadece yönetim paneli',
   'rate_required': 'sadece yönetim paneli (EFT kuru)',
+  'email_already_verified': 'davet kodu ekranı yalnızca e-posta doğrulanmadan önce gösterilir',
 };
 
 Set<String> _serverCodes() {

@@ -540,6 +540,8 @@
   "view": "Gör",
   "errAlreadyBoosted": "Profilin zaten öne çıkarılmış.",
   "errAlreadyViewed": "Bu fotoğraf zaten açıldı.",
+  "errReferralInvalidCode": "Bu davet kodu geçersiz.",
+  "errReferralAlreadyRedeemed": "Zaten bir davet kodu kullandın.",
   "mostPopular": "En popüler",
   "firstPurchaseBanner": "İlk alımına %{pct} bonus jeton!",
   "@firstPurchaseBanner": {
@@ -1369,5 +1371,31 @@
         "type": "String"
       }
     }
-  }
+  },
+  "referralTitle": "Arkadaşını davet et",
+  "referralMenuHint": "Kodunu paylaş, ikiniz de kazanın",
+  "referralExplain": "Arkadaşını kendi davet koduyla davet et. Katılıp e-postasını doğruladığında ikiniz de bonus jeton kazanırsınız.",
+  "referralYourCode": "Senin davet koden",
+  "referralCopyCode": "Kodu kopyala",
+  "referralCodeCopied": "Kod kopyalandı",
+  "referralTotalReferred": "{n} arkadaşını davet ettin",
+  "@referralTotalReferred": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "referralTotalEarned": "Toplam {n} jeton kazandın",
+  "@referralTotalEarned": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "referralHaveCode": "Davet kodun var mı?",
+  "referralCodeHint": "Davet kodu",
+  "referralApply": "Uygula",
+  "referralApplied": "Kod uygulandı!"
 }

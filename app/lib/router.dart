@@ -31,6 +31,7 @@ import 'features/profile/vibe_screen.dart';
 import 'features/profile/user_profile_screen.dart';
 import 'features/requests/requests_screen.dart';
 import 'features/me/journey_screen.dart';
+import 'features/me/referral_screen.dart';
 import 'features/wallet/cashout_screen.dart';
 import 'features/wallet/premium_screen.dart';
 import 'features/wallet/wallet_screen.dart';
@@ -90,6 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/wallet/cashout', builder: (_, _) => const CashoutScreen()),
       GoRoute(path: '/premium', builder: (_, _) => const PremiumScreen()),
       GoRoute(path: '/journey', builder: (_, _) => const JourneyScreen()),
+      GoRoute(path: '/referral', builder: (_, _) => const ReferralScreen()),
       GoRoute(path: '/chat/:id', builder: (_, s) => ChatScreen(conversationId: s.pathParameters['id']!)),
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => HomeShell(shell: shell),

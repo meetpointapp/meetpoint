@@ -181,6 +181,9 @@ class Api {
 
   Future<void> resendCode() => _post('/auth/resend-code');
 
+  // Faz 17 madde 8: davet programı — doğrulamadan önce uygulanır (bonus doğrulama anında hesaplanır)
+  Future<void> redeemReferralCode(String code) => _post('/auth/referral-code', {'code': code});
+
   Future<void> forgotPassword(String email) => _post('/auth/forgot-password', {'email': email});
 
   Future<IssuedTokens> resetPassword(String email, String code, String password) async =>
@@ -290,6 +293,9 @@ class Api {
 
   // Faz 17 madde 7: haftalık özet
   Future<WeeklyDigest> weeklyDigest() async => WeeklyDigest.fromJson(await _get('/me/weekly-digest'));
+
+  // Faz 17 madde 8: davet programı
+  Future<ReferralStats> referralStats() async => ReferralStats.fromJson(await _get('/me/referral'));
 
   // Faz 16: kozmetik mağaza
   Future<List<StoreItem>> storeItems() async =>

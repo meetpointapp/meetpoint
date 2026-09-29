@@ -25,6 +25,12 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   int _wait = _cooldown; // kayıtta kod zaten gönderildi
   Timer? _timer;
 
+  // Faz 17 madde 8: davet programı — kod tam olarak doğrulamadan ÖNCE uygulanabilir
+  final _referralCode = TextEditingController();
+  bool _showReferralField = false;
+  bool _referralApplied = false;
+  bool _referralBusy = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +41,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   void dispose() {
     _timer?.cancel();
     _code.dispose();
+    _referralCode.dispose();
     super.dispose();
   }
 
@@ -71,6 +78,21 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       _startTimer();
     } catch (e) {
       if (mounted) showSnack(context, errorText(l, e));
+    }
+  }
+
+  Future<void> _applyReferralCode() async {
+    final l = AppLocalizations.of(context);
+    final code = _referralCode.text.trim();
+    if (code.isEmpty || _referralBusy) return;
+    setState(() => _referralBusy = true);
+    try {
+      await ref.read(apiProvider).redeemReferralCode(code);
+      if (mounted) setState(() => _referralApplied = true);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(l, e));
+    } finally {
+      if (mounted) setState(() => _referralBusy = false);
     }
   }
 
@@ -114,6 +136,30 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   )
                 : TextButton(onPressed: _resend, child: Text(l.resendCode)),
           ),
+          const SizedBox(height: 12),
+          // Faz 17 madde 8: davet programı — bir kod tam olarak burada, doğrulamadan önce uygulanır
+          if (_referralApplied)
+            Center(
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.check_circle_rounded, size: 18, color: theme.colorScheme.primary),
+                const SizedBox(width: 6),
+                Text(l.referralApplied, style: TextStyle(color: theme.colorScheme.primary)),
+              ]),
+            )
+          else if (!_showReferralField)
+            Center(child: TextButton(onPressed: () => setState(() => _showReferralField = true), child: Text(l.referralHaveCode)))
+          else
+            Row(children: [
+              Expanded(
+                child: TextField(
+                  controller: _referralCode,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: InputDecoration(hintText: l.referralCodeHint),
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(onPressed: _referralBusy ? null : _applyReferralCode, child: Text(l.referralApply)),
+            ]),
         ]),
       ),
     );

@@ -90,6 +90,15 @@ model User {
   lastStreakDate     String?
   streakReminderDate String? // aynı yerel günde birden fazla "serini kaybetme" bildirimi gitmesin
 
+  // Faz 17 madde 8: davet programı. Her hesabın kendi kodu vardır (kayıtta üretilir); yeni kullanıcı
+  // doğrulanmadan önce bir kodu kullanabilir (POST /me/referral/redeem). E-posta doğrulanınca her iki
+  // taraf da bir kerelik bonus jeton kazanır (promosyon kovası — kayıt hediyesiyle aynı mekanik,
+  // bkz. src/referral.ts). Eski hesaplarda kod yok (null) — sorun değil, sadece yeni özellik.
+  referralCode String? @unique
+  referredById String?
+  referredBy   User?   @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals    User[]  @relation("Referrals")
+
   emailCodes      EmailCode[]
   verifications   VerificationRequest[]
   devices         Device[]

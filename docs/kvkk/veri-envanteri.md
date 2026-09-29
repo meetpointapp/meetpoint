@@ -5,7 +5,7 @@
 
 | Kategori | Veriler | Amaç | Hukuki sebep | Saklama | Aktarım | Tablolar |
 |---|---|---|---|---|---|---|
-| Kimlik ve iletişim | E-posta, dil, kayıt tarihi, onaylanan metin sürümleri (satış metinleri dahil), rıza durumları, bildirim tercihleri ve sessiz saatler, son etkinlik | Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı | sözleşme, yasal | Hesap süresince; silme talebinden 30 gün sonra veya 2 yıl hareketsizlikte silinir | E-posta sağlayıcısı (SMTP) | User |
+| Kimlik ve iletişim | E-posta, dil, kayıt tarihi, onaylanan metin sürümleri (satış metinleri dahil), rıza durumları, bildirim tercihleri ve sessiz saatler, son etkinlik, davet kodu ve kimin daveti üzerine katıldığı | Hesap oluşturma ve yönetimi, bildirimler, yasal onayların kanıtı | sözleşme, yasal | Hesap süresince; silme talebinden 30 gün sonra veya 2 yıl hareketsizlikte silinir | E-posta sağlayıcısı (SMTP) | User |
 | Profil | Görünen ad, doğum tarihi, cinsiyet, biyografi, şehir, ilgi alanları, sorular, boy, meslek, eğitim, burç, alışkanlıklar, fotoğraflar | Tanışma hizmetinin sunulması | sözleşme | Hesap süresince; kullanıcı istediği an değiştirebilir | Diğer kullanıcılar (profilde görünen kısmı) | Profile, Photo |
 | **Cinsel yönelim** (özel nitelikli) | Kimi görmek istediği (interestedIn) ve cinsiyetle birlikte çıkarılabilen yönelim | Eşleştirme | rıza | Hesap süresince; rıza geri alınınca eşleştirmede kullanılmaz | Aktarılmaz | Profile |
 | Konum | Yaklaşık konum (~1 km yuvarlanmış), mesafe filtresi | Yakındaki kişileri gösterme | sözleşme | Hesap süresince; en son konum saklanır, geçmiş tutulmaz | Diğer kullanıcılar (sadece yuvarlanmış mesafe) | Profile |

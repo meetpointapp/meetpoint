@@ -61,10 +61,13 @@ export const economy = {
   // Satış paketleri, bozdurma kuru, en düşük çekim, stopaj, olgunlaşma süresi ve aylık tavan veritabanında
   // (FinanceSettings, CoinPack): panelden değişir. Bkz. src/finance/settings.ts.
 
-  // Teşvikler: e-posta doğrulanınca hediye, ilk satın almada ek jeton. İkisi de "promo" kovasına girer:
+  // Teşvikler: e-posta doğrulanınca hediye, ilk satın almada ek jeton. Hepsi "promo" kovasına girer:
   // harcanabilir ama karşı tarafta bozdurulamaz kazanca dönüşür (platform zarar edemez).
   signupBonus: 50,
   firstPurchaseBonusPct: 50,
+  // Faz 17 madde 8: davet programı — davet edilen e-postasını doğrulayınca her iki taraf da bu kadar
+  // bonus jeton kazanır (kayıt hediyesiyle aynı mekanik, gerçek maliyeti yok). Bkz. src/referral.ts.
+  referralBonus: 50,
 
   // Jetonla alınan özellikler (jeton kimseye geçmez: tamamı gelir)
   superLikePrice: 30,

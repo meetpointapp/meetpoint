@@ -411,6 +411,31 @@ void main() {
     });
   });
 
+  group('Davet programı (Faz 17)', () {
+    test('Me.fromJson: referralCode ayrıştırılır', () {
+      final m = Me.fromJson({
+        'id': 'u1',
+        'email': 'a@test.com',
+        'locale': 'tr',
+        'balance': 0,
+        'cashable': 0,
+        'referralCode': 'ABC12345',
+      });
+      expect(m.referralCode, 'ABC12345');
+    });
+
+    test('Me.fromJson: eski hesaplarda referralCode null olabilir', () {
+      final m = Me.fromJson({'id': 'u1', 'email': 'a@test.com', 'locale': 'tr', 'balance': 0, 'cashable': 0});
+      expect(m.referralCode, isNull);
+    });
+
+    test('ReferralStats.fromJson', () {
+      final s = ReferralStats.fromJson({'totalReferred': 3, 'totalEarnedCoins': 150});
+      expect(s.totalReferred, 3);
+      expect(s.totalEarnedCoins, 150);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

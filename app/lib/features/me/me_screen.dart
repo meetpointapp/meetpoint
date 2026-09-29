@@ -219,6 +219,14 @@ class MeScreen extends ConsumerWidget {
                       ),
                       const Divider(height: 1, indent: 16, endIndent: 16),
                       ListTile(
+                        leading: const Icon(Icons.card_giftcard_rounded),
+                        title: Text(l.referralTitle),
+                        subtitle: Text(l.referralMenuHint),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/referral'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
                         leading: const Icon(Icons.support_agent_rounded),
                         title: Text(l.helpAndSupport),
                         trailing: Row(
