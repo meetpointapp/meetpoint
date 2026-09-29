@@ -510,6 +510,13 @@
   "icebreakerDifferentAnswer": "Farklı seçtiniz, ilginç 👀",
   "thisOrThatOptionA": "{id, select, sea_or_mountain{Deniz} coffee_or_tea{Kahve} morning_or_night{Sabah insanı} city_or_nature{Şehir} book_or_movie{Kitap} summer_or_winter{Yaz} planned_or_spontaneous{Planlı} home_or_travel{Evde kalmak} other{{id}}}",
   "thisOrThatOptionB": "{id, select, sea_or_mountain{Dağ} coffee_or_tea{Çay} morning_or_night{Gece kuşu} city_or_nature{Doğa} book_or_movie{Film} summer_or_winter{Kış} planned_or_spontaneous{Spontane} home_or_travel{Seyahat} other{{id}}}",
+  "ticTacToeButton": "XOX oyna",
+  "ticTacToeAlreadyActive": "Bu sohbette zaten aktif bir XOX oyunu var",
+  "ticTacToeYourTurn": "Sıra sende",
+  "ticTacToeOpponentTurn": "Rakibinin sırası",
+  "ticTacToeYouWon": "Kazandın! 🎉",
+  "ticTacToeYouLost": "Kaybettin",
+  "ticTacToeDraw": "Berabere!",
   "newMessageFrom": "{name}: {text}",
   "@newMessageFrom": {
     "placeholders": {

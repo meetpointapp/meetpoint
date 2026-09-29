@@ -1013,6 +1013,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get ticTacToeButton => 'Play tic-tac-toe';
+
+  @override
+  String get ticTacToeAlreadyActive =>
+      'There\'s already an active tic-tac-toe game in this chat';
+
+  @override
+  String get ticTacToeYourTurn => 'Your turn';
+
+  @override
+  String get ticTacToeOpponentTurn => 'Opponent\'s turn';
+
+  @override
+  String get ticTacToeYouWon => 'You won! 🎉';
+
+  @override
+  String get ticTacToeYouLost => 'You lost';
+
+  @override
+  String get ticTacToeDraw => 'It\'s a draw!';
+
+  @override
   String newMessageFrom(String name, String text) {
     return '$name: $text';
   }

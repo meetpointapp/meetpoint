@@ -319,6 +319,7 @@ model Conversation {
   createdAt DateTime  @default(now())
   messages  Message[]
   icebreakers IcebreakerGame[]
+  ticTacToes TicTacToeGame[]
 
   @@unique([userAId, userBId])
   @@index([userBId]) // "sohbetlerim": userAId eşleşmesi benzersiz indeksle, userBId bununla
@@ -368,6 +369,24 @@ model IcebreakerGame {
   responderChoice String?
   createdAt      DateTime     @default(now())
   answeredAt     DateTime?
+
+  @@index([conversationId, createdAt])
+}
+
+// Faz 17 madde 5: sohbet içi iki kişilik XOX (tic-tac-toe). Bir sohbette aynı anda en fazla bir
+// "active" oyun olabilir. Başlatan her zaman X'tir ve ilk hamleyi yapar.
+model TicTacToeGame {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  starterId      String // X
+  // 9 hücre: null (boş) | "X" | "O"
+  board          Json         @default("[null,null,null,null,null,null,null,null,null]")
+  turnUserId     String // sırası kimde (oyun bitince anlamsız kalır)
+  status         String       @default("active") // active | won | draw
+  winnerId       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@index([conversationId, createdAt])
 }

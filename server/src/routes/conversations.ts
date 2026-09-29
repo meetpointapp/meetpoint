@@ -1,4 +1,4 @@
-import type { IcebreakerGame, Message } from '@prisma/client';
+import type { IcebreakerGame, Message, TicTacToeGame } from '@prisma/client';
 import { Router } from 'express';
 import multer from 'multer';
 import { recordFunnelStage } from '../analytics';
@@ -299,4 +299,81 @@ conversationsRouter.post('/conversations/:id/icebreaker/:gameId/answer', require
   await unlockMilestone(me, 'first_icebreaker');
   emitToUser(otherId, 'icebreaker:answered', icebreakerDto(updated, otherId));
   res.json(icebreakerDto(updated, me));
+});
+
+// Faz 17 madde 5: sohbet içi iki kişilik XOX. Sembolik veri (kimin ne yazdığı yok, sadece tahta) —
+// buz kırıcı oyunların aksine taraf başına maskeleme gerekmiyor, tek bir DTO her iki tarafa da gider.
+const TICTACTOE_LINES = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8],
+  [0, 3, 6], [1, 4, 7], [2, 5, 8],
+  [0, 4, 8], [2, 4, 6],
+] as const;
+
+function ticTacToeWinner(board: readonly (string | null)[]): string | null {
+  for (const [a, b, c] of TICTACTOE_LINES) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+  }
+  return null;
+}
+
+function ticTacToeDto(g: TicTacToeGame) {
+  return {
+    id: g.id,
+    conversationId: g.conversationId,
+    starterId: g.starterId,
+    board: g.board,
+    turnUserId: g.turnUserId,
+    status: g.status,
+    winnerId: g.winnerId,
+    createdAt: g.createdAt,
+  };
+}
+
+conversationsRouter.post('/conversations/:id/tictactoe', requireNotRestricted, messageLimiter, async (req, res) => {
+  const me = uid(req);
+  const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
+  if (await isBlockedEitherWay(me, otherId)) throw new HttpError(403, 'blocked');
+  // Sohbette aynı anda en fazla bir açık oyun olabilir
+  const active = await prisma.ticTacToeGame.findFirst({ where: { conversationId: conv.id, status: 'active' } });
+  if (active) throw new HttpError(400, 'validation');
+  const game = await prisma.ticTacToeGame.create({
+    data: { conversationId: conv.id, starterId: me, turnUserId: me, board: Array(9).fill(null) },
+  });
+  const dto = ticTacToeDto(game);
+  emitToUser(otherId, 'tictactoe:new', dto);
+  void notify(otherId, 'message', me, '⭕', { conversationId: conv.id });
+  res.status(201).json(dto);
+});
+
+conversationsRouter.get('/conversations/:id/tictactoe', async (req, res) => {
+  const me = uid(req);
+  const { conv } = await getOwnConversation(String(req.params.id), me);
+  const games = await prisma.ticTacToeGame.findMany({ where: { conversationId: conv.id }, orderBy: { createdAt: 'asc' } });
+  res.json(games.map(ticTacToeDto));
+});
+
+conversationsRouter.post('/conversations/:id/tictactoe/:gameId/move', requireNotRestricted, async (req, res) => {
+  const me = uid(req);
+  const { conv, otherId } = await getOwnConversation(String(req.params.id), me);
+  const game = await prisma.ticTacToeGame.findUnique({ where: { id: String(req.params.gameId) } });
+  if (!game || game.conversationId !== conv.id) throw new HttpError(404, 'not_found');
+  if (game.status !== 'active' || game.turnUserId !== me) throw new HttpError(400, 'validation');
+  const { position } = z.object({ position: z.number().int().min(0).max(8) }).parse(req.body);
+  const board = [...(game.board as (string | null)[])];
+  if (board[position] !== null) throw new HttpError(400, 'validation');
+  board[position] = game.starterId === me ? 'X' : 'O';
+  const winMark = ticTacToeWinner(board);
+  const draw = !winMark && board.every((c) => c !== null);
+  const updated = await prisma.ticTacToeGame.update({
+    where: { id: game.id },
+    data: {
+      board,
+      status: winMark ? 'won' : draw ? 'draw' : 'active',
+      winnerId: winMark ? me : null,
+      turnUserId: winMark || draw ? game.turnUserId : otherId,
+    },
+  });
+  const dto = ticTacToeDto(updated);
+  emitToUser(otherId, 'tictactoe:move', dto);
+  res.json(dto);
 });

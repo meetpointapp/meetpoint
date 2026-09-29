@@ -1658,6 +1658,48 @@ abstract class AppLocalizations {
   /// **'{id, select, sea_or_mountain{Dağ} coffee_or_tea{Çay} morning_or_night{Gece kuşu} city_or_nature{Doğa} book_or_movie{Film} summer_or_winter{Kış} planned_or_spontaneous{Spontane} home_or_travel{Seyahat} other{{id}}}'**
   String thisOrThatOptionB(String id);
 
+  /// No description provided for @ticTacToeButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'XOX oyna'**
+  String get ticTacToeButton;
+
+  /// No description provided for @ticTacToeAlreadyActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sohbette zaten aktif bir XOX oyunu var'**
+  String get ticTacToeAlreadyActive;
+
+  /// No description provided for @ticTacToeYourTurn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıra sende'**
+  String get ticTacToeYourTurn;
+
+  /// No description provided for @ticTacToeOpponentTurn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rakibinin sırası'**
+  String get ticTacToeOpponentTurn;
+
+  /// No description provided for @ticTacToeYouWon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazandın! 🎉'**
+  String get ticTacToeYouWon;
+
+  /// No description provided for @ticTacToeYouLost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaybettin'**
+  String get ticTacToeYouLost;
+
+  /// No description provided for @ticTacToeDraw.
+  ///
+  /// In tr, this message translates to:
+  /// **'Berabere!'**
+  String get ticTacToeDraw;
+
   /// No description provided for @newMessageFrom.
   ///
   /// In tr, this message translates to:

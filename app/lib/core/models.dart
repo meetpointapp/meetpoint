@@ -806,6 +806,43 @@ class IcebreakerGame {
       );
 }
 
+// Faz 17 madde 5: sohbet içi iki kişilik XOX. Başlatan her zaman X; tahta 9 hücre (null|"X"|"O").
+class TicTacToeGame {
+  final String id;
+  final String conversationId;
+  final String starterId; // X
+  final List<String?> board;
+  final String turnUserId;
+  final String status; // active | won | draw
+  final String? winnerId;
+  final DateTime createdAt;
+
+  const TicTacToeGame({
+    required this.id,
+    required this.conversationId,
+    required this.starterId,
+    required this.board,
+    required this.turnUserId,
+    required this.status,
+    this.winnerId,
+    required this.createdAt,
+  });
+
+  bool get finished => status != 'active';
+  String markOf(String userId) => userId == starterId ? 'X' : 'O';
+
+  factory TicTacToeGame.fromJson(Map<String, dynamic> j) => TicTacToeGame(
+        id: j['id'],
+        conversationId: j['conversationId'],
+        starterId: j['starterId'],
+        board: [for (final c in (j['board'] as List)) c as String?],
+        turnUserId: j['turnUserId'],
+        status: j['status'],
+        winnerId: j['winnerId'],
+        createdAt: _date(j['createdAt']),
+      );
+}
+
 class Conversation {
   final String id;
   final String origin;

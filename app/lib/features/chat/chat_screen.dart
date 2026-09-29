@@ -30,6 +30,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
   List<ChatMessage>? _messages;
   List<IcebreakerGame> _games = [];
+  List<TicTacToeGame> _ticTacToes = [];
   Object? _error;
   StreamSubscription<RealtimeEvent>? _sub;
   bool _sending = false;
@@ -92,6 +93,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       case 'icebreaker:answered':
         final g = IcebreakerGame.fromJson(data);
         setState(() => _games = [for (final x in _games) x.id == g.id ? g : x]);
+      case 'tictactoe:new':
+        final g = TicTacToeGame.fromJson(data);
+        if (!_ticTacToes.any((x) => x.id == g.id)) setState(() => _ticTacToes = [..._ticTacToes, g]);
+      case 'tictactoe:move':
+        final g = TicTacToeGame.fromJson(data);
+        setState(() => _ticTacToes = [for (final x in _ticTacToes) x.id == g.id ? g : x]);
     }
   }
 
@@ -99,12 +106,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     try {
       final api = ref.read(apiProvider);
       final list = await api.messages(_id);
-      // Buz kırıcı oyunlar mesajlarla aynı önceliğe sahip değil: yüklenemezse sessizce boş kalır
+      // Buz kırıcı oyunlar ve XOX mesajlarla aynı önceliğe sahip değil: yüklenemezse sessizce boş kalır
       final games = await api.icebreakerGames(_id).catchError((_) => <IcebreakerGame>[]);
+      final ticTacToes = await api.ticTacToeGames(_id).catchError((_) => <TicTacToeGame>[]);
       if (mounted) {
         setState(() {
           _messages = list;
           _games = games;
+          _ticTacToes = ticTacToes;
           _hasOlder = list.length == Api.messagePageSize;
         });
       }
@@ -330,6 +339,38 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
+  // Faz 17 madde 5: sohbet içi iki kişilik XOX. Sohbette aynı anda en fazla bir aktif oyun olabilir,
+  // bunu istemci tarafında da kontrol ederek gereksiz bir 400 isteğinden kaçınıyoruz.
+  Future<void> _startTicTacToe() async {
+    if (_ticTacToes.any((g) => g.status == 'active')) {
+      if (mounted) showSnack(context, AppLocalizations.of(context).ticTacToeAlreadyActive);
+      return;
+    }
+    try {
+      final game = await ref.read(apiProvider).startTicTacToe(_id);
+      Fx.tap();
+      setState(() => _ticTacToes = [..._ticTacToes, game]);
+      ref.invalidate(conversationsProvider);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
+    }
+  }
+
+  Future<void> _playTicTacToe(TicTacToeGame game, int position) async {
+    final myId = ref.read(sessionProvider).value?.userId;
+    try {
+      final updated = await ref.read(apiProvider).playTicTacToe(_id, game.id, position);
+      if (updated.status == 'won' && updated.winnerId == myId) {
+        Fx.celebrate();
+      } else {
+        Fx.tap();
+      }
+      setState(() => _ticTacToes = [for (final g in _ticTacToes) g.id == updated.id ? updated : g]);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(AppLocalizations.of(context), e));
+    }
+  }
+
   Future<void> _openPhoto(ChatMessage m) async {
     final l = AppLocalizations.of(context);
     try {
@@ -398,11 +439,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 : messages == null
                     ? const Center(child: CircularProgressIndicator())
                     : Builder(builder: (context) {
-                        // Faz 17: buz kırıcı oyunlar, mesajlarla aynı zaman çizelgesinde (oluşturulma
+                        // Faz 17: buz kırıcı oyunlar ve XOX, mesajlarla aynı zaman çizelgesinde (oluşturulma
                         // zamanına göre) birleştirilir — sohbetin gerçek bir parçası gibi görünür.
-                        final timeline = <Object>[...messages, ..._games]
-                          ..sort((a, b) => (a is ChatMessage ? a.createdAt : (a as IcebreakerGame).createdAt)
-                              .compareTo(b is ChatMessage ? b.createdAt : (b as IcebreakerGame).createdAt));
+                        DateTime entryTime(Object e) =>
+                            e is ChatMessage ? e.createdAt : e is IcebreakerGame ? e.createdAt : (e as TicTacToeGame).createdAt;
+                        final timeline = <Object>[...messages, ..._games, ..._ticTacToes]
+                          ..sort((a, b) => entryTime(a).compareTo(entryTime(b)));
                         return ListView.builder(
                           reverse: true,
                           padding: const EdgeInsets.all(12),
@@ -423,6 +465,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 mine: entry.starterId == myId,
                                 otherName: other?.displayName ?? '',
                                 onAnswer: (c) => _answerIcebreaker(entry, c),
+                              );
+                            }
+                            if (entry is TicTacToeGame) {
+                              return _TicTacToeBubble(
+                                game: entry,
+                                myId: myId ?? '',
+                                onPlay: (pos) => _playTicTacToe(entry, pos),
                               );
                             }
                             final m = entry as ChatMessage;
@@ -453,6 +502,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 tooltip: l.icebreakerButton,
                 onPressed: _openIcebreakerSheet,
                 icon: const Icon(Icons.casino_outlined),
+              ),
+              IconButton(
+                tooltip: l.ticTacToeButton,
+                onPressed: _sending ? null : _startTicTacToe,
+                icon: const Icon(Icons.sports_esports_outlined),
               ),
               Expanded(
                 child: TextField(
@@ -690,6 +744,86 @@ class _IcebreakerBubble extends StatelessWidget {
           ]),
           const SizedBox(height: 10),
           body,
+        ]),
+      ),
+    );
+  }
+}
+
+// Faz 17 madde 5: sohbet içi iki kişilik XOX balonu — 3x3 tahta, sıra bendeyse boş hücrelere
+// dokunulabilir, oyun bitince sonuç metni gösterilir.
+class _TicTacToeBubble extends StatelessWidget {
+  const _TicTacToeBubble({required this.game, required this.myId, required this.onPlay});
+  final TicTacToeGame game;
+  final String myId;
+  final ValueChanged<int> onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final myTurn = game.status == 'active' && game.turnUserId == myId;
+
+    String status;
+    Color statusColor;
+    if (game.status == 'won') {
+      final won = game.winnerId == myId;
+      status = won ? l.ticTacToeYouWon : l.ticTacToeYouLost;
+      statusColor = won ? Brand.coral : scheme.onSurfaceVariant;
+    } else if (game.status == 'draw') {
+      status = l.ticTacToeDraw;
+      statusColor = scheme.onSurfaceVariant;
+    } else {
+      status = myTurn ? l.ticTacToeYourTurn : l.ticTacToeOpponentTurn;
+      statusColor = myTurn ? Brand.coral : scheme.onSurfaceVariant;
+    }
+
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 220),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Brand.coral.withValues(alpha: 0.25)),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.sports_esports_rounded, size: 16, color: Brand.coral),
+            const SizedBox(width: 6),
+            Text('XOX', style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800, color: Brand.coral)),
+          ]),
+          const SizedBox(height: 10),
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 6,
+            crossAxisSpacing: 6,
+            children: [
+              for (final (i, cell) in game.board.indexed)
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: myTurn && cell == null ? () => onPlay(i) : null,
+                  child: Container(
+                    decoration: BoxDecoration(color: scheme.surface, borderRadius: BorderRadius.circular(8)),
+                    alignment: Alignment.center,
+                    child: Text(
+                      cell ?? '',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: cell == 'X' ? Brand.coral : scheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(status, style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700, color: statusColor)),
         ]),
       ),
     );

@@ -359,6 +359,40 @@ void main() {
     });
   });
 
+  group('Sohbet içi iki kişilik XOX (Faz 17)', () {
+    test('TicTacToeGame.fromJson: boş tahta ve sıra bilgisi ayrıştırılır', () {
+      final g = TicTacToeGame.fromJson({
+        'id': 't1',
+        'conversationId': 'c1',
+        'starterId': 'u1',
+        'board': List<String?>.filled(9, null),
+        'turnUserId': 'u1',
+        'status': 'active',
+        'winnerId': null,
+        'createdAt': '2026-01-01T00:00:00.000Z',
+      });
+      expect(g.finished, isFalse);
+      expect(g.markOf('u1'), 'X');
+      expect(g.markOf('u2'), 'O');
+      expect(g.board, List<String?>.filled(9, null));
+    });
+
+    test('TicTacToeGame.fromJson: kazanan belli olunca finished true olur', () {
+      final g = TicTacToeGame.fromJson({
+        'id': 't2',
+        'conversationId': 'c1',
+        'starterId': 'u1',
+        'board': ['X', 'X', 'X', null, 'O', 'O', null, null, null],
+        'turnUserId': 'u1',
+        'status': 'won',
+        'winnerId': 'u1',
+        'createdAt': '2026-01-01T00:00:00.000Z',
+      });
+      expect(g.finished, isTrue);
+      expect(g.winnerId, 'u1');
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

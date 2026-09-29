@@ -1001,6 +1001,28 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get ticTacToeButton => 'XOX oyna';
+
+  @override
+  String get ticTacToeAlreadyActive =>
+      'Bu sohbette zaten aktif bir XOX oyunu var';
+
+  @override
+  String get ticTacToeYourTurn => 'Sıra sende';
+
+  @override
+  String get ticTacToeOpponentTurn => 'Rakibinin sırası';
+
+  @override
+  String get ticTacToeYouWon => 'Kazandın! 🎉';
+
+  @override
+  String get ticTacToeYouLost => 'Kaybettin';
+
+  @override
+  String get ticTacToeDraw => 'Berabere!';
+
+  @override
   String newMessageFrom(String name, String text) {
     return '$name: $text';
   }

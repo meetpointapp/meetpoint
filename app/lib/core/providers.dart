@@ -76,6 +76,8 @@ const _events = [
   'message:delivered',
   'icebreaker:new',
   'icebreaker:answered',
+  'tictactoe:new',
+  'tictactoe:move',
   'typing',
   'wallet:updated',
   'call:incoming',

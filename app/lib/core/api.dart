@@ -480,6 +480,17 @@ class Api {
   Future<IcebreakerGame> answerIcebreaker(String conversationId, String gameId, String choice) async =>
       IcebreakerGame.fromJson(await _post('/conversations/$conversationId/icebreaker/$gameId/answer', {'choice': choice}));
 
+  // Faz 17 madde 5: sohbet içi iki kişilik XOX
+  Future<List<TicTacToeGame>> ticTacToeGames(String conversationId) async => [
+        for (final g in (await _get('/conversations/$conversationId/tictactoe') as List)) TicTacToeGame.fromJson(g),
+      ];
+
+  Future<TicTacToeGame> startTicTacToe(String conversationId) async =>
+      TicTacToeGame.fromJson(await _post('/conversations/$conversationId/tictactoe', {}));
+
+  Future<TicTacToeGame> playTicTacToe(String conversationId, String gameId, int position) async =>
+      TicTacToeGame.fromJson(await _post('/conversations/$conversationId/tictactoe/$gameId/move', {'position': position}));
+
   // Fotoğrafı aç (sadece bir kez); baytlar bellekte gösterilir, cihaza kaydedilmez
   Future<Uint8List> openPhoto(String messageId) async {
     final data = await _send((o) => _dio.get<List<int>>('/messages/$messageId/photo',
