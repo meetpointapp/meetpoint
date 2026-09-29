@@ -1340,5 +1340,17 @@
         "type": "String"
       }
     }
+  },
+  "matchAnniversaryWeek": "1 hafta oldu 🎉",
+  "matchAnniversaryOneMonth": "1 ay oldu 🎉",
+  "matchAnniversaryThreeMonths": "3 ay oldu 🎉",
+  "matchAnniversarySixMonths": "6 ay oldu 🎉",
+  "matchAnniversaryYears": "{n} yıl oldu 🎉",
+  "@matchAnniversaryYears": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
   }
 }

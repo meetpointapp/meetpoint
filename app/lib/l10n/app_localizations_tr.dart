@@ -2692,4 +2692,21 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get premiumEntryNotSubscribed =>
       'Seni beğenenler her zaman açık olsun';
+
+  @override
+  String get matchAnniversaryWeek => '1 hafta oldu 🎉';
+
+  @override
+  String get matchAnniversaryOneMonth => '1 ay oldu 🎉';
+
+  @override
+  String get matchAnniversaryThreeMonths => '3 ay oldu 🎉';
+
+  @override
+  String get matchAnniversarySixMonths => '6 ay oldu 🎉';
+
+  @override
+  String matchAnniversaryYears(int n) {
+    return '$n yıl oldu 🎉';
+  }
 }

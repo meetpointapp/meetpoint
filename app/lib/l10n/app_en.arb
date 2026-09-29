@@ -683,5 +683,10 @@
   "premiumActiveUntil": "Your subscription is active until {date}",
   "premiumManage": "Manage subscription",
   "premiumSubscribed": "Subscribed!",
-  "premiumEntryNotSubscribed": "Get who-likes-you unlocked, always"
+  "premiumEntryNotSubscribed": "Get who-likes-you unlocked, always",
+  "matchAnniversaryWeek": "1 week since you matched! 🎉",
+  "matchAnniversaryOneMonth": "1 month since you matched! 🎉",
+  "matchAnniversaryThreeMonths": "3 months since you matched! 🎉",
+  "matchAnniversarySixMonths": "6 months since you matched! 🎉",
+  "matchAnniversaryYears": "{n, plural, =1{1 year since you matched! 🎉} other{{n} years since you matched! 🎉}}"
 }

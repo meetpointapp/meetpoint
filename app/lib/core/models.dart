@@ -846,6 +846,7 @@ class TicTacToeGame {
 class Conversation {
   final String id;
   final String origin;
+  final DateTime createdAt;
   final PublicProfile? user;
   final ChatMessage? lastMessage;
   final int unreadCount;
@@ -853,6 +854,7 @@ class Conversation {
   const Conversation({
     required this.id,
     required this.origin,
+    required this.createdAt,
     required this.user,
     required this.lastMessage,
     this.unreadCount = 0,
@@ -861,6 +863,7 @@ class Conversation {
   factory Conversation.fromJson(Map<String, dynamic> j) => Conversation(
         id: j['id'],
         origin: j['origin'],
+        createdAt: _date(j['createdAt']),
         user: j['user'] == null ? null : PublicProfile.fromJson(j['user']),
         lastMessage: j['lastMessage'] == null ? null : ChatMessage.fromJson(j['lastMessage']),
         unreadCount: j['unreadCount'] ?? 0,

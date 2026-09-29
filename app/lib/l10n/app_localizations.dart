@@ -4208,6 +4208,36 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Seni beğenenler her zaman açık olsun'**
   String get premiumEntryNotSubscribed;
+
+  /// No description provided for @matchAnniversaryWeek.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 hafta oldu 🎉'**
+  String get matchAnniversaryWeek;
+
+  /// No description provided for @matchAnniversaryOneMonth.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 ay oldu 🎉'**
+  String get matchAnniversaryOneMonth;
+
+  /// No description provided for @matchAnniversaryThreeMonths.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 ay oldu 🎉'**
+  String get matchAnniversaryThreeMonths;
+
+  /// No description provided for @matchAnniversarySixMonths.
+  ///
+  /// In tr, this message translates to:
+  /// **'6 ay oldu 🎉'**
+  String get matchAnniversarySixMonths;
+
+  /// No description provided for @matchAnniversaryYears.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} yıl oldu 🎉'**
+  String matchAnniversaryYears(int n);
 }
 
 class _AppLocalizationsDelegate

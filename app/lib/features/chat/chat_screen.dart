@@ -26,6 +26,26 @@ class ChatScreen extends ConsumerStatefulWidget {
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
+// Faz 17 madde 6: eşleşme yıldönümü. Takvim günü bazında (saat farkı önemsiz — küçük bir kutlama,
+// kesin 24 saatlik pencere gerekmiyor) 1 hafta/1 ay/3 ay/6 ay ve her yıl dönümünde tetiklenir.
+int? matchAnniversaryDays(DateTime createdAt, {DateTime? now}) {
+  final today = now ?? DateTime.now();
+  final start = DateTime(createdAt.year, createdAt.month, createdAt.day);
+  final current = DateTime(today.year, today.month, today.day);
+  final days = current.difference(start).inDays;
+  if (days == 7 || days == 30 || days == 90 || days == 180) return days;
+  if (days > 0 && days % 365 == 0) return days;
+  return null;
+}
+
+String _anniversaryLabel(AppLocalizations l, int days) => switch (days) {
+      7 => l.matchAnniversaryWeek,
+      30 => l.matchAnniversaryOneMonth,
+      90 => l.matchAnniversaryThreeMonths,
+      180 => l.matchAnniversarySixMonths,
+      _ => l.matchAnniversaryYears(days ~/ 365),
+    };
+
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
   List<ChatMessage>? _messages;
@@ -39,6 +59,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool _loadingOlder = false;
   Timer? _typingTimer;
   DateTime _lastTypingSent = DateTime(2000);
+  bool _anniversaryDismissed = false;
 
   String get _id => widget.conversationId;
 
@@ -393,7 +414,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final myId = ref.watch(sessionProvider).value?.userId;
-    final other = ref.watch(conversationsProvider).value?.where((c) => c.id == _id).firstOrNull?.user;
+    final conv = ref.watch(conversationsProvider).value?.where((c) => c.id == _id).firstOrNull;
+    final other = conv?.user;
+    // Faz 17: eşleşme yıldönümü — sadece gerçek eşleşmelerde (istekle açılan sohbetlerde değil)
+    final anniversaryDays = conv != null && conv.origin == 'MATCH' ? matchAnniversaryDays(conv.createdAt) : null;
     final messages = _messages;
     // Faz 16: kozmetik mağaza — sohbet teması sadece benim kendi görünümümü etkiler (kişisel tercih)
     final myProfile = ref.watch(meProvider).value?.profile;
@@ -431,6 +455,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
       body: Column(children: [
+        if (anniversaryDays != null && !_anniversaryDismissed)
+          Container(
+            width: double.infinity,
+            color: Brand.coral.withValues(alpha: 0.12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(children: [
+              const Icon(Icons.celebration_rounded, color: Brand.coral, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(_anniversaryLabel(l, anniversaryDays),
+                    style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700, color: Brand.coral)),
+              ),
+              IconButton(
+                iconSize: 18,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => setState(() => _anniversaryDismissed = true),
+                icon: Icon(Icons.close_rounded, color: Brand.coral.withValues(alpha: 0.7)),
+              ),
+            ]),
+          ),
         Expanded(
           child: ColoredBox(
             color: myBackgroundColor ?? Colors.transparent,

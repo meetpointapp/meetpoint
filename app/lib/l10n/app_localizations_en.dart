@@ -2732,4 +2732,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumEntryNotSubscribed => 'Get who-likes-you unlocked, always';
+
+  @override
+  String get matchAnniversaryWeek => '1 week since you matched! 🎉';
+
+  @override
+  String get matchAnniversaryOneMonth => '1 month since you matched! 🎉';
+
+  @override
+  String get matchAnniversaryThreeMonths => '3 months since you matched! 🎉';
+
+  @override
+  String get matchAnniversarySixMonths => '6 months since you matched! 🎉';
+
+  @override
+  String matchAnniversaryYears(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n years since you matched! 🎉',
+      one: '1 year since you matched! 🎉',
+    );
+    return '$_temp0';
+  }
 }
