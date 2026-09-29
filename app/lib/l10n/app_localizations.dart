@@ -3327,6 +3327,42 @@ abstract class AppLocalizations {
   /// **'{n} kademe tamamlandı'**
   String milestoneBadgeTooltip(int n);
 
+  /// No description provided for @journeyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelişimim'**
+  String get journeyTitle;
+
+  /// No description provided for @journeyRewardsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açılan ödüller'**
+  String get journeyRewardsTitle;
+
+  /// No description provided for @journeyRewardsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz bir ödül açmadın. Bir kademe tamamladığında burada görünecek.'**
+  String get journeyRewardsEmpty;
+
+  /// No description provided for @journeyNextStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıradaki adım'**
+  String get journeyNextStepTitle;
+
+  /// No description provided for @journeyNextStepBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortak ilginiz {interest} — bundan bahsederek başla'**
+  String journeyNextStepBody(String interest);
+
+  /// No description provided for @milestoneLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} other{{id}}}'**
+  String milestoneLabel(String id);
+
   /// No description provided for @quietHoursTitle.
   ///
   /// In tr, this message translates to:

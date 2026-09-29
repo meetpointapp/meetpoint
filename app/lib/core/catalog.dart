@@ -215,3 +215,33 @@ const storeChatBackgroundColor = <String, Color>{
 };
 List<String> get storeChatBackgroundIds => storeChatBackgroundColor.keys.toList();
 Color? storeChatBackgroundColorOf(String id) => storeChatBackgroundColor[id];
+
+// Faz 17: "Sosyal cesaret yolculuğu" — her kademede açılan ücretsiz kozmetik ödül. Kimlikler
+// server/src/achievements.ts MILESTONE_REWARD ile birebir eşleşmeli; görseli yukarıdaki store*
+// haritalarından (aynı kataloğun kendi rengi/emoji'si) alınır.
+const milestoneRewardId = <String, String>{
+  'first_message': 'bubble_mint',
+  'week_long_chat': 'chatbg_minimal',
+  'first_icebreaker': 'bubble_sunset',
+  'first_match': 'frame_gold',
+  'first_room_visit': 'item_piano',
+  'first_call': 'outfit_superhero',
+  'profile_complete': 'theme_royal',
+  'verified': 'badge_diamond',
+  'vibe_done': 'theme_galaxy',
+};
+
+Color milestoneRewardColorOf(String milestoneId) {
+  final id = milestoneRewardId[milestoneId];
+  return storePremiumThemeAccent[id] ??
+      storeAvatarOutfitColor[id] ??
+      storeChatBubbleColor[id] ??
+      storeChatBackgroundColor[id] ??
+      (storeFrameGradient[id]?.first) ??
+      const Color(0xFFF5A524);
+}
+
+String milestoneRewardEmojiOf(String milestoneId) {
+  final id = milestoneRewardId[milestoneId] ?? '';
+  return storeBadgeEmoji[id] ?? storeRoomItemEmoji[id] ?? '';
+}

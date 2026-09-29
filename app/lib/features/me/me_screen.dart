@@ -21,9 +21,13 @@ int profileCompletion(PublicProfile p) {
   if (p.lookingFor.isNotEmpty) score += 10;
   score += p.prompts.length.clamp(0, 3) * 10; // 30
   if (p.bio.isNotEmpty) score += 10;
-  final basics = [p.heightCm != null, p.job.isNotEmpty, p.education.isNotEmpty, p.zodiac.isNotEmpty, p.city.isNotEmpty]
-      .where((b) => b)
-      .length;
+  final basics = [
+    p.heightCm != null,
+    p.job.isNotEmpty,
+    p.education.isNotEmpty,
+    p.zodiac.isNotEmpty,
+    p.city.isNotEmpty,
+  ].where((b) => b).length;
   if (basics >= 2) score += 10;
   return score.clamp(0, 100);
 }
@@ -44,227 +48,309 @@ class MeScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l.navProfile)),
       body: me.when(
         loading: () => const ListSkeleton(rows: 4),
-        error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(meProvider)),
+        error: (e, _) =>
+            ErrorRetry(error: e, onRetry: () => ref.invalidate(meProvider)),
         data: (m) {
           final p = m.profile;
           final percent = p == null ? 0 : profileCompletion(p);
           return RefreshIndicator(
             onRefresh: () => ref.refresh(meProvider.future),
-            child: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 24), children: [
-              // Fotoğraf + tamamlama halkası
-              Center(
-                child: SizedBox.square(
-                  dimension: 132,
-                  child: Stack(alignment: Alignment.center, children: [
-                    SizedBox.square(
-                      dimension: 132,
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: percent / 100),
-                        duration: const Duration(milliseconds: 700),
-                        curve: Curves.easeOutCubic,
-                        builder: (_, v, _) => CircularProgressIndicator(
-                          value: v,
-                          strokeWidth: 5,
-                          strokeCap: StrokeCap.round,
-                          color: Brand.coral,
-                          backgroundColor: Brand.coral.withValues(alpha: 0.12),
-                        ),
-                      ),
-                    ),
-                    Avatar(p, radius: 56),
-                    Positioned(
-                      bottom: 0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                        decoration: const ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
-                        child: Text('%$percent',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12)),
-                      ),
-                    ),
-                    if (p != null)
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () => context.push('/me/edit'),
-                          child: AvatarFace(profile: p, size: 34, border: theme.colorScheme.surface),
-                        ),
-                      ),
-                  ]),
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (p != null)
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              children: [
+                // Fotoğraf + tamamlama halkası
                 Center(
-                  child: NameWithBadge('${p.displayName}, ${p.age}',
-                      verified: m.verificationStatus == 'approved', style: theme.textTheme.headlineSmall),
-                ),
-              if (percent < 100)
-                Center(
-                  child: Text(l.profileCompletion(percent),
-                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                ),
-              const SizedBox(height: 16),
-              Row(children: [
-                Expanded(
-                  child: GradientButton(
-                    label: l.editProfile,
-                    icon: Icons.edit_rounded,
-                    onPressed: () async {
-                      await context.push('/me/edit');
-                      ref.invalidate(meProvider);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10),
-                SizedBox(
-                  height: 52,
-                  child: OutlinedButton(
-                    onPressed: () => context.go('/wallet'),
-                    child: AnimatedCoinAmount(m.balance, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 16),
-              _VerificationCard(status: m.verificationStatus),
-              const SizedBox(height: 16),
-              _StreakCard(streak: m.streak),
-              const SizedBox(height: 16),
-              _JourneyCard(achievements: m.achievements),
-              const SizedBox(height: 16),
-              Card(
-                child: Column(children: [
-                  ListTile(
-                    leading: const Icon(Icons.visibility_outlined),
-                    title: Text(l.previewProfile),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/user/${m.id}'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.language_rounded),
-                    title: Text(l.language),
-                    trailing: SegmentedButton<String>(
-                      showSelectedIcon: false,
-                      style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                      segments: const [
-                        ButtonSegment(value: 'tr', label: Text('TR')),
-                        ButtonSegment(value: 'en', label: Text('EN')),
+                  child: SizedBox.square(
+                    dimension: 132,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox.square(
+                          dimension: 132,
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0, end: percent / 100),
+                            duration: const Duration(milliseconds: 700),
+                            curve: Curves.easeOutCubic,
+                            builder: (_, v, _) => CircularProgressIndicator(
+                              value: v,
+                              strokeWidth: 5,
+                              strokeCap: StrokeCap.round,
+                              color: Brand.coral,
+                              backgroundColor: Brand.coral.withValues(
+                                alpha: 0.12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Avatar(p, radius: 56),
+                        Positioned(
+                          bottom: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: const ShapeDecoration(
+                              shape: StadiumBorder(),
+                              gradient: Brand.gradient,
+                            ),
+                            child: Text(
+                              '%$percent',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (p != null)
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => context.push('/me/edit'),
+                              child: AvatarFace(
+                                profile: p,
+                                size: 34,
+                                border: theme.colorScheme.surface,
+                              ),
+                            ),
+                          ),
                       ],
-                      selected: {locale},
-                      onSelectionChanged: (s) => ref.read(localeProvider.notifier).set(s.first),
                     ),
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.notifications_none_rounded),
-                    title: Text(l.notificationsTitle),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/me/notifications'),
+                ),
+                const SizedBox(height: 12),
+                if (p != null)
+                  Center(
+                    child: NameWithBadge(
+                      '${p.displayName}, ${p.age}',
+                      verified: m.verificationStatus == 'approved',
+                      style: theme.textTheme.headlineSmall,
+                    ),
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.support_agent_rounded),
-                    title: Text(l.helpAndSupport),
-                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                      if (supportUnread > 0) Badge(label: Text('$supportUnread'), backgroundColor: Brand.coral),
-                      const Icon(Icons.chevron_right_rounded),
-                    ]),
-                    onTap: () async {
-                      await context.push('/help');
-                      ref.invalidate(supportInboxProvider);
-                    },
+                if (percent < 100)
+                  Center(
+                    child: Text(
+                      l.profileCompletion(percent),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.feedback_outlined),
-                    title: Text(l.sendFeedback),
-                    subtitle: Text(l.sendFeedbackHint),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => openNewTicket(context, category: SupportCategory.suggestion),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GradientButton(
+                        label: l.editProfile,
+                        icon: Icons.edit_rounded,
+                        onPressed: () async {
+                          await context.push('/me/edit');
+                          ref.invalidate(meProvider);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () => context.go('/wallet'),
+                        child: AnimatedCoinAmount(
+                          m.balance,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _VerificationCard(status: m.verificationStatus),
+                const SizedBox(height: 16),
+                _StreakCard(streak: m.streak),
+                const SizedBox(height: 16),
+                _JourneyCard(achievements: m.achievements),
+                const SizedBox(height: 16),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.visibility_outlined),
+                        title: Text(l.previewProfile),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/user/${m.id}'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.language_rounded),
+                        title: Text(l.language),
+                        trailing: SegmentedButton<String>(
+                          showSelectedIcon: false,
+                          style: const ButtonStyle(
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          segments: const [
+                            ButtonSegment(value: 'tr', label: Text('TR')),
+                            ButtonSegment(value: 'en', label: Text('EN')),
+                          ],
+                          selected: {locale},
+                          onSelectionChanged: (s) =>
+                              ref.read(localeProvider.notifier).set(s.first),
+                        ),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.notifications_none_rounded),
+                        title: Text(l.notificationsTitle),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/me/notifications'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.support_agent_rounded),
+                        title: Text(l.helpAndSupport),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (supportUnread > 0)
+                              Badge(
+                                label: Text('$supportUnread'),
+                                backgroundColor: Brand.coral,
+                              ),
+                            const Icon(Icons.chevron_right_rounded),
+                          ],
+                        ),
+                        onTap: () async {
+                          await context.push('/help');
+                          ref.invalidate(supportInboxProvider);
+                        },
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.feedback_outlined),
+                        title: Text(l.sendFeedback),
+                        subtitle: Text(l.sendFeedbackHint),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => openNewTicket(
+                          context,
+                          category: SupportCategory.suggestion,
+                        ),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.tips_and_updates_outlined),
+                        title: Text(l.howItWorks),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => showIntro(context),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.health_and_safety_outlined),
+                        title: Text(l.safetyCenter),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegal('safety', locale),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.privacy_tip_outlined),
+                        title: Text(l.privacyAndData),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/me/privacy'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.devices_rounded),
+                        title: Text(l.devicesTitle),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/me/devices'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.lock_outline_rounded),
+                        title: Text(l.changePassword),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push('/me/password'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.logout_rounded),
+                        title: Text(l.logout),
+                        onTap: () async {
+                          // Bu cihaza artık bu hesabın bildirimleri gelmesin
+                          await Push.instance.unregister(ref.read(apiProvider));
+                          await CoinStore.instance.logout();
+                          await ref.read(sessionProvider.notifier).logout();
+                        },
+                      ),
+                    ],
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.tips_and_updates_outlined),
-                    title: Text(l.howItWorks),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => showIntro(context),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.description_outlined),
+                        title: Text(l.termsOfService),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegal('terms', locale),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.privacy_tip_outlined),
+                        title: Text(l.privacyPolicy),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegal('privacy', locale),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.business_outlined),
+                        title: Text(l.imprint),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegal('imprint', locale),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: Icon(
+                          Icons.delete_forever_outlined,
+                          color: theme.colorScheme.error,
+                        ),
+                        title: Text(
+                          l.deleteAccount,
+                          style: TextStyle(color: theme.colorScheme.error),
+                        ),
+                        onTap: () => _deleteAccount(context, ref),
+                      ),
+                    ],
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.health_and_safety_outlined),
-                    title: Text(l.safetyCenter),
-                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-                    onTap: () => openLegal('safety', locale),
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: Text(
+                    m.email,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.outline,
+                    ),
                   ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.privacy_tip_outlined),
-                    title: Text(l.privacyAndData),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/me/privacy'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.devices_rounded),
-                    title: Text(l.devicesTitle),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/me/devices'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.lock_outline_rounded),
-                    title: Text(l.changePassword),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/me/password'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.logout_rounded),
-                    title: Text(l.logout),
-                    onTap: () async {
-                      // Bu cihaza artık bu hesabın bildirimleri gelmesin
-                      await Push.instance.unregister(ref.read(apiProvider));
-                      await CoinStore.instance.logout();
-                      await ref.read(sessionProvider.notifier).logout();
-                    },
-                  ),
-                ]),
-              ),
-              const SizedBox(height: 12),
-              Card(
-                child: Column(children: [
-                  ListTile(
-                    leading: const Icon(Icons.description_outlined),
-                    title: Text(l.termsOfService),
-                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-                    onTap: () => openLegal('terms', locale),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.privacy_tip_outlined),
-                    title: Text(l.privacyPolicy),
-                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-                    onTap: () => openLegal('privacy', locale),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: const Icon(Icons.business_outlined),
-                    title: Text(l.imprint),
-                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-                    onTap: () => openLegal('imprint', locale),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    leading: Icon(Icons.delete_forever_outlined, color: theme.colorScheme.error),
-                    title: Text(l.deleteAccount, style: TextStyle(color: theme.colorScheme.error)),
-                    onTap: () => _deleteAccount(context, ref),
-                  ),
-                ]),
-              ),
-              const SizedBox(height: 12),
-              Center(child: Text(m.email, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline))),
-            ]),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -274,7 +360,10 @@ class MeScreen extends ConsumerWidget {
   // Hesap silme: uyarı + şifre ile onay. Geri alınamaz.
   Future<void> _deleteAccount(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context);
-    final password = await showDialog<String>(context: context, builder: (_) => const _DeleteAccountDialog());
+    final password = await showDialog<String>(
+      context: context,
+      builder: (_) => const _DeleteAccountDialog(),
+    );
     if (password == null || !context.mounted) return;
     try {
       await ref.read(apiProvider).deleteAccount(password);
@@ -309,22 +398,30 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
     return AlertDialog(
       icon: Icon(Icons.warning_amber_rounded, color: error, size: 32),
       title: Text(l.deleteAccount),
-      content: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text(l.deleteAccountWarning, textAlign: TextAlign.center),
-        const SizedBox(height: 16),
-        TextField(
-          controller: _password,
-          obscureText: true,
-          autofillHints: const [AutofillHints.password],
-          decoration: InputDecoration(hintText: l.confirmWithPassword),
-          onChanged: (_) => setState(() {}),
-        ),
-      ]),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l.deleteAccountWarning, textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _password,
+            obscureText: true,
+            autofillHints: const [AutofillHints.password],
+            decoration: InputDecoration(hintText: l.confirmWithPassword),
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+      ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l.cancel)),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l.cancel),
+        ),
         FilledButton(
           style: FilledButton.styleFrom(backgroundColor: error),
-          onPressed: _password.text.isEmpty ? null : () => Navigator.pop(context, _password.text),
+          onPressed: _password.text.isEmpty
+              ? null
+              : () => Navigator.pop(context, _password.text),
           child: Text(l.deleteAccount),
         ),
       ],
@@ -344,9 +441,24 @@ class _VerificationCard extends StatelessWidget {
     const blue = Color(0xFF2F80ED);
     final (icon, title, subtitle, actionable) = switch (status) {
       'approved' => (Icons.verified_rounded, l.verifiedLabel, null, false),
-      'pending' => (Icons.hourglass_top_rounded, l.verificationPendingLabel, l.verificationSubmitted, false),
-      'rejected' => (Icons.verified_outlined, l.verifyProfile, l.verificationRejectedLabel, true),
-      _ => (Icons.verified_outlined, l.verifyProfile, l.verifyProfileHint, true),
+      'pending' => (
+        Icons.hourglass_top_rounded,
+        l.verificationPendingLabel,
+        l.verificationSubmitted,
+        false,
+      ),
+      'rejected' => (
+        Icons.verified_outlined,
+        l.verifyProfile,
+        l.verificationRejectedLabel,
+        true,
+      ),
+      _ => (
+        Icons.verified_outlined,
+        l.verifyProfile,
+        l.verifyProfileHint,
+        true,
+      ),
     };
     return Card(
       child: ListTile(
@@ -354,7 +466,10 @@ class _VerificationCard extends StatelessWidget {
         leading: Container(
           width: 42,
           height: 42,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: blue.withValues(alpha: 0.12)),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: blue.withValues(alpha: 0.12),
+          ),
           child: Icon(icon, color: blue),
         ),
         title: Text(title, style: theme.textTheme.titleSmall),
@@ -381,11 +496,22 @@ class _StreakCard extends StatelessWidget {
         leading: Container(
           width: 42,
           height: 42,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.orange.withValues(alpha: 0.14)),
-          child: const Icon(Icons.local_fire_department_rounded, color: Brand.orange),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Brand.orange.withValues(alpha: 0.14),
+          ),
+          child: const Icon(
+            Icons.local_fire_department_rounded,
+            color: Brand.orange,
+          ),
         ),
-        title: Text(l.streakDays(streak.current), style: theme.textTheme.titleSmall),
-        subtitle: streak.longest > streak.current ? Text(l.streakLongest(streak.longest)) : null,
+        title: Text(
+          l.streakDays(streak.current),
+          style: theme.textTheme.titleSmall,
+        ),
+        subtitle: streak.longest > streak.current
+            ? Text(l.streakLongest(streak.longest))
+            : null,
       ),
     );
   }
@@ -393,7 +519,11 @@ class _StreakCard extends StatelessWidget {
 
 // Faz 17: "Sosyal cesaret yolculuğu" — üç izdeki kademe durumu. Ayrıntılı bir "Gelişimim" ekranı
 // (bir sonraki adım önerisi, açılan ödüller) ayrı bir görevde eklenir; bu sadece özet.
-const _tierColors = [Color(0xFFCD7F32), Color(0xFFC0C0C0), Color(0xFFFFD700)]; // bronz, gümüş, altın
+const _tierColors = [
+  Color(0xFFCD7F32),
+  Color(0xFFC0C0C0),
+  Color(0xFFFFD700),
+]; // bronz, gümüş, altın
 
 class _JourneyCard extends StatelessWidget {
   const _JourneyCard({required this.achievements});
@@ -409,27 +539,54 @@ class _JourneyCard extends StatelessWidget {
       AchievementTrack.kimlik: l.trackKimlik,
     };
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(l.achievementsTitle, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 12),
-          for (final entry in tracks.entries) ...[
-            Row(children: [
-              Expanded(child: Text(entry.value, style: theme.textTheme.bodyMedium)),
-              for (var i = 0; i < 3; i++)
-                Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: Icon(
-                    Icons.circle,
-                    size: 12,
-                    color: i < achievements.of(entry.key).tier ? _tierColors[i] : theme.colorScheme.outlineVariant,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(Brand.radius),
+        onTap: () => context.push('/journey'),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l.achievementsTitle,
+                      style: theme.textTheme.titleSmall,
+                    ),
                   ),
+                  const Icon(Icons.chevron_right_rounded, size: 18),
+                ],
+              ),
+              const SizedBox(height: 12),
+              for (final entry in tracks.entries) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        entry.value,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                    for (var i = 0; i < 3; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: Icon(
+                          Icons.circle,
+                          size: 12,
+                          color: i < achievements.of(entry.key).tier
+                              ? _tierColors[i]
+                              : theme.colorScheme.outlineVariant,
+                        ),
+                      ),
+                  ],
                 ),
-            ]),
-            if (entry.key != AchievementTrack.kimlik) const SizedBox(height: 10),
-          ],
-        ]),
+                if (entry.key != AchievementTrack.kimlik)
+                  const SizedBox(height: 10),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }

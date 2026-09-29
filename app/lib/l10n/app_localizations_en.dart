@@ -1978,6 +1978,41 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get journeyTitle => 'My Progress';
+
+  @override
+  String get journeyRewardsTitle => 'Unlocked rewards';
+
+  @override
+  String get journeyRewardsEmpty =>
+      'No rewards yet. Complete a milestone and it\'ll show up here.';
+
+  @override
+  String get journeyNextStepTitle => 'Next step';
+
+  @override
+  String journeyNextStepBody(String interest) {
+    return 'You both like $interest — start there';
+  }
+
+  @override
+  String milestoneLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'first_message': 'First message',
+      'week_long_chat': '7-day conversation',
+      'first_icebreaker': 'First icebreaker game',
+      'first_match': 'First match',
+      'first_room_visit': 'First room visit',
+      'first_call': 'First call',
+      'profile_complete': 'Complete your profile',
+      'verified': 'Verification',
+      'vibe_done': 'Complete the vibe test',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String get quietHoursTitle => 'Quiet hours';
 
   @override

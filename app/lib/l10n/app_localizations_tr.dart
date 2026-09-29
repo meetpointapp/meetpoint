@@ -1938,6 +1938,41 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get journeyTitle => 'Gelişimim';
+
+  @override
+  String get journeyRewardsTitle => 'Açılan ödüller';
+
+  @override
+  String get journeyRewardsEmpty =>
+      'Henüz bir ödül açmadın. Bir kademe tamamladığında burada görünecek.';
+
+  @override
+  String get journeyNextStepTitle => 'Sıradaki adım';
+
+  @override
+  String journeyNextStepBody(String interest) {
+    return 'Ortak ilginiz $interest — bundan bahsederek başla';
+  }
+
+  @override
+  String milestoneLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'first_message': 'İlk mesaj',
+      'week_long_chat': '7 günlük sohbet',
+      'first_icebreaker': 'İlk buz kırıcı oyunu',
+      'first_match': 'İlk eşleşme',
+      'first_room_visit': 'İlk oda ziyareti',
+      'first_call': 'İlk arama',
+      'profile_complete': 'Profilini tamamla',
+      'verified': 'Doğrulama',
+      'vibe_done': 'Vibe testini tamamla',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String get quietHoursTitle => 'Sessiz saatler';
 
   @override

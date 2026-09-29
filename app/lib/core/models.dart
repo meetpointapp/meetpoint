@@ -523,6 +523,22 @@ class TrackState {
       );
 }
 
+// Faz 17: "Gelişimim" ekranı — bağlam duyarlı "sıradaki adım" önerisi (kural tabanlı, sunucuda
+// üretilir; bkz. server/src/achievements.ts nextStepHint()).
+class NextStepHint {
+  final String conversationId;
+  final String otherUserId;
+  final String otherName;
+  final String interestId;
+  const NextStepHint({required this.conversationId, required this.otherUserId, required this.otherName, required this.interestId});
+  factory NextStepHint.fromJson(Map<String, dynamic> j) => NextStepHint(
+        conversationId: j['conversationId'],
+        otherUserId: j['otherUserId'],
+        otherName: j['otherName'],
+        interestId: j['interestId'],
+      );
+}
+
 class Achievements {
   final Map<AchievementTrack, TrackState> tracks;
   const Achievements({this.tracks = const {}});

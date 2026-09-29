@@ -278,6 +278,13 @@ class Api {
   Future<VibeResult> myVibe() async => VibeResult.fromJson(await _get('/me/vibe'));
   Future<String> saveVibe(Map<String, String> answers) async => (await _put('/me/vibe', answers))['archetypeId'];
 
+  // Faz 17: "Gelişimim" ekranı — kademe durumu zaten GET /me'de (achievements); burada sadece
+  // bu ekrana özel, bağlam duyarlı "sıradaki adım" önerisi
+  Future<NextStepHint?> journeyNextStep() async {
+    final j = await _get('/me/journey');
+    return j['nextStepHint'] == null ? null : NextStepHint.fromJson(j['nextStepHint']);
+  }
+
   Future<void> setMood(String moodId) => _put('/me/mood', {'moodId': moodId});
   Future<void> clearMood() => _delete('/me/mood');
 

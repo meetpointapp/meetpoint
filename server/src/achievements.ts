@@ -1,4 +1,4 @@
-import { prisma } from './db';
+import { isBlockedEitherWay, prisma } from './db';
 
 // Faz 17: "Sosyal cesaret yolculuğu". Üç izde (İletişim, Bağlantı, Kimlik) kademeli ilerleme;
 // her iz kendi içinde 3 kademe taşır (bronz/gümüş/altın). Puana değil gerçek eyleme dayalı: her
@@ -93,4 +93,36 @@ export async function checkProfileComplete(
   const basics = [p.heightCm != null, !!p.job, !!p.education, !!p.zodiac, !!p.city].filter(Boolean).length;
   if (basics >= 2) score += 10;
   if (score >= 100) await unlockMilestone(userId, 'profile_complete');
+}
+
+// Faz 17 madde 3 ("Gelişimim" ekranı): bağlam duyarlı "sıradaki adım" önerisi — yapay zekâ yok,
+// var olan profil verisinden kural tabanlı üretilir. Henüz mesajlaşmaya başlamadığın en yeni
+// eşleşmende, ortak bir ilgi alanınız varsa bunu konuşma açılışı olarak önerir.
+export async function nextStepHint(userId: string) {
+  const me = await prisma.profile.findUnique({ where: { userId }, select: { interests: true } });
+  if (!me) return null;
+  const myInterests = new Set(me.interests as string[]);
+  if (myInterests.size === 0) return null;
+
+  const conversations = await prisma.conversation.findMany({
+    where: { OR: [{ userAId: userId }, { userBId: userId }] },
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: {
+      id: true,
+      userAId: true,
+      userBId: true,
+      messages: { where: { senderId: userId }, take: 1, select: { id: true } },
+    },
+  });
+  for (const c of conversations) {
+    if (c.messages.length > 0) continue; // zaten mesaj atmışsın, önerecek bir şey yok
+    const otherId = c.userAId === userId ? c.userBId : c.userAId;
+    if (await isBlockedEitherWay(userId, otherId)) continue;
+    const other = await prisma.profile.findUnique({ where: { userId: otherId }, select: { displayName: true, interests: true } });
+    if (!other) continue;
+    const sharedInterest = (other.interests as string[]).find((i) => myInterests.has(i));
+    if (sharedInterest) return { conversationId: c.id, otherUserId: otherId, otherName: other.displayName, interestId: sharedInterest };
+  }
+  return null;
 }

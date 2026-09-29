@@ -49,7 +49,7 @@ import { reviewNewPhoto } from '../moderation/detect';
 import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { sendStreakReminders, touchStreak } from '../streak';
-import { checkProfileComplete, tracksState, unlockMilestone } from '../achievements';
+import { checkProfileComplete, nextStepHint, tracksState, unlockMilestone } from '../achievements';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
 import { listSessions, revokeAllSessions, revokeSession } from '../sessions';
 
@@ -329,6 +329,12 @@ const vibeAnswersSchema = z.record(z.string(), z.string()).refine(
     VIBE_QUESTIONS.every((q) => q.options.some((o) => o.id === a[q.id])),
   'invalid_vibe_answers',
 );
+
+// Faz 17: "Gelişimim" ekranı — üç izin kademe durumu zaten GET /me'de var (achievements); burada
+// sadece o ekrana özel, daha az sık istenen veri: bağlam duyarlı "sıradaki adım" önerisi.
+profileRouter.get('/me/journey', async (req, res) => {
+  res.json({ nextStepHint: await nextStepHint(uid(req)) });
+});
 
 profileRouter.get('/me/vibe', async (req, res) => {
   const p = await prisma.profile.findUniqueOrThrow({ where: { userId: uid(req) } });

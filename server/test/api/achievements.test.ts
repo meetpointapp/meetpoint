@@ -125,4 +125,32 @@ describe('Sosyal cesaret yolculuğu (Faz 17)', () => {
     const me = await call(a.t, 'GET', '/me');
     check('birden fazla mesajdan sonra İletişim izi hâlâ bronz (1), tekrar açılmadı', me.achievements.iletisim.tier === 1);
   });
+
+  it('"sıradaki adım": ortak ilgi alanı olan, mesaj atılmamış eşleşme önerilir', async () => {
+    const a = await makeUser('Ach7a', 'male', 'female', { interests: ['coffee', 'travel'] });
+    const b = await makeUser('Ach7b', 'female', 'male', { interests: ['travel', 'music'] });
+    await call(a.t, 'POST', '/swipes', { toId: b.id, direction: 'like' });
+    const r = await call(b.t, 'POST', '/swipes', { toId: a.id, direction: 'like' });
+    check('eşleşme oluştu', r.match === true);
+
+    const journey = await call(a.t, 'GET', '/me/journey');
+    check('sıradaki adım önerildi', journey.nextStepHint !== null);
+    check('doğru sohbet önerildi', journey.nextStepHint?.conversationId === r.conversationId);
+    check('ortak ilgi alanı: travel', journey.nextStepHint?.interestId === 'travel');
+
+    // A mesaj atınca artık önerilecek bir şey kalmaz (zaten başlamış)
+    await call(a.t, 'POST', `/conversations/${r.conversationId}/messages`, { body: 'Selam!' });
+    const after = await call(a.t, 'GET', '/me/journey');
+    check('mesajdan sonra öneri kalkar', after.nextStepHint === null);
+  });
+
+  it('"sıradaki adım": ortak ilgi alanı yoksa öneri gelmez', async () => {
+    const a = await makeUser('Ach8a', 'male', 'female', { interests: ['coffee'] });
+    const b = await makeUser('Ach8b', 'female', 'male', { interests: ['gaming'] });
+    await call(a.t, 'POST', '/swipes', { toId: b.id, direction: 'like' });
+    await call(b.t, 'POST', '/swipes', { toId: a.id, direction: 'like' });
+
+    const journey = await call(a.t, 'GET', '/me/journey');
+    check('ortak ilgi yoksa öneri yok', journey.nextStepHint === null);
+  });
 });

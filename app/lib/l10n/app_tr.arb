@@ -1038,6 +1038,19 @@
       }
     }
   },
+  "journeyTitle": "Gelişimim",
+  "journeyRewardsTitle": "Açılan ödüller",
+  "journeyRewardsEmpty": "Henüz bir ödül açmadın. Bir kademe tamamladığında burada görünecek.",
+  "journeyNextStepTitle": "Sıradaki adım",
+  "journeyNextStepBody": "Ortak ilginiz {interest} — bundan bahsederek başla",
+  "@journeyNextStepBody": {
+    "placeholders": {
+      "interest": {
+        "type": "String"
+      }
+    }
+  },
+  "milestoneLabel": "{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} other{{id}}}",
   "quietHoursTitle": "Sessiz saatler",
   "quietHoursHint": "Bu saatlerde aramalar dışında bildirim gelmez.",
   "quietHours": "Sessiz saatleri aç",

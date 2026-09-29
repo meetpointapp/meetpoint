@@ -281,6 +281,15 @@ void main() {
       expect(a.totalTier, 1);
     });
 
+    test('NextStepHint.fromJson: sunucu alanlarını ayrıştırır', () {
+      final h = NextStepHint.fromJson(
+          {'conversationId': 'c1', 'otherUserId': 'u2', 'otherName': 'Ayşe', 'interestId': 'coffee'});
+      expect(h.conversationId, 'c1');
+      expect(h.otherUserId, 'u2');
+      expect(h.otherName, 'Ayşe');
+      expect(h.interestId, 'coffee');
+    });
+
     test('PublicProfile.milestoneCount: eski yanıtta (alan yok) 0, yeni yanıtta ayrıştırılır', () {
       final legacy = PublicProfile.fromJson({
         'id': 'u1', 'displayName': 'A', 'age': 20, 'gender': 'male', 'bio': '', 'city': '', 'country': '', 'photos': [],
