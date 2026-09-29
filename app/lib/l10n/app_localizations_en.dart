@@ -2850,6 +2850,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get referralApplied => 'Code applied!';
 
   @override
+  String get personalLinkTitle => 'Your personal link';
+
+  @override
+  String get personalLinkHint =>
+      '\"Find me on MeetPoint\" — share this link, whoever taps it discovers you and the app.';
+
+  @override
   String get shareButton => 'Share';
 
   @override

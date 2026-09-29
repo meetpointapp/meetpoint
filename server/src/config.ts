@@ -21,6 +21,11 @@ export const config = {
   // Sunucunun dışarıdan görünen adresi (e-postadaki indirme bağlantıları için)
   publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${process.env.PORT ?? 4000}`,
 
+  // Faz 17 madde 11: kişisel bağlantı linki ("Beni MeetPoint'te bul") — mağaza yayınlanana kadar boş;
+  // boşsa iniş sayfası indirme düğmesi yerine düz metin gösterir.
+  appStoreUrl: process.env.APP_STORE_URL ?? '',
+  playStoreUrl: process.env.PLAY_STORE_URL ?? '',
+
   // E-posta kodları
   codeTtlMinutes: 10,
   codeMaxAttempts: 5,

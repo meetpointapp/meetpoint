@@ -1402,6 +1402,8 @@
   "referralCodeHint": "Davet kodu",
   "referralApply": "Uygula",
   "referralApplied": "Kod uygulandı!",
+  "personalLinkTitle": "Kişisel bağlantın",
+  "personalLinkHint": "\"Beni MeetPoint'te bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.",
   "shareButton": "Paylaş",
   "shareMatchTitle": "Eşleştik! 💕",
   "shareMatchWith": "{name} ile",

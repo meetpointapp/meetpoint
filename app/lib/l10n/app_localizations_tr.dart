@@ -2785,6 +2785,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get referralApplied => 'Kod uygulandı!';
 
   @override
+  String get personalLinkTitle => 'Kişisel bağlantın';
+
+  @override
+  String get personalLinkHint =>
+      '\"Beni MeetPoint\'te bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.';
+
+  @override
   String get shareButton => 'Paylaş';
 
   @override

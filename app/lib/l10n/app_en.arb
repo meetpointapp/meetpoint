@@ -710,6 +710,8 @@
   "referralCodeHint": "Invite code",
   "referralApply": "Apply",
   "referralApplied": "Code applied!",
+  "personalLinkTitle": "Your personal link",
+  "personalLinkHint": "\"Find me on MeetPoint\" — share this link, whoever taps it discovers you and the app.",
   "shareButton": "Share",
   "shareMatchTitle": "It's a match! 💕",
   "shareMatchWith": "with {name}",

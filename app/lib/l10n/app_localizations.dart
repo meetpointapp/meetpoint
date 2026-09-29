@@ -4365,6 +4365,18 @@ abstract class AppLocalizations {
   /// **'Kod uygulandı!'**
   String get referralApplied;
 
+  /// No description provided for @personalLinkTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kişisel bağlantın'**
+  String get personalLinkTitle;
+
+  /// No description provided for @personalLinkHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"Beni MeetPoint\'te bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.'**
+  String get personalLinkHint;
+
   /// No description provided for @shareButton.
   ///
   /// In tr, this message translates to:
