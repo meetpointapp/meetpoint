@@ -335,6 +335,9 @@ class Api {
 
   Future<int> syncWallet() async => (await _post('/wallet/sync'))['credited'] as int;
 
+  // Faz 16: MeetPoint+ — test modu abonelik başlatma (mağaza bağlı değilken)
+  Future<void> devSubscribe() => _post('/wallet/dev-subscribe');
+
   // İletişim istekleri
   Future<void> sendRequest(String toId, RequestKind kind, {String note = ''}) =>
       _post('/requests', {'toId': toId, 'kind': requestKindApi(kind), 'note': note});

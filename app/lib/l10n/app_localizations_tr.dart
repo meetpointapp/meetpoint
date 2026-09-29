@@ -2465,4 +2465,40 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errAlreadyOwned => 'Bu öğeye zaten sahipsin.';
+
+  @override
+  String get premiumTitle => 'MeetPoint+';
+
+  @override
+  String get premiumTagline => 'Seni beğenenleri her zaman gör';
+
+  @override
+  String get premiumPerkLikes =>
+      'Seni beğenenler her zaman açık — jetonla açmana gerek yok';
+
+  @override
+  String premiumPriceMonthly(String price) {
+    return '$price/ay';
+  }
+
+  @override
+  String get premiumSubscribe => 'Abone ol';
+
+  @override
+  String get premiumActive => 'MeetPoint+ üyesisin';
+
+  @override
+  String premiumActiveUntil(String date) {
+    return 'Aboneliğin $date tarihine kadar aktif';
+  }
+
+  @override
+  String get premiumManage => 'Aboneliği yönet';
+
+  @override
+  String get premiumSubscribed => 'Abone oldun!';
+
+  @override
+  String get premiumEntryNotSubscribed =>
+      'Seni beğenenler her zaman açık olsun';
 }

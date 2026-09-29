@@ -148,6 +148,8 @@ profileRouter.get('/me', async (req, res) => {
     verificationPose: user.verificationPose,
     boostedUntil: user.boostedUntil && user.boostedUntil > new Date() ? user.boostedUntil : null,
     likesUnlockedUntil: user.likesUnlockedUntil && user.likesUnlockedUntil > new Date() ? user.likesUnlockedUntil : null,
+    // Faz 16: MeetPoint+ abonelik durumu (gerçek para, RevenueCat)
+    premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
     hasLocation: user.profile?.latitude != null,
     filters: user.profile
       ? { minAge: user.profile.filterMinAge, maxAge: user.profile.filterMaxAge, maxKm: user.profile.filterMaxKm }

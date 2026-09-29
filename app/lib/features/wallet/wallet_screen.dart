@@ -105,6 +105,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             onRefresh: () => ref.refresh(walletProvider.future),
             child: ListView(padding: const EdgeInsets.all(16), children: [
               _BalanceCard(wallet: w),
+              const SizedBox(height: 16),
+              const _PremiumPromo(),
               const SizedBox(height: 24),
               Text(l.buyCoins, style: theme.textTheme.titleMedium),
               if (!CoinStore.instance.available) ...[
@@ -148,6 +150,27 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             ]),
           );
         },
+      ),
+    );
+  }
+}
+
+// Faz 16: MeetPoint+ tanıtım kartı — abone değilse davet, aboneyse aktif rozeti
+class _PremiumPromo extends ConsumerWidget {
+  const _PremiumPromo();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final active = ref.watch(meProvider).value?.premiumUntil != null;
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.auto_awesome_rounded, color: active ? theme.colorScheme.primary : Brand.coral),
+        title: Text(l.premiumTitle),
+        subtitle: Text(active ? l.premiumActive : l.premiumEntryNotSubscribed),
+        trailing: const Icon(Icons.chevron_right_rounded),
+        onTap: () => context.push('/premium'),
       ),
     );
   }

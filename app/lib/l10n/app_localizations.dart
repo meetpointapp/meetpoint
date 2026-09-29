@@ -3890,6 +3890,66 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu öğeye zaten sahipsin.'**
   String get errAlreadyOwned;
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'MeetPoint+'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumTagline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni beğenenleri her zaman gör'**
+  String get premiumTagline;
+
+  /// No description provided for @premiumPerkLikes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni beğenenler her zaman açık — jetonla açmana gerek yok'**
+  String get premiumPerkLikes;
+
+  /// No description provided for @premiumPriceMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'{price}/ay'**
+  String premiumPriceMonthly(String price);
+
+  /// No description provided for @premiumSubscribe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Abone ol'**
+  String get premiumSubscribe;
+
+  /// No description provided for @premiumActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'MeetPoint+ üyesisin'**
+  String get premiumActive;
+
+  /// No description provided for @premiumActiveUntil.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aboneliğin {date} tarihine kadar aktif'**
+  String premiumActiveUntil(String date);
+
+  /// No description provided for @premiumManage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aboneliği yönet'**
+  String get premiumManage;
+
+  /// No description provided for @premiumSubscribed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Abone oldun!'**
+  String get premiumSubscribed;
+
+  /// No description provided for @premiumEntryNotSubscribed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni beğenenler her zaman açık olsun'**
+  String get premiumEntryNotSubscribed;
 }
 
 class _AppLocalizationsDelegate

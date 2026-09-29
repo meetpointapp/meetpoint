@@ -24,7 +24,12 @@ boostsRouter.post('/boost', async (req, res) => {
   res.json({ boostedUntil });
 });
 
-// Seni beğenenler: kilitliyken sadece sayı döner, açıkken profiller
+function isPremium(user: { premiumUntil: Date | null }) {
+  return !!user.premiumUntil && user.premiumUntil > new Date();
+}
+
+// Seni beğenenler: kilitliyken sadece sayı döner, açıkken profiller. MeetPoint+ abonesiyse
+// (Faz 16) jetonla açmaya gerek yok — her zaman açık, bu abonelik fazın tek perki.
 boostsRouter.get('/likes', async (req, res) => {
   const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
   const where = {
@@ -40,8 +45,9 @@ boostsRouter.get('/likes', async (req, res) => {
     },
   };
   const count = await prisma.swipe.count({ where });
-  const unlocked = !!me.likesUnlockedUntil && me.likesUnlockedUntil > new Date();
-  if (!unlocked) return res.json({ unlocked: false, count, users: [] });
+  const premium = isPremium(me);
+  const unlocked = premium || (!!me.likesUnlockedUntil && me.likesUnlockedUntil > new Date());
+  if (!unlocked) return res.json({ unlocked: false, premium, count, users: [] });
 
   const likes = await prisma.swipe.findMany({
     where,
@@ -51,7 +57,8 @@ boostsRouter.get('/likes', async (req, res) => {
   });
   res.json({
     unlocked: true,
-    unlockedUntil: me.likesUnlockedUntil,
+    unlockedUntil: premium ? null : me.likesUnlockedUntil, // null + premium: süresiz (abonelik boyunca)
+    premium,
     count,
     users: likes.map((s) => ({ ...publicProfile(s.from, me.profile), superLikedMe: s.direction === 'superlike' })),
   });
@@ -62,6 +69,7 @@ boostsRouter.post('/likes/unlock', async (req, res) => {
   const until = await prisma.$transaction(async (tx) => {
     await lockWallet(tx, userId);
     const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
+    if (isPremium(user)) return null; // MeetPoint+ zaten her zaman açık, jeton harcanmaz
     if (user.likesUnlockedUntil && user.likesUnlockedUntil > new Date()) return user.likesUnlockedUntil;
     await debit(tx, userId, economy.likesUnlockPrice, 'SPEND', { note: 'likes_unlock' });
     const next = new Date(Date.now() + economy.likesUnlockHours * 3600_000);

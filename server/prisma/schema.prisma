@@ -78,6 +78,11 @@ model User {
   boostedUntil       DateTime? // öne çıkarma bitişi
   likesUnlockedUntil DateTime? // "seni beğenenler" erişimi bitişi
 
+  // Faz 16: MeetPoint+ (RevenueCat aylık abonelik, gerçek para — jetonla alınan özelliklerden
+  // farklı). Perk: "seni beğenenler" her zaman açık (bkz. src/routes/boosts.ts). Süresi
+  // src/routes/revenuecat.ts RENEWAL/EXPIRATION olaylarıyla güncellenir.
+  premiumUntil DateTime?
+
   emailCodes      EmailCode[]
   verifications   VerificationRequest[]
   devices         Device[]

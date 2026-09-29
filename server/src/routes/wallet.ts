@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import { uid } from '../auth';
-import { config, economy, revenueCat } from '../config';
+import { config, economy, revenueCat, subscription } from '../config';
 import { HttpError, prisma } from '../db';
 import { payoutDto } from '../payouts';
 import { getFinance, getPacks, packById } from '../finance/settings';
@@ -79,7 +79,10 @@ walletRouter.post('/wallet/sync', async (req, res) => {
   });
   if (!r.ok) throw new HttpError(502, 'store_unavailable');
   const body = (await r.json()) as {
-    subscriber?: { non_subscriptions?: Record<string, { id: string; store?: string; is_sandbox?: boolean; store_transaction_id?: string }[]> };
+    subscriber?: {
+      non_subscriptions?: Record<string, { id: string; store?: string; is_sandbox?: boolean; store_transaction_id?: string }[]>;
+      subscriptions?: Record<string, { expires_date?: string }>;
+    };
   };
 
   let credited = 0;
@@ -96,6 +99,18 @@ walletRouter.post('/wallet/sync', async (req, res) => {
       if (result.credited) credited += result.coins + result.bonus;
     }
   }
+
+  // Faz 16: MeetPoint+ — RevenueCat sunucusundan da abonelik durumu senkronize edilir (webhook
+  // gecikirse veya kaçırılırsa yakalanır). En son bilinen bitiş tarihinden ileriyse güncellenir.
+  const subExpires = body.subscriber?.subscriptions?.[subscription.productId]?.expires_date;
+  if (subExpires) {
+    const expiresAt = new Date(subExpires);
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    if (!user.premiumUntil || expiresAt > user.premiumUntil) {
+      await prisma.user.update({ where: { id: userId }, data: { premiumUntil: expiresAt } });
+    }
+  }
+
   res.json({ credited, balance: await getBalance(userId) });
 });
 
@@ -114,4 +129,15 @@ walletRouter.post('/wallet/dev-topup', async (req, res) => {
     store: 'dev',
   });
   res.json({ balance: await getBalance(userId), coins: result.coins, bonus: result.bonus });
+});
+
+// GEÇİCİ: Faz 16 MeetPoint+ — gerçek RevenueCat sandbox akışı bağlanana kadar test için abonelik
+// başlatma. Gerçek akışta bu, RevenueCat webhook'unun INITIAL_PURCHASE olayıyla yapılır
+// (src/routes/revenuecat.ts). Yayında bu uç kapalıdır.
+walletRouter.post('/wallet/dev-subscribe', async (req, res) => {
+  if (config.isProduction) throw new HttpError(404, 'not_found');
+  const userId = uid(req);
+  const premiumUntil = new Date(Date.now() + 30 * 24 * 3600_000);
+  await prisma.user.update({ where: { id: userId }, data: { premiumUntil } });
+  res.json({ premiumUntil });
 });

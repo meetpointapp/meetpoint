@@ -2480,4 +2480,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errAlreadyOwned => 'You already own this item.';
+
+  @override
+  String get premiumTitle => 'MeetPoint+';
+
+  @override
+  String get premiumTagline => 'Always see who likes you';
+
+  @override
+  String get premiumPerkLikes =>
+      'Who likes you is always unlocked — no need to spend coins';
+
+  @override
+  String premiumPriceMonthly(String price) {
+    return '$price/mo';
+  }
+
+  @override
+  String get premiumSubscribe => 'Subscribe';
+
+  @override
+  String get premiumActive => 'You\'re a MeetPoint+ member';
+
+  @override
+  String premiumActiveUntil(String date) {
+    return 'Your subscription is active until $date';
+  }
+
+  @override
+  String get premiumManage => 'Manage subscription';
+
+  @override
+  String get premiumSubscribed => 'Subscribed!';
+
+  @override
+  String get premiumEntryNotSubscribed => 'Get who-likes-you unlocked, always';
 }

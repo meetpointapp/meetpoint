@@ -430,6 +430,8 @@ class Me {
   final int cashable;
   final DateTime? boostedUntil;
   final DateTime? likesUnlockedUntil;
+  // Faz 16: MeetPoint+ abonelik bitişi (gerçek para, RevenueCat). null = abone değil.
+  final DateTime? premiumUntil;
   final bool hasLocation;
   final DiscoverFilters filters;
   final ConsentState consents;
@@ -450,6 +452,7 @@ class Me {
     required this.cashable,
     this.boostedUntil,
     this.likesUnlockedUntil,
+    this.premiumUntil,
     this.hasLocation = false,
     this.filters = const DiscoverFilters(),
     this.consents = const ConsentState(),
@@ -469,6 +472,7 @@ class Me {
         cashable: j['cashable'],
         boostedUntil: j['boostedUntil'] == null ? null : _date(j['boostedUntil']),
         likesUnlockedUntil: j['likesUnlockedUntil'] == null ? null : _date(j['likesUnlockedUntil']),
+        premiumUntil: j['premiumUntil'] == null ? null : _date(j['premiumUntil']),
         hasLocation: j['hasLocation'] ?? false,
         filters: DiscoverFilters.fromJson(j['filters']),
         consents: j['consents'] == null ? const ConsentState() : ConsentState.fromJson(j['consents']),
@@ -712,14 +716,17 @@ class Conversation {
 class LikesInfo {
   final bool unlocked;
   final DateTime? unlockedUntil;
+  // Faz 16: MeetPoint+ abonesiyse jetonla açmaya gerek yok, her zaman açık
+  final bool premium;
   final int count;
   final List<PublicProfile> users;
 
-  const LikesInfo({required this.unlocked, this.unlockedUntil, required this.count, required this.users});
+  const LikesInfo({required this.unlocked, this.unlockedUntil, this.premium = false, required this.count, required this.users});
 
   factory LikesInfo.fromJson(Map<String, dynamic> j) => LikesInfo(
         unlocked: j['unlocked'] ?? false,
         unlockedUntil: j['unlockedUntil'] == null ? null : _date(j['unlockedUntil']),
+        premium: j['premium'] ?? false,
         count: j['count'] ?? 0,
         users: [for (final u in (j['users'] as List? ?? const [])) PublicProfile.fromJson(u)],
       );

@@ -87,6 +87,14 @@ class _LikesScreenState extends ConsumerState<LikesScreen> {
                 busy: _busy,
                 onPressed: _unlock,
               ),
+              const SizedBox(height: 10),
+              Center(
+                child: TextButton.icon(
+                  icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                  label: Text(l.premiumEntryNotSubscribed),
+                  onPressed: () => context.push('/premium'),
+                ),
+              ),
             ]);
           }
           return GridView.builder(

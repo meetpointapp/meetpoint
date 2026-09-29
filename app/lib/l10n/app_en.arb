@@ -630,5 +630,15 @@
   "storeOwned": "Owned",
   "storePurchased": "Purchased!",
   "errItemNotOwned": "You haven't purchased this item yet.",
-  "errAlreadyOwned": "You already own this item."
+  "errAlreadyOwned": "You already own this item.",
+  "premiumTitle": "MeetPoint+",
+  "premiumTagline": "Always see who likes you",
+  "premiumPerkLikes": "Who likes you is always unlocked — no need to spend coins",
+  "premiumPriceMonthly": "{price}/mo",
+  "premiumSubscribe": "Subscribe",
+  "premiumActive": "You're a MeetPoint+ member",
+  "premiumActiveUntil": "Your subscription is active until {date}",
+  "premiumManage": "Manage subscription",
+  "premiumSubscribed": "Subscribed!",
+  "premiumEntryNotSubscribed": "Get who-likes-you unlocked, always"
 }

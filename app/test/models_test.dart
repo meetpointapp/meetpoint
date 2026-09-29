@@ -218,6 +218,26 @@ void main() {
     });
   });
 
+  group('MeetPoint+ abonelik (Faz 16)', () {
+    Map<String, dynamic> meJson({Object? premiumUntil}) =>
+        {'id': 'u1', 'email': 'a@b.com', 'locale': 'tr', 'balance': 0, 'cashable': 0, 'premiumUntil': premiumUntil};
+
+    test('Me.premiumUntil: eski yanıtta (alan yok) null, yeni yanıtta ayrıştırılır', () {
+      final legacy = Me.fromJson(meJson());
+      expect(legacy.premiumUntil, isNull);
+      final withPremium = Me.fromJson(meJson(premiumUntil: '2026-12-31T00:00:00.000Z'));
+      expect(withPremium.premiumUntil, isNotNull);
+    });
+
+    test('LikesInfo.premium: varsayılan false, sunucudan gelirse ayrıştırılır', () {
+      final locked = LikesInfo.fromJson({'unlocked': false, 'count': 2, 'premium': false});
+      expect(locked.premium, isFalse);
+      final unlockedByPremium = LikesInfo.fromJson({'unlocked': true, 'count': 2, 'premium': true, 'users': []});
+      expect(unlockedByPremium.premium, isTrue);
+      expect(unlockedByPremium.unlocked, isTrue);
+    });
+  });
+
   group('WalletInfo', () {
     test('arama ücretleri, hediyeler ve para çekme kuralları', () {
       final w = WalletInfo.fromJson(walletJson(cashout: {'minCoins': 2000, 'usdPerCoin': 0.01, 'pending': null}));

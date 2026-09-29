@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Jeton satın alma (RevenueCat → App Store / Google Play).
 // Anahtarlar derleme sırasında verilir:
@@ -46,9 +47,12 @@ class CoinStore {
   }
 
   // Mağazanın yerel fiyatları (ör. "₺499,99"); ürün kimliği → fiyat metni
-  Future<Map<String, String>> localPrices(List<String> productIds) async {
+  Future<Map<String, String>> localPrices(List<String> productIds, {bool subscription = false}) async {
     if (!available) return {};
-    final products = await Purchases.getProducts(productIds, productCategory: ProductCategory.nonSubscription);
+    final products = await Purchases.getProducts(
+      productIds,
+      productCategory: subscription ? ProductCategory.subscription : ProductCategory.nonSubscription,
+    );
     for (final p in products) {
       _products[p.identifier] = p;
     }
@@ -56,10 +60,10 @@ class CoinStore {
   }
 
   // true: satın alındı · false: kullanıcı vazgeçti
-  Future<bool> buy(String productId) async {
+  Future<bool> buy(String productId, {bool subscription = false}) async {
     var product = _products[productId];
     if (product == null) {
-      await localPrices([productId]);
+      await localPrices([productId], subscription: subscription);
       product = _products[productId];
     }
     if (product == null) throw StoreUnavailable();
@@ -71,4 +75,13 @@ class CoinStore {
       rethrow;
     }
   }
+}
+
+// Faz 16: MeetPoint+ — abonelik iptali/yönetimi bizim API'mizden değil, mağazanın kendi
+// ayarlarından yapılır (App Store / Google Play); burada sadece ilgili sayfaya yönlendiriyoruz.
+void launchSubscriptionManagement() {
+  final url = defaultTargetPlatform == TargetPlatform.iOS
+      ? 'https://apps.apple.com/account/subscriptions'
+      : 'https://play.google.com/store/account/subscriptions';
+  launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
 }

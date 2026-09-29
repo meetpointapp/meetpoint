@@ -85,6 +85,14 @@ export const revenueCat = {
   apiBase: process.env.REVENUECAT_API_BASE ?? 'https://api.revenuecat.com/v1',
 };
 
+// Faz 16: MeetPoint+ — RevenueCat üzerinden aylık abonelik (mevcut IAP altyapısına ek, gerçek
+// para — jetonla alınan özelliklerden farklı). Fiyat ($7.99/ay) App Store Connect/Play Console
+// tarafında ayarlanır; burada sadece webhook eşleştirmesi için ürün kimliği var. Perk: "seni
+// beğenenler" her zaman açık (bkz. src/routes/boosts.ts).
+export const subscription = {
+  productId: process.env.MEETPOINT_PLUS_PRODUCT_ID || 'meetpoint_plus_monthly',
+};
+
 // Agora (ses/görüntü). Boşsa aramalar "simülasyon modunda" çalışır: akış ve ücretlendirme
 // gerçek, ama ses/görüntü aktarılmaz (geliştirme ve test için).
 export const agora = {

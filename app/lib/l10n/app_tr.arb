@@ -1207,5 +1207,29 @@
   "storeOwned": "Sahipsin",
   "storePurchased": "Satın alındı!",
   "errItemNotOwned": "Bu öğeyi henüz satın almadın.",
-  "errAlreadyOwned": "Bu öğeye zaten sahipsin."
+  "errAlreadyOwned": "Bu öğeye zaten sahipsin.",
+  "premiumTitle": "MeetPoint+",
+  "premiumTagline": "Seni beğenenleri her zaman gör",
+  "premiumPerkLikes": "Seni beğenenler her zaman açık — jetonla açmana gerek yok",
+  "premiumPriceMonthly": "{price}/ay",
+  "premiumSubscribe": "Abone ol",
+  "premiumActive": "MeetPoint+ üyesisin",
+  "premiumActiveUntil": "Aboneliğin {date} tarihine kadar aktif",
+  "premiumManage": "Aboneliği yönet",
+  "premiumSubscribed": "Abone oldun!",
+  "premiumEntryNotSubscribed": "Seni beğenenler her zaman açık olsun",
+  "@premiumPriceMonthly": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@premiumActiveUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }
