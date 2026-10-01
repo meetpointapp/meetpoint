@@ -279,7 +279,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: Column(children: [const _MoodBanner(), const _GroupsStrip(), Expanded(child: body)]),
+        child: Column(children: [const _MoodBanner(), const _LiveActivityStrip(), const _GroupsStrip(), Expanded(child: body)]),
       ),
     );
   }
@@ -367,6 +367,36 @@ class _MoodBanner extends ConsumerWidget {
           ]),
         ),
       ),
+    );
+  }
+}
+
+// Faz 19: canlı aktivite göstergesi — uygulamanın canlı/kalabalık hissetmesi. Sinyal yoksa (gece,
+// düşük trafik) hiç gösterilmez; "0 kişi" demek tam tersi bir izlenim bırakır.
+final _activityProvider = FutureProvider.autoDispose<LiveActivity>((ref) => ref.watch(apiProvider).activity());
+
+class _LiveActivityStrip extends ConsumerWidget {
+  const _LiveActivityStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activity = ref.watch(_activityProvider).value;
+    if (activity == null || !activity.hasSignal) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+      child: Row(children: [
+        Container(width: 6, height: 6, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1FA463))),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            l.liveActivityBanner(activity.activeCalls, activity.recentMatches),
+            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ]),
     );
   }
 }
