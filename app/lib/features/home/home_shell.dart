@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -45,8 +46,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     Push.instance.register(api, onOpen: (route) {
       if (mounted) context.push(route);
     });
-    // Yerel gelen arama ekranından (CallKit/Android tam ekran) kabul/ret (Faz 15)
-    _callKitSub = FlutterCallkitIncoming.onEvent.listen(_onCallKitEvent);
+    // Yerel gelen arama ekranından (CallKit/Android tam ekran) kabul/ret (Faz 15).
+    // Eklentinin web karşılığı yok; web'de dinlemeye çalışmak MissingPluginException fırlatır.
+    if (!kIsWeb) _callKitSub = FlutterCallkitIncoming.onEvent.listen(_onCallKitEvent);
     // Mağaza hesabını kullanıcıya bağla (satın almalar bu kimlikle webhook'a düşer)
     final userId = ref.read(sessionProvider).value?.userId;
     if (userId != null) CoinStore.instance.login(userId);
