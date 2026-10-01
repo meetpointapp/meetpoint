@@ -182,12 +182,12 @@ model Profile {
 
   // Faz 16: kendi oda. Eşleştiğin/bağlantılı olduğun kişi salt görüntüleme ile ziyaret edebilir.
   // items: [{ itemId, x, y }] — en fazla ROOM_MAX_ITEMS (src/catalog.ts), ROOM_GRID_W×ROOM_GRID_H ızgarası.
-  roomWallpaperId String @default("")
-  roomFloorId     String @default("")
-  roomItems       Json   @default("[]")
+  roomWallpaperId   String    @default("")
+  roomFloorId       String    @default("")
+  roomItems         Json      @default("[]")
   // Faz 17 madde 10: "Odanı sergile" — haftalık "en güzel odalar" galerisi. Varsayılan kapalı: oda
   // normalde sadece bağlantılı kişilere açık, galeride görünmek açık bir tercih gerektirir.
-  roomShowcaseOptIn Boolean  @default(false)
+  roomShowcaseOptIn Boolean   @default(false)
   roomUpdatedAt     DateTime?
 
   // Faz 16: "Kendini Keşfet" vibe sistemi. answers: { [soruId]: seçenekId } — src/vibe.ts.
@@ -213,6 +213,9 @@ model Profile {
   // Faz 17: "Sosyal cesaret yolculuğu" — açılan kademe kimlikleri (src/achievements.ts). Her biri
   // bir kez açılır, kademe sırası TRACK_MILESTONES'teki sırayla belirlenir (kalıcı, geri alınmaz).
   milestones Json @default("[]") // ["first_message", "first_match", ...]
+
+  // Faz 19: kazananlar sıralamasında görünmeyi kabul etti mi (varsayılan kapalı, isteğe bağlı)
+  leaderboardOptIn Boolean @default(false)
 
   // Konum: gizlilik için ~1 km'ye yuvarlanmış saklanır, kimseye gösterilmez (sadece mesafe)
   latitude   Float?
@@ -323,16 +326,16 @@ model ContactRequest {
 // İki kullanıcı arasındaki sohbet. Eşleşme (karşılıklı beğeni) veya
 // kabul edilen mesaj isteği ile açılır. userAId < userBId (sıralı) tutulur.
 model Conversation {
-  id        String    @id @default(cuid())
-  userAId   String
-  userBId   String
-  userA     User      @relation("ConvA", fields: [userAId], references: [id], onDelete: Cascade)
-  userB     User      @relation("ConvB", fields: [userBId], references: [id], onDelete: Cascade)
-  origin    String // MATCH | REQUEST
-  createdAt DateTime  @default(now())
-  messages  Message[]
+  id          String           @id @default(cuid())
+  userAId     String
+  userBId     String
+  userA       User             @relation("ConvA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB       User             @relation("ConvB", fields: [userBId], references: [id], onDelete: Cascade)
+  origin      String // MATCH | REQUEST
+  createdAt   DateTime         @default(now())
+  messages    Message[]
   icebreakers IcebreakerGame[]
-  ticTacToes TicTacToeGame[]
+  ticTacToes  TicTacToeGame[]
 
   @@unique([userAId, userBId])
   @@index([userBId]) // "sohbetlerim": userAId eşleşmesi benzersiz indeksle, userBId bununla
@@ -364,24 +367,24 @@ model Message {
 // kadar API yanıtından çıkarılır (src/routes/icebreaker.ts) — Message modelinin aksine, burada
 // taraflara farklı (maskelenmiş) veri döner.
 model IcebreakerGame {
-  id             String       @id @default(cuid())
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  starterId      String
-  kind           String // this_or_that | two_truths
+  id              String       @id @default(cuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  starterId       String
+  kind            String // this_or_that | two_truths
   // this_or_that: THIS_OR_THAT_PROMPTS kimliği. two_truths: kullanılmaz ("").
-  promptId       String       @default("")
+  promptId        String       @default("")
   // two_truths: [ifade1, ifade2, ifade3] (serbest metin, moderasyon var). this_or_that: [].
-  statements     Json         @default("[]")
+  statements      Json         @default("[]")
   // two_truths: hangi ifadenin yalan olduğu (0-2) — cevaplanana kadar sadece başlatana döner.
-  lieIndex       Int?
+  lieIndex        Int?
   // this_or_that: başlatanın seçimi ('a' | 'b').
-  starterChoice  String       @default("")
-  responderId    String?
+  starterChoice   String       @default("")
+  responderId     String?
   // this_or_that: cevaplayanın seçimi ('a' | 'b'). two_truths: tahmin edilen ifade sırası ("0"-"2").
   responderChoice String?
-  createdAt      DateTime     @default(now())
-  answeredAt     DateTime?
+  createdAt       DateTime     @default(now())
+  answeredAt      DateTime?
 
   @@index([conversationId, createdAt])
 }
@@ -1036,4 +1039,18 @@ model CompanyInfo {
   verbisNo   String   @default("")
   updatedBy  String   @default("")
   updatedAt  DateTime @updatedAt
+}
+
+// Faz 19: zaman sınırlı kazanç etkinlikleri ("Bu hafta sonu 2x kazanç"). Panelden (Finans) yönetilir;
+// aktif etkinlik varken EARN kredilerine bonus eklenir (src/events.ts).
+model EarningEvent {
+  id         String   @id @default(cuid())
+  title      String
+  multiplier Float    @default(2) // 2 = kazancın %100 fazlası bonus olarak eklenir
+  startAt    DateTime
+  endAt      DateTime
+  createdBy  String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([startAt, endAt])
 }
