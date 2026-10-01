@@ -21,6 +21,7 @@ import { adminSupportRouter } from './routes/adminSupport';
 import { accountWebRouter } from './routes/accountWeb';
 import { personalLinkRouter } from './routes/personalLink';
 import { helpRouter } from './routes/help';
+import { engagementRouter } from './routes/engagement';
 import { notificationsRouter } from './routes/notifications';
 import { supportRouter } from './routes/support';
 import { ensureHelpArticles } from './support/help';
@@ -119,6 +120,7 @@ app.use(
   safetyRouter,
   supportRouter,
   notificationsRouter,
+  engagementRouter,
 );
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
