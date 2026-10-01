@@ -219,6 +219,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             label: l.navWallet,
           ),
           NavigationDestination(
+            icon: const Icon(Icons.chair_alt_outlined),
+            selectedIcon: const Icon(Icons.chair_alt_rounded),
+            label: l.navRoom,
+          ),
+          NavigationDestination(
             icon: const Icon(Icons.person_outline_rounded),
             selectedIcon: const Icon(Icons.person_rounded),
             label: l.navProfile,

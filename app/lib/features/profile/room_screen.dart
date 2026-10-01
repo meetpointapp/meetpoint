@@ -23,34 +23,97 @@ class RoomCanvas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final byPos = {for (final it in room.items) '${it.x},${it.y}': it.itemId};
+    // Düzenleme modunda (onCellTap != null) nereye dokunduğunu görebilmen için çok hafif bir ızgara
+    // rehberi var; salt görüntülemede (kendi odanı/ziyaretinde) tamamen kaybolur — tek görülen,
+    // döşenmiş bir oda sahnesi olur.
+    final editing = onCellTap != null;
     return AspectRatio(
       aspectRatio: roomGridW / roomGridH,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Brand.radius),
         child: Stack(fit: StackFit.expand, children: [
+          // Duvar + zemin: zeminin üst kenarına hafif bir gölge, derinlik hissi için
           Column(children: [
-            Expanded(flex: 4, child: ColoredBox(color: roomWallpaperColorOf(room.wallpaperId))),
-            Expanded(flex: 1, child: ColoredBox(color: roomFloorColorOf(room.floorId))),
-          ]),
-          GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: roomGridW),
-            itemCount: roomGridW * roomGridH,
-            itemBuilder: (_, i) {
-              final x = i % roomGridW;
-              final y = i ~/ roomGridW;
-              final itemId = byPos['$x,$y'];
-              return GestureDetector(
-                onTap: onCellTap == null ? null : () => onCellTap!(x, y),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(border: Border.all(color: Colors.black.withValues(alpha: 0.06))),
-                  child: itemId == null ? null : Center(child: Text(roomItemEmojiOf(itemId), style: const TextStyle(fontSize: 26))),
+            Expanded(
+              flex: 7,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [roomWallpaperColorOf(room.wallpaperId), roomWallpaperColorOf(room.wallpaperId).withValues(alpha: 0.85)],
+                  ),
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color.lerp(roomFloorColorOf(room.floorId), Colors.black, 0.08)!, roomFloorColorOf(room.floorId)],
+                  ),
+                  boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, -4))],
+                ),
+              ),
+            ),
+          ]),
+          LayoutBuilder(builder: (context, c) {
+            final cellW = c.maxWidth / roomGridW;
+            final cellH = c.maxHeight / roomGridH;
+            return Stack(children: [
+              for (var y = 0; y < roomGridH; y++)
+                for (var x = 0; x < roomGridW; x++)
+                  Positioned(
+                    left: x * cellW,
+                    top: y * cellH,
+                    width: cellW,
+                    height: cellH,
+                    child: GestureDetector(
+                      onTap: onCellTap == null ? null : () => onCellTap!(x, y),
+                      child: editing
+                          ? DecoratedBox(
+                              decoration: BoxDecoration(border: Border.all(color: Colors.white.withValues(alpha: 0.14))),
+                              child: _RoomItemSticker(itemId: byPos['$x,$y'], depth: y / (roomGridH - 1)),
+                            )
+                          : _RoomItemSticker(itemId: byPos['$x,$y'], depth: y / (roomGridH - 1)),
+                    ),
+                  ),
+            ]);
+          }),
         ]),
+      ),
+    );
+  }
+}
+
+// Bir eşyayı ızgara hücresinde düz bir ikon yerine, gölgesi olan, yere "oturan" bir çıkartma gibi
+// çizer. depth (0 = duvara yakın/uzak, 1 = öne/zemine yakın): öndeki eşyalar biraz daha büyük —
+// gerçek 3B değil ama basit bir perspektif hissi verir.
+class _RoomItemSticker extends StatelessWidget {
+  const _RoomItemSticker({required this.itemId, required this.depth});
+  final String? itemId;
+  final double depth;
+
+  @override
+  Widget build(BuildContext context) {
+    final id = itemId;
+    if (id == null) return const SizedBox.shrink();
+    final scale = 0.82 + depth * 0.3;
+    return Center(
+      child: Transform.scale(
+        scale: scale,
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withValues(alpha: 0.22),
+            boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 3))],
+          ),
+          child: Text(roomItemEmojiOf(id), style: const TextStyle(fontSize: 26)),
+        ),
       ),
     );
   }

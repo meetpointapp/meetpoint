@@ -143,12 +143,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   Text(l.avatarSection, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ]),
                 const SizedBox(height: 8),
+                // Oda artık alt menüde kendi sekmesi — burada sadece hatırlatma
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.chair_alt_outlined),
                     title: Text(l.roomSection),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/room'),
+                    subtitle: Text(l.roomInBottomNavHint),
                   ),
                 ),
                 const SizedBox(height: 8),
