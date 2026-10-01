@@ -2132,6 +2132,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'profile_complete': 'Complete your profile',
       'verified': 'Verification',
       'vibe_done': 'Complete the vibe test',
+      'first_earning': 'Your first earning',
+      'earning_50usd': '\$50 earned',
+      'earning_100usd': '\$100 earned',
       'other': '$id',
     });
     return '$_temp0';
@@ -2869,4 +2872,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareProfileTagline => 'My MeetPoint profile';
+
+  @override
+  String get trackKazanc => 'Earnings';
+
+  @override
+  String get txEarnBonus => 'Event bonus';
+
+  @override
+  String get leaderboardTitle => 'Top earners';
+
+  @override
+  String get leaderboardWeekly => 'This week';
+
+  @override
+  String get leaderboardMonthly => 'This month';
+
+  @override
+  String get leaderboardEmpty =>
+      'No one\'s on the list yet. You could be first!';
+
+  @override
+  String get leaderboardOptInBanner => 'Want to appear on the leaderboard?';
+
+  @override
+  String get leaderboardOptInHint =>
+      'Your approximate earnings will show publicly with your name. You can turn it off anytime.';
+
+  @override
+  String get leaderboardOptInAction => 'Join the leaderboard';
+
+  @override
+  String get leaderboardOptedIn => 'You\'re on the leaderboard 🎉';
+
+  @override
+  String get leaderboardOptOut => 'Leave the leaderboard';
+
+  @override
+  String get leaderboardYou => 'You';
+
+  @override
+  String liveActivityBanner(int calls, int matches) {
+    return '$calls people on a call right now · $matches new matches in the last 5 minutes';
+  }
+
+  @override
+  String get liveEarningsLabel => 'Your earnings are growing';
+
+  @override
+  String eventBannerTitle(String title, String multiplier) {
+    return '$title · ${multiplier}x earnings active!';
+  }
+
+  @override
+  String eventEndsIn(String time) {
+    return 'Ends in $time';
+  }
+
+  @override
+  String milestoneEarnedCelebration(String label) {
+    return '$label 🎉 New reward unlocked!';
+  }
+
+  @override
+  String get navRoom => 'Room';
+
+  @override
+  String get roomInBottomNavHint =>
+      'Decorate it from the Room tab in the bottom menu';
 }

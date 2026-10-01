@@ -108,9 +108,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           return RefreshIndicator(
             onRefresh: () => ref.refresh(walletProvider.future),
             child: ListView(padding: const EdgeInsets.all(16), children: [
+              const _EventBanner(),
               _BalanceCard(wallet: w),
               const SizedBox(height: 16),
               const _PremiumPromo(),
+              const SizedBox(height: 8),
+              const _LeaderboardPromo(),
               const SizedBox(height: 24),
               Text(l.buyCoins, style: theme.textTheme.titleMedium),
               if (!CoinStore.instance.available) ...[
@@ -154,6 +157,56 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
             ]),
           );
         },
+      ),
+    );
+  }
+}
+
+// Faz 19: aktif kazanç etkinliği varsa üstte kısa, iddialı bir şerit
+final _activeEventProvider = FutureProvider.autoDispose<EarningEvent?>((ref) => ref.watch(apiProvider).activeEarningEvent());
+
+class _EventBanner extends ConsumerWidget {
+  const _EventBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final event = ref.watch(_activeEventProvider).value;
+    if (event == null) return const SizedBox.shrink();
+    final remaining = event.remaining;
+    final hm = remaining.inHours > 0 ? '${remaining.inHours} sa ${remaining.inMinutes % 60} dk' : '${remaining.inMinutes} dk';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(Brand.radius), gradient: Brand.gradient),
+      child: Row(children: [
+        const Text('⚡', style: TextStyle(fontSize: 22)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(l.eventBannerTitle(event.title, event.multiplier.toStringAsFixed(event.multiplier == event.multiplier.roundToDouble() ? 0 : 1)),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            Text(l.eventEndsIn(hm), style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+// Faz 19: kazananlar sıralaması tanıtım kartı
+class _LeaderboardPromo extends StatelessWidget {
+  const _LeaderboardPromo();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Card(
+      child: ListTile(
+        leading: const Icon(Icons.leaderboard_rounded, color: Brand.coral),
+        title: Text(l.leaderboardTitle),
+        trailing: const Icon(Icons.chevron_right_rounded),
+        onTap: () => context.push('/leaderboard'),
       ),
     );
   }
@@ -363,6 +416,7 @@ class _EntryTile extends StatelessWidget {
       'HOLD' => l.txHold,
       'REFUND' => l.txRefund,
       'EARN' => l.txEarn,
+      'EARN_BONUS' => l.txEarnBonus,
       'SPEND' => l.txSpend,
       'CALL' => l.txCall,
       'GIFT' => l.txGift,

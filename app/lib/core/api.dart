@@ -580,4 +580,16 @@ class Api {
   Future<void> block(String toId) => _post('/blocks', {'toId': toId});
 
   Future<void> report(String toId, String reason) => _post('/reports', {'toId': toId, 'reason': reason});
+
+  // Faz 19: kazanç heyecanı
+  Future<Leaderboard> leaderboard({String period = 'week'}) async => Leaderboard.fromJson(await _get('/leaderboard', {'period': period}));
+
+  Future<bool> setLeaderboardOptIn(bool optIn) async => (await _put('/me/leaderboard', {'optIn': optIn}))['optIn'] as bool;
+
+  Future<LiveActivity> activity() async => LiveActivity.fromJson(await _get('/activity'));
+
+  Future<EarningEvent?> activeEarningEvent() async {
+    final r = await _get('/events/active');
+    return r == null ? null : EarningEvent.fromJson(r as Map<String, dynamic>);
+  }
 }

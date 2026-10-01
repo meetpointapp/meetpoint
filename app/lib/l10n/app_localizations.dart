@@ -3534,7 +3534,7 @@ abstract class AppLocalizations {
   /// No description provided for @milestoneLabel.
   ///
   /// In tr, this message translates to:
-  /// **'{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} other{{id}}}'**
+  /// **'{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} first_earning{İlk kazancın} earning_50usd{50\$ kazanç} earning_100usd{100\$ kazanç} other{{id}}}'**
   String milestoneLabel(String id);
 
   /// No description provided for @quietHoursTitle.
@@ -4400,6 +4400,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'MeetPoint\'te profilim'**
   String get shareProfileTagline;
+
+  /// No description provided for @trackKazanc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazanç'**
+  String get trackKazanc;
+
+  /// No description provided for @txEarnBonus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Etkinlik bonusu'**
+  String get txEarnBonus;
+
+  /// No description provided for @leaderboardTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazananlar sıralaması'**
+  String get leaderboardTitle;
+
+  /// No description provided for @leaderboardWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta'**
+  String get leaderboardWeekly;
+
+  /// No description provided for @leaderboardMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay'**
+  String get leaderboardMonthly;
+
+  /// No description provided for @leaderboardEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz kimse listede yok. İlk sen olabilirsin!'**
+  String get leaderboardEmpty;
+
+  /// No description provided for @leaderboardOptInBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamada görünmek ister misin?'**
+  String get leaderboardOptInBanner;
+
+  /// No description provided for @leaderboardOptInHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazancın (yaklaşık, tam tutar değil) adınla birlikte herkese açık sıralamada görünür. İstediğin an kapatabilirsin.'**
+  String get leaderboardOptInHint;
+
+  /// No description provided for @leaderboardOptInAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamaya katıl'**
+  String get leaderboardOptInAction;
+
+  /// No description provided for @leaderboardOptedIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamadasın 🎉'**
+  String get leaderboardOptedIn;
+
+  /// No description provided for @leaderboardOptOut.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamadan çık'**
+  String get leaderboardOptOut;
+
+  /// No description provided for @leaderboardYou.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sen'**
+  String get leaderboardYou;
+
+  /// No description provided for @liveActivityBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{calls} kişi şu an aramada · Son 5 dakikada {matches} yeni eşleşme'**
+  String liveActivityBanner(int calls, int matches);
+
+  /// No description provided for @liveEarningsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazancın artıyor'**
+  String get liveEarningsLabel;
+
+  /// No description provided for @eventBannerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{title} · {multiplier}x kazanç aktif!'**
+  String eventBannerTitle(String title, String multiplier);
+
+  /// No description provided for @eventEndsIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitmesine {time} kaldı'**
+  String eventEndsIn(String time);
+
+  /// No description provided for @milestoneEarnedCelebration.
+  ///
+  /// In tr, this message translates to:
+  /// **'{label} 🎉 Yeni bir ödül açıldı!'**
+  String milestoneEarnedCelebration(String label);
+
+  /// No description provided for @navRoom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oda'**
+  String get navRoom;
+
+  /// No description provided for @roomInBottomNavHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alt menüdeki Oda sekmesinden dekore edebilirsin'**
+  String get roomInBottomNavHint;
 }
 
 class _AppLocalizationsDelegate

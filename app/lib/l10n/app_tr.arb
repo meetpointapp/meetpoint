@@ -1103,7 +1103,7 @@
       }
     }
   },
-  "milestoneLabel": "{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} other{{id}}}",
+  "milestoneLabel": "{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} first_earning{İlk kazancın} earning_50usd{50$ kazanç} earning_100usd{100$ kazanç} other{{id}}}",
   "quietHoursTitle": "Sessiz saatler",
   "quietHoursHint": "Bu saatlerde aramalar dışında bildirim gelmez.",
   "quietHours": "Sessiz saatleri aç",
@@ -1414,5 +1414,58 @@
       }
     }
   },
-  "shareProfileTagline": "MeetPoint'te profilim"
+  "shareProfileTagline": "MeetPoint'te profilim",
+  "trackKazanc": "Kazanç",
+  "txEarnBonus": "Etkinlik bonusu",
+  "leaderboardTitle": "Kazananlar sıralaması",
+  "leaderboardWeekly": "Bu hafta",
+  "leaderboardMonthly": "Bu ay",
+  "leaderboardEmpty": "Henüz kimse listede yok. İlk sen olabilirsin!",
+  "leaderboardOptInBanner": "Sıralamada görünmek ister misin?",
+  "leaderboardOptInHint": "Kazancın (yaklaşık, tam tutar değil) adınla birlikte herkese açık sıralamada görünür. İstediğin an kapatabilirsin.",
+  "leaderboardOptInAction": "Sıralamaya katıl",
+  "leaderboardOptedIn": "Sıralamadasın 🎉",
+  "leaderboardOptOut": "Sıralamadan çık",
+  "leaderboardYou": "Sen",
+  "liveActivityBanner": "{calls} kişi şu an aramada · Son 5 dakikada {matches} yeni eşleşme",
+  "@liveActivityBanner": {
+    "placeholders": {
+      "calls": {
+        "type": "int"
+      },
+      "matches": {
+        "type": "int"
+      }
+    }
+  },
+  "liveEarningsLabel": "Kazancın artıyor",
+  "eventBannerTitle": "{title} · {multiplier}x kazanç aktif!",
+  "@eventBannerTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "multiplier": {
+        "type": "String"
+      }
+    }
+  },
+  "eventEndsIn": "Bitmesine {time} kaldı",
+  "@eventEndsIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "milestoneEarnedCelebration": "{label} 🎉 Yeni bir ödül açıldı!",
+  "@milestoneEarnedCelebration": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "navRoom": "Oda",
+  "roomInBottomNavHint": "Alt menüdeki Oda sekmesinden dekore edebilirsin"
 }

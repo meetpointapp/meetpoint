@@ -539,7 +539,7 @@ class Streak {
 
 // Faz 17: "Sosyal cesaret yolculuğu". Üç iz (İletişim/Bağlantı/Kimlik), her biri 3 kademe
 // (bronz/gümüş/altın) — kimlikler ve sıra server/src/achievements.ts ile birebir eşleşmeli.
-enum AchievementTrack { iletisim, baglanti, kimlik }
+enum AchievementTrack { iletisim, baglanti, kimlik, kazanc }
 
 class Milestone {
   final String id;
@@ -1506,4 +1506,75 @@ class NotificationPrefs {
       quietEnd: q['end'] ?? 8 * 60,
     );
   }
+}
+
+// ---------- Faz 19: kazanç heyecanı ----------
+
+class LeaderboardEntry {
+  final int rank;
+  final String userId;
+  final String displayName;
+  final int approxUsd;
+  final Photo? photo;
+
+  const LeaderboardEntry({
+    required this.rank,
+    required this.userId,
+    required this.displayName,
+    required this.approxUsd,
+    this.photo,
+  });
+
+  factory LeaderboardEntry.fromJson(Map<String, dynamic> j) => LeaderboardEntry(
+        rank: j['rank'],
+        userId: j['userId'],
+        displayName: j['displayName'] ?? '',
+        approxUsd: j['approxUsd'] ?? 0,
+        photo: j['photo'] == null ? null : Photo.fromJson({'id': '', ...j['photo'] as Map<String, dynamic>}),
+      );
+}
+
+class YourRank {
+  final int rank;
+  final bool optedIn;
+  final int approxUsd;
+  const YourRank({required this.rank, required this.optedIn, required this.approxUsd});
+  factory YourRank.fromJson(Map<String, dynamic> j) => YourRank(rank: j['rank'], optedIn: j['optedIn'] ?? false, approxUsd: j['approxUsd'] ?? 0);
+}
+
+class Leaderboard {
+  final String period; // week | month
+  final List<LeaderboardEntry> entries;
+  final YourRank? you;
+  const Leaderboard({required this.period, this.entries = const [], this.you});
+  factory Leaderboard.fromJson(Map<String, dynamic> j) => Leaderboard(
+        period: j['period'] ?? 'week',
+        entries: [for (final e in (j['entries'] as List)) LeaderboardEntry.fromJson(e)],
+        you: j['you'] == null ? null : YourRank.fromJson(j['you']),
+      );
+}
+
+class LiveActivity {
+  final int activeCalls;
+  final int recentMatches;
+  const LiveActivity({this.activeCalls = 0, this.recentMatches = 0});
+  factory LiveActivity.fromJson(Map<String, dynamic> j) => LiveActivity(activeCalls: j['activeCalls'] ?? 0, recentMatches: j['recentMatches'] ?? 0);
+  bool get hasSignal => activeCalls > 0 || recentMatches > 0;
+}
+
+class EarningEvent {
+  final String id;
+  final String title;
+  final double multiplier;
+  final DateTime startAt;
+  final DateTime endAt;
+  const EarningEvent({required this.id, required this.title, required this.multiplier, required this.startAt, required this.endAt});
+  factory EarningEvent.fromJson(Map<String, dynamic> j) => EarningEvent(
+        id: j['id'],
+        title: j['title'] ?? '',
+        multiplier: (j['multiplier'] as num).toDouble(),
+        startAt: _date(j['startAt']),
+        endAt: _date(j['endAt']),
+      );
+  Duration get remaining => endAt.difference(DateTime.now());
 }

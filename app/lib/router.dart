@@ -34,6 +34,7 @@ import 'features/requests/requests_screen.dart';
 import 'features/me/journey_screen.dart';
 import 'features/me/referral_screen.dart';
 import 'features/wallet/cashout_screen.dart';
+import 'features/wallet/leaderboard_screen.dart';
 import 'features/wallet/premium_screen.dart';
 import 'features/wallet/wallet_screen.dart';
 
@@ -79,7 +80,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/support/new', builder: (_, s) => NewTicketScreen(args: s.extra is NewTicketArgs ? s.extra as NewTicketArgs : null)),
       GoRoute(path: '/support/:id', builder: (_, s) => TicketScreen(ticketId: s.pathParameters['id']!)),
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
-      GoRoute(path: '/room', builder: (_, _) => const RoomEditorScreen()),
       GoRoute(path: '/rooms/showcase', builder: (_, _) => const RoomShowcaseScreen()),
       GoRoute(path: '/user/:id/room', builder: (_, s) => RoomVisitScreen(userId: s.pathParameters['id']!)),
       GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
@@ -91,6 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/calls', builder: (_, _) => const CallHistoryScreen()),
       GoRoute(path: '/wallet/cashout', builder: (_, _) => const CashoutScreen()),
+      GoRoute(path: '/leaderboard', builder: (_, _) => const LeaderboardScreen()),
       GoRoute(path: '/premium', builder: (_, _) => const PremiumScreen()),
       GoRoute(path: '/journey', builder: (_, _) => const JourneyScreen()),
       GoRoute(path: '/referral', builder: (_, _) => const ReferralScreen()),
@@ -102,6 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [GoRoute(path: '/requests', builder: (_, _) => const RequestsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/chats', builder: (_, _) => const ConversationsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen())]),
+          StatefulShellBranch(routes: [GoRoute(path: '/room', builder: (_, _) => const RoomEditorScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/me', builder: (_, _) => const MeScreen())]),
         ],
       ),

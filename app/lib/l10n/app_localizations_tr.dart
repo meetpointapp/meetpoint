@@ -2089,6 +2089,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'profile_complete': 'Profilini tamamla',
       'verified': 'Doğrulama',
       'vibe_done': 'Vibe testini tamamla',
+      'first_earning': 'İlk kazancın',
+      'earning_50usd': '50\$ kazanç',
+      'earning_100usd': '100\$ kazanç',
       'other': '$id',
     });
     return '$_temp0';
@@ -2804,4 +2807,72 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get shareProfileTagline => 'MeetPoint\'te profilim';
+
+  @override
+  String get trackKazanc => 'Kazanç';
+
+  @override
+  String get txEarnBonus => 'Etkinlik bonusu';
+
+  @override
+  String get leaderboardTitle => 'Kazananlar sıralaması';
+
+  @override
+  String get leaderboardWeekly => 'Bu hafta';
+
+  @override
+  String get leaderboardMonthly => 'Bu ay';
+
+  @override
+  String get leaderboardEmpty =>
+      'Henüz kimse listede yok. İlk sen olabilirsin!';
+
+  @override
+  String get leaderboardOptInBanner => 'Sıralamada görünmek ister misin?';
+
+  @override
+  String get leaderboardOptInHint =>
+      'Kazancın (yaklaşık, tam tutar değil) adınla birlikte herkese açık sıralamada görünür. İstediğin an kapatabilirsin.';
+
+  @override
+  String get leaderboardOptInAction => 'Sıralamaya katıl';
+
+  @override
+  String get leaderboardOptedIn => 'Sıralamadasın 🎉';
+
+  @override
+  String get leaderboardOptOut => 'Sıralamadan çık';
+
+  @override
+  String get leaderboardYou => 'Sen';
+
+  @override
+  String liveActivityBanner(int calls, int matches) {
+    return '$calls kişi şu an aramada · Son 5 dakikada $matches yeni eşleşme';
+  }
+
+  @override
+  String get liveEarningsLabel => 'Kazancın artıyor';
+
+  @override
+  String eventBannerTitle(String title, String multiplier) {
+    return '$title · ${multiplier}x kazanç aktif!';
+  }
+
+  @override
+  String eventEndsIn(String time) {
+    return 'Bitmesine $time kaldı';
+  }
+
+  @override
+  String milestoneEarnedCelebration(String label) {
+    return '$label 🎉 Yeni bir ödül açıldı!';
+  }
+
+  @override
+  String get navRoom => 'Oda';
+
+  @override
+  String get roomInBottomNavHint =>
+      'Alt menüdeki Oda sekmesinden dekore edebilirsin';
 }

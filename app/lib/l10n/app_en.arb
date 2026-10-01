@@ -571,7 +571,7 @@
   "journeyRewardsEmpty": "No rewards yet. Complete a milestone and it'll show up here.",
   "journeyNextStepTitle": "Next step",
   "journeyNextStepBody": "You both like {interest} — start there",
-  "milestoneLabel": "{id, select, first_message{First message} week_long_chat{7-day conversation} first_icebreaker{First icebreaker game} first_match{First match} first_room_visit{First room visit} first_call{First call} profile_complete{Complete your profile} verified{Verification} vibe_done{Complete the vibe test} other{{id}}}",
+  "milestoneLabel": "{id, select, first_message{First message} week_long_chat{7-day conversation} first_icebreaker{First icebreaker game} first_match{First match} first_room_visit{First room visit} first_call{First call} profile_complete{Complete your profile} verified{Verification} vibe_done{Complete the vibe test} first_earning{Your first earning} earning_50usd{$50 earned} earning_100usd{$100 earned} other{{id}}}",
   "quietHoursTitle": "Quiet hours",
   "quietHoursHint": "Only calls come through during these hours.",
   "quietHours": "Turn on quiet hours",
@@ -715,5 +715,58 @@
   "shareButton": "Share",
   "shareMatchTitle": "It's a match! 💕",
   "shareMatchWith": "with {name}",
-  "shareProfileTagline": "My MeetPoint profile"
+  "shareProfileTagline": "My MeetPoint profile",
+  "trackKazanc": "Earnings",
+  "txEarnBonus": "Event bonus",
+  "leaderboardTitle": "Top earners",
+  "leaderboardWeekly": "This week",
+  "leaderboardMonthly": "This month",
+  "leaderboardEmpty": "No one's on the list yet. You could be first!",
+  "leaderboardOptInBanner": "Want to appear on the leaderboard?",
+  "leaderboardOptInHint": "Your approximate earnings will show publicly with your name. You can turn it off anytime.",
+  "leaderboardOptInAction": "Join the leaderboard",
+  "leaderboardOptedIn": "You're on the leaderboard 🎉",
+  "leaderboardOptOut": "Leave the leaderboard",
+  "leaderboardYou": "You",
+  "liveActivityBanner": "{calls} people on a call right now · {matches} new matches in the last 5 minutes",
+  "@liveActivityBanner": {
+    "placeholders": {
+      "calls": {
+        "type": "int"
+      },
+      "matches": {
+        "type": "int"
+      }
+    }
+  },
+  "liveEarningsLabel": "Your earnings are growing",
+  "eventBannerTitle": "{title} · {multiplier}x earnings active!",
+  "@eventBannerTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "multiplier": {
+        "type": "String"
+      }
+    }
+  },
+  "eventEndsIn": "Ends in {time}",
+  "@eventEndsIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "milestoneEarnedCelebration": "{label} 🎉 New reward unlocked!",
+  "@milestoneEarnedCelebration": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "navRoom": "Room",
+  "roomInBottomNavHint": "Decorate it from the Room tab in the bottom menu"
 }
