@@ -360,15 +360,25 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. ✅ **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
 7. ✅ **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
 
-## Faz 19 · Kazanç heyecanı
+## Faz 19 · Kazanç heyecanı ✅
 
 **Amaç:** Uygulamanın en güçlü kancası — "görüntülü konuşarak kazanma" ihtimalini görünür, iddialı ve paylaşılası hale getirmek. Dış maliyet yok, var olan cüzdan/arama altyapısının üzerine.
 
-1. 🛠 **Kazananlar sıralaması.** Haftalık/aylık en çok kazananlar listesi, isteğe bağlı katılım (gizlilik). Statü ve sosyal kanıt yaratır.
-2. 🛠 **Canlı aktivite göstergesi.** "Şu an X kişi aramada", "Bu dakika Y yeni eşleşme" — uygulamanın canlı ve kalabalık hissetmesi.
-3. 🛠 **Arama içi gerçek zamanlı kazanç sayacı.** Arama sürerken kazancın dakika dakika arttığını gösteren bir sayaç (şu an sadece arama bitince toplam gösteriliyor).
-4. 🛠 **Kazanç kilometre taşları.** "Sosyal cesaret yolculuğu"na 4. iz: gerçek para kazanma adımları (ilk kazanç, $50, $100 eşiği) — her kademe kozmetik ödül açar.
-5. 🛠 **Zaman sınırlı etkinlikler.** "Bu hafta sonu 2x kazanç" gibi panelden ayarlanabilen, süreli bonus dönemleri.
+1. ✅ **Kazananlar sıralaması.** Haftalık/aylık en çok kazananlar listesi, isteğe bağlı katılım (gizlilik). Statü ve sosyal kanıt yaratır.
+2. ✅ **Canlı aktivite göstergesi.** "Şu an X kişi aramada", "Bu dakika Y yeni eşleşme" — uygulamanın canlı ve kalabalık hissetmesi.
+3. ✅ **Arama içi gerçek zamanlı kazanç sayacı.** Arama sürerken kazancın dakika dakika arttığını gösteren bir sayaç (şu an sadece arama bitince toplam gösteriliyor).
+4. ✅ **Kazanç kilometre taşları.** "Sosyal cesaret yolculuğu"na 4. iz: gerçek para kazanma adımları (ilk kazanç, $50, $100 eşiği) — her kademe kozmetik ödül açar.
+5. ✅ **Zaman sınırlı etkinlikler.** "Bu hafta sonu 2x kazanç" gibi panelden ayarlanabilen, süreli bonus dönemleri.
+
+### Faz 19'da bulunanlar
+
+Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin üzerine. Sunucu tip kontrolü ve `test -p test` temiz; tam otomatik test takımı bu makinede önceden var olan bir ortam sorunu yüzünden çalıştırılamadı (`embedded-postgres`'in test veritabanı Windows'ta `groupadd` komutunu bulamıyor — kod değişikliklerinden bağımsız, önceden de vardı). Bunun yerine: doğrudan fonksiyon testi (`checkEarningMilestones` gerçek veriyle doğrulandı: $83 kazanç → "ilk kazanç" + "$50 eşiği" açıldı, "$100 eşiği" doğru şekilde açılmadı) ve headless tarayıcıda uçtan uca akış (giriş, sıralamaya katılma, oda sekmesi, eşya yerleştirme) — hepsi konsol hatasız.
+
+**Bulunan ve düzeltilen hata (bu fazın dışında ama test sırasında ortaya çıktı):** `home_shell.dart`'taki CallKit olay dinleyicisi web'de `kIsWeb` ile korunmamıştı, `MissingPluginException` basıyordu; düzeltildi.
+
+**Ayrıca bu oturumda (kullanıcı geri bildirimiyle):** Oda, Profil içine gömülü olmaktan çıkıp alt menüde kendi sekmesi oldu; eşyalar ızgara çizgili kutularda düz ikon yerine gölgeli, derinlik hissi olan "çıkartmalar" olarak çiziliyor.
+
+**Açık soru:** Test ortamındaki `embedded-postgres`/Windows uyumsuzluğu (`groupadd`) ayrıca araştırılmalı — gerçek bir kod hatası değil ama tam otomatik test koşusunu bu makinede engelliyor.
 
 ## Faz 20 · Canlı yayın (bire-çok)
 
