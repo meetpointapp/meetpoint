@@ -406,7 +406,7 @@ class _TopBar extends StatelessWidget {
         if (active) ...[
           const SizedBox(height: 8),
           Row(children: [
-            _Pill(coin: true, label: call.outgoing ? '-${call.totalCoins}' : '+${call.totalCoins}'),
+            call.outgoing ? _Pill(coin: true, label: '-${call.totalCoins}') : _LiveEarningsPill(call: call),
             const SizedBox(width: 8),
             _Pill(label: l.perMinute(call.ratePerMin)),
             const Spacer(),
@@ -416,6 +416,56 @@ class _TopBar extends StatelessWidget {
       ]),
     );
   }
+}
+
+// Faz 19: arama içi gerçek zamanlı kazanç sayacı. Sunucu dakikada bir (call:charged) kesin tutarı
+// bildirir; aradaki saniyelerde, o dakikanın ortalama hızında görsel olarak akar — her sunucu
+// güncellemesinde gerçek değere anında senkronlanır (kendi kendini düzeltir, asla gerçek tutarı geçmez).
+class _LiveEarningsPill extends StatefulWidget {
+  const _LiveEarningsPill({required this.call});
+  final CallInfo call;
+
+  @override
+  State<_LiveEarningsPill> createState() => _LiveEarningsPillState();
+}
+
+class _LiveEarningsPillState extends State<_LiveEarningsPill> {
+  Timer? _ticker;
+  late int _baseCoins = widget.call.totalCoins;
+  DateTime _syncedAt = DateTime.now();
+  double _displayed = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayed = _baseCoins.toDouble();
+    _ticker = Timer.periodic(const Duration(milliseconds: 200), (_) => _tick());
+  }
+
+  @override
+  void didUpdateWidget(covariant _LiveEarningsPill old) {
+    super.didUpdateWidget(old);
+    if (widget.call.totalCoins != old.call.totalCoins) {
+      _baseCoins = widget.call.totalCoins;
+      _syncedAt = DateTime.now();
+    }
+  }
+
+  void _tick() {
+    final elapsedMin = DateTime.now().difference(_syncedAt).inMilliseconds / 60000;
+    // Bir sonraki dakikanın ücreti henüz kesinleşmedi: tahmini akış asla tam dakikayı geçmesin
+    final projected = _baseCoins + (widget.call.ratePerMin * elapsedMin).clamp(0.0, widget.call.ratePerMin.toDouble());
+    if (mounted) setState(() => _displayed = projected);
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => _Pill(coin: true, label: '+${_displayed.floor()}');
 }
 
 class _Pill extends StatelessWidget {
