@@ -209,6 +209,7 @@ class _TrackSection extends StatelessWidget {
       AchievementTrack.iletisim => l.trackIletisim,
       AchievementTrack.baglanti => l.trackBaglanti,
       AchievementTrack.kimlik => l.trackKimlik,
+      AchievementTrack.kazanc => l.trackKazanc,
     };
     return Card(
       child: Padding(

@@ -553,6 +553,7 @@ class _JourneyCard extends StatelessWidget {
       AchievementTrack.iletisim: l.trackIletisim,
       AchievementTrack.baglanti: l.trackBaglanti,
       AchievementTrack.kimlik: l.trackKimlik,
+      AchievementTrack.kazanc: l.trackKazanc,
     };
     return Card(
       child: InkWell(
@@ -597,7 +598,7 @@ class _JourneyCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                if (entry.key != AchievementTrack.kimlik)
+                if (entry.key != AchievementTrack.values.last)
                   const SizedBox(height: 10),
               ],
             ],
