@@ -7,6 +7,7 @@ import { listCallDisputes, resolveCallDispute } from '../calls';
 import { HttpError, prisma } from '../db';
 import { decryptField } from '../fieldCrypto';
 import { decideKyc, kycDocument, kycView } from '../finance/kyc';
+import { eventDto } from '../events';
 import { financeReport, reportCsv } from '../finance/report';
 import { getFinance, invalidateFinance, packReport } from '../finance/settings';
 import { markPayoutPaid } from '../payouts';
@@ -195,4 +196,34 @@ adminFinanceRouter.get('/report', FIN, async (req, res) => {
 // ---------- Kullanım hunisi (Faz 16): kayıt → eşleşme → ilk mesaj → ilk satın alma
 adminFinanceRouter.get('/funnel', FIN, async (_req, res) => {
   res.json(await funnelReport());
+});
+
+// ---------- Faz 19: zaman sınırlı kazanç etkinlikleri ("Bu hafta sonu 2x kazanç")
+adminFinanceRouter.get('/events', FIN, async (_req, res) => {
+  const list = await prisma.earningEvent.findMany({ orderBy: { startAt: 'desc' }, take: 100 });
+  res.json(list.map(eventDto));
+});
+
+const eventSchema = z
+  .object({
+    title: z.string().trim().min(3).max(120),
+    multiplier: z.number().min(1).max(10),
+    startAt: z.coerce.date(),
+    endAt: z.coerce.date(),
+  })
+  .refine((d) => d.endAt > d.startAt, { message: 'endAt_before_startAt' });
+
+adminFinanceRouter.post('/events', SUPER, async (req, res) => {
+  const data = eventSchema.parse(req.body);
+  const e = await prisma.earningEvent.create({ data: { ...data, createdBy: await adminEmailOf(req) } });
+  await audit(req, 'event.create', 'earningEvent', e.id, { title: e.title, multiplier: e.multiplier });
+  res.status(201).json(eventDto(e));
+});
+
+adminFinanceRouter.delete('/events/:id', SUPER, async (req, res) => {
+  const e = await prisma.earningEvent.findUnique({ where: { id: req.params.id } });
+  if (!e) throw new HttpError(404, 'not_found');
+  await prisma.earningEvent.delete({ where: { id: e.id } });
+  await audit(req, 'event.delete', 'earningEvent', e.id, { title: e.title });
+  res.json({ ok: true });
 });
