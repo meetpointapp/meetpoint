@@ -1,7 +1,8 @@
 import { RtcRole, RtcTokenBuilder } from 'agora-token';
 import type { Call, Photo, Prisma, Profile, User } from '@prisma/client';
-import { unlockMilestone } from './achievements';
+import { checkEarningMilestones, unlockMilestone } from './achievements';
 import { agora, callTiming, economy, type CallKind } from './config';
+import { applyEarningEventBonus } from './events';
 import { fileReport } from './moderation/reports';
 import { hasConsent, requireConsent } from './privacy/consents';
 import { HttpError, isBlockedEitherWay, prisma } from './db';
@@ -175,6 +176,9 @@ export async function chargeDueMinute(id: string, now = new Date()): Promise<'ch
   await broadcast(id, 'call:charged');
   // Bir sonraki dakikaya yetmeyecekse arayanı uyar
   if (result.remaining < result.call.ratePerMin) emitToUser(result.call.callerId, 'call:low_balance', { id });
+  // Faz 19: kazanç heyecanı — etkinlik bonusu ve kilometre taşları (ana işlemden ayrı, defter tutarlılığını bozmaz)
+  await applyEarningEventBonus(result.call.calleeId, result.call.ratePerMin, `call:${id}`).catch(() => {});
+  await checkEarningMilestones(result.call.calleeId).catch(() => {});
   return 'charged';
 }
 
@@ -295,6 +299,8 @@ export async function sendGift(id: string, fromId: string, giftId: string) {
   const payload = { callId: id, giftId: gift.id, emoji: gift.emoji, coins: gift.coins, fromId };
   emitToUser(fromId, 'call:gift', payload);
   emitToUser(toId, 'call:gift', payload);
+  await applyEarningEventBonus(toId, gift.coins, `gift:${id}:${gift.id}`).catch(() => {});
+  await checkEarningMilestones(toId).catch(() => {});
   return { balance: await getBalance(fromId) };
 }
 

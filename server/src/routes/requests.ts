@@ -7,6 +7,8 @@ import { HttpError, isBlockedEitherWay, orderedPair, prisma } from '../db';
 import { requestLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
+import { checkEarningMilestones } from '../achievements';
+import { applyEarningEventBonus } from '../events';
 import { closeRequest, expireStaleRequests } from '../requestService';
 import { credit, debit, earningsFrom, heldBuckets, lockWallet } from '../wallet';
 import { publicProfile } from './profile';
@@ -110,6 +112,9 @@ requestsRouter.post('/requests/:id/accept', async (req, res) => {
     status: 'ACCEPTED',
     conversationId: result.conversationId,
   });
+  // Faz 19: kazanç heyecanı — etkinlik bonusu ve kilometre taşları
+  await applyEarningEventBonus(me, result.request.price, `request:${id}`).catch(() => {});
+  await checkEarningMilestones(me).catch(() => {});
   res.json({ ok: true, conversationId: result.conversationId });
 });
 
