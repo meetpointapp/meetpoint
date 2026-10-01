@@ -324,7 +324,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 **Amaç:** Uygulamayı "sağlam bir Tinder/Bumble klonu" olmaktan çıkarıp kullanıcının kendi alanı gibi hissettirmesi; aynı zamanda jeton dışında yeni bir gelir katmanı eklemek — işletme maliyetini artırmadan (yapay zekâ/dış API yok, hepsi kendi sunucumuzda).
 
 1. ✅ **Kişisel profil vitrini.** Profil kartına renk teması, arkaplan ve "şu an" rozeti gibi kişiselleştirme seçenekleri; profil gerçekten kendi alanın gibi hissettirir.
-2. ✅ **Kendi odan, avatar ve ziyaret.** Dekore edilebilir statik bir profil odası (mobilya, duvar kağıdı) ve özelleştirilebilir çizgi avatar (fotoğraf yanında, sohbet balonlarında kullanılır). Eşleştiğin kişi odanı ziyaret edebilir (salt görüntüleme, gerçek zamanlı gezinme/çok oyunculu harita YOK — kapsam dışı bırakıldı, haftalar sürecek ayrı bir proje büyüklüğünde); "gel bizim eve" daveti gibi, dating ile kişisel alan temasını birleştiren en güçlü parça.
+2. ✅ **Kendi odan, avatar ve ziyaret.** Dekore edilebilir statik bir profil odası (mobilya, duvar kağıdı) ve özelleştirilebilir çizgi avatar. Eşleştiğin kişi odanı ziyaret edebilir (salt görüntüleme, gerçek zamanlı gezinme YOK — kapsam dışı). **2026-10-01 güncellemesi:** alt menüde kendi sekmesi (Profil içine gömülü değildi) ve daha görsel/profesyonel bir oda sahnesi (ikon ızgarası yerine).
 3. ✅ **"Kendini Keşfet" vibe sistemi.** Kısa, oyunlaştırılmış bir soru seti (flört tarzı, ideal randevu, iletişim tarzı gibi ~10-12 soru); kural tabanlı bir eşleştirme motoru (yapay zekâ yok) cevapları 10-12 "vibe" arketipinden birine bağlar (ör. "Maceracı Romantik", "Sakin Gözlemci", "Sosyal Kelebek"). Sonuç, özenle tasarlanmış görsel bir "vibe kartı" olarak profilde görünür (paylaşılabilir görsele dönüştürme Faz 17'deki organik büyüme döngüsünde). Profil güncellendikçe (yeni ilgi alanı, yeni prompt cevabı) vibe yeniden hesaplanır — statik bir etiket değil, seninle birlikte gelişen bir kimlik. Eşleştiğin kişiyle vibe'lar kural tabanlı bir "uyum notu" olarak da gösterilir (ör. "Maceracı Romantik + Sakin Gözlemci: zıt kutuplar çekişimi").
 4. ✅ **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
 5. ✅ **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
@@ -360,7 +360,21 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 6. ✅ **Gizlilik dostu kullanım analitiği.** Rızaya bağlı, kendi sunucumuzda: kayıt → eşleşme → ilk mesaj → ilk satın alma hunisi.
 7. ✅ **Uygulama içi geri bildirim.** Kullanıcının kolayca öneri ve hata bildirebilmesi.
 
-## Faz 19 · Dış süreçler ve yayın
+## Faz 19 · Kazanç heyecanı
+
+**Amaç:** Uygulamanın en güçlü kancası — "görüntülü konuşarak kazanma" ihtimalini görünür, iddialı ve paylaşılası hale getirmek. Dış maliyet yok, var olan cüzdan/arama altyapısının üzerine.
+
+1. 🛠 **Kazananlar sıralaması.** Haftalık/aylık en çok kazananlar listesi, isteğe bağlı katılım (gizlilik). Statü ve sosyal kanıt yaratır.
+2. 🛠 **Canlı aktivite göstergesi.** "Şu an X kişi aramada", "Bu dakika Y yeni eşleşme" — uygulamanın canlı ve kalabalık hissetmesi.
+3. 🛠 **Arama içi gerçek zamanlı kazanç sayacı.** Arama sürerken kazancın dakika dakika arttığını gösteren bir sayaç (şu an sadece arama bitince toplam gösteriliyor).
+4. 🛠 **Kazanç kilometre taşları.** "Sosyal cesaret yolculuğu"na 4. iz: gerçek para kazanma adımları (ilk kazanç, $50, $100 eşiği) — her kademe kozmetik ödül açar.
+5. 🛠 **Zaman sınırlı etkinlikler.** "Bu hafta sonu 2x kazanç" gibi panelden ayarlanabilen, süreli bonus dönemleri.
+
+## Faz 20 · Canlı yayın (bire-çok)
+
+**Amaç:** Bire-bir arama yerine bire-çok canlı yayın; izleyiciler hediye gönderebilir. En büyük tek sıçrama, ama en büyük iş de bu — yeni yayın altyapısı, ölçekte moderasyon, yeni ekonomi kuralları gerektirir. Ayrı, kendi başına bir faz büyüklüğünde; Faz 15-18 gibi adım adım planlanmalı. **2026-10-01: henüz başlanmadı, kapsamı ayrıca netleştirilecek.**
+
+## Faz 21 · Dış süreçler ve yayın
 
 **Amaç:** Uygulama bittikten sonra, hepsi bir arada.
 
@@ -394,4 +408,6 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 | 16 Kimlik, premium katman ve mağaza | 9–13 gün |
 | 17 Oyunlaştırma, alışkanlık ve organik büyüme | 8–12 gün |
 | 18 Kullanım kolaylığı | 4–6 gün |
-| 19 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
+| 19 Kazanç heyecanı | 4–6 gün |
+| 20 Canlı yayın | Kapsam netleşince belirlenecek (muhtemelen 2–3 hafta) |
+| 21 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |
