@@ -834,8 +834,8 @@ document.querySelectorAll('#tab-finance .seg-btn').forEach((btn) =>
 );
 
 function loadFinance() {
-  ['kyc', 'disputes', 'economy', 'report', 'funnel'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
-  return { kyc: loadKyc, disputes: loadDisputes, economy: loadEconomy, report: loadReport, funnel: loadFunnel }[finView]();
+  ['kyc', 'disputes', 'economy', 'report', 'funnel', 'events'].forEach((v) => $(`#fin-${v}`).classList.toggle('hidden', v !== finView));
+  return { kyc: loadKyc, disputes: loadDisputes, economy: loadEconomy, report: loadReport, funnel: loadFunnel, events: loadEvents }[finView]();
 }
 
 async function loadKyc() {
@@ -1031,6 +1031,60 @@ async function loadFunnel() {
   $('#funnel').innerHTML = `<div class="stats">${cards.join('')}</div>
     <p class="muted small">Analitik rızası veren kullanıcı sayısı: ${r.consented}. Yüzdeler "Kayıt oldu" aşamasına göredir.</p>`;
 }
+
+// ---------- Faz 19: zaman sınırlı kazanç etkinlikleri ----------
+function fmtRange(a, b) {
+  const opts = { dateStyle: 'medium', timeStyle: 'short' };
+  return `${new Date(a).toLocaleString('tr-TR', opts)} → ${new Date(b).toLocaleString('tr-TR', opts)}`;
+}
+
+async function loadEvents() {
+  const list = await api('GET', '/admin/api/finance/events');
+  const now = Date.now();
+  $('#events').innerHTML = list.length
+    ? list
+        .map((e) => {
+          const active = now >= new Date(e.startAt).getTime() && now < new Date(e.endAt).getTime();
+          return `<div class="card item">
+        <div class="item-head"><div><span class="pill ${active ? 'green' : ''}">${active ? 'Aktif' : 'Pasif'}</span> <b>${esc(e.title)}</b> · ${e.multiplier}x</div>
+          <span class="muted small">${esc(e.createdBy)}</span></div>
+        <div class="muted small">${fmtRange(e.startAt, e.endAt)}</div>
+        <div class="actions"><button class="btn ghost" data-event-delete="${esc(e.id)}">Sil</button></div>
+      </div>`;
+        })
+        .join('')
+    : '<div class="card empty">Henüz etkinlik yok</div>';
+}
+
+$('#event-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await api('POST', '/admin/api/finance/events', {
+      title: $('#event-title').value.trim(),
+      multiplier: Number($('#event-multiplier').value),
+      startAt: new Date($('#event-start').value).toISOString(),
+      endAt: new Date($('#event-end').value).toISOString(),
+    });
+    toast('Etkinlik oluşturuldu');
+    $('#event-form').reset();
+    $('#event-multiplier').value = '2';
+    loadEvents();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#events').addEventListener('click', async (e) => {
+  const del = e.target.closest('button[data-event-delete]');
+  if (!del) return;
+  if (!confirm('Etkinlik silinsin mi?')) return;
+  try {
+    await api('DELETE', `/admin/api/finance/events/${encodeURIComponent(del.dataset.eventDelete)}`);
+    loadEvents();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
 
 $('#report-load').addEventListener('click', () => loadReport().catch((e) => toast(errText(e))));
 $('#report-csv').addEventListener('click', async () => {

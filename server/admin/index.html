@@ -216,6 +216,7 @@
             <button data-fin="economy" class="seg-btn">Ekonomi</button>
             <button data-fin="report" class="seg-btn">Aylık rapor</button>
             <button data-fin="funnel" class="seg-btn">Kullanım hunisi</button>
+            <button data-fin="events" class="seg-btn">Etkinlikler</button>
           </div>
         </div>
         <div id="fin-kyc">
@@ -246,6 +247,19 @@
         <div id="fin-funnel" class="hidden">
           <p class="muted">Sadece kullanım analitiği rızası verilmiş kullanıcılar sayılır (Gizlilik ayarlarından açılır kapanır). Üçüncü tarafa gitmez, kendi sunucumuzda tutulur.</p>
           <div id="funnel" class="list"></div>
+        </div>
+        <div id="fin-events" class="hidden">
+          <p class="muted">Zaman sınırlı kazanç etkinliği: aktif olduğu sürece kullanıcıların kazandığı her jetona bonus eklenir (platform karşılar, karşı taraftan kesilmez). Aynı anda birden fazla aktifse en yükseği uygulanır.</p>
+          <form id="event-form" class="card item">
+            <input id="event-title" placeholder="Başlık (ör. Hafta sonu bonusu)" required maxlength="120">
+            <div class="actions">
+              <input id="event-multiplier" type="number" step="0.1" min="1" max="10" value="2" title="Çarpan">
+              <input id="event-start" type="datetime-local" required>
+              <input id="event-end" type="datetime-local" required>
+              <button type="submit" class="btn primary">Etkinlik oluştur</button>
+            </div>
+          </form>
+          <div id="events" class="list"></div>
         </div>
       </div>
 
