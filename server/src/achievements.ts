@@ -1,11 +1,12 @@
 import { isBlockedEitherWay, prisma } from './db';
+import { getFinance } from './finance/settings';
 
 // Faz 17: "Sosyal cesaret yolculuğu". Üç izde (İletişim, Bağlantı, Kimlik) kademeli ilerleme;
 // her iz kendi içinde 3 kademe taşır (bronz/gümüş/altın). Puana değil gerçek eyleme dayalı: her
 // kademe kimliği bu dosyadaki tetikleyicilerden biri gerçekleştiğinde bir kez ve kalıcı olarak
 // açılır (src/routes/*.ts içindeki unlockMilestone() çağrıları). Her kademe, Faz 16'daki kozmetik
 // mağazadan ücretsiz bir ödül açar (MILESTONE_REWARD → StorePurchase, jeton harcanmadan).
-export const TRACKS = ['iletisim', 'baglanti', 'kimlik'] as const;
+export const TRACKS = ['iletisim', 'baglanti', 'kimlik', 'kazanc'] as const;
 export type Track = (typeof TRACKS)[number];
 
 // Sıra önemli: bir izdeki N'inci kademe = bu dizideki N'inci kimlik tamamlandığında açılır.
@@ -15,6 +16,9 @@ export const TRACK_MILESTONES: Record<Track, readonly string[]> = {
   iletisim: ['first_message', 'week_long_chat', 'first_icebreaker'],
   baglanti: ['first_match', 'first_room_visit', 'first_call'],
   kimlik: ['profile_complete', 'verified', 'vibe_done'],
+  // Faz 19: gerçek para kazanma adımları. Eşik, o ana kadar başkalarından kazanılan TÜM jetonun
+  // (bozdurulmuş olsun olmasın) bugünkü bozdurma kuruyla USD karşılığına göre — bkz. checkEarningMilestones.
+  kazanc: ['first_earning', 'earning_50usd', 'earning_100usd'],
 };
 
 export const ALL_MILESTONES = TRACKS.flatMap((t) => TRACK_MILESTONES[t]);
@@ -31,6 +35,9 @@ export const MILESTONE_REWARD: Record<MilestoneId, string> = {
   profile_complete: 'theme_royal',
   verified: 'badge_diamond',
   vibe_done: 'theme_galaxy',
+  first_earning: 'badge_crown',
+  earning_50usd: 'frame_stars',
+  earning_100usd: 'item_chandelier',
 };
 
 export function trackOf(milestoneId: string): Track {
@@ -93,6 +100,26 @@ export async function checkProfileComplete(
   const basics = [p.heightCm != null, !!p.job, !!p.education, !!p.zodiac, !!p.city].filter(Boolean).length;
   if (basics >= 2) score += 10;
   if (score >= 100) await unlockMilestone(userId, 'profile_complete');
+}
+
+// Faz 19: kazanç kilometre taşları. Başkalarından kazanılan jetonların (WalletEntry type=EARN,
+// bozdurulmuş olsun olmasın) toplamı, bugünkü bozdurma kuruyla USD karşılığına çevrilip eşiklerle
+// karşılaştırılır. Her EARN kredisinden sonra çağrılır (idempotent, sırayla eşikleri geçer).
+const EARNING_THRESHOLDS_USD: [MilestoneId, number][] = [
+  ['first_earning', 0],
+  ['earning_50usd', 50],
+  ['earning_100usd', 100],
+];
+
+export async function checkEarningMilestones(userId: string) {
+  const [sum, finance] = await Promise.all([
+    prisma.walletEntry.aggregate({ where: { userId, type: 'EARN', amount: { gt: 0 } }, _sum: { amount: true } }),
+    getFinance(),
+  ]);
+  const totalUsd = (sum._sum.amount ?? 0) * finance.cashoutUsdPerCoin;
+  for (const [id, threshold] of EARNING_THRESHOLDS_USD) {
+    if (totalUsd >= threshold) await unlockMilestone(userId, id);
+  }
 }
 
 // Faz 17 madde 3 ("Gelişimim" ekranı): bağlam duyarlı "sıradaki adım" önerisi — yapay zekâ yok,
