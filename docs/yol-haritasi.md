@@ -380,11 +380,29 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 
 **Açık soru:** Test ortamındaki `embedded-postgres`/Windows uyumsuzluğu (`groupadd`) ayrıca araştırılmalı — gerçek bir kod hatası değil ama tam otomatik test koşusunu bu makinede engelliyor.
 
-## Faz 20 · Canlı yayın (bire-çok)
+## Faz 20 · Eşleştirme modları, mağaza ve görsel yenileme ✅
 
-**Amaç:** Bire-bir arama yerine bire-çok canlı yayın; izleyiciler hediye gönderebilir. En büyük tek sıçrama, ama en büyük iş de bu — yeni yayın altyapısı, ölçekte moderasyon, yeni ekonomi kuralları gerektirir. Ayrı, kendi başına bir faz büyüklüğünde; Faz 15-18 gibi adım adım planlanmalı. **2026-10-01: henüz başlanmadı, kapsamı ayrıca netleştirilecek.**
+**Amaç:** Kullanıcı testinden gelen geri bildirim: eşleşme "aynı Tinder" hissi veriyor, uygulama sade, oda istenen gibi olmadı, kozmetik mağaza bulunamıyor, profil sayfası gereğinden büyük. Dış maliyet yok; hepsi kural tabanlı, kendi sunucumuzda.
 
-## Faz 21 · Dış süreçler ve yayın
+1. ✅ **Eşleştirme modları.** Keşfet ekranının üstünde Tümü / Astroloji / Müzik / İlgi / Vibe düğmeleri. Her mod aday havuzunu kendi uyum skoruna göre sıralar ve kartın üstünde "neden bu kişi" açıklaması gösterir (ör. Akrep × Aslan: "kıvılcım çıkaran, tutkulu bir çekim"). Burç, seçilmemişse doğum tarihinden hesaplanır; açı kuralı (üçgen, altılı, karşıt, kare) klasik astroloji; müzik için yeni profil alanı (en fazla 4 tür); vibe için mevcut arketip uyumu.
+2. ✅ **Oda kaldırıldı.** Oda sekmesi, düzenleyici, ziyaret ve "odanı sergile" galerisi, sunucu uçları ve mobilya ürünleri çıkarıldı. Bağlantı izindeki "ilk oda ziyareti" kademesi "ilk hediye" oldu. Veritabanındaki `room*` sütunları veri kaybı olmasın diye duruyor (kullanılmıyor).
+3. ✅ **Mağaza sekmesi.** Alt menüde kendi sekmesi, kategori düğmeleri, canlı önizleme (mini sohbet), satın alınca doğrudan "Kullan". Sohbet balonu 4→10, sohbet arka planı 4→10 (gradyan ve desenli), çerçeve 6, rozet 8.
+4. ✅ **Kompakt profil.** Başkasının profilinde küçük avatar başlığı ve yatay fotoğraf şeridi; kendi profilinde küçük avatar + tamamlama çubuğu. Fotoğrafa dokununca tam ekran görüntüleyici (kaydır, yakınlaştır).
+5. ✅ **Görsel yenileme.** Renkli ışık hüzmeli uygulama zemini, yumuşak gölgeli kartlar, nav çubuğu, gradyanlı düğmeler. Ana sekmeler saydam Scaffold ile bu zeminin üstünde.
+6. ✅ **Avatar sistemi kaldırıldı.** Çizgi avatar (ten, saç, aksesuar), düzenleyicisi ve "avatar kıyafeti" mağaza ürünleri çıkarıldı; profil fotoğrafı ve mağaza çerçevesi kaldı. Bu kıyafetleri ödül veren iki kilometre taşının ödülü değişti (ilk arama → Neon balon, $100 kazanç → Gökkuşağı çerçeve). Veritabanındaki `avatar*` sütunları veri silinmesin diye duruyor (kullanılmıyor).
+7. ✅ **Sohbette emoji.** Girişteki emoji düğmesi kendi panelini açar (5 kategori, son kullanılanlar, silme tuşu; dış paket yok). Sadece 1-3 emoji'den oluşan mesaj balonsuz, büyük gösterilir.
+
+### Faz 20'de bulunanlar
+
+- Faz 19'dan kalan iki kırık birim testi bulundu ve düzeltildi (`EarningEvent` KVKK veri envanterinde yoktu; kilometre taşı testi hâlâ 9 bekliyordu). Tam takım bu makinede çalışmadığı için Faz 19'da gözden kaçmıştı. Rozetteki "n/9" toplamı da 12 oldu.
+- `npm run test:unit` (104 test) ve `flutter test` (95 test) geçiyor, `tsc` ve `flutter analyze` temiz. API testleri hâlâ bu makinede çalışmıyor (Windows `embedded-postgres`); mağaza satın alma/uygulama, eşleştirme modları ve sohbet teması headless tarayıcı turuyla (`tools/ui-tours/faz20.mjs`) doğrulandı.
+- **Açık:** Müzik modunun etkili olması için kullanıcıların müzik türü eklemesi gerekir; kayıt sihirbazına eklenmedi (kayıt uzamasın diye), profil düzenlemede var.
+
+## Faz 21 · Canlı yayın (bire-çok)
+
+**Amaç:** Bire-bir arama yerine bire-çok canlı yayın; izleyiciler hediye gönderebilir. En büyük tek sıçrama, ama en büyük iş de bu — yeni yayın altyapısı, ölçekte moderasyon, yeni ekonomi kuralları gerektirir. Ayrı, kendi başına bir faz büyüklüğünde; Faz 15-18 gibi adım adım planlanmalı. **Henüz başlanmadı, kapsamı ayrıca netleştirilecek.**
+
+## Faz 22 · Dış süreçler ve yayın
 
 **Amaç:** Uygulama bittikten sonra, hepsi bir arada.
 

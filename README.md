@@ -306,7 +306,7 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 - [x] **Faz 6 · Sesli ve görüntülü arama:** dakika başı ücret (sesli 15, görüntülü 30 jeton/dk), Agora altyapısı ve test modu, gelen/giden/görüşme ekranları, bulanık başlayan görüntü, arama içi hediyeler, arama sonrası puan ve sorun bildirimi, arama geçmişi, yönetimde arama istatistikleri
 - [x] **Faz 7 · Para çekme ve yayın hazırlığı:** manuel onaylı para çekme (IBAN/PayPal, min. $20, mavi tik şartı), yönetimde Ödemeler ve Hatalar sekmeleri, uygulama ve sunucu hata takibi, yayında eksik ayarla açılmayan sunucu, `.env.example`, yayın rehberi, mağaza metinleri (TR/EN), yasal taslak güncellemeleri, GitHub özel depo
 
-Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
+Yayın öncesi seri: önce uygulama (Faz 8–21), dış işler en sonda (Faz 22). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
 - [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
 - [x] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
@@ -316,12 +316,13 @@ Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19)
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [x] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [x] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar + ziyaret (Sanalika esinli, statik), "Kendini Keşfet" vibe sistemi, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (MeetPoint+), mikro-etkileşimler
+- [x] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, avatar (oda Faz 20'de kaldırıldı), "Kendini Keşfet" vibe sistemi, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (MeetPoint+), mikro-etkileşimler
 - [x] **Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme:** giriş serisi, sosyal cesaret yolculuğu, "Gelişimim" ekranı, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet, davet programı, paylaşılabilir anlar, oda galerisi, kişisel bağlantı linki
 - [x] **Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [x] **Faz 19 · Kazanç heyecanı:** kazananlar sıralaması, canlı aktivite göstergesi, arama içi gerçek zamanlı kazanç sayacı, kazanç kilometre taşları, zaman sınırlı etkinlikler
-- [ ] **Faz 20 · Canlı yayın (bire-çok):** kapsamı henüz netleşmedi, ayrı büyük faz
-- [ ] **Faz 21 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
+- [x] **Faz 20 · Eşleştirme modları, mağaza ve görsel yenileme:** astroloji/müzik/ilgi/vibe modları ve "neden bu kişi" açıklaması, oda kaldırıldı, mağaza sekmesi (10 balon, 10 arka plan, canlı önizleme, doğrudan kullan), kompakt profil + fotoğraf görüntüleyici, görsel yenileme
+- [ ] **Faz 21 · Canlı yayın (bire-çok):** kapsamı henüz netleşmedi, ayrı büyük faz
+- [ ] **Faz 22 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar
 
