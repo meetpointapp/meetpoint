@@ -436,44 +436,39 @@ void main() {
     });
   });
 
-  group('Odanı sergile (Faz 17)', () {
-    test('RoomInfo.fromJson: showcaseOptIn ayrıştırılır', () {
-      final r = RoomInfo.fromJson({
-        'wallpaperId': 'ocean',
-        'floorId': 'wood',
-        'items': [
-          {'itemId': 'sofa', 'x': 0, 'y': 0},
-        ],
-        'showcaseOptIn': true,
+  group('Eşleştirme modları (Faz 20)', () {
+    Map<String, dynamic> base() => {
+          'id': 'u1',
+          'displayName': 'Ayşe',
+          'age': 28,
+          'gender': 'female',
+          'photos': [],
+        };
+
+    test('PublicProfile.fromJson: match ve musicGenres ayrıştırılır', () {
+      final p = PublicProfile.fromJson({
+        ...base(),
+        'musicGenres': ['rock', 'jazz'],
+        'match': {'mode': 'astro', 'score': 70, 'key': 'astro_square', 'args': ['scorpio', 'leo']},
       });
-      expect(r.showcaseOptIn, isTrue);
-      expect(r.items.single.itemId, 'sofa');
+      expect(p.musicGenres, ['rock', 'jazz']);
+      expect(p.match!.mode, 'astro');
+      expect(p.match!.key, 'astro_square');
+      expect(p.match!.args, ['scorpio', 'leo']);
     });
 
-    test('RoomInfo.fromJson: showcaseOptIn yoksa varsayılan false', () {
-      final r = RoomInfo.fromJson({'wallpaperId': '', 'floorId': '', 'items': []});
-      expect(r.showcaseOptIn, isFalse);
+    test('PublicProfile.fromJson: eski sunucu yanıtında match yok, musicGenres boş', () {
+      final p = PublicProfile.fromJson(base());
+      expect(p.match, isNull);
+      expect(p.musicGenres, isEmpty);
     });
 
-    test('RoomInfo.copyWith: showcaseOptIn güncellenebilir', () {
-      const r = RoomInfo(showcaseOptIn: false);
-      final updated = r.copyWith(showcaseOptIn: true);
-      expect(updated.showcaseOptIn, isTrue);
-    });
-
-    test('RoomShowcaseEntry.fromJson', () {
-      final e = RoomShowcaseEntry.fromJson({
-        'userId': 'u1',
-        'displayName': 'Ayşe',
-        'wallpaperId': 'sunset',
-        'floorId': 'tile',
-        'items': [
-          {'itemId': 'bed', 'x': 0, 'y': 0},
-          {'itemId': 'lamp', 'x': 1, 'y': 0},
-        ],
-      });
-      expect(e.displayName, 'Ayşe');
-      expect(e.items.length, 2);
+    test('ProfileDraft: müzik türleri kopyalanır ve sunucuya gönderilir', () {
+      final d = ProfileDraft()
+        ..birthDate = DateTime(1996, 5, 3)
+        ..musicGenres = ['pop', 'indie'];
+      expect(d.copy().musicGenres, ['pop', 'indie']);
+      expect(d.toJson()['musicGenres'], ['pop', 'indie']);
     });
   });
 

@@ -3492,7 +3492,7 @@ abstract class AppLocalizations {
   /// No description provided for @milestoneCountShort.
   ///
   /// In tr, this message translates to:
-  /// **'{n}/9'**
+  /// **'{n}/12'**
   String milestoneCountShort(int n);
 
   /// No description provided for @milestoneBadgeTooltip.
@@ -3534,7 +3534,7 @@ abstract class AppLocalizations {
   /// No description provided for @milestoneLabel.
   ///
   /// In tr, this message translates to:
-  /// **'{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} first_earning{İlk kazancın} earning_50usd{50\$ kazanç} earning_100usd{100\$ kazanç} other{{id}}}'**
+  /// **'{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_gift{İlk hediye} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} first_earning{İlk kazancın} earning_50usd{50\$ kazanç} earning_100usd{100\$ kazanç} other{{id}}}'**
   String milestoneLabel(String id);
 
   /// No description provided for @quietHoursTitle.
@@ -3819,138 +3819,6 @@ abstract class AppLocalizations {
   /// **'Yok'**
   String get none;
 
-  /// No description provided for @avatarSection.
-  ///
-  /// In tr, this message translates to:
-  /// **'Avatar'**
-  String get avatarSection;
-
-  /// No description provided for @avatarSkin.
-  ///
-  /// In tr, this message translates to:
-  /// **'Ten rengi'**
-  String get avatarSkin;
-
-  /// No description provided for @avatarHairStyle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Saç şekli'**
-  String get avatarHairStyle;
-
-  /// No description provided for @avatarHairColor.
-  ///
-  /// In tr, this message translates to:
-  /// **'Saç rengi'**
-  String get avatarHairColor;
-
-  /// No description provided for @avatarOutfit.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kıyafet rengi'**
-  String get avatarOutfit;
-
-  /// No description provided for @avatarAccessory.
-  ///
-  /// In tr, this message translates to:
-  /// **'Aksesuar'**
-  String get avatarAccessory;
-
-  /// No description provided for @avatarHairStyleLabel.
-  ///
-  /// In tr, this message translates to:
-  /// **'{id, select, bald{Kel} short{Kısa} long{Uzun} curly{Kıvırcık} other{{id}}}'**
-  String avatarHairStyleLabel(String id);
-
-  /// No description provided for @avatarAccessoryLabel.
-  ///
-  /// In tr, this message translates to:
-  /// **'{id, select, glasses{Gözlük} hat{Şapka} headphones{Kulaklık} other{{id}}}'**
-  String avatarAccessoryLabel(String id);
-
-  /// No description provided for @roomSection.
-  ///
-  /// In tr, this message translates to:
-  /// **'Odam'**
-  String get roomSection;
-
-  /// No description provided for @roomEditTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Odanı dekore et'**
-  String get roomEditTitle;
-
-  /// No description provided for @roomWallpaper.
-  ///
-  /// In tr, this message translates to:
-  /// **'Duvar kağıdı'**
-  String get roomWallpaper;
-
-  /// No description provided for @roomFloor.
-  ///
-  /// In tr, this message translates to:
-  /// **'Zemin'**
-  String get roomFloor;
-
-  /// No description provided for @roomItemsHint.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.'**
-  String get roomItemsHint;
-
-  /// No description provided for @roomShowcaseOptIn.
-  ///
-  /// In tr, this message translates to:
-  /// **'Odamı sergile'**
-  String get roomShowcaseOptIn;
-
-  /// No description provided for @roomShowcaseOptInHint.
-  ///
-  /// In tr, this message translates to:
-  /// **'Açarsan bağlantın olmayan kişiler de haftalık \"en güzel odalar\" galerisinde odanı görebilir.'**
-  String get roomShowcaseOptInHint;
-
-  /// No description provided for @roomShowcaseTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bu haftanın öne çıkan odaları'**
-  String get roomShowcaseTitle;
-
-  /// No description provided for @roomShowcaseEmpty.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bu hafta henüz sergilenen bir oda yok. İlk olmak ister misin?'**
-  String get roomShowcaseEmpty;
-
-  /// No description provided for @roomVisit.
-  ///
-  /// In tr, this message translates to:
-  /// **'Odasını gör'**
-  String get roomVisit;
-
-  /// No description provided for @roomVisitTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'{name} kişisinin odası'**
-  String roomVisitTitle(String name);
-
-  /// No description provided for @roomNotConnected.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bu odayı görebilmek için önce bir sohbetiniz olmalı.'**
-  String get roomNotConnected;
-
-  /// No description provided for @roomItemLabel.
-  ///
-  /// In tr, this message translates to:
-  /// **'{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} other{{id}}}'**
-  String roomItemLabel(String id);
-
-  /// No description provided for @roomFull.
-  ///
-  /// In tr, this message translates to:
-  /// **'Oda dolu, önce bir eşya kaldır'**
-  String get roomFull;
-
   /// No description provided for @vibeQuestionLabel.
   ///
   /// In tr, this message translates to:
@@ -4098,7 +3966,7 @@ abstract class AppLocalizations {
   /// No description provided for @storeItemName.
   ///
   /// In tr, this message translates to:
-  /// **'{id, select, frame_gold{Altın Çerçeve} frame_neon{Neon Çerçeve} frame_floral{Çiçekli Çerçeve} frame_stars{Yıldızlı Çerçeve} badge_crown{Taç Rozeti} badge_fire{Ateş Rozeti} badge_diamond{Elmas Rozeti} badge_heart{Kalp Rozeti} theme_galaxy{Galaksi Teması} theme_fire{Ateş Teması} theme_ice{Buz Teması} theme_royal{Kraliyet Teması} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} outfit_tuxedo{Smokin} outfit_superhero{Süper Kahraman} outfit_wizard{Büyücü} outfit_astronaut{Astronot} bubble_midnight{Gece Yarısı Baloncuğu} bubble_sunset{Gün Batımı Baloncuğu} bubble_mint{Nane Baloncuğu} bubble_rosegold{Rose Gold Baloncuğu} chatbg_stars{Yıldızlı Arka Plan} chatbg_waves{Dalga Arka Plan} chatbg_geometric{Geometrik Arka Plan} chatbg_minimal{Sade Arka Plan} other{{id}}}'**
+  /// **'{id, select, frame_gold{Altın Çerçeve} frame_neon{Neon Çerçeve} frame_floral{Çiçekli Çerçeve} frame_stars{Yıldızlı Çerçeve} badge_crown{Taç Rozeti} badge_fire{Ateş Rozeti} badge_diamond{Elmas Rozeti} badge_heart{Kalp Rozeti} theme_galaxy{Galaksi Teması} theme_fire{Ateş Teması} theme_ice{Buz Teması} theme_royal{Kraliyet Teması} bubble_midnight{Gece Yarısı Baloncuğu} bubble_sunset{Gün Batımı Baloncuğu} bubble_mint{Nane Baloncuğu} bubble_rosegold{Rose Gold Baloncuğu} chatbg_stars{Yıldızlı Arka Plan} chatbg_waves{Dalga Arka Plan} chatbg_geometric{Geometrik Arka Plan} chatbg_minimal{Sade Arka Plan} bubble_ocean{Okyanus Balonu} bubble_neon{Neon Balon} bubble_aurora{Aurora Balonu} bubble_gold{Altın Balon} bubble_candy{Şeker Balonu} bubble_forest{Orman Balonu} chatbg_sunset{Gün Batımı Arka Planı} chatbg_aurora{Aurora Arka Planı} chatbg_hearts{Kalpli Arka Plan} chatbg_space{Uzay Arka Planı} chatbg_forest{Orman Arka Planı} chatbg_coffee{Kahve Arka Planı} frame_rainbow{Gökkuşağı Çerçeve} frame_fire{Ateş Çerçeve} badge_star{Yıldız Rozeti} badge_rocket{Roket Rozeti} badge_cat{Kedi Rozeti} badge_music{Müzik Rozeti} other{{id}}}'**
   String storeItemName(String id);
 
   /// No description provided for @storeTitle.
@@ -4130,18 +3998,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Premium temalar'**
   String get storeCategoryTheme;
-
-  /// No description provided for @storeCategoryRoomItem.
-  ///
-  /// In tr, this message translates to:
-  /// **'Oda mobilyaları'**
-  String get storeCategoryRoomItem;
-
-  /// No description provided for @storeCategoryAvatarOutfit.
-  ///
-  /// In tr, this message translates to:
-  /// **'Avatar kıyafetleri'**
-  String get storeCategoryAvatarOutfit;
 
   /// No description provided for @storeCategoryChatBubble.
   ///
@@ -4503,17 +4359,155 @@ abstract class AppLocalizations {
   /// **'{label} 🎉 Yeni bir ödül açıldı!'**
   String milestoneEarnedCelebration(String label);
 
-  /// No description provided for @navRoom.
+  /// No description provided for @musicGenreLabel.
   ///
   /// In tr, this message translates to:
-  /// **'Oda'**
-  String get navRoom;
+  /// **'{id, select, pop{Pop} rock{Rock} rap{Rap} electronic{Elektronik} jazz{Caz} classical{Klasik} arabesk{Arabesk} turkish_folk{Halk müziği} turkish_pop{Türkçe pop} metal{Metal} rnb{R&B} indie{Indie} latin{Latin} kpop{K-pop} reggae{Reggae} blues{Blues} other{{id}}}'**
+  String musicGenreLabel(String id);
 
-  /// No description provided for @roomInBottomNavHint.
+  /// No description provided for @musicTaste.
   ///
   /// In tr, this message translates to:
-  /// **'Alt menüdeki Oda sekmesinden dekore edebilirsin'**
-  String get roomInBottomNavHint;
+  /// **'Müzik zevki'**
+  String get musicTaste;
+
+  /// No description provided for @musicTasteHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müzik zevkini ekle, ortak türdeki kişilerle eşleş'**
+  String get musicTasteHint;
+
+  /// No description provided for @discoverModeAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get discoverModeAll;
+
+  /// No description provided for @discoverModeAstro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Astroloji'**
+  String get discoverModeAstro;
+
+  /// No description provided for @discoverModeMusic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müzik'**
+  String get discoverModeMusic;
+
+  /// No description provided for @discoverModeInterests.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgi'**
+  String get discoverModeInterests;
+
+  /// No description provided for @discoverModeVibe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vibe'**
+  String get discoverModeVibe;
+
+  /// No description provided for @discoverModeEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu modda şu an uygun kimse yok. Profilini zenginleştir ya da başka bir mod dene.'**
+  String get discoverModeEmpty;
+
+  /// No description provided for @discoverModeEmptyAstro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz burç uyumu yüksek kimse yok. Birazdan tekrar dene.'**
+  String get discoverModeEmptyAstro;
+
+  /// No description provided for @discoverModeEmptyMusic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortak müzik zevkine sahip kimse yok. Profilinden müzik türlerini ekledin mi?'**
+  String get discoverModeEmptyMusic;
+
+  /// No description provided for @discoverModeEmptyVibe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vibe eşleşmesi için önce \'Kendini Keşfet\' testini çöz.'**
+  String get discoverModeEmptyVibe;
+
+  /// No description provided for @addMusicTaste.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müzik zevkini ekle'**
+  String get addMusicTaste;
+
+  /// No description provided for @takeVibeTest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Testi çöz'**
+  String get takeVibeTest;
+
+  /// No description provided for @matchReasonText.
+  ///
+  /// In tr, this message translates to:
+  /// **'{key, select, astro_trine{{a} ve {b} aynı elementten: doğal bir uyum, kolay anlaşırsınız} astro_sextile{{a} ile {b} birbirini tamamlıyor: eğlenceli ve dengeli bir ikili} astro_opposite{{a} ve {b} zıt kutuplar: birbirini çeken, birbirinden öğrenen bir çift} astro_same{İkiniz de {a}: birbirinizi sözsüz anlarsınız} astro_square{{a} ile {b}: kıvılcım çıkaran, tutkulu ve hareketli bir çekim} music_shared{İkiniz de dinliyorsunuz: {a}} interests_shared{Ortak ilgi alanlarınız: {a}} other{{a}}}'**
+  String matchReasonText(String key, String a, String b);
+
+  /// No description provided for @navStore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mağaza'**
+  String get navStore;
+
+  /// No description provided for @storeHeroTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sohbetine ve profiline tarz kat'**
+  String get storeHeroTitle;
+
+  /// No description provided for @storeCollected.
+  ///
+  /// In tr, this message translates to:
+  /// **'{owned}/{total} ürün koleksiyonunda'**
+  String storeCollected(int owned, int total);
+
+  /// No description provided for @storeEquip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullan'**
+  String get storeEquip;
+
+  /// No description provided for @storeInUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanımda'**
+  String get storeInUse;
+
+  /// No description provided for @storeEquippedSnack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulandı!'**
+  String get storeEquippedSnack;
+
+  /// No description provided for @storeRemovedSnack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaldırıldı, varsayılana dönüldü'**
+  String get storeRemovedSnack;
+
+  /// No description provided for @emojiButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Emoji'**
+  String get emojiButton;
+
+  /// No description provided for @emojiBackspace.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get emojiBackspace;
+
+  /// No description provided for @emojiCategoryLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{id, select, recent{Son kullanılanlar} smileys{Yüzler} hearts{Kalpler ve aşk} gestures{El hareketleri} fun{Eğlence ve yemek} nature{Hayvanlar ve doğa} other{{id}}}'**
+  String emojiCategoryLabel(String id);
 }
 
 class _AppLocalizationsDelegate

@@ -273,16 +273,6 @@ class Api {
 
   Future<PublicProfile> user(String id) async => PublicProfile.fromJson(await _get('/users/$id'));
 
-  // Faz 16: kendi oda (statik yerleşim). Ziyaret sadece bağlantın olan kişilerde çalışır (403 not_connected).
-  Future<RoomInfo> myRoom() async => RoomInfo.fromJson(await _get('/me/room'));
-  Future<void> saveRoom(RoomInfo room) => _put('/me/room', room.toJson());
-  Future<RoomInfo> userRoom(String id) async => RoomInfo.fromJson(await _get('/users/$id/room'));
-
-  // Faz 17 madde 10: "Odanı sergile" — haftalık "en güzel odalar" galerisi
-  Future<List<RoomShowcaseEntry>> roomShowcase() async => [
-        for (final r in (await _get('/rooms/showcase') as List)) RoomShowcaseEntry.fromJson(r),
-      ];
-
   Future<VibeResult> myVibe() async => VibeResult.fromJson(await _get('/me/vibe'));
   Future<String> saveVibe(Map<String, String> answers) async => (await _put('/me/vibe', answers))['archetypeId'];
 
@@ -308,8 +298,9 @@ class Api {
   Future<void> purchaseItem(String itemId) => _post('/store/purchase', {'itemId': itemId});
 
   // Keşfet
-  Future<List<PublicProfile>> discover() async =>
-      [for (final p in (await _get('/discover') as List)) PublicProfile.fromJson(p)];
+  // mode: all | astro | music | interests | vibe (Faz 20 eşleştirme modları)
+  Future<List<PublicProfile>> discover({String mode = 'all'}) async =>
+      [for (final p in (await _get('/discover?mode=$mode') as List)) PublicProfile.fromJson(p)];
 
   // Faz 16: salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar
   Future<List<InterestGroup>> discoverGroups() async =>

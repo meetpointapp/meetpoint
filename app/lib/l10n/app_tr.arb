@@ -1075,7 +1075,7 @@
   "trackIletisim": "İletişim",
   "trackBaglanti": "Bağlantı",
   "trackKimlik": "Kimlik",
-  "milestoneCountShort": "{n}/9",
+  "milestoneCountShort": "{n}/12",
   "@milestoneCountShort": {
     "placeholders": {
       "n": {
@@ -1103,7 +1103,7 @@
       }
     }
   },
-  "milestoneLabel": "{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_room_visit{İlk oda ziyareti} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} first_earning{İlk kazancın} earning_50usd{50$ kazanç} earning_100usd{100$ kazanç} other{{id}}}",
+  "milestoneLabel": "{id, select, first_message{İlk mesaj} week_long_chat{7 günlük sohbet} first_icebreaker{İlk buz kırıcı oyunu} first_match{İlk eşleşme} first_gift{İlk hediye} first_call{İlk arama} profile_complete{Profilini tamamla} verified{Doğrulama} vibe_done{Vibe testini tamamla} first_earning{İlk kazancın} earning_50usd{50$ kazanç} earning_100usd{100$ kazanç} other{{id}}}",
   "quietHoursTitle": "Sessiz saatler",
   "quietHoursHint": "Bu saatlerde aramalar dışında bildirim gelmez.",
   "quietHours": "Sessiz saatleri aç",
@@ -1165,56 +1165,6 @@
   "showcaseCustom": "Kişiselleştirildi",
   "activeNow": "Şu an aktif",
   "none": "Yok",
-  "avatarSection": "Avatar",
-  "avatarSkin": "Ten rengi",
-  "avatarHairStyle": "Saç şekli",
-  "avatarHairColor": "Saç rengi",
-  "avatarOutfit": "Kıyafet rengi",
-  "avatarAccessory": "Aksesuar",
-  "avatarHairStyleLabel": "{id, select, bald{Kel} short{Kısa} long{Uzun} curly{Kıvırcık} other{{id}}}",
-  "@avatarHairStyleLabel": {
-    "placeholders": {
-      "id": {
-        "type": "String"
-      }
-    }
-  },
-  "avatarAccessoryLabel": "{id, select, glasses{Gözlük} hat{Şapka} headphones{Kulaklık} other{{id}}}",
-  "@avatarAccessoryLabel": {
-    "placeholders": {
-      "id": {
-        "type": "String"
-      }
-    }
-  },
-  "roomSection": "Odam",
-  "roomEditTitle": "Odanı dekore et",
-  "roomWallpaper": "Duvar kağıdı",
-  "roomFloor": "Zemin",
-  "roomItemsHint": "Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.",
-  "roomShowcaseOptIn": "Odamı sergile",
-  "roomShowcaseOptInHint": "Açarsan bağlantın olmayan kişiler de haftalık \"en güzel odalar\" galerisinde odanı görebilir.",
-  "roomShowcaseTitle": "Bu haftanın öne çıkan odaları",
-  "roomShowcaseEmpty": "Bu hafta henüz sergilenen bir oda yok. İlk olmak ister misin?",
-  "roomVisit": "Odasını gör",
-  "roomVisitTitle": "{name} kişisinin odası",
-  "@roomVisitTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "roomNotConnected": "Bu odayı görebilmek için önce bir sohbetiniz olmalı.",
-  "roomItemLabel": "{id, select, sofa{Koltuk} bed{Yatak} plant{Bitki} lamp{Lamba} tv{Televizyon} bookshelf{Kitaplık} table{Masa} rug{Halı} window{Pencere} picture{Tablo} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} other{{id}}}",
-  "@roomItemLabel": {
-    "placeholders": {
-      "id": {
-        "type": "String"
-      }
-    }
-  },
-  "roomFull": "Oda dolu, önce bir eşya kaldır",
   "vibeQuestionLabel": "{id, select, ideal_date{İdeal bir randevu senin için nasıl olur?} flirt_style{Flört tarzını nasıl tanımlarsın?} weekend{Tipik bir hafta sonun nasıl geçer?} communication{İletişim tarzın nasıl?} conflict{Bir anlaşmazlık çıktığında ne yaparsın?} dream_trip{Hayalindeki seyahat nasıl?} friday_night{Cuma akşamı tercihin?} gift_style{Nasıl hediye vermeyi seversin?} social_battery{Sosyal enerjini ne besler?} love_language{Sevgini nasıl gösterirsin?} other{{id}}}",
   "@vibeQuestionLabel": {
     "placeholders": {
@@ -1301,7 +1251,7 @@
   },
   "interestGroupsTitle": "İlgi alanına göre keşfet",
   "interestGroupEmpty": "Şu an bu grupta uygun kimse yok.",
-  "storeItemName": "{id, select, frame_gold{Altın Çerçeve} frame_neon{Neon Çerçeve} frame_floral{Çiçekli Çerçeve} frame_stars{Yıldızlı Çerçeve} badge_crown{Taç Rozeti} badge_fire{Ateş Rozeti} badge_diamond{Elmas Rozeti} badge_heart{Kalp Rozeti} theme_galaxy{Galaksi Teması} theme_fire{Ateş Teması} theme_ice{Buz Teması} theme_royal{Kraliyet Teması} item_piano{Piyano} item_aquarium{Akvaryum} item_chandelier{Avize} item_arcade{Oyun Makinesi} outfit_tuxedo{Smokin} outfit_superhero{Süper Kahraman} outfit_wizard{Büyücü} outfit_astronaut{Astronot} bubble_midnight{Gece Yarısı Baloncuğu} bubble_sunset{Gün Batımı Baloncuğu} bubble_mint{Nane Baloncuğu} bubble_rosegold{Rose Gold Baloncuğu} chatbg_stars{Yıldızlı Arka Plan} chatbg_waves{Dalga Arka Plan} chatbg_geometric{Geometrik Arka Plan} chatbg_minimal{Sade Arka Plan} other{{id}}}",
+  "storeItemName": "{id, select, frame_gold{Altın Çerçeve} frame_neon{Neon Çerçeve} frame_floral{Çiçekli Çerçeve} frame_stars{Yıldızlı Çerçeve} badge_crown{Taç Rozeti} badge_fire{Ateş Rozeti} badge_diamond{Elmas Rozeti} badge_heart{Kalp Rozeti} theme_galaxy{Galaksi Teması} theme_fire{Ateş Teması} theme_ice{Buz Teması} theme_royal{Kraliyet Teması} bubble_midnight{Gece Yarısı Baloncuğu} bubble_sunset{Gün Batımı Baloncuğu} bubble_mint{Nane Baloncuğu} bubble_rosegold{Rose Gold Baloncuğu} chatbg_stars{Yıldızlı Arka Plan} chatbg_waves{Dalga Arka Plan} chatbg_geometric{Geometrik Arka Plan} chatbg_minimal{Sade Arka Plan} bubble_ocean{Okyanus Balonu} bubble_neon{Neon Balon} bubble_aurora{Aurora Balonu} bubble_gold{Altın Balon} bubble_candy{Şeker Balonu} bubble_forest{Orman Balonu} chatbg_sunset{Gün Batımı Arka Planı} chatbg_aurora{Aurora Arka Planı} chatbg_hearts{Kalpli Arka Plan} chatbg_space{Uzay Arka Planı} chatbg_forest{Orman Arka Planı} chatbg_coffee{Kahve Arka Planı} frame_rainbow{Gökkuşağı Çerçeve} frame_fire{Ateş Çerçeve} badge_star{Yıldız Rozeti} badge_rocket{Roket Rozeti} badge_cat{Kedi Rozeti} badge_music{Müzik Rozeti} other{{id}}}",
   "@storeItemName": {
     "placeholders": {
       "id": {
@@ -1314,8 +1264,6 @@
   "storeCategoryFrame": "Profil çerçeveleri",
   "storeCategoryBadge": "Rozetler",
   "storeCategoryTheme": "Premium temalar",
-  "storeCategoryRoomItem": "Oda mobilyaları",
-  "storeCategoryAvatarOutfit": "Avatar kıyafetleri",
   "storeCategoryChatBubble": "Sohbet baloncuğu",
   "storeCategoryChatBackground": "Sohbet arka planı",
   "storeBuy": "Satın al",
@@ -1466,6 +1414,66 @@
       }
     }
   },
-  "navRoom": "Oda",
-  "roomInBottomNavHint": "Alt menüdeki Oda sekmesinden dekore edebilirsin"
+  "musicGenreLabel": "{id, select, pop{Pop} rock{Rock} rap{Rap} electronic{Elektronik} jazz{Caz} classical{Klasik} arabesk{Arabesk} turkish_folk{Halk müziği} turkish_pop{Türkçe pop} metal{Metal} rnb{R&B} indie{Indie} latin{Latin} kpop{K-pop} reggae{Reggae} blues{Blues} other{{id}}}",
+  "@musicGenreLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "musicTaste": "Müzik zevki",
+  "musicTasteHint": "Müzik zevkini ekle, ortak türdeki kişilerle eşleş",
+  "discoverModeAll": "Tümü",
+  "discoverModeAstro": "Astroloji",
+  "discoverModeMusic": "Müzik",
+  "discoverModeInterests": "İlgi",
+  "discoverModeVibe": "Vibe",
+  "discoverModeEmpty": "Bu modda şu an uygun kimse yok. Profilini zenginleştir ya da başka bir mod dene.",
+  "discoverModeEmptyAstro": "Henüz burç uyumu yüksek kimse yok. Birazdan tekrar dene.",
+  "discoverModeEmptyMusic": "Ortak müzik zevkine sahip kimse yok. Profilinden müzik türlerini ekledin mi?",
+  "discoverModeEmptyVibe": "Vibe eşleşmesi için önce 'Kendini Keşfet' testini çöz.",
+  "addMusicTaste": "Müzik zevkini ekle",
+  "takeVibeTest": "Testi çöz",
+  "matchReasonText": "{key, select, astro_trine{{a} ve {b} aynı elementten: doğal bir uyum, kolay anlaşırsınız} astro_sextile{{a} ile {b} birbirini tamamlıyor: eğlenceli ve dengeli bir ikili} astro_opposite{{a} ve {b} zıt kutuplar: birbirini çeken, birbirinden öğrenen bir çift} astro_same{İkiniz de {a}: birbirinizi sözsüz anlarsınız} astro_square{{a} ile {b}: kıvılcım çıkaran, tutkulu ve hareketli bir çekim} music_shared{İkiniz de dinliyorsunuz: {a}} interests_shared{Ortak ilgi alanlarınız: {a}} other{{a}}}",
+  "@matchReasonText": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      },
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      }
+    }
+  },
+  "navStore": "Mağaza",
+  "storeHeroTitle": "Sohbetine ve profiline tarz kat",
+  "storeCollected": "{owned}/{total} ürün koleksiyonunda",
+  "@storeCollected": {
+    "placeholders": {
+      "owned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "storeEquip": "Kullan",
+  "storeInUse": "Kullanımda",
+  "storeEquippedSnack": "Uygulandı!",
+  "storeRemovedSnack": "Kaldırıldı, varsayılana dönüldü",
+  "emojiButton": "Emoji",
+  "emojiBackspace": "Sil",
+  "emojiCategoryLabel": "{id, select, recent{Son kullanılanlar} smileys{Yüzler} hearts{Kalpler ve aşk} gestures{El hareketleri} fun{Eğlence ve yemek} nature{Hayvanlar ve doğa} other{{id}}}",
+  "@emojiCategoryLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  }
 }

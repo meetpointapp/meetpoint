@@ -12,6 +12,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../call/start_call.dart';
+import 'photo_viewer.dart';
 import 'profile_widgets.dart';
 import 'request_actions.dart';
 import 'vibe_screen.dart';
@@ -52,26 +53,31 @@ class _ProfileBody extends ConsumerWidget {
     final photos = p.photos;
     final prompts = p.prompts;
 
-    // Fotoğraflar ile soruları sırayla birleştir: foto, soru, foto, etiketler, soru...
+    // Faz 20: kompakt profil — küçük avatar başlığı + yatay fotoğraf şeridi (dokununca tam ekran büyür)
     final blocks = <Widget>[];
-    Widget photo(Photo ph) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(Brand.radius),
-            child: AspectRatio(aspectRatio: 4 / 5, child: NetPhoto(ph.fullUrl)),
-          ),
-        );
     Widget gap(Widget w) => Padding(padding: const EdgeInsets.only(bottom: 12), child: w);
 
-    if (!isMe) {
-      blocks.add(gap(Card(
-        child: ListTile(
-          leading: AvatarFace(profile: p, size: 36),
-          title: Text(l.roomVisit),
-          trailing: const Icon(Icons.chevron_right_rounded),
-          onTap: () => context.push('/user/${p.id}/room'),
+    if (photos.length > 1) {
+      blocks.add(Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: SizedBox(
+          height: 148,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: photos.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (_, i) => GestureDetector(
+              onTap: () => showPhotoViewer(context, photos, initial: i),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(Brand.radius),
+                child: AspectRatio(aspectRatio: 3 / 4, child: NetPhoto(photos[i].thumbUrl, width: 120, height: 160)),
+              ),
+            ),
+          ),
         ),
-      )));
+      ));
+    }
+    if (!isMe) {
       if (p.vibeArchetypeId.isNotEmpty) {
         blocks.add(gap(VibeCard(archetypeId: p.vibeArchetypeId)));
         final myArchetypeId = ref.watch(meProvider).value?.profile?.vibeArchetypeId ?? '';
@@ -83,7 +89,6 @@ class _ProfileBody extends ConsumerWidget {
     blocks.add(gap(BasicsChips(profile: p)));
     if (p.bio.isNotEmpty) blocks.add(gap(Card(child: Padding(padding: const EdgeInsets.all(18), child: Text(p.bio, style: theme.textTheme.bodyLarge)))));
     if (prompts.isNotEmpty) blocks.add(gap(PromptCard(prompt: prompts[0])));
-    if (photos.length > 1) blocks.add(photo(photos[1]));
     if (p.interests.isNotEmpty) {
       final common = p.interests.where(mine.contains).length;
       blocks.add(gap(Card(
@@ -103,78 +108,110 @@ class _ProfileBody extends ConsumerWidget {
         ),
       )));
     }
+    if (p.musicGenres.isNotEmpty) {
+      blocks.add(gap(Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(l.musicTaste, style: theme.textTheme.titleSmall),
+            const SizedBox(height: 10),
+            Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final id in p.musicGenres)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: ShapeDecoration(shape: const StadiumBorder(), color: theme.colorScheme.surfaceContainerHighest),
+                  child: Text('${musicEmoji[id] ?? ''} ${l.musicGenreLabel(id)}',
+                      style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+                ),
+            ]),
+          ]),
+        ),
+      )));
+    }
     for (var i = 1; i < prompts.length; i++) {
       blocks.add(gap(PromptCard(prompt: prompts[i])));
-      if (photos.length > i + 1) blocks.add(photo(photos[i + 1]));
-    }
-    for (var i = prompts.length.clamp(1, 99) + 1; i < photos.length; i++) {
-      blocks.add(photo(photos[i]));
     }
 
-    return CustomScrollView(slivers: [
-      SliverAppBar(
-        pinned: true,
-        stretch: true,
-        expandedHeight: MediaQuery.sizeOf(context).width * 1.15,
-        foregroundColor: Colors.white,
-        backgroundColor: theme.colorScheme.surface,
-        leading: const _CircleBack(),
-        actions: [if (isMe) _ShareProfileButton(profile: p) else _SafetyMenu(profile: p)],
-        flexibleSpace: FlexibleSpaceBar(
-          background: Stack(fit: StackFit.expand, children: [
-            NetPhoto(p.coverUrl),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.center,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black54],
-                ),
+    final banner = cardGradientOf(p.cardBackgroundId.isEmpty ? 'default' : p.cardBackgroundId);
+    final bannerHeight = MediaQuery.paddingOf(context).top + 116;
+    // Başlık (banner + avatar) tek bir kutuda: avatar banner'ın üstüne taşar ama kutunun içinde kalır,
+    // geri/menü düğmeleri en üstte sabit durur.
+    return Stack(children: [
+      CustomScrollView(slivers: [
+        SliverToBoxAdapter(
+          child: Stack(clipBehavior: Clip.none, children: [
+            Container(
+              height: bannerHeight,
+              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: banner)),
+              child: Stack(children: [
+                Positioned(right: -18, bottom: -22, child: Text('✦', style: TextStyle(fontSize: 120, color: Colors.white.withValues(alpha: 0.12)))),
+                Positioned(left: 70, top: bannerHeight / 2, child: Text('✧', style: TextStyle(fontSize: 46, color: Colors.white.withValues(alpha: 0.16)))),
+              ]),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16 + 96 + 14, bannerHeight + 10, 16, 8),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 56),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  NameWithBadge(
+                    '${p.displayName}, ${p.age}',
+                    verified: p.verified,
+                    badgeId: p.badgeId,
+                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(spacing: 10, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                    if (p.online)
+                      Row(mainAxisSize: MainAxisSize.min, children: [
+                        Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.like)),
+                        const SizedBox(width: 5),
+                        Text(l.activeNow, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+                      ]),
+                    if (p.moodId.isNotEmpty)
+                      Text('${moodEmoji[p.moodId] ?? ''} ${l.moodLabel(p.moodId)}', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    if (p.milestoneCount > 0) MilestoneBadge(p.milestoneCount),
+                  ]),
+                ]),
               ),
             ),
             Positioned(
-              left: 20,
-              right: 20,
-              bottom: 18,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                NameWithBadge(
-                  '${p.displayName}, ${p.age}',
-                  verified: p.verified,
-                  onPhoto: true,
-                  badgeId: p.badgeId,
-                  style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
+              left: 16,
+              top: bannerHeight - 48,
+              child: GestureDetector(
+                onTap: () => showPhotoViewer(context, photos),
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.surface,
+                    border: p.themeId.isEmpty ? null : Border.all(color: themeColorOf(p.themeId), width: 2.5),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 12, offset: const Offset(0, 4))],
+                  ),
+                  child: Avatar(p, radius: 45),
                 ),
-                if (p.online) ...[
-                  const SizedBox(height: 4),
-                  Row(mainAxisSize: MainAxisSize.min, children: [
-                    Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.like)),
-                    const SizedBox(width: 6),
-                    Text(l.activeNow, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
-                  ]),
-                ],
-                if (p.moodId.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(moodEmoji[p.moodId] ?? '', style: const TextStyle(fontSize: 14)),
-                    const SizedBox(width: 6),
-                    Text(l.moodLabel(p.moodId), style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
-                  ]),
-                ],
-                if (p.milestoneCount > 0) ...[
-                  const SizedBox(height: 6),
-                  MilestoneBadge(p.milestoneCount, onPhoto: true),
-                ],
-              ]),
+              ),
             ),
-            // Kişisel profil vitrini: özel bir renk seçilmişse alt kenarda ince bir vurgu şeridi
-            if (p.themeId.isNotEmpty)
-              Positioned(left: 0, right: 0, bottom: 0, child: Container(height: 4, color: themeColorOf(p.themeId))),
+            // Alt boşluk: avatar (96px) başlık kutusundan taşmasın
+            SizedBox(height: bannerHeight + 10 + 56 + 8),
           ]),
         ),
-      ),
-      SliverPadding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        sliver: SliverList.list(children: blocks),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+          sliver: SliverList.list(children: blocks),
+        ),
+      ]),
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        child: SafeArea(
+          bottom: false,
+          child: Row(children: [
+            const _CircleBack(),
+            const Spacer(),
+            if (isMe) _ShareProfileButton(profile: p) else _SafetyMenu(profile: p),
+          ]),
+        ),
       ),
     ]);
   }

@@ -23,6 +23,22 @@ class ProfilePrompt {
   Map<String, dynamic> toJson() => {'id': id, 'answer': answer};
 }
 
+// Faz 20: keşfet eşleştirme modlarında ("astro", "music"...) kartın neden önerildiği. Metin
+// uygulamada l10n'den üretilir; sunucu sadece kimlik ve parametre gönderir.
+class MatchInfo {
+  final String mode; // astro | music | interests | vibe
+  final int score;
+  final String key; // astro_trine, music_shared, vibe_similar ...
+  final List<String> args;
+  const MatchInfo({required this.mode, required this.score, required this.key, this.args = const []});
+  factory MatchInfo.fromJson(Map<String, dynamic> j) => MatchInfo(
+        mode: j['mode'],
+        score: j['score'] ?? 0,
+        key: j['key'],
+        args: [for (final a in (j['args'] as List? ?? const [])) a as String],
+      );
+}
+
 class PublicProfile {
   final String id;
   final bool verified;
@@ -36,6 +52,8 @@ class PublicProfile {
   final String country;
   final List<Photo> photos;
   final List<String> interests;
+  final List<String> musicGenres;
+  final MatchInfo? match; // sadece mod seçili keşfet destesinde dolu
   final List<ProfilePrompt> prompts;
   final String lookingFor;
   final int? heightCm;
@@ -49,12 +67,6 @@ class PublicProfile {
   final String themeId;
   final String cardBackgroundId;
   final bool online;
-  // Faz 16: çizgi avatar (fotoğraf yanında ve sohbette kullanılır). '' = varsayılan.
-  final String avatarSkinId;
-  final String avatarHairStyle;
-  final String avatarHairColorId;
-  final String avatarOutfitId;
-  final String avatarAccessoryId;
   // Faz 16: "Kendini Keşfet" vibe sistemi. '' = testi henüz tamamlamamış.
   final String vibeArchetypeId;
   // Faz 16: günlük ruh hali. '' = paylaşmamış veya 24 saat dolmuş (sunucu hesaplar).
@@ -63,7 +75,7 @@ class PublicProfile {
   // döner (chatBubbleThemeId/chatBackgroundThemeId → MyProfile'da).
   final String frameId;
   final String badgeId;
-  // Faz 17: "Sosyal cesaret yolculuğu" — toplam açılan kademe sayısı (0-9), herkese görünür.
+  // Faz 17: "Sosyal cesaret yolculuğu" — toplam açılan kademe sayısı (0-12), herkese görünür.
   final int milestoneCount;
 
   const PublicProfile({
@@ -79,6 +91,8 @@ class PublicProfile {
     required this.country,
     required this.photos,
     this.interests = const [],
+    this.musicGenres = const [],
+    this.match,
     this.prompts = const [],
     this.lookingFor = '',
     this.heightCm,
@@ -90,11 +104,6 @@ class PublicProfile {
     this.themeId = '',
     this.cardBackgroundId = '',
     this.online = false,
-    this.avatarSkinId = '',
-    this.avatarHairStyle = '',
-    this.avatarHairColorId = '',
-    this.avatarOutfitId = '',
-    this.avatarAccessoryId = '',
     this.vibeArchetypeId = '',
     this.moodId = '',
     this.frameId = '',
@@ -119,6 +128,8 @@ class PublicProfile {
         country: j['country'] ?? '',
         photos: [for (final p in (j['photos'] as List)) Photo.fromJson(p)],
         interests: [for (final i in (j['interests'] as List? ?? const [])) i as String],
+        musicGenres: [for (final i in (j['musicGenres'] as List? ?? const [])) i as String],
+        match: j['match'] == null ? null : MatchInfo.fromJson(Map<String, dynamic>.from(j['match'])),
         prompts: [for (final p in (j['prompts'] as List? ?? const [])) ProfilePrompt.fromJson(p)],
         lookingFor: j['lookingFor'] ?? '',
         heightCm: j['heightCm'],
@@ -130,11 +141,6 @@ class PublicProfile {
         themeId: j['themeId'] ?? '',
         cardBackgroundId: j['cardBackgroundId'] ?? '',
         online: j['online'] ?? false,
-        avatarSkinId: j['avatarSkinId'] ?? '',
-        avatarHairStyle: j['avatarHairStyle'] ?? '',
-        avatarHairColorId: j['avatarHairColorId'] ?? '',
-        avatarOutfitId: j['avatarOutfitId'] ?? '',
-        avatarAccessoryId: j['avatarAccessoryId'] ?? '',
         vibeArchetypeId: j['vibeArchetypeId'] ?? '',
         moodId: j['moodId'] ?? '',
         frameId: j['frameId'] ?? '',
@@ -180,11 +186,6 @@ class MyProfile extends PublicProfile {
           drinking: j['drinking'] ?? '',
           themeId: j['themeId'] ?? '',
           cardBackgroundId: j['cardBackgroundId'] ?? '',
-          avatarSkinId: j['avatarSkinId'] ?? '',
-          avatarHairStyle: j['avatarHairStyle'] ?? '',
-          avatarHairColorId: j['avatarHairColorId'] ?? '',
-          avatarOutfitId: j['avatarOutfitId'] ?? '',
-          avatarAccessoryId: j['avatarAccessoryId'] ?? '',
           vibeArchetypeId: j['vibeArchetypeId'] ?? '',
           moodId: j['moodId'] ?? '',
           frameId: j['frameId'] ?? '',
@@ -219,7 +220,6 @@ class InterestGroup {
       );
 }
 
-// Faz 16: kozmetik mağaza. category: frame | badge | theme | roomItem | avatarOutfit | chatBubble
 // | chatBackground. Jetonla alınır, kullanıcıdan kullanıcıya geçmez.
 class StoreItem {
   final String id;
@@ -243,6 +243,7 @@ class ProfileDraft {
   String interestedIn = '';
   List<Photo> photos = [];
   List<String> interests = [];
+  List<String> musicGenres = [];
   String lookingFor = '';
   List<ProfilePrompt> prompts = [];
   String bio = '';
@@ -256,11 +257,6 @@ class ProfileDraft {
   String drinking = '';
   String themeId = '';
   String cardBackgroundId = '';
-  String avatarSkinId = '';
-  String avatarHairStyle = '';
-  String avatarHairColorId = '';
-  String avatarOutfitId = '';
-  String avatarAccessoryId = '';
   // Faz 16: kozmetik mağaza (sadece satın alınmış öğeler seçilebilir)
   String frameId = '';
   String badgeId = '';
@@ -276,6 +272,7 @@ class ProfileDraft {
         interestedIn = p.interestedIn,
         photos = [...p.photos],
         interests = [...p.interests],
+        musicGenres = [...p.musicGenres],
         lookingFor = p.lookingFor,
         prompts = [...p.prompts],
         bio = p.bio,
@@ -289,11 +286,6 @@ class ProfileDraft {
         drinking = p.drinking,
         themeId = p.themeId,
         cardBackgroundId = p.cardBackgroundId,
-        avatarSkinId = p.avatarSkinId,
-        avatarHairStyle = p.avatarHairStyle,
-        avatarHairColorId = p.avatarHairColorId,
-        avatarOutfitId = p.avatarOutfitId,
-        avatarAccessoryId = p.avatarAccessoryId,
         frameId = p.frameId,
         badgeId = p.badgeId,
         chatBubbleThemeId = p.chatBubbleThemeId,
@@ -306,6 +298,7 @@ class ProfileDraft {
     ..interestedIn = interestedIn
     ..photos = [...photos]
     ..interests = [...interests]
+    ..musicGenres = [...musicGenres]
     ..lookingFor = lookingFor
     ..prompts = [...prompts]
     ..bio = bio
@@ -319,11 +312,6 @@ class ProfileDraft {
     ..drinking = drinking
     ..themeId = themeId
     ..cardBackgroundId = cardBackgroundId
-    ..avatarSkinId = avatarSkinId
-    ..avatarHairStyle = avatarHairStyle
-    ..avatarHairColorId = avatarHairColorId
-    ..avatarOutfitId = avatarOutfitId
-    ..avatarAccessoryId = avatarAccessoryId
     ..frameId = frameId
     ..badgeId = badgeId
     ..chatBubbleThemeId = chatBubbleThemeId
@@ -340,6 +328,7 @@ class ProfileDraft {
         country: country,
         photos: photos,
         interests: interests,
+        musicGenres: musicGenres,
         prompts: prompts,
         lookingFor: lookingFor,
         heightCm: heightCm,
@@ -350,11 +339,6 @@ class ProfileDraft {
         drinking: drinking,
         themeId: themeId,
         cardBackgroundId: cardBackgroundId,
-        avatarSkinId: avatarSkinId,
-        avatarHairStyle: avatarHairStyle,
-        avatarHairColorId: avatarHairColorId,
-        avatarOutfitId: avatarOutfitId,
-        avatarAccessoryId: avatarAccessoryId,
         frameId: frameId,
         badgeId: badgeId,
       );
@@ -367,6 +351,7 @@ class ProfileDraft {
       'gender': gender,
       'interestedIn': interestedIn,
       'interests': interests,
+      'musicGenres': musicGenres,
       'lookingFor': lookingFor,
       'prompts': [for (final p in prompts) p.toJson()],
       'bio': bio.trim(),
@@ -380,77 +365,12 @@ class ProfileDraft {
       'drinking': drinking,
       'themeId': themeId,
       'cardBackgroundId': cardBackgroundId,
-      'avatarSkinId': avatarSkinId,
-      'avatarHairStyle': avatarHairStyle,
-      'avatarHairColorId': avatarHairColorId,
-      'avatarOutfitId': avatarOutfitId,
-      'avatarAccessoryId': avatarAccessoryId,
       'frameId': frameId,
       'badgeId': badgeId,
       'chatBubbleThemeId': chatBubbleThemeId,
       'chatBackgroundThemeId': chatBackgroundThemeId,
     };
   }
-}
-
-// Faz 16: kendi oda. Statik yerleşim (ızgara hücresi başına bir eşya); eşleşilen/bağlantılı
-// kişi salt görüntüleme ile ziyaret edebilir.
-class RoomItem {
-  final String itemId;
-  final int x;
-  final int y;
-  const RoomItem({required this.itemId, required this.x, required this.y});
-  factory RoomItem.fromJson(Map<String, dynamic> j) => RoomItem(itemId: j['itemId'], x: j['x'], y: j['y']);
-  Map<String, dynamic> toJson() => {'itemId': itemId, 'x': x, 'y': y};
-}
-
-class RoomInfo {
-  final String wallpaperId;
-  final String floorId;
-  final List<RoomItem> items;
-  final String displayName; // sadece ziyarette dolu
-  // Faz 17 madde 10: "Odanı sergile" — açıksa oda, bağlantısı olmayanlara da haftalık galeride görünür
-  final bool showcaseOptIn;
-  const RoomInfo({this.wallpaperId = '', this.floorId = '', this.items = const [], this.displayName = '', this.showcaseOptIn = false});
-  factory RoomInfo.fromJson(Map<String, dynamic> j) => RoomInfo(
-        wallpaperId: j['wallpaperId'] ?? '',
-        floorId: j['floorId'] ?? '',
-        items: [for (final i in (j['items'] as List? ?? const [])) RoomItem.fromJson(i)],
-        displayName: j['displayName'] ?? '',
-        showcaseOptIn: j['showcaseOptIn'] ?? false,
-      );
-  Map<String, dynamic> toJson() =>
-      {'wallpaperId': wallpaperId, 'floorId': floorId, 'items': [for (final i in items) i.toJson()], 'showcaseOptIn': showcaseOptIn};
-
-  RoomInfo copyWith({String? wallpaperId, String? floorId, List<RoomItem>? items, bool? showcaseOptIn}) => RoomInfo(
-        wallpaperId: wallpaperId ?? this.wallpaperId,
-        floorId: floorId ?? this.floorId,
-        items: items ?? this.items,
-        showcaseOptIn: showcaseOptIn ?? this.showcaseOptIn,
-      );
-}
-
-// Faz 17 madde 10: haftalık "en güzel odalar" galerisi — sergilemeyi açık bırakan kullanıcılar
-class RoomShowcaseEntry {
-  final String userId;
-  final String displayName;
-  final String wallpaperId;
-  final String floorId;
-  final List<RoomItem> items;
-  const RoomShowcaseEntry({
-    required this.userId,
-    required this.displayName,
-    this.wallpaperId = '',
-    this.floorId = '',
-    this.items = const [],
-  });
-  factory RoomShowcaseEntry.fromJson(Map<String, dynamic> j) => RoomShowcaseEntry(
-        userId: j['userId'],
-        displayName: j['displayName'] ?? '',
-        wallpaperId: j['wallpaperId'] ?? '',
-        floorId: j['floorId'] ?? '',
-        items: [for (final i in (j['items'] as List? ?? const [])) RoomItem.fromJson(i)],
-      );
 }
 
 class Me {

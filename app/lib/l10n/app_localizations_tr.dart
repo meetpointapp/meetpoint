@@ -2051,7 +2051,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String milestoneCountShort(int n) {
-    return '$n/9';
+    return '$n/12';
   }
 
   @override
@@ -2084,7 +2084,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'week_long_chat': '7 günlük sohbet',
       'first_icebreaker': 'İlk buz kırıcı oyunu',
       'first_match': 'İlk eşleşme',
-      'first_room_visit': 'İlk oda ziyareti',
+      'first_gift': 'İlk hediye',
       'first_call': 'İlk arama',
       'profile_complete': 'Profilini tamamla',
       'verified': 'Doğrulama',
@@ -2255,114 +2255,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get none => 'Yok';
-
-  @override
-  String get avatarSection => 'Avatar';
-
-  @override
-  String get avatarSkin => 'Ten rengi';
-
-  @override
-  String get avatarHairStyle => 'Saç şekli';
-
-  @override
-  String get avatarHairColor => 'Saç rengi';
-
-  @override
-  String get avatarOutfit => 'Kıyafet rengi';
-
-  @override
-  String get avatarAccessory => 'Aksesuar';
-
-  @override
-  String avatarHairStyleLabel(String id) {
-    String _temp0 = intl.Intl.selectLogic(id, {
-      'bald': 'Kel',
-      'short': 'Kısa',
-      'long': 'Uzun',
-      'curly': 'Kıvırcık',
-      'other': '$id',
-    });
-    return '$_temp0';
-  }
-
-  @override
-  String avatarAccessoryLabel(String id) {
-    String _temp0 = intl.Intl.selectLogic(id, {
-      'glasses': 'Gözlük',
-      'hat': 'Şapka',
-      'headphones': 'Kulaklık',
-      'other': '$id',
-    });
-    return '$_temp0';
-  }
-
-  @override
-  String get roomSection => 'Odam';
-
-  @override
-  String get roomEditTitle => 'Odanı dekore et';
-
-  @override
-  String get roomWallpaper => 'Duvar kağıdı';
-
-  @override
-  String get roomFloor => 'Zemin';
-
-  @override
-  String get roomItemsHint =>
-      'Bir eşya seç, ızgarada boş bir yere dokun. Yerleştirilmiş bir eşyaya dokunmak kaldırır.';
-
-  @override
-  String get roomShowcaseOptIn => 'Odamı sergile';
-
-  @override
-  String get roomShowcaseOptInHint =>
-      'Açarsan bağlantın olmayan kişiler de haftalık \"en güzel odalar\" galerisinde odanı görebilir.';
-
-  @override
-  String get roomShowcaseTitle => 'Bu haftanın öne çıkan odaları';
-
-  @override
-  String get roomShowcaseEmpty =>
-      'Bu hafta henüz sergilenen bir oda yok. İlk olmak ister misin?';
-
-  @override
-  String get roomVisit => 'Odasını gör';
-
-  @override
-  String roomVisitTitle(String name) {
-    return '$name kişisinin odası';
-  }
-
-  @override
-  String get roomNotConnected =>
-      'Bu odayı görebilmek için önce bir sohbetiniz olmalı.';
-
-  @override
-  String roomItemLabel(String id) {
-    String _temp0 = intl.Intl.selectLogic(id, {
-      'sofa': 'Koltuk',
-      'bed': 'Yatak',
-      'plant': 'Bitki',
-      'lamp': 'Lamba',
-      'tv': 'Televizyon',
-      'bookshelf': 'Kitaplık',
-      'table': 'Masa',
-      'rug': 'Halı',
-      'window': 'Pencere',
-      'picture': 'Tablo',
-      'item_piano': 'Piyano',
-      'item_aquarium': 'Akvaryum',
-      'item_chandelier': 'Avize',
-      'item_arcade': 'Oyun Makinesi',
-      'other': '$id',
-    });
-    return '$_temp0';
-  }
-
-  @override
-  String get roomFull => 'Oda dolu, önce bir eşya kaldır';
 
   @override
   String vibeQuestionLabel(String id) {
@@ -2616,14 +2508,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'theme_fire': 'Ateş Teması',
       'theme_ice': 'Buz Teması',
       'theme_royal': 'Kraliyet Teması',
-      'item_piano': 'Piyano',
-      'item_aquarium': 'Akvaryum',
-      'item_chandelier': 'Avize',
-      'item_arcade': 'Oyun Makinesi',
-      'outfit_tuxedo': 'Smokin',
-      'outfit_superhero': 'Süper Kahraman',
-      'outfit_wizard': 'Büyücü',
-      'outfit_astronaut': 'Astronot',
       'bubble_midnight': 'Gece Yarısı Baloncuğu',
       'bubble_sunset': 'Gün Batımı Baloncuğu',
       'bubble_mint': 'Nane Baloncuğu',
@@ -2632,6 +2516,24 @@ class AppLocalizationsTr extends AppLocalizations {
       'chatbg_waves': 'Dalga Arka Plan',
       'chatbg_geometric': 'Geometrik Arka Plan',
       'chatbg_minimal': 'Sade Arka Plan',
+      'bubble_ocean': 'Okyanus Balonu',
+      'bubble_neon': 'Neon Balon',
+      'bubble_aurora': 'Aurora Balonu',
+      'bubble_gold': 'Altın Balon',
+      'bubble_candy': 'Şeker Balonu',
+      'bubble_forest': 'Orman Balonu',
+      'chatbg_sunset': 'Gün Batımı Arka Planı',
+      'chatbg_aurora': 'Aurora Arka Planı',
+      'chatbg_hearts': 'Kalpli Arka Plan',
+      'chatbg_space': 'Uzay Arka Planı',
+      'chatbg_forest': 'Orman Arka Planı',
+      'chatbg_coffee': 'Kahve Arka Planı',
+      'frame_rainbow': 'Gökkuşağı Çerçeve',
+      'frame_fire': 'Ateş Çerçeve',
+      'badge_star': 'Yıldız Rozeti',
+      'badge_rocket': 'Roket Rozeti',
+      'badge_cat': 'Kedi Rozeti',
+      'badge_music': 'Müzik Rozeti',
       'other': '$id',
     });
     return '$_temp0';
@@ -2652,12 +2554,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get storeCategoryTheme => 'Premium temalar';
-
-  @override
-  String get storeCategoryRoomItem => 'Oda mobilyaları';
-
-  @override
-  String get storeCategoryAvatarOutfit => 'Avatar kıyafetleri';
 
   @override
   String get storeCategoryChatBubble => 'Sohbet baloncuğu';
@@ -2870,9 +2766,132 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get navRoom => 'Oda';
+  String musicGenreLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'pop': 'Pop',
+      'rock': 'Rock',
+      'rap': 'Rap',
+      'electronic': 'Elektronik',
+      'jazz': 'Caz',
+      'classical': 'Klasik',
+      'arabesk': 'Arabesk',
+      'turkish_folk': 'Halk müziği',
+      'turkish_pop': 'Türkçe pop',
+      'metal': 'Metal',
+      'rnb': 'R&B',
+      'indie': 'Indie',
+      'latin': 'Latin',
+      'kpop': 'K-pop',
+      'reggae': 'Reggae',
+      'blues': 'Blues',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
 
   @override
-  String get roomInBottomNavHint =>
-      'Alt menüdeki Oda sekmesinden dekore edebilirsin';
+  String get musicTaste => 'Müzik zevki';
+
+  @override
+  String get musicTasteHint =>
+      'Müzik zevkini ekle, ortak türdeki kişilerle eşleş';
+
+  @override
+  String get discoverModeAll => 'Tümü';
+
+  @override
+  String get discoverModeAstro => 'Astroloji';
+
+  @override
+  String get discoverModeMusic => 'Müzik';
+
+  @override
+  String get discoverModeInterests => 'İlgi';
+
+  @override
+  String get discoverModeVibe => 'Vibe';
+
+  @override
+  String get discoverModeEmpty =>
+      'Bu modda şu an uygun kimse yok. Profilini zenginleştir ya da başka bir mod dene.';
+
+  @override
+  String get discoverModeEmptyAstro =>
+      'Henüz burç uyumu yüksek kimse yok. Birazdan tekrar dene.';
+
+  @override
+  String get discoverModeEmptyMusic =>
+      'Ortak müzik zevkine sahip kimse yok. Profilinden müzik türlerini ekledin mi?';
+
+  @override
+  String get discoverModeEmptyVibe =>
+      'Vibe eşleşmesi için önce \'Kendini Keşfet\' testini çöz.';
+
+  @override
+  String get addMusicTaste => 'Müzik zevkini ekle';
+
+  @override
+  String get takeVibeTest => 'Testi çöz';
+
+  @override
+  String matchReasonText(String key, String a, String b) {
+    String _temp0 = intl.Intl.selectLogic(key, {
+      'astro_trine':
+          '$a ve $b aynı elementten: doğal bir uyum, kolay anlaşırsınız',
+      'astro_sextile':
+          '$a ile $b birbirini tamamlıyor: eğlenceli ve dengeli bir ikili',
+      'astro_opposite':
+          '$a ve $b zıt kutuplar: birbirini çeken, birbirinden öğrenen bir çift',
+      'astro_same': 'İkiniz de $a: birbirinizi sözsüz anlarsınız',
+      'astro_square':
+          '$a ile $b: kıvılcım çıkaran, tutkulu ve hareketli bir çekim',
+      'music_shared': 'İkiniz de dinliyorsunuz: $a',
+      'interests_shared': 'Ortak ilgi alanlarınız: $a',
+      'other': '$a',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get navStore => 'Mağaza';
+
+  @override
+  String get storeHeroTitle => 'Sohbetine ve profiline tarz kat';
+
+  @override
+  String storeCollected(int owned, int total) {
+    return '$owned/$total ürün koleksiyonunda';
+  }
+
+  @override
+  String get storeEquip => 'Kullan';
+
+  @override
+  String get storeInUse => 'Kullanımda';
+
+  @override
+  String get storeEquippedSnack => 'Uygulandı!';
+
+  @override
+  String get storeRemovedSnack => 'Kaldırıldı, varsayılana dönüldü';
+
+  @override
+  String get emojiButton => 'Emoji';
+
+  @override
+  String get emojiBackspace => 'Sil';
+
+  @override
+  String emojiCategoryLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'recent': 'Son kullanılanlar',
+      'smileys': 'Yüzler',
+      'hearts': 'Kalpler ve aşk',
+      'gestures': 'El hareketleri',
+      'fun': 'Eğlence ve yemek',
+      'nature': 'Hayvanlar ve doğa',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
 }

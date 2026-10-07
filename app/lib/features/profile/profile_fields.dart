@@ -338,6 +338,32 @@ class InterestPicker extends StatelessWidget {
   }
 }
 
+// Faz 20: müzik zevki — "Müzik" eşleştirme modu ortak türlere göre öneri yapar (en fazla 4 tür)
+class MusicPicker extends StatelessWidget {
+  const MusicPicker({super.key, required this.draft, required this.onChanged});
+  final ProfileDraft draft;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final full = draft.musicGenres.length >= maxMusicGenres;
+    return Wrap(spacing: 8, runSpacing: 8, children: [
+      for (final id in musicGenreIds)
+        FilterChip(
+          showCheckmark: false,
+          label: Text('${musicEmoji[id]} ${l.musicGenreLabel(id)}'),
+          selected: draft.musicGenres.contains(id),
+          onSelected: (on) {
+            if (on && full) return;
+            draft.musicGenres = on ? [...draft.musicGenres, id] : draft.musicGenres.where((x) => x != id).toList();
+            onChanged();
+          },
+        ),
+    ]);
+  }
+}
+
 // Profil soruları: en fazla 3 soru seçilip cevaplanır
 class PromptsEditor extends StatelessWidget {
   const PromptsEditor({super.key, required this.draft, required this.onChanged});
@@ -776,105 +802,6 @@ class ShowcasePicker extends ConsumerWidget {
             },
           ),
         ),
-    ]);
-  }
-}
-
-// Faz 16: çizgi avatar düzenleyici — canlı önizleme + ten/saç şekli/saç rengi/kıyafet/aksesuar seçimi.
-class AvatarPicker extends ConsumerWidget {
-  const AvatarPicker({super.key, required this.draft, required this.onChanged});
-  final ProfileDraft draft;
-  final VoidCallback onChanged;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    // Faz 16: kozmetik mağaza — satın alınmış premium kıyafetler ücretsiz kataloğa eklenir
-    final owned = ref.watch(storeItemsProvider).value?.where((i) => i.owned).map((i) => i.id).toSet() ?? const <String>{};
-    Widget section(String title, Widget child) => Padding(
-          padding: const EdgeInsets.only(bottom: 22),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 10),
-            child,
-          ]),
-        );
-    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      Center(child: AvatarFace(profile: draft.toPreview(), size: 96)),
-      const SizedBox(height: 24),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          section(
-            l.avatarSkin,
-            swatchPicker(
-              context,
-              avatarSkinIds,
-              draft.avatarSkinId,
-              (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarSkinColor[id])),
-              (id) {
-                draft.avatarSkinId = id;
-                onChanged();
-              },
-            ),
-          ),
-          section(
-            l.avatarHairStyle,
-            Wrap(spacing: 8, children: [
-              for (final s in avatarHairStyles)
-                ChoiceChip(
-                  label: Text(l.avatarHairStyleLabel(s)),
-                  selected: draft.avatarHairStyle == s,
-                  onSelected: (_) {
-                    draft.avatarHairStyle = draft.avatarHairStyle == s ? '' : s;
-                    onChanged();
-                  },
-                ),
-            ]),
-          ),
-          section(
-            l.avatarHairColor,
-            swatchPicker(
-              context,
-              avatarHairColorIds,
-              draft.avatarHairColorId,
-              (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarHairColor[id])),
-              (id) {
-                draft.avatarHairColorId = id;
-                onChanged();
-              },
-            ),
-          ),
-          section(
-            l.avatarOutfit,
-            swatchPicker(
-              context,
-              [...avatarOutfitIds, ...storeAvatarOutfitIds.where(owned.contains)],
-              draft.avatarOutfitId,
-              (id) => DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: avatarOutfitColorOf(id))),
-              (id) {
-                draft.avatarOutfitId = id;
-                onChanged();
-              },
-            ),
-          ),
-          section(
-            l.avatarAccessory,
-            Wrap(spacing: 8, children: [
-              for (final a in avatarAccessoryIds)
-                ChoiceChip(
-                  label: Text(a == 'none' ? l.none : '${avatarAccessoryEmoji[a]} ${l.avatarAccessoryLabel(a)}'),
-                  selected: draft.avatarAccessoryId == a,
-                  onSelected: (_) {
-                    draft.avatarAccessoryId = a == 'none' ? '' : a;
-                    onChanged();
-                  },
-                ),
-            ]),
-          ),
-        ]),
-      ),
     ]);
   }
 }

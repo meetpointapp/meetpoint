@@ -192,7 +192,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ),
             ),
           ),
-        Expanded(child: widget.shell),
+        Expanded(
+          child: AppBackdrop(
+            // Sekme sayfalarının Scaffold'ları saydam: zemin ışıkları görünsün
+            child: Theme(
+              data: Theme.of(context).copyWith(scaffoldBackgroundColor: Colors.transparent),
+              child: widget.shell,
+            ),
+          ),
+        ),
       ]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: widget.shell.currentIndex,
@@ -219,9 +227,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             label: l.navWallet,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.chair_alt_outlined),
-            selectedIcon: const Icon(Icons.chair_alt_rounded),
-            label: l.navRoom,
+            icon: const Icon(Icons.storefront_outlined),
+            selectedIcon: const Icon(Icons.storefront_rounded),
+            label: l.navStore,
           ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline_rounded),

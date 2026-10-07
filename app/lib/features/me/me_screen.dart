@@ -11,6 +11,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../onboarding/intro_screen.dart';
+import '../profile/photo_viewer.dart';
 import '../support/support_screens.dart';
 
 // Profil tamamlama yüzdesi: fotoğraf, soru ve temel bilgiler eşleşmeyi artırır
@@ -64,115 +65,17 @@ class MeScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                // Fotoğraf + tamamlama halkası
-                Center(
-                  child: SizedBox.square(
-                    dimension: 132,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox.square(
-                          dimension: 132,
-                          child: TweenAnimationBuilder<double>(
-                            tween: Tween(begin: 0, end: percent / 100),
-                            duration: const Duration(milliseconds: 700),
-                            curve: Curves.easeOutCubic,
-                            builder: (_, v, _) => CircularProgressIndicator(
-                              value: v,
-                              strokeWidth: 5,
-                              strokeCap: StrokeCap.round,
-                              color: Brand.coral,
-                              backgroundColor: Brand.coral.withValues(
-                                alpha: 0.12,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Avatar(p, radius: 56),
-                        Positioned(
-                          bottom: 0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3,
-                            ),
-                            decoration: const ShapeDecoration(
-                              shape: StadiumBorder(),
-                              gradient: Brand.gradient,
-                            ),
-                            child: Text(
-                              '%$percent',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (p != null)
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: GestureDetector(
-                              onTap: () => context.push('/me/edit'),
-                              child: AvatarFace(
-                                profile: p,
-                                size: 34,
-                                border: theme.colorScheme.surface,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (p != null)
-                  Center(
-                    child: NameWithBadge(
-                      '${p.displayName}, ${p.age}',
-                      verified: m.verificationStatus == 'approved',
-                      style: theme.textTheme.headlineSmall,
-                    ),
-                  ),
-                if (percent < 100)
-                  Center(
-                    child: Text(
-                      l.profileCompletion(percent),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: GradientButton(
-                        label: l.editProfile,
-                        icon: Icons.edit_rounded,
-                        onPressed: () async {
-                          await context.push('/me/edit');
-                          ref.invalidate(meProvider);
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    SizedBox(
-                      height: 52,
-                      child: OutlinedButton(
-                        onPressed: () => context.go('/wallet'),
-                        child: AnimatedCoinAmount(
-                          m.balance,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                // Faz 20: kompakt başlık — küçük avatar (dokununca fotoğraf büyür), isim, tamamlama çubuğu
+                _MeHeader(
+                  profile: p,
+                  percent: percent,
+                  verified: m.verificationStatus == 'approved',
+                  balance: m.balance,
+                  onEdit: () async {
+                    await context.push('/me/edit');
+                    ref.invalidate(meProvider);
+                  },
+                  onWallet: () => context.go('/wallet'),
                 ),
                 const SizedBox(height: 16),
                 _VerificationCard(status: m.verificationStatus),
@@ -638,6 +541,110 @@ class _WeeklyDigestCard extends ConsumerWidget {
         ),
         subtitle: digest.longestChat != null ? Text(l.weeklyDigestLongestChat(digest.longestChat!.otherName)) : null,
       ),
+    );
+  }
+}
+
+class _MeHeader extends StatelessWidget {
+  const _MeHeader({
+    required this.profile,
+    required this.percent,
+    required this.verified,
+    required this.balance,
+    required this.onEdit,
+    required this.onWallet,
+  });
+  final MyProfile? profile;
+  final int percent;
+  final bool verified;
+  final int balance;
+  final VoidCallback onEdit;
+  final VoidCallback onWallet;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final p = profile;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        color: theme.cardTheme.color,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Brand.coral.withValues(alpha: 0.12), Brand.orange.withValues(alpha: 0.05)],
+        ),
+        border: Border.all(color: Brand.coral.withValues(alpha: 0.18)),
+      ),
+      child: Column(children: [
+        Row(children: [
+          GestureDetector(
+            onTap: p == null || p.photos.isEmpty ? onEdit : () => showPhotoViewer(context, p.photos),
+            child: SizedBox.square(
+              dimension: 84,
+              child: Stack(alignment: Alignment.center, children: [
+                SizedBox.square(
+                  dimension: 84,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: percent / 100),
+                    duration: const Duration(milliseconds: 700),
+                    curve: Curves.easeOutCubic,
+                    builder: (_, v, _) => CircularProgressIndicator(
+                      value: v,
+                      strokeWidth: 4,
+                      strokeCap: StrokeCap.round,
+                      color: Brand.coral,
+                      backgroundColor: Brand.coral.withValues(alpha: 0.14),
+                    ),
+                  ),
+                ),
+                Avatar(p, radius: 34),
+              ]),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (p != null)
+                NameWithBadge(
+                  '${p.displayName}, ${p.age}',
+                  verified: verified,
+                  badgeId: p.badgeId,
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: percent / 100,
+                  minHeight: 7,
+                  color: Brand.coral,
+                  backgroundColor: Brand.coral.withValues(alpha: 0.14),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                percent < 100 ? l.profileCompletion(percent) : '%100 ✓',
+                style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ]),
+          ),
+        ]),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(child: GradientButton(label: l.editProfile, icon: Icons.edit_rounded, dense: true, onPressed: onEdit)),
+          const SizedBox(width: 10),
+          SizedBox(
+            height: 44,
+            child: OutlinedButton(
+              onPressed: onWallet,
+              child: AnimatedCoinAmount(balance, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+            ),
+          ),
+        ]),
+      ]),
     );
   }
 }

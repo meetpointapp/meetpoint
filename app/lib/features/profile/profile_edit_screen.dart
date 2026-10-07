@@ -107,6 +107,16 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 Wrap(spacing: 6, runSpacing: 6, children: [
                   for (final id in d.interests) InterestChip(id),
                 ]),
+                _SectionTitle(l.musicTaste, onEdit: () => _editSection(
+                      '${l.musicTaste} (0-$maxMusicGenres)',
+                      (d, c) => MusicPicker(draft: d, onChanged: c),
+                    )),
+                if (d.musicGenres.isEmpty)
+                  Text(l.musicTasteHint, style: TextStyle(color: Theme.of(context).colorScheme.outline))
+                else
+                  Wrap(spacing: 6, runSpacing: 6, children: [
+                    for (final id in d.musicGenres) Chip(label: Text('${musicEmoji[id]} ${l.musicGenreLabel(id)}')),
+                  ]),
                 _SectionTitle(l.prompts, onEdit: () => _editSection(l.prompts, (d, c) => PromptsEditor(draft: d, onChanged: c))),
                 if (d.prompts.isEmpty)
                   Text(l.obPromptsHint, style: TextStyle(color: Theme.of(context).colorScheme.outline))
@@ -135,23 +145,6 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   Text(d.themeId.isEmpty && d.cardBackgroundId.isEmpty ? l.showcaseDefault : l.showcaseCustom,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ]),
-                _SectionTitle(l.avatarSection,
-                    onEdit: () => _editSection(l.avatarSection, (d, c) => AvatarPicker(draft: d, onChanged: c))),
-                Row(children: [
-                  AvatarFace(profile: d.toPreview(), size: 40),
-                  const SizedBox(width: 12),
-                  Text(l.avatarSection, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                ]),
-                const SizedBox(height: 8),
-                // Oda artık alt menüde kendi sekmesi — burada sadece hatırlatma
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.chair_alt_outlined),
-                    title: Text(l.roomSection),
-                    subtitle: Text(l.roomInBottomNavHint),
-                  ),
-                ),
-                const SizedBox(height: 8),
                 _SectionTitle(l.vibeSection),
                 _VibeSummary(),
                 const SizedBox(height: 8),
@@ -163,7 +156,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     leading: const Icon(Icons.storefront_outlined),
                     title: Text(l.storeTitle),
                     trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/store'),
+                    onTap: () => context.go('/store'),
                   ),
                 ),
               ]),

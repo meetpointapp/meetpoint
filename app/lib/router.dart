@@ -26,8 +26,6 @@ import 'features/likes/likes_screen.dart';
 import 'features/me/me_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/profile/profile_edit_screen.dart';
-import 'features/profile/room_screen.dart';
-import 'features/profile/room_showcase_screen.dart';
 import 'features/profile/vibe_screen.dart';
 import 'features/profile/user_profile_screen.dart';
 import 'features/requests/requests_screen.dart';
@@ -80,11 +78,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/support/new', builder: (_, s) => NewTicketScreen(args: s.extra is NewTicketArgs ? s.extra as NewTicketArgs : null)),
       GoRoute(path: '/support/:id', builder: (_, s) => TicketScreen(ticketId: s.pathParameters['id']!)),
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
-      GoRoute(path: '/rooms/showcase', builder: (_, _) => const RoomShowcaseScreen()),
-      GoRoute(path: '/user/:id/room', builder: (_, s) => RoomVisitScreen(userId: s.pathParameters['id']!)),
       GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
       GoRoute(path: '/discover/groups/:interestId', builder: (_, s) => InterestGroupScreen(interestId: s.pathParameters['interestId']!)),
-      GoRoute(path: '/store', builder: (_, _) => const StoreScreen()),
       GoRoute(
         path: '/call/:id',
         builder: (_, s) => CallScreen(callId: s.pathParameters['id']!, initial: s.extra is CallInfo ? s.extra as CallInfo : null),
@@ -103,7 +98,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [GoRoute(path: '/requests', builder: (_, _) => const RequestsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/chats', builder: (_, _) => const ConversationsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/room', builder: (_, _) => const RoomEditorScreen())]),
+          StatefulShellBranch(routes: [GoRoute(path: '/store', builder: (_, _) => const StoreScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/me', builder: (_, _) => const MeScreen())]),
         ],
       ),

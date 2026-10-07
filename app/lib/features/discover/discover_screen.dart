@@ -15,6 +15,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../profile/mood_widgets.dart';
+import 'match_modes.dart';
 import '../profile/profile_widgets.dart';
 import '../profile/request_actions.dart';
 
@@ -33,6 +34,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   int _current = 0;
   // Yeni deste yüklendiğinde CardSwiper'ı sıfırlamak için
   int _deckVersion = 0;
+  // Faz 20: eşleştirme modu (all | astro | music | interests | vibe)
+  String _mode = 'all';
 
   @override
   void initState() {
@@ -52,7 +55,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       _error = null;
     });
     try {
-      final cards = await ref.read(apiProvider).discover();
+      final cards = await ref.read(apiProvider).discover(mode: _mode);
       if (mounted) {
         setState(() {
           _cards = cards;
@@ -64,6 +67,16 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     } catch (e) {
       if (mounted) setState(() => _error = e);
     }
+  }
+
+  void _setMode(String mode) {
+    if (mode == _mode) return;
+    Fx.tap();
+    setState(() {
+      _mode = mode;
+      _finished = false;
+    });
+    _load();
   }
 
   // Sağ: beğen · Sol: geç · Yukarı: süper beğeni (jetonla). Hata olursa kart geri döner.
@@ -178,6 +191,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       body = ErrorRetry(error: _error!, onRetry: _load);
     } else if (cards == null) {
       body = const _DeckSkeleton();
+    } else if (_finished && _mode != 'all') {
+      body = ModeEmpty(mode: _mode, onBack: () => _setMode('all'));
     } else if (_finished) {
       body = CenteredMessage(
         icon: Icons.travel_explore_rounded,
@@ -279,7 +294,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: Column(children: [const _MoodBanner(), const _LiveActivityStrip(), const _GroupsStrip(), Expanded(child: body)]),
+        child: Column(children: [
+          ModeBar(mode: _mode, onSelected: _setMode),
+          const _MoodBanner(),
+          const _LiveActivityStrip(),
+          if (_mode == 'interests') const _GroupsStrip(),
+          Expanded(child: body),
+        ]),
       ),
     );
   }
@@ -353,8 +374,8 @@ class _MoodBanner extends ConsumerWidget {
       child: InkWell(
         onTap: () => showMoodSheet(context, ref),
         child: Container(
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          margin: const EdgeInsets.fromLTRB(16, 2, 16, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Brand.radius),
             color: Brand.coral.withValues(alpha: 0.08),
@@ -362,7 +383,7 @@ class _MoodBanner extends ConsumerWidget {
           child: Row(children: [
             const Text('💭', style: TextStyle(fontSize: 18)),
             const SizedBox(width: 10),
-            Expanded(child: Text(l.moodPromptBanner, style: theme.textTheme.bodySmall)),
+            Expanded(child: Text(l.moodPromptBanner, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall)),
             const Icon(Icons.chevron_right_rounded, size: 18),
           ]),
         ),
@@ -534,6 +555,7 @@ class _ProfileCardState extends State<_ProfileCard> {
                 right: 18,
                 bottom: 18,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  if (p.match != null) MatchBubble(match: p.match!),
                   Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                     Expanded(
                       child: Text.rich(

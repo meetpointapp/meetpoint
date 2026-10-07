@@ -564,14 +564,14 @@
   "trackIletisim": "Communication",
   "trackBaglanti": "Connection",
   "trackKimlik": "Identity",
-  "milestoneCountShort": "{n}/9",
+  "milestoneCountShort": "{n}/12",
   "milestoneBadgeTooltip": "{n, plural, =1{1 milestone completed} other{{n} milestones completed}}",
   "journeyTitle": "My Progress",
   "journeyRewardsTitle": "Unlocked rewards",
   "journeyRewardsEmpty": "No rewards yet. Complete a milestone and it'll show up here.",
   "journeyNextStepTitle": "Next step",
   "journeyNextStepBody": "You both like {interest} — start there",
-  "milestoneLabel": "{id, select, first_message{First message} week_long_chat{7-day conversation} first_icebreaker{First icebreaker game} first_match{First match} first_room_visit{First room visit} first_call{First call} profile_complete{Complete your profile} verified{Verification} vibe_done{Complete the vibe test} first_earning{Your first earning} earning_50usd{$50 earned} earning_100usd{$100 earned} other{{id}}}",
+  "milestoneLabel": "{id, select, first_message{First message} week_long_chat{7-day conversation} first_icebreaker{First icebreaker game} first_match{First match} first_gift{First gift} first_call{First call} profile_complete{Complete your profile} verified{Verification} vibe_done{Complete the vibe test} first_earning{Your first earning} earning_50usd{$50 earned} earning_100usd{$100 earned} other{{id}}}",
   "quietHoursTitle": "Quiet hours",
   "quietHoursHint": "Only calls come through during these hours.",
   "quietHours": "Turn on quiet hours",
@@ -619,28 +619,6 @@
   "showcaseCustom": "Customized",
   "activeNow": "Active now",
   "none": "None",
-  "avatarSection": "Avatar",
-  "avatarSkin": "Skin tone",
-  "avatarHairStyle": "Hair style",
-  "avatarHairColor": "Hair color",
-  "avatarOutfit": "Outfit color",
-  "avatarAccessory": "Accessory",
-  "avatarHairStyleLabel": "{id, select, bald{Bald} short{Short} long{Long} curly{Curly} other{{id}}}",
-  "avatarAccessoryLabel": "{id, select, glasses{Glasses} hat{Hat} headphones{Headphones} other{{id}}}",
-  "roomSection": "My room",
-  "roomEditTitle": "Decorate your room",
-  "roomWallpaper": "Wallpaper",
-  "roomFloor": "Floor",
-  "roomItemsHint": "Pick an item, then tap an empty spot on the grid. Tapping a placed item removes it.",
-  "roomShowcaseOptIn": "Showcase my room",
-  "roomShowcaseOptInHint": "If you turn this on, people you're not connected with can see your room in the weekly \"best rooms\" gallery.",
-  "roomShowcaseTitle": "This week's featured rooms",
-  "roomShowcaseEmpty": "No rooms showcased this week yet. Want to be the first?",
-  "roomVisit": "See their room",
-  "roomVisitTitle": "{name}'s room",
-  "roomNotConnected": "You need to have chatted with each other to see this room.",
-  "roomItemLabel": "{id, select, sofa{Sofa} bed{Bed} plant{Plant} lamp{Lamp} tv{TV} bookshelf{Bookshelf} table{Table} rug{Rug} window{Window} picture{Picture} item_piano{Piano} item_aquarium{Aquarium} item_chandelier{Chandelier} item_arcade{Arcade Machine} other{{id}}}",
-  "roomFull": "Room is full, remove an item first",
   "vibeQuestionLabel": "{id, select, ideal_date{What's your ideal date?} flirt_style{How would you describe your flirting style?} weekend{What does a typical weekend look like for you?} communication{What's your communication style?} conflict{What do you do when a conflict comes up?} dream_trip{What's your dream trip?} friday_night{Your ideal Friday night?} gift_style{How do you like to give gifts?} social_battery{What fuels your social battery?} love_language{How do you show love?} other{{id}}}",
   "vibeOptionLabel": "{id, select, road_trip{A spontaneous road trip} cafe_chat{A calm chat at a café} concert{A crowded concert or event} candlelit_dinner{A carefully planned romantic dinner} direct{Direct and bold} slow_burn{Slow, building trust step by step} playful{Playful and fun} deep_talk{I connect through deep conversations} explore_new_place{I explore somewhere new} stay_in{I unwind at home with a book or film} spontaneous_hangout{Unplanned hangouts with friends} planned_activity{A pre-planned activity} frequent_texts{Frequent, in-the-moment texting} rare_deep{Fewer but deeper conversations} voice_notes{Spontaneous voice notes} plans_ahead{I like clarity and planning ahead} talk_now{Talk it out right away} cool_off_first{I need to cool off first} bring_others{I ask mutual friends for advice} write_it_out{I write out my thoughts} backpacking{Unplanned backpacking adventure} quiet_cabin{A quiet cabin in the mountains} group_tour{A lively group tour} romantic_getaway{A romantic getaway for two} new_experience{Trying something I've never done} movie_at_home{Movie night at home} party{A crowded party} one_on_one{One-on-one time with someone} surprise_adventure{A surprise adventure} practical{Something useful and practical} shared_experience{An experience to share together} handwritten_note{A heartfelt handwritten note} crowd_energizes{A crowd energizes me} small_group{A small, close group is enough} one_friend{One close friend} alone_time{Alone time recharges me} adventure_together{By diving into adventures together} words{Through words and heartfelt expression} fun_together{By having fun together} reliability{By being reliable and steady} other{{id}}}",
   "vibeArchetypeName": "{id, select, maceraci_romantik{Adventurous Romantic} sakin_gozlemci{Calm Observer} sosyal_kelebek{Social Butterfly} pragmatik_planlayici{Practical Planner} tutkulu_idealist{Passionate Idealist} ozgur_ruh{Free Spirit} sadik_yoldas{Loyal Companion} merakli_kasif{Curious Explorer} duygusal_derinlik{Emotional Depth} eglence_duskunu{Life of the Party} sessiz_guc{Quiet Strength} dengeli_ruh{Balanced Soul} other{{id}}}",
@@ -665,14 +643,12 @@
   "interestGroupMemberCount": "{count} people",
   "interestGroupsTitle": "Discover by interest",
   "interestGroupEmpty": "No one available in this group right now.",
-  "storeItemName": "{id, select, frame_gold{Gold Frame} frame_neon{Neon Frame} frame_floral{Floral Frame} frame_stars{Starry Frame} badge_crown{Crown Badge} badge_fire{Fire Badge} badge_diamond{Diamond Badge} badge_heart{Heart Badge} theme_galaxy{Galaxy Theme} theme_fire{Fire Theme} theme_ice{Ice Theme} theme_royal{Royal Theme} item_piano{Piano} item_aquarium{Aquarium} item_chandelier{Chandelier} item_arcade{Arcade Machine} outfit_tuxedo{Tuxedo} outfit_superhero{Superhero} outfit_wizard{Wizard} outfit_astronaut{Astronaut} bubble_midnight{Midnight Bubble} bubble_sunset{Sunset Bubble} bubble_mint{Mint Bubble} bubble_rosegold{Rose Gold Bubble} chatbg_stars{Starry Background} chatbg_waves{Waves Background} chatbg_geometric{Geometric Background} chatbg_minimal{Minimal Background} other{{id}}}",
+  "storeItemName": "{id, select, frame_gold{Gold Frame} frame_neon{Neon Frame} frame_floral{Floral Frame} frame_stars{Starry Frame} badge_crown{Crown Badge} badge_fire{Fire Badge} badge_diamond{Diamond Badge} badge_heart{Heart Badge} theme_galaxy{Galaxy Theme} theme_fire{Fire Theme} theme_ice{Ice Theme} theme_royal{Royal Theme} bubble_midnight{Midnight Bubble} bubble_sunset{Sunset Bubble} bubble_mint{Mint Bubble} bubble_rosegold{Rose Gold Bubble} chatbg_stars{Starry Background} chatbg_waves{Waves Background} chatbg_geometric{Geometric Background} chatbg_minimal{Minimal Background} bubble_ocean{Ocean Bubble} bubble_neon{Neon Bubble} bubble_aurora{Aurora Bubble} bubble_gold{Gold Bubble} bubble_candy{Candy Bubble} bubble_forest{Forest Bubble} chatbg_sunset{Sunset Backdrop} chatbg_aurora{Aurora Backdrop} chatbg_hearts{Hearts Backdrop} chatbg_space{Space Backdrop} chatbg_forest{Forest Backdrop} chatbg_coffee{Coffee Backdrop} frame_rainbow{Rainbow Frame} frame_fire{Fire Frame} badge_star{Star Badge} badge_rocket{Rocket Badge} badge_cat{Cat Badge} badge_music{Music Badge} other{{id}}}",
   "storeTitle": "Store",
   "storeIntro": "Cosmetic items bought with coins — they never transfer between users, they just personalize your look.",
   "storeCategoryFrame": "Profile frames",
   "storeCategoryBadge": "Badges",
   "storeCategoryTheme": "Premium themes",
-  "storeCategoryRoomItem": "Room furniture",
-  "storeCategoryAvatarOutfit": "Avatar outfits",
   "storeCategoryChatBubble": "Chat bubble",
   "storeCategoryChatBackground": "Chat background",
   "storeBuy": "Buy",
@@ -767,6 +743,66 @@
       }
     }
   },
-  "navRoom": "Room",
-  "roomInBottomNavHint": "Decorate it from the Room tab in the bottom menu"
+  "musicGenreLabel": "{id, select, pop{Pop} rock{Rock} rap{Rap} electronic{Electronic} jazz{Jazz} classical{Classical} arabesk{Arabesk} turkish_folk{Turkish folk} turkish_pop{Turkish pop} metal{Metal} rnb{R&B} indie{Indie} latin{Latin} kpop{K-pop} reggae{Reggae} blues{Blues} other{{id}}}",
+  "@musicGenreLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "musicTaste": "Music taste",
+  "musicTasteHint": "Add your music taste to match with people who share it",
+  "discoverModeAll": "All",
+  "discoverModeAstro": "Astrology",
+  "discoverModeMusic": "Music",
+  "discoverModeInterests": "Interests",
+  "discoverModeVibe": "Vibe",
+  "discoverModeEmpty": "Nobody fits this mode right now. Enrich your profile or try another mode.",
+  "discoverModeEmptyAstro": "No strong zodiac matches yet. Try again in a bit.",
+  "discoverModeEmptyMusic": "Nobody shares your music taste yet. Have you added genres to your profile?",
+  "discoverModeEmptyVibe": "Take the 'Discover yourself' quiz first to get vibe matches.",
+  "addMusicTaste": "Add your music taste",
+  "takeVibeTest": "Take the quiz",
+  "matchReasonText": "{key, select, astro_trine{{a} and {b} share an element: a natural match, you'll click easily} astro_sextile{{a} and {b} complement each other: a fun, balanced pair} astro_opposite{{a} and {b} are opposites: drawn to each other, learning from each other} astro_same{You're both {a}: you get each other without words} astro_square{{a} and {b}: a spark-flying, passionate, lively pull} music_shared{You both listen to: {a}} interests_shared{Shared interests: {a}} other{{a}}}",
+  "@matchReasonText": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      },
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      }
+    }
+  },
+  "navStore": "Store",
+  "storeHeroTitle": "Give your chats and profile some style",
+  "storeCollected": "{owned}/{total} items in your collection",
+  "@storeCollected": {
+    "placeholders": {
+      "owned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "storeEquip": "Use",
+  "storeInUse": "In use",
+  "storeEquippedSnack": "Applied!",
+  "storeRemovedSnack": "Removed, back to default",
+  "emojiButton": "Emoji",
+  "emojiBackspace": "Delete",
+  "emojiCategoryLabel": "{id, select, recent{Recent} smileys{Smileys} hearts{Hearts and love} gestures{Gestures} fun{Fun and food} nature{Animals and nature} other{{id}}}",
+  "@emojiCategoryLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  }
 }

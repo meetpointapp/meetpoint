@@ -2088,7 +2088,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String milestoneCountShort(int n) {
-    return '$n/9';
+    return '$n/12';
   }
 
   @override
@@ -2127,7 +2127,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'week_long_chat': '7-day conversation',
       'first_icebreaker': 'First icebreaker game',
       'first_match': 'First match',
-      'first_room_visit': 'First room visit',
+      'first_gift': 'First gift',
       'first_call': 'First call',
       'profile_complete': 'Complete your profile',
       'verified': 'Verification',
@@ -2298,114 +2298,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get none => 'None';
-
-  @override
-  String get avatarSection => 'Avatar';
-
-  @override
-  String get avatarSkin => 'Skin tone';
-
-  @override
-  String get avatarHairStyle => 'Hair style';
-
-  @override
-  String get avatarHairColor => 'Hair color';
-
-  @override
-  String get avatarOutfit => 'Outfit color';
-
-  @override
-  String get avatarAccessory => 'Accessory';
-
-  @override
-  String avatarHairStyleLabel(String id) {
-    String _temp0 = intl.Intl.selectLogic(id, {
-      'bald': 'Bald',
-      'short': 'Short',
-      'long': 'Long',
-      'curly': 'Curly',
-      'other': '$id',
-    });
-    return '$_temp0';
-  }
-
-  @override
-  String avatarAccessoryLabel(String id) {
-    String _temp0 = intl.Intl.selectLogic(id, {
-      'glasses': 'Glasses',
-      'hat': 'Hat',
-      'headphones': 'Headphones',
-      'other': '$id',
-    });
-    return '$_temp0';
-  }
-
-  @override
-  String get roomSection => 'My room';
-
-  @override
-  String get roomEditTitle => 'Decorate your room';
-
-  @override
-  String get roomWallpaper => 'Wallpaper';
-
-  @override
-  String get roomFloor => 'Floor';
-
-  @override
-  String get roomItemsHint =>
-      'Pick an item, then tap an empty spot on the grid. Tapping a placed item removes it.';
-
-  @override
-  String get roomShowcaseOptIn => 'Showcase my room';
-
-  @override
-  String get roomShowcaseOptInHint =>
-      'If you turn this on, people you\'re not connected with can see your room in the weekly \"best rooms\" gallery.';
-
-  @override
-  String get roomShowcaseTitle => 'This week\'s featured rooms';
-
-  @override
-  String get roomShowcaseEmpty =>
-      'No rooms showcased this week yet. Want to be the first?';
-
-  @override
-  String get roomVisit => 'See their room';
-
-  @override
-  String roomVisitTitle(String name) {
-    return '$name\'s room';
-  }
-
-  @override
-  String get roomNotConnected =>
-      'You need to have chatted with each other to see this room.';
-
-  @override
-  String roomItemLabel(String id) {
-    String _temp0 = intl.Intl.selectLogic(id, {
-      'sofa': 'Sofa',
-      'bed': 'Bed',
-      'plant': 'Plant',
-      'lamp': 'Lamp',
-      'tv': 'TV',
-      'bookshelf': 'Bookshelf',
-      'table': 'Table',
-      'rug': 'Rug',
-      'window': 'Window',
-      'picture': 'Picture',
-      'item_piano': 'Piano',
-      'item_aquarium': 'Aquarium',
-      'item_chandelier': 'Chandelier',
-      'item_arcade': 'Arcade Machine',
-      'other': '$id',
-    });
-    return '$_temp0';
-  }
-
-  @override
-  String get roomFull => 'Room is full, remove an item first';
 
   @override
   String vibeQuestionLabel(String id) {
@@ -2658,14 +2550,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'theme_fire': 'Fire Theme',
       'theme_ice': 'Ice Theme',
       'theme_royal': 'Royal Theme',
-      'item_piano': 'Piano',
-      'item_aquarium': 'Aquarium',
-      'item_chandelier': 'Chandelier',
-      'item_arcade': 'Arcade Machine',
-      'outfit_tuxedo': 'Tuxedo',
-      'outfit_superhero': 'Superhero',
-      'outfit_wizard': 'Wizard',
-      'outfit_astronaut': 'Astronaut',
       'bubble_midnight': 'Midnight Bubble',
       'bubble_sunset': 'Sunset Bubble',
       'bubble_mint': 'Mint Bubble',
@@ -2674,6 +2558,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'chatbg_waves': 'Waves Background',
       'chatbg_geometric': 'Geometric Background',
       'chatbg_minimal': 'Minimal Background',
+      'bubble_ocean': 'Ocean Bubble',
+      'bubble_neon': 'Neon Bubble',
+      'bubble_aurora': 'Aurora Bubble',
+      'bubble_gold': 'Gold Bubble',
+      'bubble_candy': 'Candy Bubble',
+      'bubble_forest': 'Forest Bubble',
+      'chatbg_sunset': 'Sunset Backdrop',
+      'chatbg_aurora': 'Aurora Backdrop',
+      'chatbg_hearts': 'Hearts Backdrop',
+      'chatbg_space': 'Space Backdrop',
+      'chatbg_forest': 'Forest Backdrop',
+      'chatbg_coffee': 'Coffee Backdrop',
+      'frame_rainbow': 'Rainbow Frame',
+      'frame_fire': 'Fire Frame',
+      'badge_star': 'Star Badge',
+      'badge_rocket': 'Rocket Badge',
+      'badge_cat': 'Cat Badge',
+      'badge_music': 'Music Badge',
       'other': '$id',
     });
     return '$_temp0';
@@ -2694,12 +2596,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storeCategoryTheme => 'Premium themes';
-
-  @override
-  String get storeCategoryRoomItem => 'Room furniture';
-
-  @override
-  String get storeCategoryAvatarOutfit => 'Avatar outfits';
 
   @override
   String get storeCategoryChatBubble => 'Chat bubble';
@@ -2935,9 +2831,130 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get navRoom => 'Room';
+  String musicGenreLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'pop': 'Pop',
+      'rock': 'Rock',
+      'rap': 'Rap',
+      'electronic': 'Electronic',
+      'jazz': 'Jazz',
+      'classical': 'Classical',
+      'arabesk': 'Arabesk',
+      'turkish_folk': 'Turkish folk',
+      'turkish_pop': 'Turkish pop',
+      'metal': 'Metal',
+      'rnb': 'R&B',
+      'indie': 'Indie',
+      'latin': 'Latin',
+      'kpop': 'K-pop',
+      'reggae': 'Reggae',
+      'blues': 'Blues',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
 
   @override
-  String get roomInBottomNavHint =>
-      'Decorate it from the Room tab in the bottom menu';
+  String get musicTaste => 'Music taste';
+
+  @override
+  String get musicTasteHint =>
+      'Add your music taste to match with people who share it';
+
+  @override
+  String get discoverModeAll => 'All';
+
+  @override
+  String get discoverModeAstro => 'Astrology';
+
+  @override
+  String get discoverModeMusic => 'Music';
+
+  @override
+  String get discoverModeInterests => 'Interests';
+
+  @override
+  String get discoverModeVibe => 'Vibe';
+
+  @override
+  String get discoverModeEmpty =>
+      'Nobody fits this mode right now. Enrich your profile or try another mode.';
+
+  @override
+  String get discoverModeEmptyAstro =>
+      'No strong zodiac matches yet. Try again in a bit.';
+
+  @override
+  String get discoverModeEmptyMusic =>
+      'Nobody shares your music taste yet. Have you added genres to your profile?';
+
+  @override
+  String get discoverModeEmptyVibe =>
+      'Take the \'Discover yourself\' quiz first to get vibe matches.';
+
+  @override
+  String get addMusicTaste => 'Add your music taste';
+
+  @override
+  String get takeVibeTest => 'Take the quiz';
+
+  @override
+  String matchReasonText(String key, String a, String b) {
+    String _temp0 = intl.Intl.selectLogic(key, {
+      'astro_trine':
+          '$a and $b share an element: a natural match, you\'ll click easily',
+      'astro_sextile': '$a and $b complement each other: a fun, balanced pair',
+      'astro_opposite':
+          '$a and $b are opposites: drawn to each other, learning from each other',
+      'astro_same': 'You\'re both $a: you get each other without words',
+      'astro_square': '$a and $b: a spark-flying, passionate, lively pull',
+      'music_shared': 'You both listen to: $a',
+      'interests_shared': 'Shared interests: $a',
+      'other': '$a',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get navStore => 'Store';
+
+  @override
+  String get storeHeroTitle => 'Give your chats and profile some style';
+
+  @override
+  String storeCollected(int owned, int total) {
+    return '$owned/$total items in your collection';
+  }
+
+  @override
+  String get storeEquip => 'Use';
+
+  @override
+  String get storeInUse => 'In use';
+
+  @override
+  String get storeEquippedSnack => 'Applied!';
+
+  @override
+  String get storeRemovedSnack => 'Removed, back to default';
+
+  @override
+  String get emojiButton => 'Emoji';
+
+  @override
+  String get emojiBackspace => 'Delete';
+
+  @override
+  String emojiCategoryLabel(String id) {
+    String _temp0 = intl.Intl.selectLogic(id, {
+      'recent': 'Recent',
+      'smileys': 'Smileys',
+      'hearts': 'Hearts and love',
+      'gestures': 'Gestures',
+      'fun': 'Fun and food',
+      'nature': 'Animals and nature',
+      'other': '$id',
+    });
+    return '$_temp0';
+  }
 }

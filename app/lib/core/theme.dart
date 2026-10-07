@@ -43,10 +43,11 @@ ThemeData buildTheme(Brightness brightness) {
 
   return base.copyWith(
     textTheme: text,
-    scaffoldBackgroundColor: scheme.surface,
+    scaffoldBackgroundColor: dark ? const Color(0xFF130F17) : const Color(0xFFFFF8F6),
     appBarTheme: AppBarTheme(
-      backgroundColor: scheme.surface,
+      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
       centerTitle: false,
       titleTextStyle: text.titleLarge?.copyWith(color: scheme.onSurface, fontWeight: FontWeight.w800),
     ),
@@ -75,9 +76,14 @@ ThemeData buildTheme(Brightness brightness) {
       style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48), shape: const StadiumBorder()),
     ),
     cardTheme: CardThemeData(
-      elevation: 0,
+      // Yumuşak, hafif renkli gölge: düz görünen kartlara derinlik verir
+      elevation: dark ? 0 : 2,
+      shadowColor: Brand.coral.withValues(alpha: 0.22),
       color: dark ? const Color(0xFF1F1A23) : Colors.white,
-      shape: shape,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: (dark ? Colors.white : Brand.coral).withValues(alpha: dark ? 0.06 : 0.07)),
+      ),
       clipBehavior: Clip.antiAlias,
       margin: EdgeInsets.zero,
     ),
@@ -90,9 +96,13 @@ ThemeData buildTheme(Brightness brightness) {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
     ),
     navigationBarTheme: NavigationBarThemeData(
-      height: 64,
+      height: 68,
+      elevation: 12,
+      shadowColor: Brand.coral.withValues(alpha: 0.4),
+      surfaceTintColor: Colors.transparent,
       backgroundColor: dark ? const Color(0xFF1B161F) : Colors.white,
-      indicatorColor: Brand.coral.withValues(alpha: 0.15),
+      indicatorShape: const StadiumBorder(),
+      indicatorColor: Brand.coral.withValues(alpha: 0.16),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       iconTheme: WidgetStateProperty.resolveWith(
         (s) => IconThemeData(color: s.contains(WidgetState.selected) ? Brand.coral : scheme.onSurfaceVariant),
@@ -115,11 +125,12 @@ ThemeData buildTheme(Brightness brightness) {
 
 // Gradyanlı ana buton (en önemli eylemler için: devam et, eşleşme vb.)
 class GradientButton extends StatelessWidget {
-  const GradientButton({super.key, required this.label, required this.onPressed, this.busy = false, this.icon});
+  const GradientButton({super.key, required this.label, required this.onPressed, this.busy = false, this.icon, this.dense = false});
   final String label;
   final VoidCallback? onPressed;
   final bool busy;
   final IconData? icon;
+  final bool dense; // kompakt yükseklik (44)
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +163,7 @@ class GradientButton extends StatelessWidget {
                   }
                 : null,
             child: SizedBox(
-              height: 52,
+              height: dense ? 44 : 52,
               child: Center(
                 child: busy
                     ? const SizedBox.square(

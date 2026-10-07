@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/api.dart';
 import '../../core/catalog.dart';
+import '../../core/cosmetics.dart';
 import '../../core/fx.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
@@ -16,6 +17,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import 'emoji_picker.dart';
 import 'message_outbox.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -48,6 +50,8 @@ String _anniversaryLabel(AppLocalizations l, int days) => switch (days) {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
+  final _inputFocus = FocusNode();
+  bool _showEmoji = false; // Faz 20: emoji paneli
   List<ChatMessage>? _messages;
   List<IcebreakerGame> _games = [];
   List<TicTacToeGame> _ticTacToes = [];
@@ -75,6 +79,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _sub?.cancel();
     _typingTimer?.cancel();
     _input.dispose();
+    _inputFocus.dispose();
     super.dispose();
   }
 
@@ -253,6 +258,43 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   // Metin mesajları çevrimdışı kuyruktan gider (Faz 15): önce iyimser balon gösterilir, sunucuya
   // ulaşınca gerçek mesajla değiştirilir; ağ yoksa kuyrukta kalır ve bağlantı gelince tekrar denenir.
+  // Faz 20: emoji paneli — açılınca klavye kapanır, panel imlecin olduğu yere emoji ekler
+  void _toggleEmoji() {
+    if (_showEmoji) {
+      setState(() => _showEmoji = false);
+      _inputFocus.requestFocus();
+    } else {
+      _inputFocus.unfocus();
+      setState(() => _showEmoji = true);
+    }
+  }
+
+  void _insertEmoji(String emoji) {
+    final text = _input.text;
+    final sel = _input.selection;
+    final start = sel.isValid ? sel.start : text.length;
+    final end = sel.isValid ? sel.end : text.length;
+    _input.value = TextEditingValue(
+      text: text.replaceRange(start, end, emoji),
+      selection: TextSelection.collapsed(offset: start + emoji.length),
+    );
+    _onTyping(_input.text);
+  }
+
+  void _emojiBackspace() {
+    final text = _input.text;
+    final sel = _input.selection;
+    final cursor = sel.isValid ? sel.start : text.length;
+    if (sel.isValid && sel.start != sel.end) {
+      _input.value = TextEditingValue(text: text.replaceRange(sel.start, sel.end, ''), selection: TextSelection.collapsed(offset: sel.start));
+      return;
+    }
+    if (cursor == 0) return;
+    final before = text.substring(0, cursor).characters.skipLast(1).toString();
+    _input.value = TextEditingValue(text: before + text.substring(cursor), selection: TextSelection.collapsed(offset: before.length));
+    _onTyping(_input.text);
+  }
+
   Future<void> _send() async {
     final text = _input.text.trim();
     final myId = ref.read(sessionProvider).value?.userId;
@@ -421,8 +463,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final messages = _messages;
     // Faz 16: kozmetik mağaza — sohbet teması sadece benim kendi görünümümü etkiler (kişisel tercih)
     final myProfile = ref.watch(meProvider).value?.profile;
-    final myBubbleColor = storeChatBubbleColorOf(myProfile?.chatBubbleThemeId ?? '');
-    final myBackgroundColor = storeChatBackgroundColorOf(myProfile?.chatBackgroundThemeId ?? '');
+    final myBubbleStyle = storeChatBubbleStyleOf(myProfile?.chatBubbleThemeId ?? '');
+    final myBackdrop = storeChatBackdropStyleOf(myProfile?.chatBackgroundThemeId ?? '');
 
     return Scaffold(
       appBar: AppBar(
@@ -430,15 +472,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: InkWell(
           onTap: other == null ? null : () => context.push('/user/${other.id}'),
           child: Row(children: [
-            Stack(clipBehavior: Clip.none, children: [
-              Avatar(other, radius: 18),
-              if (other != null)
-                Positioned(
-                  bottom: -2,
-                  right: -2,
-                  child: AvatarFace(profile: other, size: 18, border: theme.colorScheme.surface),
-                ),
-            ]),
+            Avatar(other, radius: 18),
             const SizedBox(width: 10),
             Flexible(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
@@ -477,8 +511,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ]),
           ),
         Expanded(
-          child: ColoredBox(
-            color: myBackgroundColor ?? Colors.transparent,
+          child: ChatBackdrop(
+            style: myBackdrop,
             child: _error != null
                 ? ErrorRetry(error: _error!, onRetry: _load)
                 : messages == null
@@ -524,7 +558,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               message: m,
                               mine: m.senderId == myId,
                               locale: l.localeName,
-                              bubbleColor: myBubbleColor,
+                              bubbleStyle: myBubbleStyle,
                               onOpenPhoto: () => _openPhoto(m),
                               onRetry: m.failed ? () => _retry(m) : null,
                             );
@@ -535,8 +569,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
         SafeArea(
           top: false,
+          bottom: !_showEmoji,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(4, 4, 8, 8),
+            padding: EdgeInsets.fromLTRB(4, 4, 8, _showEmoji ? 4 : 8),
             child: Row(children: [
               IconButton(
                 tooltip: l.sendPhoto,
@@ -556,6 +591,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               Expanded(
                 child: TextField(
                   controller: _input,
+                  focusNode: _inputFocus,
+                  onTap: () {
+                    if (_showEmoji) setState(() => _showEmoji = false);
+                  },
                   minLines: 1,
                   maxLines: 5,
                   textInputAction: TextInputAction.send,
@@ -563,6 +602,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   onSubmitted: (_) => _send(),
                   decoration: InputDecoration(
                     hintText: l.typeMessage,
+                    prefixIcon: IconButton(
+                      tooltip: l.emojiButton,
+                      onPressed: _toggleEmoji,
+                      icon: Icon(_showEmoji ? Icons.keyboard_rounded : Icons.emoji_emotions_outlined),
+                    ),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
@@ -573,26 +617,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ]),
           ),
         ),
+        if (_showEmoji)
+          SafeArea(top: false, child: EmojiPicker(onEmoji: _insertEmoji, onBackspace: _emojiBackspace)),
       ]),
     );
   }
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.message, required this.mine, required this.locale, required this.onOpenPhoto, this.onRetry, this.bubbleColor});
+  const _Bubble({required this.message, required this.mine, required this.locale, required this.onOpenPhoto, this.onRetry, this.bubbleStyle});
   final ChatMessage message;
   final bool mine;
   final String locale;
   final VoidCallback onOpenPhoto;
   final VoidCallback? onRetry;
   // Faz 16: kozmetik mağaza — sadece kendi mesaj baloncuklarımı etkiler (kişisel tercih)
-  final Color? bubbleColor;
+  final ChatBubbleStyle? bubbleStyle;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final fg = mine ? Colors.white : scheme.onSurface;
+    // Sadece 1-3 emoji'den oluşan mesaj: balonsuz, büyük gösterilir
+    final big = !message.isPhoto && isEmojiOnly(message.body);
+    final fg = mine && !big ? (bubbleStyle?.text ?? Colors.white) : scheme.onSurface;
     final m = message;
 
     Widget content;
@@ -616,7 +664,7 @@ class _Bubble extends StatelessWidget {
         ]),
       );
     } else {
-      content = Text(m.body, style: TextStyle(color: fg));
+      content = Text(m.body, style: big ? const TextStyle(fontSize: 44, height: 1.15) : TextStyle(color: fg));
     }
 
     // Faz 15: durum ikonu — saat: kuyrukta/gönderiliyor, tek tik: sunucuya ulaştı, soluk çift tik:
@@ -644,8 +692,8 @@ class _Bubble extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 3),
           padding: const EdgeInsets.fromLTRB(14, 8, 12, 6),
           decoration: BoxDecoration(
-            gradient: mine && bubbleColor == null ? Brand.gradient : null,
-            color: mine ? bubbleColor : scheme.surfaceContainerHighest,
+            gradient: mine && !big ? (bubbleStyle?.gradient ?? Brand.gradient) : null,
+            color: mine || big ? null : scheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(18).copyWith(
               bottomRight: mine ? const Radius.circular(4) : null,
               bottomLeft: mine ? null : const Radius.circular(4),
