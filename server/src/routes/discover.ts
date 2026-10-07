@@ -14,6 +14,7 @@ import { swipeLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { debit, lockWallet } from '../wallet';
+import { MATCH_MODES, matchReason } from '../matching';
 import { publicProfile, withOnlineMany } from './profile';
 
 export const discoverRouter = Router();
@@ -25,6 +26,8 @@ export const discoverRouter = Router();
 // Süzme ve sıralamanın tamamı veritabanında yapılır, sadece gösterilecek 20 kart okunur
 // (kullanıcı sayısı büyüdükçe eski süper beğenenler veya yakındakiler kaybolmasın).
 const DECK_SIZE = 20;
+// Eşleştirme modlarında (burç, müzik...) skor JS'te hesaplandığı için daha geniş bir aday havuzu çekilir
+const MODE_POOL_SIZE = 300;
 const KM_PER_DEG_LAT = 111.32;
 
 // /discover ve /discover/groups/:interestId aynı uygunluk kurallarını paylaşır: daha önce
@@ -65,6 +68,7 @@ function eligibilityFilter(my: {
 }
 
 discoverRouter.get('/discover', async (req, res) => {
+  const { mode } = z.object({ mode: z.enum(MATCH_MODES).default('all') }).parse(req.query);
   const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
   const my = me.profile;
   if (!my) throw new HttpError(400, 'profile_required');
@@ -93,11 +97,29 @@ discoverRouter.get('/discover', async (req, res) => {
       AND NOT EXISTS (SELECT 1 FROM "Block" b WHERE (b."fromId" = u."id" AND b."toId" = ${me.id}) OR (b."fromId" = ${me.id} AND b."toId" = u."id"))
       ${distanceFilter}
     ORDER BY "superLikedMe" DESC, "boosted" DESC, "km" ASC NULLS LAST, u."createdAt" DESC
-    LIMIT ${DECK_SIZE}`;
+    LIMIT ${mode === 'all' ? DECK_SIZE : MODE_POOL_SIZE}`;
 
   const users = await prisma.user.findMany({ where: { id: { in: rows.map((r) => r.id) } }, include: { profile: true, photos: true } });
   const byId = new Map(users.map((u) => [u.id, u]));
-  const deck = rows.filter((r) => byId.has(r.id)).map((r) => ({ ...publicProfile(byId.get(r.id)!, my)!, superLikedMe: r.superLikedMe }));
+  let deck: (ReturnType<typeof publicProfile> & { superLikedMe: boolean; match?: unknown })[] = rows
+    .filter((r) => byId.has(r.id))
+    .map((r) => ({ ...publicProfile(byId.get(r.id)!, my)!, superLikedMe: r.superLikedMe }));
+
+  if (mode !== 'all') {
+    // Faz 20: seçilen moda uyan adaylar, uyum skoruna göre (eşit skorda mevcut sıra korunur) ve
+    // her kartta "neden bu kişi" açıklamasıyla
+    const scored = rows
+      .filter((r) => byId.has(r.id))
+      .map((r, i) => ({ r, i, reason: matchReason(mode, my, byId.get(r.id)!.profile!) }))
+      .filter((x): x is typeof x & { reason: NonNullable<typeof x.reason> } => x.reason != null)
+      .sort((a, b) => b.reason.score - a.reason.score || a.i - b.i)
+      .slice(0, DECK_SIZE);
+    deck = scored.map(({ r, reason }) => ({
+      ...publicProfile(byId.get(r.id)!, my)!,
+      superLikedMe: r.superLikedMe,
+      match: { mode: reason.mode, score: reason.score, key: reason.key, args: reason.args },
+    }));
+  }
   res.json(await withOnlineMany(deck));
 });
 

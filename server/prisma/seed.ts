@@ -56,6 +56,23 @@ const cityCoords: Record<string, { latitude: number; longitude: number }> = {
   'Eskişehir': { latitude: 39.78, longitude: 30.52 },
 };
 
+// Faz 20: eşleştirme modlarını (müzik, vibe) denemek için demo müzik zevkleri ve vibe arketipleri
+const demoMusic: Record<string, string[]> = {
+  'Test': ['rock', 'indie', 'electronic'],
+  'Ayşe': ['indie', 'jazz', 'turkish_pop'],
+  'Zeynep': ['pop', 'latin', 'electronic'],
+  'Elif': ['jazz', 'classical', 'indie'],
+  'Selin': ['pop', 'reggae'],
+  'Emma': ['rock', 'indie', 'blues'],
+  'Deniz': ['rock', 'metal', 'rap'],
+  'Mert': ['electronic', 'rock', 'rap'],
+  'Can': ['turkish_folk', 'rock', 'blues'],
+};
+const demoVibe: Record<string, string> = {
+  'Test': 'maceraci_romantik', 'Ayşe': 'maceraci_romantik', 'Zeynep': 'sosyal_kelebek', 'Elif': 'merakli_kasif',
+  'Selin': 'dengeli_ruh', 'Emma': 'ozgur_ruh', 'Deniz': 'eglence_duskunu', 'Mert': 'merakli_kasif', 'Can': 'sakin_gozlemci',
+};
+
 const demoUsers = [
   {
     name: 'Ayşe', gender: 'female', interestedIn: 'male', city: 'İstanbul', likesTest: true,
@@ -154,6 +171,8 @@ async function main() {
           country: 'Türkiye',
           bio: 'Test hesabı',
           interests: ['coffee', 'travel', 'tech'],
+          musicGenres: demoMusic['Test'],
+          vibeArchetypeId: demoVibe['Test'],
           lookingFor: 'relationship',
           latitude: 41.04,
           longitude: 29.0,
@@ -185,6 +204,8 @@ async function main() {
             country: u.city === 'London' ? 'UK' : 'Türkiye',
             bio: u.bio,
             interests: u.interests,
+            musicGenres: demoMusic[u.name] ?? [],
+            vibeArchetypeId: demoVibe[u.name] ?? '',
             prompts: u.prompts,
             ...u.details,
             ...cityCoords[u.city],

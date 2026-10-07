@@ -301,6 +301,8 @@ export async function sendGift(id: string, fromId: string, giftId: string) {
   emitToUser(toId, 'call:gift', payload);
   await applyEarningEventBonus(toId, gift.coins, `gift:${id}:${gift.id}`).catch(() => {});
   await checkEarningMilestones(toId).catch(() => {});
+  // Faz 17/20: "Sosyal cesaret yolculuğu" — Bağlantı izi (ilk hediye)
+  await unlockMilestone(fromId, 'first_gift').catch(() => {});
   return { balance: await getBalance(fromId) };
 }
 

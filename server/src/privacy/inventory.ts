@@ -108,8 +108,8 @@ export const INVENTORY: InventoryEntry[] = [
   },
   {
     category: 'Ekonomi ayarları (kişisel veri değil)',
-    tables: ['FinanceSettings', 'CoinPack'],
-    data: 'Paket fiyatları, kurlar, oranlar, son değiştiren yönetici',
+    tables: ['FinanceSettings', 'CoinPack', 'EarningEvent'],
+    data: 'Paket fiyatları, kurlar, oranlar, kazanç etkinlikleri (başlık, çarpan, tarih), son değiştiren yönetici',
     purpose: 'Fiyatlandırma ve ödeme hesapları',
     basis: ['meşru'],
     retention: 'Süresiz (değişiklikler işlem kaydında)',

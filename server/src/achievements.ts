@@ -14,7 +14,8 @@ export const TRACK_MILESTONES: Record<Track, readonly string[]> = {
   // "first_icebreaker": sohbet içi buz kırıcı mini oyun bir tur tamamlanınca (başlat + cevapla)
   // her iki tarafta da açılır — bkz. src/routes/conversations.ts icebreaker/:gameId/answer.
   iletisim: ['first_message', 'week_long_chat', 'first_icebreaker'],
-  baglanti: ['first_match', 'first_room_visit', 'first_call'],
+  // first_gift: bir görüşmede hediye gönderildiğinde (bkz. src/calls.ts sendGift)
+  baglanti: ['first_match', 'first_gift', 'first_call'],
   kimlik: ['profile_complete', 'verified', 'vibe_done'],
   // Faz 19: gerçek para kazanma adımları. Eşik, o ana kadar başkalarından kazanılan TÜM jetonun
   // (bozdurulmuş olsun olmasın) bugünkü bozdurma kuruyla USD karşılığına göre — bkz. checkEarningMilestones.
@@ -30,14 +31,14 @@ export const MILESTONE_REWARD: Record<MilestoneId, string> = {
   week_long_chat: 'chatbg_minimal',
   first_icebreaker: 'bubble_sunset',
   first_match: 'frame_gold',
-  first_room_visit: 'item_piano',
-  first_call: 'outfit_superhero',
+  first_gift: 'badge_heart',
+  first_call: 'bubble_neon',
   profile_complete: 'theme_royal',
   verified: 'badge_diamond',
   vibe_done: 'theme_galaxy',
   first_earning: 'badge_crown',
   earning_50usd: 'frame_stars',
-  earning_100usd: 'item_chandelier',
+  earning_100usd: 'frame_rainbow',
 };
 
 export function trackOf(milestoneId: string): Track {

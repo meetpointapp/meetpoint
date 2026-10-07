@@ -6,10 +6,10 @@ describe('Sosyal cesaret yolculuğu — kademe hesaplama (Faz 17)', () => {
     for (const t of TRACKS) expect(TRACK_MILESTONES[t]).toHaveLength(3);
   });
 
-  it('9 kademenin hepsinin benzersiz bir ödülü var', () => {
-    expect(ALL_MILESTONES).toHaveLength(9);
+  it('12 kademenin hepsinin benzersiz bir ödülü var', () => {
+    expect(ALL_MILESTONES).toHaveLength(12);
     const rewards = ALL_MILESTONES.map((m) => MILESTONE_REWARD[m]);
-    expect(new Set(rewards).size).toBe(9);
+    expect(new Set(rewards).size).toBe(12);
   });
 
   it('trackOf ve tierIndexOf doğru izi/sırayı döner', () => {

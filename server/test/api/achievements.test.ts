@@ -3,7 +3,7 @@
 // ücretsiz bir ödül verir (jeton harcanmadan StorePurchase satırı).
 import { describe, it } from 'vitest';
 import { call, check, makeUser, testDb, upload } from '../helpers';
-import { MILESTONE_REWARD } from '../../src/achievements';
+import { MILESTONE_REWARD, unlockMilestone } from '../../src/achievements';
 
 describe('Sosyal cesaret yolculuğu (Faz 17)', () => {
   it('ilk mesaj: İletişim izinin bronz kademesini açar ve ücretsiz ödül verir', async () => {
@@ -94,22 +94,21 @@ describe('Sosyal cesaret yolculuğu (Faz 17)', () => {
     check('profile_complete açık (fotoğraf + ilgi alanı + prompt + iş/bio yeterli)', done?.done === true);
   });
 
-  it('oda ziyareti: bağlantın olan birinin odasına bakınca Bağlantı izinde kademe açar', async () => {
+  it('ilk hediye: Bağlantı izinde ikinci kademeyi açar (eşleşme zaten birincisini açmıştı)', async () => {
     const a = await makeUser('Ach5a', 'male', 'female');
     const b = await makeUser('Ach5b', 'female', 'male');
     await call(a.t, 'POST', '/swipes', { toId: b.id, direction: 'like' });
     await call(b.t, 'POST', '/swipes', { toId: a.id, direction: 'like' });
 
-    // Eşleşme zaten first_match'i açtı; oda ziyaretinin AYRI bir kademe olduğunu doğrulamak için
-    // Bağlantı izinin bu ziyaretten önce sadece 1 (first_match) olduğunu kontrol ediyoruz.
     const before = await call(a.t, 'GET', '/me');
-    check('ziyaret öncesi Bağlantı izi 1 (sadece eşleşme)', before.achievements.baglanti.tier === 1);
+    check('hediye öncesi Bağlantı izi 1 (sadece eşleşme)', before.achievements.baglanti.tier === 1);
 
-    const visit = await call(a.t, 'GET', `/users/${b.id}/room`);
-    check('oda görüntülendi', visit.http === 200);
+    // sendGift() aktif bir arama gerektirir (calls.test.ts'te uçtan uca denenir); burada tetikleyicinin kendisi
+    await unlockMilestone(a.id, 'first_gift');
 
     const after = await call(a.t, 'GET', '/me');
-    check('ziyaret sonrası Bağlantı izi 2', after.achievements.baglanti.tier === 2);
+    check('hediye sonrası Bağlantı izi 2', after.achievements.baglanti.tier === 2);
+    check('first_gift kademesi işaretli', after.achievements.baglanti.milestones[1].id === 'first_gift' && after.achievements.baglanti.milestones[1].done);
   });
 
   it('kademe iki kez tetiklenince tekrar açılmaz (idempotent)', async () => {

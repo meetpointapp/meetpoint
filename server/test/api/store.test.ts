@@ -1,5 +1,5 @@
 // Faz 16: kozmetik mağaza. Jetonla alınır (kullanıcıdan kullanıcıya geçmez); satın alınmadan
-// premium bir öğe (çerçeve, rozet, tema, oda mobilyası, avatar kıyafeti, sohbet teması) profile
+// premium bir öğe (çerçeve, rozet, tema, sohbet teması) profile
 // uygulanamaz — sahiplik server/src/routes/store.ts assertOwned() ile zorlanır.
 import { describe, it } from 'vitest';
 import { call, check, makeUser } from '../helpers';
@@ -71,24 +71,6 @@ describe('Kozmetik mağaza (Faz 16)', () => {
 
     const me = await call(a.t, 'GET', '/me');
     check('sahibi kendi sohbet temasını görür', me.profile.chatBubbleThemeId === bubble.id);
-  });
-
-  it('oda mobilyası: sahip olunmadan yerleştirilemez, satın alınca yerleştirilebilir', async () => {
-    const a = await makeUser('Store4a', 'male', 'female');
-    const items = (await call(a.t, 'GET', '/store/items'))._arr;
-    const roomItem = items.find((i: { category: string }) => i.category === 'roomItem');
-
-    const rejected = await call(a.t, 'PUT', '/me/room', {
-      wallpaperId: '', floorId: '', items: [{ itemId: roomItem.id, x: 0, y: 0 }],
-    });
-    check('sahip olunmayan mobilya reddedilir', rejected.http === 403 && rejected.error === 'item_not_owned');
-
-    await call(a.t, 'POST', '/wallet/dev-topup', { packId: 'coins_1000' });
-    await call(a.t, 'POST', '/store/purchase', { itemId: roomItem.id });
-    const saved = await call(a.t, 'PUT', '/me/room', {
-      wallpaperId: '', floorId: '', items: [{ itemId: roomItem.id, x: 0, y: 0 }],
-    });
-    check('satın alınan mobilya yerleştirilebilir', saved.http === 200);
   });
 
   it('geçersiz öğe kimliği reddedilir', async () => {

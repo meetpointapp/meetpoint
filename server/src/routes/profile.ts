@@ -4,33 +4,22 @@ import multer from 'multer';
 import { z } from 'zod';
 import { currentSession, uid } from '../auth';
 import {
-  AVATAR_ACCESSORIES,
-  AVATAR_HAIR_COLORS,
-  AVATAR_HAIR_STYLES,
-  AVATAR_OUTFITS,
-  AVATAR_SKINS,
   CARD_BACKGROUNDS,
   EDUCATION,
   HABIT,
   INTERESTS,
   LOOKING_FOR,
   MAX_INTERESTS,
+  MAX_MUSIC_GENRES,
+  MUSIC_GENRES,
   MAX_PROMPTS,
   MOOD_TTL_MS,
   MOODS,
   PROMPTS,
-  ROOM_FLOORS,
-  ROOM_GRID_H,
-  ROOM_GRID_W,
-  ROOM_ITEMS,
-  ROOM_MAX_ITEMS,
-  ROOM_WALLPAPERS,
-  STORE_AVATAR_OUTFITS,
   STORE_BADGES,
   STORE_CHAT_BACKGROUNDS,
   STORE_CHAT_BUBBLES,
   STORE_FRAMES,
-  STORE_ROOM_ITEMS,
   STORE_THEMES,
   THEMES,
   ZODIAC,
@@ -41,7 +30,7 @@ import { ageOf } from '../age';
 import { verifyPassword } from '../passwords';
 import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
 import { config } from '../config';
-import { HttpError, isBlockedEitherWay, orderedPair, prisma } from '../db';
+import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
 import { isOnline } from '../realtime';
 import { getBalance, getCashable } from '../wallet';
@@ -49,7 +38,7 @@ import { reviewNewPhoto } from '../moderation/detect';
 import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { sendStreakReminders, touchStreak } from '../streak';
-import { checkProfileComplete, nextStepHint, tracksState, unlockMilestone } from '../achievements';
+import { ALL_MILESTONES, checkProfileComplete, nextStepHint, tracksState, unlockMilestone } from '../achievements';
 import { referralStats } from '../referral';
 import { weeklyDigest } from '../weeklyDigest';
 import { consentState, legalUpdatesNeeded, requireConsent } from '../privacy/consents';
@@ -98,6 +87,7 @@ export function publicProfile(
     city: p.city,
     country: p.country,
     interests: p.interests as string[],
+    musicGenres: p.musicGenres as string[],
     prompts: p.prompts as { id: string; answer: string }[],
     lookingFor: p.lookingFor,
     heightCm: p.heightCm,
@@ -108,11 +98,6 @@ export function publicProfile(
     drinking: p.drinking,
     themeId: p.themeId,
     cardBackgroundId: p.cardBackgroundId,
-    avatarSkinId: p.avatarSkinId,
-    avatarHairStyle: p.avatarHairStyle,
-    avatarHairColorId: p.avatarHairColorId,
-    avatarOutfitId: p.avatarOutfitId,
-    avatarAccessoryId: p.avatarAccessoryId,
     vibeArchetypeId: p.vibeArchetypeId,
     moodId: activeMood(p).moodId,
     ...(opts.owner ? { moodExpiresAt: activeMood(p).moodExpiresAt } : {}),
@@ -120,9 +105,10 @@ export function publicProfile(
     // sahibinin kendi görünümünü etkilediği için başkasına döndürülmez.
     frameId: p.frameId,
     badgeId: p.badgeId,
-    // Faz 17: "Sosyal cesaret yolculuğu" — toplam açılan kademe sayısı (0-9), keşfet kartında ve
+    // Faz 17: "Sosyal cesaret yolculuğu" — toplam açılan kademe sayısı (0-12), keşfet kartında ve
     // profilde görünen güncel rozet. Ayrıntılı iz/kademe kırılımı sadece sahibine (GET /me) gider.
-    milestoneCount: (p.milestones as string[]).length,
+    // Kaldırılmış eski kademeler (ör. first_room_visit) sayılmaz
+    milestoneCount: (p.milestones as string[]).filter((m) => (ALL_MILESTONES as readonly string[]).includes(m)).length,
     ...(opts.owner ? { chatBubbleThemeId: p.chatBubbleThemeId, chatBackgroundThemeId: p.chatBackgroundThemeId } : {}),
     // İncelemedeki fotoğraflar başkalarına gösterilmez; sahibi "incelemede" etiketiyle görür
     photos: [...user.photos]
@@ -275,6 +261,11 @@ const profileSchema = z.object({
     .max(MAX_PROMPTS)
     .default([])
     .refine((a) => new Set(a.map((p) => p.id)).size === a.length, 'duplicate_prompt'),
+  musicGenres: z
+    .array(z.enum(MUSIC_GENRES))
+    .max(MAX_MUSIC_GENRES)
+    .default([])
+    .transform((a) => [...new Set(a)]),
   lookingFor: z.enum(LOOKING_FOR).or(z.literal('')).default(''),
   heightCm: z.number().int().min(120).max(230).nullable().default(null),
   job: z.string().trim().max(60).default(''),
@@ -282,15 +273,10 @@ const profileSchema = z.object({
   zodiac: z.enum(ZODIAC).or(z.literal('')).default(''),
   smoking: z.enum(HABIT).or(z.literal('')).default(''),
   drinking: z.enum(HABIT).or(z.literal('')).default(''),
-  // themeId/avatarOutfitId: ücretsiz katalog + mağazadan satın alınmış premium seçenekler aynı
+  // themeId: ücretsiz katalog + mağazadan satın alınmış premium seçenekler aynı
   // alanı paylaşır (sahiplik kontrolü aşağıda assertOwned() ile yapılır, zod sadece kimliği doğrular)
   themeId: z.enum([...THEMES, ...STORE_THEMES]).or(z.literal('')).default(''),
   cardBackgroundId: z.enum(CARD_BACKGROUNDS).or(z.literal('')).default(''),
-  avatarSkinId: z.enum(AVATAR_SKINS).or(z.literal('')).default(''),
-  avatarHairStyle: z.enum(AVATAR_HAIR_STYLES).or(z.literal('')).default(''),
-  avatarHairColorId: z.enum(AVATAR_HAIR_COLORS).or(z.literal('')).default(''),
-  avatarOutfitId: z.enum([...AVATAR_OUTFITS, ...STORE_AVATAR_OUTFITS]).or(z.literal('')).default(''),
-  avatarAccessoryId: z.enum(AVATAR_ACCESSORIES).or(z.literal('')).default(''),
   // Faz 16: kozmetik mağaza — hepsi sahiplik gerektiren premium kataloglar (assertOwned())
   frameId: z.enum(STORE_FRAMES).or(z.literal('')).default(''),
   badgeId: z.enum(STORE_BADGES).or(z.literal('')).default(''),
@@ -302,7 +288,6 @@ profileRouter.put('/me/profile', requireNotRestricted, async (req, res) => {
   const data = profileSchema.parse(req.body);
   const owned = await ownedItemIds(uid(req));
   assertOwned(owned, data.themeId, STORE_THEMES);
-  assertOwned(owned, data.avatarOutfitId, STORE_AVATAR_OUTFITS);
   assertOwned(owned, data.frameId, STORE_FRAMES);
   assertOwned(owned, data.badgeId, STORE_BADGES);
   assertOwned(owned, data.chatBubbleThemeId, STORE_CHAT_BUBBLES);
@@ -449,102 +434,3 @@ profileRouter.get('/users/:id', async (req, res) => {
   res.json(target === me ? profile : await withOnline(profile));
 });
 
-// Faz 16: kendi oda (statik yerleşim, gerçek zamanlı gezinme yok). Izgara src/catalog.ts ROOM_GRID_*.
-const roomItemSchema = z.object({
-  // Ücretsiz katalog + mağazadan satın alınmış premium mobilyalar (sahiplik aşağıda assertOwned())
-  itemId: z.enum([...ROOM_ITEMS, ...STORE_ROOM_ITEMS]),
-  x: z.number().int().min(0).max(ROOM_GRID_W - 1),
-  y: z.number().int().min(0).max(ROOM_GRID_H - 1),
-});
-const roomSchema = z.object({
-  wallpaperId: z.enum(ROOM_WALLPAPERS).or(z.literal('')).default(''),
-  floorId: z.enum(ROOM_FLOORS).or(z.literal('')).default(''),
-  items: z
-    .array(roomItemSchema)
-    .max(ROOM_MAX_ITEMS)
-    .default([])
-    .refine((items) => new Set(items.map((i) => `${i.x},${i.y}`)).size === items.length, 'duplicate_position'),
-  // Faz 17 madde 10: "Odanı sergile" — açıksa oda, haftalık galeride bağlantısı olmayanlara da görünür
-  showcaseOptIn: z.boolean().default(false),
-});
-const roomDto = (p: Pick<Profile, 'roomWallpaperId' | 'roomFloorId' | 'roomItems' | 'roomShowcaseOptIn'>) => ({
-  wallpaperId: p.roomWallpaperId,
-  floorId: p.roomFloorId,
-  items: p.roomItems as { itemId: string; x: number; y: number }[],
-  showcaseOptIn: p.roomShowcaseOptIn,
-});
-
-profileRouter.get('/me/room', async (req, res) => {
-  const p = await prisma.profile.findUniqueOrThrow({ where: { userId: uid(req) } });
-  res.json(roomDto(p));
-});
-
-profileRouter.put('/me/room', requireNotRestricted, async (req, res) => {
-  const data = roomSchema.parse(req.body);
-  const owned = await ownedItemIds(uid(req));
-  for (const item of data.items) assertOwned(owned, item.itemId, STORE_ROOM_ITEMS);
-  await prisma.profile.update({
-    where: { userId: uid(req) },
-    data: {
-      roomWallpaperId: data.wallpaperId,
-      roomFloorId: data.floorId,
-      roomItems: data.items,
-      roomShowcaseOptIn: data.showcaseOptIn,
-      roomUpdatedAt: new Date(),
-    },
-  });
-  res.json({ ok: true });
-});
-
-// Faz 17 madde 10: "Odanı sergile" — son 7 günde güncellenmiş, sergilemeyi açık bırakmış odalardan
-// en çok eşyalı 10 tanesi (kural tabanlı "en güzel": emek = eşya sayısı, yapay zekâ yok).
-profileRouter.get('/rooms/showcase', async (req, res) => {
-  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const me = uid(req);
-  const profiles = await prisma.profile.findMany({
-    where: {
-      roomShowcaseOptIn: true,
-      roomUpdatedAt: { gte: since },
-      user: {
-        bannedAt: null,
-        deletionRequestedAt: null,
-        NOT: { OR: [{ blocksGiven: { some: { toId: me } } }, { blocksReceived: { some: { fromId: me } } }] },
-      },
-    },
-    select: { userId: true, displayName: true, roomWallpaperId: true, roomFloorId: true, roomItems: true },
-  });
-  const ranked = profiles
-    .map((p) => ({ ...p, itemCount: (p.roomItems as unknown[]).length }))
-    .filter((p) => p.itemCount > 0)
-    .sort((a, b) => b.itemCount - a.itemCount)
-    .slice(0, 10);
-  res.json(
-    ranked.map((p) => ({
-      userId: p.userId,
-      displayName: p.displayName,
-      wallpaperId: p.roomWallpaperId,
-      floorId: p.roomFloorId,
-      items: p.roomItems,
-    })),
-  );
-});
-
-// Ziyaret: bağlantın olan (bir konuşmanız olan) kişilerin odasını, veya galeri için sergilemeyi
-// açık bırakmış herkesin odasını salt görüntüleme ile görebilirsin.
-profileRouter.get('/users/:id/room', async (req, res) => {
-  const me = uid(req);
-  const target = req.params.id;
-  const user = await prisma.user.findUnique({ where: { id: target }, include: { profile: true } });
-  if (!user?.profile || user.bannedAt || user.deletionRequestedAt) throw new HttpError(404, 'not_found');
-  if (target !== me) {
-    if (await isBlockedEitherWay(me, target)) throw new HttpError(404, 'not_found');
-    if (!user.profile.roomShowcaseOptIn) {
-      const [userAId, userBId] = orderedPair(me, target);
-      const conv = await prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } } });
-      if (!conv) throw new HttpError(403, 'not_connected');
-    }
-  }
-  // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi (kendi odana bakmak sayılmaz)
-  if (target !== me) await unlockMilestone(me, 'first_room_visit');
-  res.json({ ...roomDto(user.profile), displayName: user.profile.displayName });
-});

@@ -166,6 +166,8 @@ model Profile {
   job          String   @default("")
   education    String   @default("") // high_school | bachelor | master | phd
   zodiac       String   @default("")
+  // Faz 20: müzik zevki (src/catalog.ts MUSIC_GENRES), "Müzik" eşleştirme modu için
+  musicGenres  Json     @default("[]")
   smoking      String   @default("") // no | sometimes | yes
   drinking     String   @default("") // no | sometimes | yes
 
