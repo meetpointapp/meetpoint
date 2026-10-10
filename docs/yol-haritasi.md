@@ -391,6 +391,13 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 5. ✅ **Görsel yenileme.** Renkli ışık hüzmeli uygulama zemini, yumuşak gölgeli kartlar, nav çubuğu, gradyanlı düğmeler. Ana sekmeler saydam Scaffold ile bu zeminin üstünde.
 6. ✅ **Avatar sistemi kaldırıldı.** Çizgi avatar (ten, saç, aksesuar), düzenleyicisi ve "avatar kıyafeti" mağaza ürünleri çıkarıldı; profil fotoğrafı ve mağaza çerçevesi kaldı. Bu kıyafetleri ödül veren iki kilometre taşının ödülü değişti (ilk arama → Neon balon, $100 kazanç → Gökkuşağı çerçeve). Veritabanındaki `avatar*` sütunları veri silinmesin diye duruyor (kullanılmıyor).
 7. ✅ **Sohbette emoji.** Girişteki emoji düğmesi kendi panelini açar (5 kategori, son kullanılanlar, silme tuşu; dış paket yok). Sadece 1-3 emoji'den oluşan mesaj balonsuz, büyük gösterilir.
+8. ✅ **Eşleşmeler ayrı sekme.** Alt menüde "Eşleşmeler" (karşılıklı beğeniyle açılanlar, "Yeni" etiketi, "Seni beğenenler" girişi); mesaj istekleri "Sohbetler" sekmesinin içine alındı (Sohbetler / İstekler).
+9. ✅ **Sohbet teması iki tarafta.** Sohbetin balon stili ve arka planı, sohbeti ilk başlatanın (ilk mesajı yazanın) seçimidir; iki taraf da aynısını görür. Başlatanın seçimi boşsa kişi kendi seçimini görür.
+10. ✅ **Premium tema uygulamanın rengini değiştirir.** Seçilen (ya da mağazadan alınan) tema artık sadece profil kartını değil, uygulamanın ana rengini (düğmeler, vurgular, gradyanlar, alt menü) boyar. `Brand` renkleri dinamik oldu, ağaç tema değişince yeniden kurulur.
+11. ✅ **Beğeni hakkı.** 24 saatte 25 beğeni (kayan pencere); keşfet kartında sayaç, hak bitince "50 jetonla sıfırla" ya da bekle. Süper beğeni ve geçmek sayılmaz.
+12. ✅ **Keşfet düzeni.** Kaydırmanın yanında büyük Geç / Beğen düğmeleri kartın üstüne bindi, kart ~%25 büyüdü; günlük ruh hali üst çubukta simge oldu.
+13. ✅ **Mesaj isteği emaneti.** Kabulde 50 jeton alıcıya hemen geçmez: alıcı en az 5 kelimelik 3 cevap yazınca geçer, 7 gün içinde yazmazsa gönderene iade edilir. Sohbette ve istek kartında ilerleme gösterilir.
+14. ✅ **Aramada ilk 30 saniye ücretsiz.** İlk dakika 30. saniyede alınır; ondan önce biten aramada hiç ücret yok. Çağrı ekranında geri sayım. `CALL_FREE_SECONDS` ile ayarlanır (0 = kapalı).
 
 ### Faz 20'de bulunanlar
 
@@ -398,9 +405,15 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 - `npm run test:unit` (104 test) ve `flutter test` (95 test) geçiyor, `tsc` ve `flutter analyze` temiz. API testleri hâlâ bu makinede çalışmıyor (Windows `embedded-postgres`); mağaza satın alma/uygulama, eşleştirme modları ve sohbet teması headless tarayıcı turuyla (`tools/ui-tours/faz20.mjs`) doğrulandı.
 - **Açık:** Müzik modunun etkili olması için kullanıcıların müzik türü eklemesi gerekir; kayıt sihirbazına eklenmedi (kayıt uzamasın diye), profil düzenlemede var.
 
-## Faz 21 · Canlı yayın (bire-çok)
+## Faz 21 · Agora altyapısı (gerçek sesli ve görüntülü arama)
 
-**Amaç:** Bire-bir arama yerine bire-çok canlı yayın; izleyiciler hediye gönderebilir. En büyük tek sıçrama, ama en büyük iş de bu — yeni yayın altyapısı, ölçekte moderasyon, yeni ekonomi kuralları gerektirir. Ayrı, kendi başına bir faz büyüklüğünde; Faz 15-18 gibi adım adım planlanmalı. **Henüz başlanmadı, kapsamı ayrıca netleştirilecek.**
+**Amaç:** Arama kodu (jeton üretimi, jeton yenileme, ortam doğrulaması, adil ücretlendirme) Faz 6 ve 15'te yazıldı, ama `AGORA_APP_ID` boş olduğu için bugüne kadar hep "test modunda" (ses ve görüntü yok) çalıştı. Bu faz, gerçek ses ve görüntünün akmasını sağlar. Canlı yayın (bire-çok) kapsam dışı bırakıldı.
+
+1. 👤 **Agora hesabı ve projesi.** console.agora.io'da proje açılır; App ID ve App Certificate alınır (Certificate açık olmalı, jetonlu giriş). Ücretsiz aylık dakika kotası ve fiyat kademeleri not edilir.
+2. 🛠 **Yapılandırma.** `AGORA_APP_ID` ve `AGORA_APP_CERT` sunucu ayarlarına girilir; yayında bunlar olmadan sunucunun açılmaması zorunlu hale gelir (`assertProductionConfig`). Eksik/yanlış anahtar için net hata mesajı.
+3. 🛠 **Gerçek cihazda medya testi.** İki telefonda (ya da telefon + tarayıcı) sesli ve görüntülü arama: izinler, kamera/mikrofon, bulanık başlayan görüntü, hoparlör/kulaklık, arka plana alma, ağ kopması ve yeniden bağlanma.
+4. 🛠 **Maliyet görünürlüğü.** Arama dakikaları ve tahmini Agora maliyeti yönetim panelinde görünür (jeton geliri ile karşılaştırma); beklenmedik kullanımda uyarı.
+5. 🛠 **Kalite ve güvenilirlik.** Zayıf ağda çözünürlük/bit hızı uyarlaması, jeton yenilemenin 1 saatten uzun gerçek aramada doğrulanması, ortam doğrulaması (iki taraf da katılmadıysa ücret yok) gerçek akışla sınanması.
 
 ## Faz 22 · Dış süreçler ve yayın
 
@@ -437,5 +450,5 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 | 17 Oyunlaştırma, alışkanlık ve organik büyüme | 8–12 gün |
 | 18 Kullanım kolaylığı | 4–6 gün |
 | 19 Kazanç heyecanı | 4–6 gün |
-| 20 Canlı yayın | Kapsam netleşince belirlenecek (muhtemelen 2–3 hafta) |
+| 21 Agora altyapısı | 2–4 gün (hesap ve gerçek cihaz testi kullanıcıya bağlı) |
 | 21 Dış süreçler ve yayın | Dış taraflara bağlı; beta 2–4 hafta |

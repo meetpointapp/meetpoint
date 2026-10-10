@@ -24,6 +24,15 @@ if (conv) {
   await call(mert, 'POST', `/conversations/${conv.id}/messages`, { body: 'Aynen, hangi grupları dinliyorsun?' });
 }
 
+// Tema denemesi: TOUR_THEME=theme_fire gibi verilirse mert bu temayı alıp uygular ('none' = varsayılana dön)
+if (process.env.TOUR_THEME) {
+  const wanted = process.env.TOUR_THEME === 'none' ? '' : process.env.TOUR_THEME;
+  if (wanted) await call(mert, 'POST', '/store/purchase', { itemId: wanted });
+  const me0 = (await call(mert, 'GET', '/me')).profile;
+  const r = await call(mert, 'PUT', '/me/profile', { ...me0, birthDate: me0.birthDate.slice(0, 10), themeId: wanted });
+  console.log('tema', wanted || 'varsayılan', r.status);
+}
+
 let errors = 0;
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
@@ -105,8 +114,12 @@ await shot('11d-emoji-sent', 1500);
 await page.goBack().catch(() => {});
 
 // Diğer sekmeler
-await tap('İstekler');
-await shot('12-requests', 1200);
+await tap('Eşleşmeler');
+await shot('12-matches', 1800);
+await tap('Sohbetler');
+await shot('12b-chats', 1500);
+await page.getByRole('tab', { name: /İstekler/ }).click({ timeout: 4000 }).catch(() => {});
+await shot('12c-chats-requests', 1200);
 await tap('Cüzdan');
 await shot('13-wallet', 1500);
 

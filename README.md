@@ -321,7 +321,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–21), dış işler en sonda (Faz 22)
 - [x] **Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [x] **Faz 19 · Kazanç heyecanı:** kazananlar sıralaması, canlı aktivite göstergesi, arama içi gerçek zamanlı kazanç sayacı, kazanç kilometre taşları, zaman sınırlı etkinlikler
 - [x] **Faz 20 · Eşleştirme modları, mağaza ve görsel yenileme:** astroloji/müzik/ilgi/vibe modları ve "neden bu kişi" açıklaması, oda kaldırıldı, mağaza sekmesi (10 balon, 10 arka plan, canlı önizleme, doğrudan kullan), kompakt profil + fotoğraf görüntüleyici, görsel yenileme
-- [ ] **Faz 21 · Canlı yayın (bire-çok):** kapsamı henüz netleşmedi, ayrı büyük faz
+- [ ] **Faz 21 · Agora altyapısı:** gerçek sesli/görüntülü arama için Agora hesabı ve anahtarları, gerçek cihaz testi, maliyet görünürlüğü, kalite
 - [ ] **Faz 22 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar
