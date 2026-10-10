@@ -398,6 +398,7 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 12. ✅ **Keşfet düzeni.** Kaydırmanın yanında büyük Geç / Beğen düğmeleri kartın üstüne bindi, kart ~%25 büyüdü; günlük ruh hali üst çubukta simge oldu.
 13. ✅ **Mesaj isteği emaneti.** Kabulde 50 jeton alıcıya hemen geçmez: alıcı en az 5 kelimelik 3 cevap yazınca geçer, 7 gün içinde yazmazsa gönderene iade edilir. Sohbette ve istek kartında ilerleme gösterilir.
 14. ✅ **Aramada ilk 30 saniye ücretsiz.** İlk dakika 30. saniyede alınır; ondan önce biten aramada hiç ücret yok. Çağrı ekranında geri sayım. `CALL_FREE_SECONDS` ile ayarlanır (0 = kapalı).
+15. ✅ **Marka adı VibeUpMe.** Bulut oturumunda uygulama adı MeetPoint'ten VibeUpMe'ye çevrildi: arayüz ve sunucu metinleri, Android/iOS paket kimliği (`com.vibeupme.vibeupme`), Dart paketi (`vibeupme`), yeni logo (kalp + oynatma üçgeni) ve tüm platform ikonları, native açılış ekranı. Yerel geliştirme veritabanının rol/ad kimliği bilerek `meetpoint` kaldı (mevcut `.pgdata` bu rolle kurulu; bkz. `server/scripts/postgres.ts`).
 
 ### Faz 20'de bulunanlar
 

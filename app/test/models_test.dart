@@ -463,6 +463,18 @@ void main() {
       expect(p.musicGenres, isEmpty);
     });
 
+    test('MyProfile.fromJson: kendi profilinde müzik türleri okunur (kaydedilince silinmesin)', () {
+      final me = MyProfile.fromJson({
+        ...base(),
+        'interestedIn': 'male',
+        'birthDate': '1996-05-03',
+        'musicGenres': ['rock', 'jazz'],
+      });
+      expect(me.musicGenres, ['rock', 'jazz']);
+      // Düzenleme taslağı müzik türlerini korur
+      expect(ProfileDraft.from(me).musicGenres, ['rock', 'jazz']);
+    });
+
     test('ProfileDraft: müzik türleri kopyalanır ve sunucuya gönderilir', () {
       final d = ProfileDraft()
         ..birthDate = DateTime(1996, 5, 3)

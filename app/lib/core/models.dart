@@ -176,6 +176,8 @@ class MyProfile extends PublicProfile {
           country: j['country'] ?? '',
           photos: [for (final p in (j['photos'] as List)) Photo.fromJson(p)],
           interests: [for (final i in (j['interests'] as List? ?? const [])) i as String],
+          // Faz 20: kendi profilinde de okunmalı; yoksa profil kaydedilince müzik türleri silinirdi
+          musicGenres: [for (final i in (j['musicGenres'] as List? ?? const [])) i as String],
           prompts: [for (final p in (j['prompts'] as List? ?? const [])) ProfilePrompt.fromJson(p)],
           lookingFor: j['lookingFor'] ?? '',
           heightCm: j['heightCm'],
