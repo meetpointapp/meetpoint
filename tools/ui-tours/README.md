@@ -36,7 +36,6 @@ Ekran görüntüleri `shots/` klasörüne düşer (git'e girmez). Kolaj: `node c
 | `faz16b.mjs` | Faz 16 (Kimlik, premium katman ve mağaza): profil vitrini, oda dekorasyonu + ziyaret, vibe testi, günlük ruh hali, ilgi alanı grupları, kozmetik mağaza satın alma, VibeUpMe+ abonelik, eşleşme kutlaması |
 | `faz17.mjs` | Faz 17 (Oyunlaştırma, alışkanlık ve organik büyüme): günlük giriş serisi, ilk eşleşme kutlaması + paylaşım, sohbet içi buz kırıcı oyun ve XOX, eşleşme yıldönümü, "Gelişimim" ekranı, haftalık özet, davet programı + kişisel bağlantı linki, vibe/profil paylaşım kartları, oda vitrini anahtarı + galeri |
 | `admin.mjs` | Yönetim paneli |
-| `icon.mjs` | Uygulama ikonunu üretir (`app/assets/icon`) |
 | `collage*.mjs` | Faz önizleme kolajları |
 
 Headless tarayıcıda bazı fotoğraflar siyah görünebilir (WebGL kısıtı); uygulama hatası değildir.
