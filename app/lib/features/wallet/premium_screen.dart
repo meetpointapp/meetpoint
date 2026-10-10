@@ -11,14 +11,14 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 
-// Faz 16: MeetPoint+ — RevenueCat üzerinden aylık abonelik (mevcut jeton mağazasıyla aynı
+// Faz 16: VibeUpMe+ — RevenueCat üzerinden aylık abonelik (mevcut jeton mağazasıyla aynı
 // CoinStore istemcisini paylaşır, sadece ürün kategorisi "subscription"). Tek perk: "seni
 // beğenenler" her zaman açık (server/src/routes/boosts.ts). Fiyat mağaza tarafında ayarlanır;
 // mağaza bağlı değilse (web/test) dev-subscribe ile test modu.
 final _premiumPriceProvider = FutureProvider<String?>((ref) async {
   try {
-    final prices = await CoinStore.instance.localPrices([meetPointPlusProductId], subscription: true);
-    return prices[meetPointPlusProductId];
+    final prices = await CoinStore.instance.localPrices([vibeUpMePlusProductId], subscription: true);
+    return prices[vibeUpMePlusProductId];
   } catch (_) {
     return null;
   }
@@ -40,7 +40,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
     setState(() => _busy = true);
     try {
       if (CoinStore.instance.available) {
-        if (!await CoinStore.instance.buy(meetPointPlusProductId, subscription: true)) return; // vazgeçti
+        if (!await CoinStore.instance.buy(vibeUpMePlusProductId, subscription: true)) return; // vazgeçti
         if (mounted) showSnack(context, l.paymentProcessing);
         // Webhook gecikebilir: sunucu RevenueCat'ten abonelik durumunu çekip yükler
         for (var i = 0; i < 3; i++) {

@@ -187,7 +187,7 @@ async function collect(userId: string) {
       status: t.status,
       createdAt: t.createdAt,
       closedAt: t.closedAt,
-      messages: t.messages.map((m) => ({ from: m.fromStaff ? 'MeetPoint' : 'me', body: m.body, attachment: m.attachment ? `support/${m.id}.webp` : null, createdAt: m.createdAt })),
+      messages: t.messages.map((m) => ({ from: m.fromStaff ? 'VibeUpMe' : 'me', body: m.body, attachment: m.attachment ? `support/${m.id}.webp` : null, createdAt: m.createdAt })),
     })),
     kvkkRequests: u.dsrRequests.map(({ kind, message, status, answer, createdAt, answeredAt }) => ({ kind, message, status, answer, createdAt, answeredAt })),
   };
@@ -195,8 +195,8 @@ async function collect(userId: string) {
 }
 
 const README: Record<string, string> = {
-  tr: 'MeetPoint kişisel veri kopyan\n\nveriler.json: hesabın, profilin, rızaların, beğenilerin, eşleşmelerin, gönderdiğin mesajlar, cüzdan hareketlerin, satın almaların, para çekme taleplerin, aramaların ve oturumların.\nphotos/: profil fotoğrafların.\nselfie/: mavi tik için gönderdiğin selfie\'ler (saklanıyorsa).\n\nKarşı tarafın mesajları ve seni şikayet eden kişiler başkalarının verisi olduğu için eklenmez.\nSorun ya da talebin için uygulamada Profil > Gizlilik ve verilerim > KVKK başvurusu.',
-  en: 'Your MeetPoint personal data copy\n\ndata.json: your account, profile, consents, likes, matches, messages you sent, wallet history, purchases, payout requests, calls and sessions.\nphotos/: your profile photos.\nselfie/: selfies you sent for verification (if still stored).\n\nThe other person\'s messages and the people who reported you are other people\'s data and are not included.\nFor questions: Profile > Privacy & my data > Data request in the app.',
+  tr: 'VibeUpMe kişisel veri kopyan\n\nveriler.json: hesabın, profilin, rızaların, beğenilerin, eşleşmelerin, gönderdiğin mesajlar, cüzdan hareketlerin, satın almaların, para çekme taleplerin, aramaların ve oturumların.\nphotos/: profil fotoğrafların.\nselfie/: mavi tik için gönderdiğin selfie\'ler (saklanıyorsa).\n\nKarşı tarafın mesajları ve seni şikayet eden kişiler başkalarının verisi olduğu için eklenmez.\nSorun ya da talebin için uygulamada Profil > Gizlilik ve verilerim > KVKK başvurusu.',
+  en: 'Your VibeUpMe personal data copy\n\ndata.json: your account, profile, consents, likes, matches, messages you sent, wallet history, purchases, payout requests, calls and sessions.\nphotos/: your profile photos.\nselfie/: selfies you sent for verification (if still stored).\n\nThe other person\'s messages and the people who reported you are other people\'s data and are not included.\nFor questions: Profile > Privacy & my data > Data request in the app.',
 };
 
 export async function buildExportZip(userId: string): Promise<Buffer> {
@@ -244,7 +244,7 @@ export async function processPendingExports() {
       const tr = x.user.locale === 'tr';
       await sendMail(
         x.user.email,
-        tr ? 'MeetPoint: verilerin hazır' : 'MeetPoint: your data is ready',
+        tr ? 'VibeUpMe: verilerin hazır' : 'VibeUpMe: your data is ready',
         tr
           ? `Merhaba,\n\nİstediğin kişisel veri kopyası hazır. Aşağıdaki bağlantıdan bir kez indirebilirsin (${retention.exportTtlDays} gün geçerli):\n\n${link}\n\nBu talebi sen yapmadıysan bağlantıyı açma, şifreni değiştir.`
           : `Hi,\n\nThe copy of your personal data is ready. You can download it once from the link below (valid for ${retention.exportTtlDays} days):\n\n${link}\n\nIf you didn't request this, don't open the link and change your password.`,
@@ -265,5 +265,5 @@ export async function takeExport(token: string) {
   const file = await privateStore.read(x.path);
   await privateStore.remove(x.path);
   if (!file) throw new HttpError(404, 'export_unavailable');
-  return { file, name: `meetpoint-${x.createdAt.toISOString().slice(0, 10)}.zip` };
+  return { file, name: `vibeupme-${x.createdAt.toISOString().slice(0, 10)}.zip` };
 }

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/core/api.dart';
-import 'package:meetpoint/core/ui.dart';
-import 'package:meetpoint/l10n/app_localizations.dart';
+import 'package:vibeupme/core/api.dart';
+import 'package:vibeupme/core/ui.dart';
+import 'package:vibeupme/l10n/app_localizations.dart';
 
 // Sunucunun döndürebileceği her hata kodunun uygulamada anlaşılır bir mesajı olmalı.
 // Yeni bir hata kodu eklenince bu test, ya mesaj eklenmesini ya da aşağıdaki listeye

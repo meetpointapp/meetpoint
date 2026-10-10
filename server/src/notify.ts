@@ -66,7 +66,7 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
         : { title: 'Para çekme talebi', body: 'Talebin reddedildi, jetonların bakiyene geri eklendi.' },
     support: (_n, subject) => ({ title: 'Destek yanıtı 💬', body: subject ? `Talebine yanıt geldi: ${subject}` : 'Destek talebine yanıt geldi.' }),
     // Faz 17: günlük giriş serisi. "extra" = mevcut seri sayısı (src/streak.ts)
-    streak_risk: (_n, days) => ({ title: 'Serin tehlikede! 🔥', body: `${days} günlük serini bugün kaybetme, MeetPoint'i aç.` }),
+    streak_risk: (_n, days) => ({ title: 'Serin tehlikede! 🔥', body: `${days} günlük serini bugün kaybetme, VibeUpMe'yi aç.` }),
   },
   en: {
     match: (n) => ({ title: "It's a match! 💞", body: `You and ${n} liked each other. Say hi!` }),
@@ -79,7 +79,7 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
         ? { title: 'Payout sent 💸', body: 'Your cash-out was paid. It may take a few days to reach your account.' }
         : { title: 'Cash-out request', body: 'Your request was declined and the coins are back in your balance.' },
     support: (_n, subject) => ({ title: 'Support reply 💬', body: subject ? `New reply to: ${subject}` : 'Your support request has a new reply.' }),
-    streak_risk: (_n, days) => ({ title: 'Your streak is at risk! 🔥', body: `Don't lose your ${days}-day streak — open MeetPoint today.` }),
+    streak_risk: (_n, days) => ({ title: 'Your streak is at risk! 🔥', body: `Don't lose your ${days}-day streak — open VibeUpMe today.` }),
   },
 };
 
@@ -128,7 +128,7 @@ export async function notify(toUserId: string, kind: Kind, fromUserId: string, e
       if (!messaging) console.log(`[push dev] → ${toUserId}: ${kind} gönderilmedi (${decision === 'quiet' ? 'sessiz saat' : 'kapalı'})`);
       return;
     }
-    const text = (TEXTS[to.locale] ?? TEXTS.en)[kind](from?.displayName ?? 'MeetPoint', extra);
+    const text = (TEXTS[to.locale] ?? TEXTS.en)[kind](from?.displayName ?? 'VibeUpMe', extra);
     const route = routeFor(kind, data);
     // Arama: uygulama, veriyi kendi tam ekran arama arayüzünü göstermek için kullanır (Faz 15
     // madde 1). Sadece veri mesajı olarak gider — üstte bir "notification" bloğu olursa Android
@@ -138,7 +138,7 @@ export async function notify(toUserId: string, kind: Kind, fromUserId: string, e
       ...data,
       kind,
       ...(route ? { route } : {}),
-      ...(isCall ? { callerName: from?.displayName ?? 'MeetPoint', callKind: extra ?? 'VOICE' } : {}),
+      ...(isCall ? { callerName: from?.displayName ?? 'VibeUpMe', callKind: extra ?? 'VOICE' } : {}),
     };
 
     if (!messaging) {

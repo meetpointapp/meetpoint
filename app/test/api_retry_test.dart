@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/core/api.dart';
-import 'package:meetpoint/core/auth_tokens.dart';
+import 'package:vibeupme/core/api.dart';
+import 'package:vibeupme/core/auth_tokens.dart';
 
 // Sahte ağ: her istek sıradaki adımı uygular (ağ hatası ya da yanıt)
 class _FakeNet implements HttpClientAdapter {

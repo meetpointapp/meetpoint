@@ -54,7 +54,7 @@ await browser.close();
 const b2 = await chromium.launch({ channel: 'msedge', headless: true });
 const admin = await b2.newPage({ viewport: { width: 1280, height: 900 } });
 await admin.goto(`${B}/admin`);
-await admin.fill('#login-email', 'admin@meetpoint.dev');
+await admin.fill('#login-email', 'admin@vibeupme.dev');
 await admin.fill('#login-password', 'password123');
 await admin.click('#login-form button');
 await admin.waitForSelector('.stat');

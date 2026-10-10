@@ -11,7 +11,7 @@ const PASSWORD = 'Meet-Point-Tour-2026!';
 // Sunucunun paketleri: 2FA kodu ve yönetici rolü vermek için
 const req = createRequire(`${REPO}/server/package.json`);
 const OTPAuth = req('otpauth');
-process.env.DATABASE_URL ??= 'postgresql://meetpoint:meetpoint-dev@localhost:5433/meetpoint';
+process.env.DATABASE_URL ??= 'postgresql://vibeupme:vibeupme-dev@localhost:5433/vibeupme';
 const { PrismaClient } = req('@prisma/client');
 const db = new PrismaClient();
 

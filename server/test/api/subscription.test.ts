@@ -1,4 +1,4 @@
-// Faz 16: MeetPoint+ — RevenueCat üzerinden aylık abonelik (gerçek para, mevcut IAP altyapısına
+// Faz 16: VibeUpMe+ — RevenueCat üzerinden aylık abonelik (gerçek para, mevcut IAP altyapısına
 // ek). Tek perk: "seni beğenenler" her zaman açık, jetonla açmaya gerek yok.
 // Sunucu şu ayarlarla çalışmalı: REVENUECAT_WEBHOOK_AUTH='Bearer test-webhook-secret'
 import { describe, it } from 'vitest';
@@ -27,7 +27,7 @@ const subEvent = (type: string, userId: string, extra: Record<string, unknown> =
   ...extra,
 });
 
-describe('MeetPoint+ abonelik (Faz 16)', () => {
+describe('VibeUpMe+ abonelik (Faz 16)', () => {
   it('RENEWAL/INITIAL_PURCHASE olayı premiumUntil ayarlar, GET /me yansıtır', async () => {
     const u = await registerVerified(`plus1${Date.now()}@test.com`);
     const me0 = await call(u.t, 'GET', '/me');

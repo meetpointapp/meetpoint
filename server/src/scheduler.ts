@@ -16,7 +16,7 @@ import { sendStreakReminders } from './streak';
 // lock ile seçilir. Lider çökerse bağlantısı kopar, kilit serbest kalır ve başka bir sunucu birkaç
 // saniye içinde liderliği devralır. İşler veritabanında durduğu için hiçbir şey kaybolmaz.
 
-const LOCK_KEY = 727_001; // "meetpoint zamanlayıcı" kilidi
+const LOCK_KEY = 727_001; // "vibeupme zamanlayıcı" kilidi
 let leaderClient: pg.PoolClient | null = null;
 let timer: NodeJS.Timeout | null = null;
 let running = false;

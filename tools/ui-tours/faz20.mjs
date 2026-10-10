@@ -1,18 +1,18 @@
 // Faz 20 UI turu: eşleştirme modları (astroloji/müzik/ilgi/vibe), mağaza sekmesi, kompakt profil,
-// görsel yenileme. Seed'li demo hesapla (mert6@meetpoint.dev) giriş yapar, ekran görüntüsü alır.
+// görsel yenileme. Seed'li demo hesapla (mert6@vibeupme.dev) giriş yapar, ekran görüntüsü alır.
 import fs from 'node:fs';
 import { chromium } from 'playwright-core';
 import { WEB, call } from './lib.mjs';
 
 const out = new URL('./shots/', import.meta.url).pathname.replace(/^\/(\w:)/, '$1');
 fs.mkdirSync(out, { recursive: true });
-const email = process.env.TOUR_EMAIL ?? 'mert6@meetpoint.dev';
+const email = process.env.TOUR_EMAIL ?? 'mert6@vibeupme.dev';
 const password = process.env.TOUR_PASSWORD ?? 'password123';
 
 // Hazırlık: mert ile deniz arasında sohbet aç (demo hesaplar, yoksa eşleştir) ve birkaç mesaj yaz
 const login = async (mail) => (await call(null, 'POST', '/auth/login', { email: mail, password })).token;
 const mert = await login(email);
-const deniz = await login('deniz5@meetpoint.dev');
+const deniz = await login('deniz5@vibeupme.dev');
 const mertId = (await call(mert, 'GET', '/me')).id;
 const denizId = (await call(deniz, 'GET', '/me')).id;
 await call(deniz, 'POST', '/swipes', { toId: mertId, direction: 'like' });

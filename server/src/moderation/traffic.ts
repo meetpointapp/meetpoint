@@ -99,7 +99,7 @@ export async function verifyTrafficChain() {
 export async function purgeOldTraffic() {
   const cutoff = new Date(Date.now() - retention.trafficLogDays * 86_400_000);
   return prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`SELECT set_config('meetpoint.retention', 'on', true)`;
+    await tx.$executeRaw`SELECT set_config('vibeupme.retention', 'on', true)`;
     const old = await tx.trafficBatch.findMany({ where: { createdAt: { lt: cutoff } }, select: { id: true } });
     if (!old.length) return 0;
     const ids = old.map((b) => b.id);

@@ -3,7 +3,7 @@ import { config } from '../config';
 import { prisma } from '../db';
 import { esc, sendPage } from '../web/page';
 
-// Faz 17 madde 11: kişisel bağlantı linki ("Beni MeetPoint'te bul"). Davet programıyla (src/referral.ts)
+// Faz 17 madde 11: kişisel bağlantı linki ("Beni VibeUpMe'de bul"). Davet programıyla (src/referral.ts)
 // aynı kodu kullanır — ayrı bir kimlik üretmeye gerek yok, ikisi de "kendi kodun" kavramı. Tamamen
 // herkese açık (oturum gerekmez): sadece görünen ad gösterilir, fotoğraf yok (gizlilik — bu sayfayı
 // arama motorları da görebilir, noindex olsa bile bazı botlar bunu yok sayar).
@@ -13,20 +13,20 @@ const lang = (v: unknown) => (v === 'en' ? 'en' : 'tr') as 'tr' | 'en';
 
 const T = {
   tr: {
-    title: 'MeetPoint',
-    foundIntro: (name: string) => `<b>${esc(name)}</b> seni MeetPoint'te bekliyor! 💌`,
-    genericIntro: "Biri seni MeetPoint'e davet etti! 💌",
-    body: 'MeetPoint; sohbet, sesli/görüntülü arama ve gerçek bağlantılar için tasarlanmış bir tanışma uygulaması.',
+    title: 'VibeUpMe',
+    foundIntro: (name: string) => `<b>${esc(name)}</b> seni VibeUpMe'de bekliyor! 💌`,
+    genericIntro: "Biri seni VibeUpMe'ye davet etti! 💌",
+    body: 'VibeUpMe; sohbet, sesli/görüntülü arama ve gerçek bağlantılar için tasarlanmış bir tanışma uygulaması.',
     download: 'Uygulamayı indir',
-    downloadHint: 'MeetPoint uygulamasını App Store veya Google Play\'den indirebilirsin.',
+    downloadHint: 'VibeUpMe uygulamasını App Store veya Google Play\'den indirebilirsin.',
   },
   en: {
-    title: 'MeetPoint',
-    foundIntro: (name: string) => `<b>${esc(name)}</b> is waiting for you on MeetPoint! 💌`,
-    genericIntro: 'Someone invited you to MeetPoint! 💌',
-    body: 'MeetPoint is a dating app built for chat, voice/video calls and real connections.',
+    title: 'VibeUpMe',
+    foundIntro: (name: string) => `<b>${esc(name)}</b> is waiting for you on VibeUpMe! 💌`,
+    genericIntro: 'Someone invited you to VibeUpMe! 💌',
+    body: 'VibeUpMe is a dating app built for chat, voice/video calls and real connections.',
     download: 'Download the app',
-    downloadHint: "You can download MeetPoint from the App Store or Google Play.",
+    downloadHint: "You can download VibeUpMe from the App Store or Google Play.",
   },
 };
 

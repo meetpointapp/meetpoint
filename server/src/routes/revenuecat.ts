@@ -29,7 +29,7 @@ revenueCatRouter.post('/', async (req, res) => {
   const transactionId = String(event.transaction_id ?? event.id ?? '');
   const productId = String(event.product_id ?? '');
 
-  // Faz 16: MeetPoint+ aylık abonelik. Jetonla alınan özelliklerden farklı — gerçek para,
+  // Faz 16: VibeUpMe+ aylık abonelik. Jetonla alınan özelliklerden farklı — gerçek para,
   // creditPurchase()'a girmez. Süre RevenueCat'in bildirdiği expiration_at_ms'ten alınır.
   if (productId === subscription.productId) {
     if (!userId) return res.json({ ok: true, ignored: 'missing_user' });

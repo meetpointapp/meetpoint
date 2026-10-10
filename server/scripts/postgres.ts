@@ -10,6 +10,9 @@ export type PgOptions = {
   log?: boolean;
 };
 
+// Geliştirme veritabanı kimliği eski adıyla kalır: uygulama VibeUpMe olarak yeniden adlandırıldı ama
+// mevcut yerel veri klasörü (server/.pgdata) 'meetpoint' rolüyle kuruldu; adı değiştirmek veritabanını
+// açılmaz yapar. Yayında ayrı bir veritabanı/rol kullanılır (docs/yayin-rehberi.md).
 export const PG_USER = 'meetpoint';
 export const PG_PASSWORD = 'meetpoint-dev';
 

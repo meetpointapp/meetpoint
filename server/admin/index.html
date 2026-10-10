@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MeetPoint Yönetim</title>
+  <title>VibeUpMe Yönetim</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
   <!-- Giriş -->
   <section id="login" class="login hidden">
     <form id="login-form" class="card login-card">
-      <div class="logo">meetpoint</div>
+      <div class="logo">vibeupme</div>
       <p class="muted">Yönetim paneli</p>
       <input id="login-email" type="email" placeholder="E-posta" autocomplete="username" required>
       <input id="login-password" type="password" placeholder="Şifre" autocomplete="current-password" required>
@@ -20,7 +20,7 @@
 
     <!-- 2FA kurulumu (ilk giriş) -->
     <form id="mfa-setup" class="card login-card hidden">
-      <div class="logo">meetpoint</div>
+      <div class="logo">vibeupme</div>
       <p class="item-title">İki adımlı doğrulamayı kur</p>
       <p class="muted small">Google Authenticator, Microsoft Authenticator veya Authy ile bu kodu tara. Tarayamıyorsan anahtarı elle gir.</p>
       <img id="mfa-qr" class="qr" alt="QR kod">
@@ -32,7 +32,7 @@
 
     <!-- Yedek kodlar (bir kez gösterilir) -->
     <div id="mfa-backup" class="card login-card hidden">
-      <div class="logo">meetpoint</div>
+      <div class="logo">vibeupme</div>
       <p class="item-title">Yedek kodların</p>
       <p class="muted small">Telefonunu kaybedersen bu kodlarla girebilirsin. Her biri bir kez kullanılır. Güvenli bir yere kaydet; bir daha gösterilmeyecek.</p>
       <div id="mfa-backup-codes" class="codes"></div>
@@ -42,7 +42,7 @@
 
     <!-- 2FA kodu (her girişte) -->
     <form id="mfa-verify" class="card login-card hidden">
-      <div class="logo">meetpoint</div>
+      <div class="logo">vibeupme</div>
       <p class="item-title">Doğrulama kodu</p>
       <p class="muted small">Doğrulayıcı uygulamadaki 6 haneli kodu gir. Telefonun yanında değilse yedek kodlarından birini kullanabilirsin.</p>
       <input id="mfa-code" autocomplete="one-time-code" placeholder="123456 veya yedek kod" maxlength="20" required>
@@ -55,7 +55,7 @@
   <!-- Panel -->
   <section id="app" class="hidden">
     <header class="topbar">
-      <div class="logo">meetpoint <span class="badge-admin">yönetim</span></div>
+      <div class="logo">vibeupme <span class="badge-admin">yönetim</span></div>
       <nav id="tabs">
         <button data-tab="overview" class="tab active">Özet</button>
         <button data-tab="reports" data-roles="moderator" class="tab">Moderasyon <span id="count-reports" class="count"></span></button>

@@ -212,7 +212,7 @@ class _LeaderboardPromo extends StatelessWidget {
   }
 }
 
-// Faz 16: MeetPoint+ tanıtım kartı — abone değilse davet, aboneyse aktif rozeti
+// Faz 16: VibeUpMe+ tanıtım kartı — abone değilse davet, aboneyse aktif rozeti
 class _PremiumPromo extends ConsumerWidget {
   const _PremiumPromo();
 

@@ -152,10 +152,10 @@ ALTER TABLE "Appeal" ADD CONSTRAINT "Appeal_userId_fkey" FOREIGN KEY ("userId") 
 ALTER TABLE "ModerationFlag" ADD CONSTRAINT "ModerationFlag_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Trafik kayıtları ve partileri değiştirilemez, silinemez (sadece saklama süresi dolanı imha işi siler:
--- o işlem bu tetikleyiciyi geçici olarak aşmak için "meetpoint.retention" ayarını açar)
+-- o işlem bu tetikleyiciyi geçici olarak aşmak için "vibeupme.retention" ayarını açar)
 CREATE OR REPLACE FUNCTION traffic_append_only() RETURNS trigger AS $$
 BEGIN
-  IF TG_OP = 'DELETE' AND current_setting('meetpoint.retention', true) = 'on' THEN
+  IF TG_OP = 'DELETE' AND current_setting('vibeupme.retention', true) = 'on' THEN
     RETURN OLD;
   END IF;
   RAISE EXCEPTION 'Trafik kayıtları değiştirilemez veya silinemez';

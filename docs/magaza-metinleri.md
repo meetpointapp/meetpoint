@@ -1,10 +1,10 @@
-# MeetPoint · Mağaza metinleri (taslak)
+# VibeUpMe · Mağaza metinleri (taslak)
 
-Uygulama adı henüz kesin değil; "MeetPoint" geçici. Ad değişirse metinlerde güncellenir.
+Uygulama adı henüz kesin değil; "VibeUpMe" geçici. Ad değişirse metinlerde güncellenir.
 
 ## Türkçe
 
-**Uygulama adı (30 karakter):** MeetPoint: Tanış, Eşleş, Konuş
+**Uygulama adı (30 karakter):** VibeUpMe: Tanış, Eşleş, Konuş
 
 **Kısa açıklama (Google Play, 80 karakter):**
 Yakındaki insanlarla tanış, eşleş, ücretsiz sohbet et, görüntülü konuş.
@@ -13,7 +13,7 @@ Yakındaki insanlarla tanış, eşleş, ücretsiz sohbet et, görüntülü konu�
 
 **Tam açıklama:**
 
-MeetPoint, gerçek insanlarla tanışmanın sade ve güvenli yolu.
+VibeUpMe, gerçek insanlarla tanışmanın sade ve güvenli yolu.
 
 💞 EŞLEŞ VE ÜCRETSİZ SOHBET ET
 Profilleri kaydır, beğen. Karşılıklı beğenide eşleşirsiniz ve sohbet tamamen ücretsizdir.
@@ -37,14 +37,14 @@ Aramalardan, hediyelerden ve kabul ettiğin isteklerden jeton kazan; doğrulanm�
 ⭐ ÖNE ÇIK
 Süper beğeniyle ilgini göster, öne çıkarmayla daha çok kişiye görün, seni kimlerin beğendiğini gör.
 
-MeetPoint'i indir, bugün birileriyle tanış.
+VibeUpMe'yi indir, bugün birileriyle tanış.
 
 **Anahtar kelimeler (App Store, 100 karakter):**
 arkadaşlık,tanışma,eşleşme,sohbet,görüntülü arama,flört,sevgili,yakınımdakiler,buluşma
 
 ## English
 
-**App name (30 chars):** MeetPoint: Meet, Match, Talk
+**App name (30 chars):** VibeUpMe: Meet, Match, Talk
 
 **Short description (Google Play, 80 chars):**
 Meet people nearby, match, chat for free and jump on a video call.
@@ -53,7 +53,7 @@ Meet people nearby, match, chat for free and jump on a video call.
 
 **Full description:**
 
-MeetPoint is the simple, safe way to meet real people.
+VibeUpMe is the simple, safe way to meet real people.
 
 💞 MATCH AND CHAT FOR FREE
 Swipe through profiles and like the ones you love. When it's mutual, you match, and chatting is completely free.
@@ -77,7 +77,7 @@ Earn coins from calls, gifts and accepted requests, and cash out with your verif
 ⭐ STAND OUT
 Show interest with a Super Like, get seen by more people with a Boost, and find out who already likes you.
 
-Download MeetPoint and meet someone today.
+Download VibeUpMe and meet someone today.
 
 **Keywords (App Store, 100 chars):**
 dating,meet,match,chat,video call,singles,flirt,nearby,friends,relationship

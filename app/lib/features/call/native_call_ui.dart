@@ -19,7 +19,7 @@ Future<void> showIncomingCallUi({
     await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
       id: callId,
       nameCaller: callerName,
-      appName: 'MeetPoint',
+      appName: 'VibeUpMe',
       avatar: avatarUrl,
       handle: callerName,
       type: isVideo ? 1 : 0,

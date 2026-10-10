@@ -264,7 +264,7 @@ describe('KVKK (Faz 11)', () => {
     const upd = await call(sup.t, 'PATCH', `/admin/api/privacy/breaches/${b.id}`, { authorityNotified: true, measures: 'Anahtarlar yenilendi.' });
     check('authority notification marked', upd.http === 200 && !!upd.authorityNotifiedAt);
 
-    const body = { scope: 'ids', ids: [victim.id], subject: 'MeetPoint: güvenlik bildirimi', message: 'Hesabınla ilgili bir güvenlik olayı yaşandı; şifreni değiştirmeni öneriyoruz.' };
+    const body = { scope: 'ids', ids: [victim.id], subject: 'VibeUpMe: güvenlik bildirimi', message: 'Hesabınla ilgili bir güvenlik olayı yaşandı; şifreni değiştirmeni öneriyoruz.' };
     const dry = await call(sup.t, 'POST', `/admin/api/privacy/breaches/${b.id}/notify`, body);
     check('dry run counts only', dry.recipients === 1 && dry.sent === undefined);
     const sent = await call(sup.t, 'POST', `/admin/api/privacy/breaches/${b.id}/notify`, { ...body, dryRun: false });

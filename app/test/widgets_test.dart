@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/core/fx.dart';
-import 'package:meetpoint/core/theme.dart';
-import 'package:meetpoint/core/ui.dart';
+import 'package:vibeupme/core/fx.dart';
+import 'package:vibeupme/core/theme.dart';
+import 'package:vibeupme/core/ui.dart';
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: Center(child: child)));
 

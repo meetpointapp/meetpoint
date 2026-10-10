@@ -8,7 +8,7 @@ import { decryptField, encryptField } from './fieldCrypto';
 // Gizli anahtar veritabanında şifreli durur. Aynı kod iki kez kullanılamaz (mfaLastCounter).
 // Telefon kaybına karşı 10 tek kullanımlık yedek kod verilir (sadece özetleri saklanır).
 
-const ISSUER = 'MeetPoint Yönetim';
+const ISSUER = 'VibeUpMe Yönetim';
 const totp = (secret: string, label: string) =>
   new OTPAuth.TOTP({ issuer: ISSUER, label, algorithm: 'SHA1', digits: 6, period: 30, secret: OTPAuth.Secret.fromBase32(secret) });
 

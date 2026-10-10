@@ -217,7 +217,7 @@ adminModerationRouter.post('/appeals/:id/decide', MOD, async (req, res) => {
   const tr = a.user.locale === 'tr';
   await sendMail(
     a.user.email,
-    tr ? 'MeetPoint: itirazının sonucu' : 'MeetPoint: result of your appeal',
+    tr ? 'VibeUpMe: itirazının sonucu' : 'VibeUpMe: result of your appeal',
     tr
       ? `Merhaba,\n\nİtirazın ${accept ? 'kabul edildi ve yaptırım kaldırıldı' : 'incelendi ve reddedildi'}.\n\n${answer}`
       : `Hi,\n\nYour appeal was ${accept ? 'accepted and the decision was lifted' : 'reviewed and rejected'}.\n\n${answer}`,

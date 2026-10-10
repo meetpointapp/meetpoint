@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fingerprintOf } from '../../src/errors';
 
 const frame = (line: number, col = 12) =>
-  `#0 _ChatScreenState._send (package:meetpoint/features/chat/chat_screen.dart:${line}:${col})\n#1 handleTap`;
+  `#0 _ChatScreenState._send (package:vibeupme/features/chat/chat_screen.dart:${line}:${col})\n#1 handleTap`;
 
 describe('hata parmak izi (gruplama)', () => {
   it('satır/sütun numarası farklı olsa da aynı hata aynı grupta', () => {

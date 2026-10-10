@@ -1,4 +1,4 @@
-# MeetPoint · Mağaza uyumu ve form içerikleri
+# VibeUpMe · Mağaza uyumu ve form içerikleri
 
 > Faz 14. Apple App Store ve Google Play kurallarının madde madde kontrolü, mağaza formlarının cevapları ve inceleme notu.
 > Kurallar sık güncellenir: gönderimden hemen önce (Faz 19) resmi metinlerle tekrar karşılaştırılmalı.
@@ -103,14 +103,14 @@ Yayın sunucusunda bir kez:
 REVIEW_ACCOUNT_PASSWORD='buraya-en-az-12-karakterlik-sifre' npm run review:account
 ```
 
-`review@meetpoint.app` (e-posta `REVIEW_ACCOUNT_EMAIL` ile değişir) ve onunla eşleşmiş `review-partner@meetpoint.app` açılır. İnceleme hesabına 1000 promosyon jetonu yüklenir (mağazadan satın almadan ücretli özellikler denenebilsin), satış koşulları ve rızalar onaylı gelir. Tekrar çalıştırmak hesabı sıfırlar.
+`review@vibeupme.app` (e-posta `REVIEW_ACCOUNT_EMAIL` ile değişir) ve onunla eşleşmiş `review-partner@vibeupme.app` açılır. İnceleme hesabına 1000 promosyon jetonu yüklenir (mağazadan satın almadan ücretli özellikler denenebilsin), satış koşulları ve rızalar onaylı gelir. Tekrar çalıştırmak hesabı sıfırlar.
 
 **App Review Notes (İngilizce, forma yapıştır):**
 
-> Demo account: review@meetpoint.app / (password)
+> Demo account: review@vibeupme.app / (password)
 > The account already has a match ("Mia") with a chat, and 1,000 coins so paid features can be tested without purchasing.
 >
-> MeetPoint is an 18+ dating app. Chatting after a mutual match is free. Coins (sold only via In-App Purchase, never expire) are used to message people you haven't matched with, for per-minute voice/video calls and virtual gifts. The coins a user spends go to the receiving user; receivers may request a payout of coins earned from others after identity verification (payout happens outside the app by bank transfer). Purchased coins cannot be cashed out.
+> VibeUpMe is an 18+ dating app. Chatting after a mutual match is free. Coins (sold only via In-App Purchase, never expire) are used to message people you haven't matched with, for per-minute voice/video calls and virtual gifts. The coins a user spends go to the receiving user; receivers may request a payout of coins earned from others after identity verification (payout happens outside the app by bank transfer). Purchased coins cannot be cashed out.
 >
 > Safety: every profile, chat and call has Report and Block. Reports go to a moderation queue reviewed by our team (urgent reports are prioritised). Sharing contact details, spam and explicit images are detected automatically and queued for review. Explicit or sexual content and any paid sexual service are forbidden by our Community Rules and lead to a permanent ban.
 >

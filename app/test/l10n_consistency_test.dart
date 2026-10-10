@@ -15,7 +15,7 @@ const _identicalAllowed = {
   'emojiButton', // "Emoji": iki dilde de aynı kelime
   'discoverModeVibe', // "Vibe": iki dilde de aynı kelime
   'bonusCoins', // "+{count} bonus": "bonus" kelimesi TR'de de kullanılıyor
-  'premiumTitle', // "MeetPoint+": marka/ürün adı, çevrilmez
+  'premiumTitle', // "VibeUpMe+": marka/ürün adı, çevrilmez
   'milestoneCountShort', // "{n}/9": sadece sayı
   'icebreakerTheyChose', // "{name}: {choice}": newMessageFrom ile aynı biçim, içerik değil
 };

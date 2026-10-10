@@ -1,6 +1,6 @@
 // Mağaza incelemesi (Apple App Review / Google Play) için demo hesap. Yayın sunucusunda bir kez çalıştırılır;
 // tekrar çalıştırılırsa hesabı sıfırlar (şifre, bakiye, rızalar). İki hesap açar:
-//   REVIEW_ACCOUNT_EMAIL (varsayılan review@meetpoint.app): incelemecinin gireceği hesap
+//   REVIEW_ACCOUNT_EMAIL (varsayılan review@vibeupme.app): incelemecinin gireceği hesap
 //   review-partner+<aynı alan>: onunla eşleşmiş, sohbet geçmişi olan demo profil
 // Kullanım:
 //   REVIEW_ACCOUNT_PASSWORD='en-az-12-karakter' npm run review:account
@@ -78,7 +78,7 @@ async function main() {
   const [a, b] = [reviewer.id, partner.id].sort();
   const conv = await prisma.conversation.upsert({ where: { userAId_userBId: { userAId: a, userBId: b } }, create: { userAId: a, userBId: b, origin: 'MATCH' }, update: {} });
   if (!(await prisma.message.count({ where: { conversationId: conv.id } }))) {
-    await prisma.message.create({ data: { conversationId: conv.id, senderId: partner.id, body: 'Hi Alex! Welcome to MeetPoint 👋' } });
+    await prisma.message.create({ data: { conversationId: conv.id, senderId: partner.id, body: 'Hi Alex! Welcome to VibeUpMe 👋' } });
   }
   for (const [from, to] of [[reviewer.id, partner.id], [partner.id, reviewer.id]]) {
     await prisma.swipe.upsert({ where: { fromId_toId: { fromId: from, toId: to } }, create: { fromId: from, toId: to, direction: 'like' }, update: {} });

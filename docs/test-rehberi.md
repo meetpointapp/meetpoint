@@ -1,4 +1,4 @@
-# MeetPoint · Elle test rehberi
+# VibeUpMe · Elle test rehberi
 
 Uygulama web sürümüyle tarayıcıda test edilir: http://localhost:8080
 Yönetim paneli: http://localhost:4000/admin
@@ -25,11 +25,11 @@ Yeni hesap açarken `password123` gibi yaygın şifreler artık kabul edilmez; `
 
 | Hesap | Ne için |
 |---|---|
-| `test@meetpoint.dev` | Ana test hesabı (erkek). 1000 jeton, 2 gelen mesaj isteği; Ayşe ve Elif seni beğenmiş, Deniz süper beğenmiş |
-| `aye0@meetpoint.dev` | Ayşe: ikinci kişi (eşleşme, sohbet, arama için) |
-| `zeynep1@meetpoint.dev`, `elif2@…`, `selin3@…`, `emma4@…`, `deniz5@…` | Diğer demo kadınlar |
-| `mert6@meetpoint.dev`, `can7@…` | Demo erkekler |
-| `admin@meetpoint.dev` | Yönetim paneli |
+| `test@vibeupme.dev` | Ana test hesabı (erkek). 1000 jeton, 2 gelen mesaj isteği; Ayşe ve Elif seni beğenmiş, Deniz süper beğenmiş |
+| `aye0@vibeupme.dev` | Ayşe: ikinci kişi (eşleşme, sohbet, arama için) |
+| `zeynep1@vibeupme.dev`, `elif2@…`, `selin3@…`, `emma4@…`, `deniz5@…` | Diğer demo kadınlar |
+| `mert6@vibeupme.dev`, `can7@…` | Demo erkekler |
+| `admin@vibeupme.dev` | Yönetim paneli |
 
 **İki kişilik testler için** (eşleşme, sohbet, arama) ikinci hesabı **gizli pencerede** veya başka bir tarayıcıda aç. Aynı tarayıcının sekmeleri aynı oturumu paylaşır.
 
@@ -104,7 +104,7 @@ Yeni hesap açarken `password123` gibi yaygın şifreler artık kabul edilmez; `
 - [ ] Profil › Yardım ve destek: arama ("iade", "arama"), kategoriler, "Bize yaz"
 - [ ] Yeni talep: kategori + başlık + açıklama + ekran görüntüsü → yazışma ekranı "Yanıt bekliyor"
 - [ ] Cüzdan geçmişinde bir harekete dokun → "Bu işlemle ilgili yardım al" → talepte işlem iliştirilmiş
-- [ ] Panel → Destek: talebi aç, ekran görüntüsünü gör, yanıtla → uygulamada okunmamış rozeti, yazışmada "MeetPoint Destek"
+- [ ] Panel → Destek: talebi aç, ekran görüntüsünü gör, yanıtla → uygulamada okunmamış rozeti, yazışmada "VibeUpMe Destek"
 - [ ] Panel → Destek → Yardım merkezi: soru ekle / yayından kaldır; uygulamada görünüp kayboluyor
 - [ ] Panel → Destek → Künye: unvanı gir → http://localhost:4000/legal/imprint ve /legal/terms'te görünüyor
 - [ ] Web: http://localhost:4000/help, http://localhost:4000/account/delete (yanlış şifre / doğru şifre)

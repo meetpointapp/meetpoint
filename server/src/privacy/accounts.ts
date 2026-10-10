@@ -25,7 +25,7 @@ export async function requestDeletion(userId: string) {
   const when = fmtDate(deleteAfter, user.locale);
   await sendMail(
     user.email,
-    user.locale === 'tr' ? 'MeetPoint: hesabın silinecek' : 'MeetPoint: your account will be deleted',
+    user.locale === 'tr' ? 'VibeUpMe: hesabın silinecek' : 'VibeUpMe: your account will be deleted',
     user.locale === 'tr'
       ? `Merhaba,\n\nHesap silme talebini aldık. Hesabın artık kimseye görünmüyor ve ${when} tarihinde kalıcı olarak silinecek.\n\nFikrini değiştirirsen bu tarihten önce uygulamaya giriş yapman yeterli; hesabın olduğu gibi geri gelir.\n\nBu talebi sen yapmadıysan hemen giriş yap ve şifreni değiştir.`
       : `Hi,\n\nWe received your request to delete your account. Your account is now hidden and will be permanently deleted on ${when}.\n\nIf you change your mind, just sign in before then and everything will be restored.\n\nIf you didn't request this, sign in now and change your password.`,

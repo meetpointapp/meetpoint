@@ -86,7 +86,7 @@ await page.getByRole('button', { name: 'Tamam' }).click();
 await shot('a10-me-pending', 2000);
 
 // Yönetici onaylasın -> rozet
-const admin = await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' });
+const admin = await call(null, 'POST', '/auth/login', { email: 'admin@vibeupme.dev', password: 'password123' });
 const queue = await call(admin.token, 'GET', '/admin/api/verifications');
 const mine = queue._arr.find((v) => v.user.email === email);
 await call(admin.token, 'POST', `/admin/api/verifications/${mine.id}/approve`, {});
@@ -117,10 +117,10 @@ console.log('banned notice shown:', bannedShown > 0, me.id ? '' : '');
 // 7) Şifremi unuttum (test hesabı)
 await page.getByRole('button', { name: 'Şifremi unuttum' }).click();
 await page.waitForTimeout(1000);
-await typeInto('E-posta', 'test@meetpoint.dev');
+await typeInto('E-posta', 'test@vibeupme.dev');
 await page.getByRole('button', { name: 'Kod gönder' }).click();
 await shot('a14-reset-code', 2000);
-const resetCode = await latestCode('test@meetpoint.dev');
+const resetCode = await latestCode('test@vibeupme.dev');
 await typeInto('000000', resetCode);
 await page.getByRole('textbox', { name: 'Yeni şifre' }).click();
 await page.keyboard.type('password123', { delay: 15 });

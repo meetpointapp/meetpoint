@@ -1,4 +1,4 @@
-# meetpoint
+# vibeupme
 
 A new Flutter project.
 

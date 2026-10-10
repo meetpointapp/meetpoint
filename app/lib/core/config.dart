@@ -18,5 +18,5 @@ const maxPhotos = 6;
 // Hata raporlarında görünür; pubspec'teki sürümle aynı tutulmalı
 const appVersion = String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
 
-// Faz 16: MeetPoint+ aylık abonelik. Sunucudaki (server/src/config.ts) varsayılanla aynı olmalı.
-const meetPointPlusProductId = String.fromEnvironment('MEETPOINT_PLUS_PRODUCT_ID', defaultValue: 'meetpoint_plus_monthly');
+// Faz 16: VibeUpMe+ aylık abonelik. Sunucudaki (server/src/config.ts) varsayılanla aynı olmalı.
+const vibeUpMePlusProductId = String.fromEnvironment('VIBEUPME_PLUS_PRODUCT_ID', defaultValue: 'vibeupme_plus_monthly');

@@ -1,7 +1,7 @@
 // Faz 17 madde 6: eşleşme yıldönümü — takvim günü bazında 1 hafta/1 ay/3 ay/6 ay ve her yıl
 // dönümünde tetiklenmeli, diğer günlerde null dönmeli.
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/features/chat/chat_screen.dart';
+import 'package:vibeupme/features/chat/chat_screen.dart';
 
 void main() {
   group('matchAnniversaryDays (Faz 17)', () {

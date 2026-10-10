@@ -50,7 +50,7 @@ import flutter_callkit_incoming
     }
     let dict = payload.dictionaryPayload
     let id = dict["id"] as? String ?? UUID().uuidString
-    let nameCaller = dict["nameCaller"] as? String ?? "MeetPoint"
+    let nameCaller = dict["nameCaller"] as? String ?? "VibeUpMe"
     let handle = dict["handle"] as? String ?? nameCaller
     let isVideo = dict["isVideo"] as? Bool ?? false
 

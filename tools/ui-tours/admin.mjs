@@ -14,7 +14,7 @@ await call(evil.t, 'PUT', '/me/profile', {
   bio: '<script>alert(2)</script>',
 });
 await upload(evil.t, '/me/photos', 'photo');
-const test = await call(null, 'POST', '/auth/login', { email: 'test@meetpoint.dev', password: 'password123' });
+const test = await call(null, 'POST', '/auth/login', { email: 'test@vibeupme.dev', password: 'password123' });
 await call(test.token, 'POST', '/reports', { toId: evil.id, reason: 'scam', details: '<b onmouseover=alert(3)>hover</b>' });
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
@@ -27,7 +27,7 @@ page.on('dialog', async (d) => {
 page.on('pageerror', (e) => console.log('page error:', e.message));
 
 await page.goto(`${B}/admin`);
-await page.fill('#login-email', 'admin@meetpoint.dev');
+await page.fill('#login-email', 'admin@vibeupme.dev');
 await page.fill('#login-password', 'password123');
 await page.click('#login-form button');
 await page.waitForSelector('.stat');

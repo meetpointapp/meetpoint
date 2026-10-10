@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.meetpoint.meetpoint"
+    namespace = "com.vibeupme.vibeupme"
     // permission_handler_android Android 37 ile derleniyor: uygulama en az onunla derlenmeli (geriye uyumlu,
     // hangi telefonlara kurulabileceğini minSdk belirler)
     compileSdk = 37
@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.meetpoint.meetpoint"
+        applicationId = "com.vibeupme.vibeupme"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

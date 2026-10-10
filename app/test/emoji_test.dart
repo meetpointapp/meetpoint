@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/features/chat/emoji_picker.dart';
+import 'package:vibeupme/features/chat/emoji_picker.dart';
 
 void main() {
   group('isEmojiOnly (büyük emoji mesajı)', () {
