@@ -63,6 +63,7 @@ export function callDto(call: CallWithUsers, viewerId: string) {
     status: call.status,
     endReason: call.endReason,
     ratePerMin: call.ratePerMin,
+    freeSeconds: callTiming.freeSeconds,
     billedMinutes: call.billedMinutes,
     totalCoins: call.totalCoins,
     giftCoins: call.giftCoins,
@@ -187,21 +188,22 @@ export async function acceptCall(id: string, userId: string) {
   if (!call || call.calleeId !== userId) throw new HttpError(404, 'not_found');
   await requireConsent(userId, 'overseas_transfer');
   const now = new Date();
-  // İlk dakika kabul anında alınır: ücret anı "şimdi". Agora ayarlıysa, iki taraf da bu süre içinde
-  // kanala katılmazsa chargeDueMinute'ün aldığı ücret tamamen iade edilir (bkz. processCallDeadlines).
+  // İlk dakika, ücretsiz süre (callTiming.freeSeconds) dolunca alınır; süre 0 ise kabul anında. Böylece
+  // kabul eden kişi siyah ekranla boşuna kazanç elde edemez. Agora ayarlıysa, iki taraf da
+  // mediaConfirmSeconds içinde kanala katılmazsa arama bağlantı kurulamadı sayılır (bkz. processCallDeadlines).
   const mediaConfirmDeadline = agora.appId ? secondsFromNow(callTiming.mediaConfirmSeconds, now.getTime()) : null;
   if (
     !(await transition(id, ['RINGING'], {
       status: 'ACTIVE',
       answeredAt: now,
       ringDeadline: null,
-      nextBillingAt: now,
+      nextBillingAt: secondsFromNow(callTiming.freeSeconds, now.getTime()),
       mediaConfirmDeadline,
     }))
   ) {
     throw new HttpError(409, 'call_not_ringing');
   }
-  if ((await chargeDueMinute(id, now)) === 'ended') throw new HttpError(402, 'caller_insufficient_balance');
+  if (callTiming.freeSeconds <= 0 && (await chargeDueMinute(id, now)) === 'ended') throw new HttpError(402, 'caller_insufficient_balance');
 
   const fresh = (await load(id))!;
   emitToUser(call.callerId, 'call:accepted', { ...callDto(fresh, call.callerId), media: mediaFor(id, 1) });
@@ -212,8 +214,10 @@ export async function acceptCall(id: string, userId: string) {
 // o dakikanın kullanılmayan kısmı saniye bazlı orantılı iade edilir. Bağlantı hiç kurulamadıysa
 // (connect_failed) alınan ücretin tamamı iade edilir. Bakiye yetmezliğinde (balance) zaten tam
 // dakika ücretlendirilmişti, iade yok.
-function partialRefund(call: Pick<Call, 'ratePerMin' | 'nextBillingAt' | 'totalCoins'>, reason: string, now: Date) {
+function partialRefund(call: Pick<Call, 'ratePerMin' | 'nextBillingAt' | 'totalCoins' | 'billedMinutes'>, reason: string, now: Date) {
   if (reason === 'connect_failed') return call.totalCoins;
+  // Ücretsiz sürede bitti: henüz hiçbir dakika alınmadı, iade edilecek bir şey yok
+  if (call.billedMinutes === 0) return 0;
   if (reason === 'balance' || !call.nextBillingAt || call.nextBillingAt <= now) return 0;
   const billingMs = callTiming.billingSeconds * 1000;
   const unusedMs = call.nextBillingAt.getTime() - now.getTime();

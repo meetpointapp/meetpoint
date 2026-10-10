@@ -51,13 +51,25 @@ describe('Temel akışlar (Faz 1)', () => {
 
     w = await call(ali.t, 'GET', '/wallet');
     check('sender refunded rejected request', w.balance === 1500, `balance=${w.balance}`);
-    const zw = await call(zeynep.t, 'GET', '/wallet');
-    // Ali'nin ilk harcaması bonus/hediye jetonlarından: Zeynep'in kazancı harcanabilir ama bozdurulamaz
-    check('receiver earned 50 (+50 gift) from bonus coins: not cashable', zw.balance === 100 && zw.cashable === 0 && zw.promoEarnings === 50, `bal=${zw.balance} cash=${zw.cashable} promo=${zw.promoEarnings}`);
-    check('ali purchased coins not cashable', w.cashable === 0);
+    // Faz 20: kabulde jeton emanette kalır, alıcıya henüz geçmez
+    const zw0 = await call(zeynep.t, 'GET', '/wallet');
+    check('receiver not paid at accept (escrow)', zw0.balance === 50, `bal=${zw0.balance}`);
 
     const convs = await call(zeynep.t, 'GET', '/conversations');
     check('conversation opened from request', convs._arr?.length === 1 && convs._arr[0].lastMessage?.body === 'Merhaba Zeynep');
+    check('conversation carries escrow info for earner', convs._arr[0].escrow?.role === 'earner' && convs._arr[0].escrow?.needed === 3);
+
+    // Kısa cevaplar sayılmaz; 5+ kelimelik 3 cevap jetonu alıcıya geçirir
+    const cid = convs._arr[0].id;
+    await call(zeynep.t, 'POST', `/conversations/${cid}/messages`, { body: 'tamam' });
+    for (let i = 0; i < 3; i++) {
+      await call(zeynep.t, 'POST', `/conversations/${cid}/messages`, { body: `Merhaba Ali nasılsın bugün neler yapıyorsun ${i}` });
+    }
+    await new Promise((r) => setTimeout(r, 800));
+    const zw = await call(zeynep.t, 'GET', '/wallet');
+    // Ali'nin ilk harcaması bonus/hediye jetonlarından: Zeynep'in kazancı harcanabilir ama bozdurulamaz
+    check('receiver earned 50 (+50 gift) after replies: not cashable', zw.balance === 100 && zw.cashable === 0 && zw.promoEarnings === 50, `bal=${zw.balance} cash=${zw.cashable} promo=${zw.promoEarnings}`);
+    check('ali purchased coins not cashable', w.cashable === 0);
 
     await call(zeynep.t, 'POST', '/blocks', { toId: ali.id });
     const blockedMsg = await call(ali.t, 'POST', `/conversations/${convs._arr[0].id}/messages`, { body: 'hey' });

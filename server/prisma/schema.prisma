@@ -168,7 +168,10 @@ model Profile {
   zodiac       String   @default("")
   // Faz 20: müzik zevki (src/catalog.ts MUSIC_GENRES), "Müzik" eşleştirme modu için
   musicGenres  Json     @default("[]")
-  smoking      String   @default("") // no | sometimes | yes
+  // Faz 20: günlük beğeni hakkı. Son likesResetAt'tan (ya da son 24 saatten, hangisi yakınsa) beri atılan
+  // beğeniler sayılır; jetonla "sıfırla" bu alanı şimdiye çeker.
+  likesResetAt DateTime?
+  smoking     String   @default("") // no | sometimes | yes
   drinking     String   @default("") // no | sometimes | yes
 
   // Faz 16: kişisel profil vitrini (kataloglar src/catalog.ts THEMES/CARD_BACKGROUNDS). "" = varsayılan.
@@ -321,8 +324,17 @@ model ContactRequest {
   expiresAt   DateTime
   respondedAt DateTime?
 
+  // Faz 20: mesaj isteğinde kabul, jetonu hemen alıcıya geçirmez (emanet). Alıcı yeterince anlamlı
+  // cevap yazınca (config economy.requestEscrow) jeton alıcıya geçer; escrowUntil'e kadar yazmazsa
+  // gönderene iade edilir. settlement: "" | RELEASED | REFUNDED
+  escrow           Boolean   @default(false)
+  escrowUntil      DateTime?
+  qualifiedReplies Int       @default(0)
+  settlement       String    @default("")
+
   @@index([toId, status])
   @@index([fromId, status])
+  @@index([escrow, escrowUntil])
 }
 
 // İki kullanıcı arasındaki sohbet. Eşleşme (karşılıklı beğeni) veya

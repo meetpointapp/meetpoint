@@ -6,7 +6,7 @@ import { pool } from './pgPool';
 import { processPendingExports } from './privacy/dataExport';
 import { runRetention } from './privacy/retention';
 import { cleanupIdempotencyKeys } from './idempotency';
-import { expireStaleRequests } from './requestService';
+import { expireStaleRequests, settleExpiredEscrows } from './requestService';
 import { sendStreakReminders } from './streak';
 
 // Zamanlayıcı: zamanı gelen işleri veritabanından okuyup işler (arama ücretleri, cevapsız aramalar,
@@ -71,6 +71,8 @@ async function tick() {
     await processCallDeadlines();
     await periodic('presence', cfg.presenceSweepMs, () => sweepCallPresence());
     await periodic('requests', 30_000, () => expireStaleRequests());
+    // Faz 20: cevap yazılmayan mesaj isteği emanetleri gönderene iade edilir
+    await periodic('escrow', 60_000, () => settleExpiredEscrows());
     await periodic('idempotency', 3_600_000, cleanupIdempotencyKeys);
     await periodic('rateLimits', 60_000, () =>
       prisma.$executeRaw`DELETE FROM "RateLimitHit" WHERE "resetAt" < (now() AT TIME ZONE 'UTC')`,

@@ -14,6 +14,7 @@ import { swipeLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { debit, lockWallet } from '../wallet';
+import { likeStatus } from '../likeLimit';
 import { MATCH_MODES, matchReason } from '../matching';
 import { publicProfile, withOnlineMany } from './profile';
 
@@ -214,6 +215,15 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
   const target = await prisma.user.findUnique({ where: { id: toId }, select: { bannedAt: true, deletionRequestedAt: true } });
   if (!target || target.bannedAt || target.deletionRequestedAt || (await isBlockedEitherWay(me, toId))) throw new HttpError(404, 'not_found');
 
+  // Faz 20: beğeni hakkı. Aynı kişiye tekrar beğeni yeni hak harcamaz.
+  if (direction === 'like') {
+    const prior = await prisma.swipe.findUnique({ where: { fromId_toId: { fromId: me, toId } }, select: { direction: true } });
+    if (prior?.direction !== 'like') {
+      const status = await likeStatus(me);
+      if (status.remaining <= 0) throw new HttpError(403, 'like_limit_reached', { likes: status });
+    }
+  }
+
   await prisma.$transaction(async (tx) => {
     // Süper beğenide önce cüzdan kilitlenir: eşzamanlı iki istek çift ücret alamaz
     if (direction === 'superlike') await lockWallet(tx, me);
@@ -229,6 +239,8 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
     });
   });
 
+  // Uygulama sayacı güncel tutsun diye beğeni sonrası kalan hak da döner
+  const likes = direction === 'like' ? await likeStatus(me) : undefined;
   if (direction === 'pass') return res.json({ match: false });
 
   const reverse = await prisma.swipe.findUnique({ where: { fromId_toId: { fromId: toId, toId: me } } });
@@ -238,7 +250,7 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
       emitToUser(toId, 'superlike', { fromId: me });
       void notify(toId, 'superlike', me);
     }
-    return res.json({ match: false });
+    return res.json({ match: false, likes });
   }
 
   // Karşılıklı beğeni: ücretsiz sohbet açılır
@@ -255,5 +267,23 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
   // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi
   await unlockMilestone(me, 'first_match');
   await unlockMilestone(toId, 'first_match');
-  res.json({ match: true, conversationId: conversation.id });
+  res.json({ match: true, conversationId: conversation.id, likes });
+});
+
+// Faz 20: beğeni hakkı durumu (sayaç) ve jetonla sıfırlama
+discoverRouter.get('/discover/like-status', async (req, res) => {
+  res.json(await likeStatus(uid(req)));
+});
+
+discoverRouter.post('/discover/like-reset', requireNotRestricted, async (req, res) => {
+  const me = uid(req);
+  const before = await likeStatus(me);
+  // Kullanılmış hak yoksa sıfırlanacak bir şey yok: jeton alınmaz
+  if (before.used === 0) return res.json(before);
+  await prisma.$transaction(async (tx) => {
+    await lockWallet(tx, me);
+    await debit(tx, me, economy.likeResetPrice, 'SPEND', { note: 'like_reset' });
+    await tx.profile.update({ where: { userId: me }, data: { likesResetAt: new Date() } });
+  });
+  res.json(await likeStatus(me));
 });

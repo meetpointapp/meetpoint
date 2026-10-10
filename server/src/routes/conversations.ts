@@ -1,4 +1,4 @@
-import type { IcebreakerGame, Message, TicTacToeGame } from '@prisma/client';
+import { Prisma, type IcebreakerGame, type Message, type TicTacToeGame } from '@prisma/client';
 import { Router } from 'express';
 import multer from 'multer';
 import { recordFunnelStage } from '../analytics';
@@ -14,6 +14,8 @@ import { afterMessage, contactInfo } from '../moderation/detect';
 import { requireNotRestricted } from '../moderation/sanctions';
 import { notify } from '../notify';
 import { emitToUser, isOnline } from '../realtime';
+import { economy } from '../config';
+import { recordEscrowReply } from '../requestService';
 import { publicProfile } from './profile';
 
 export const conversationsRouter = Router();
@@ -78,15 +80,50 @@ conversationsRouter.get('/conversations', async (req, res) => {
     },
   });
 
+  // Faz 20: sohbet teması = sohbeti İLK BAŞLATANIN (ilk mesajı yazanın) balon stili ve arka planı;
+  // iki taraf da aynı temayı görür. İlk mesaj henüz yoksa tema yok (uygulama kendi temasına döner).
+  const ids = convs.map((c) => c.id);
+  const firstSenders = ids.length
+    ? await prisma.$queryRaw<{ conversationId: string; senderId: string }[]>`
+        SELECT DISTINCT ON ("conversationId") "conversationId", "senderId"
+        FROM "Message" WHERE "conversationId" IN (${Prisma.join(ids)})
+        ORDER BY "conversationId", "createdAt" ASC, "id" ASC`
+    : [];
+  const initiatorOf = new Map(firstSenders.map((r) => [r.conversationId, r.senderId]));
+  // Emanetteki mesaj istekleri (jetonu alıcıya geçmemiş): kazanç/iade durumu sohbette gösterilir
+  const escrows = await prisma.contactRequest.findMany({
+    where: { escrow: true, kind: 'MESSAGE', OR: [{ fromId: me }, { toId: me }] },
+  });
+  const escrowByOther = new Map(escrows.map((e) => [e.fromId === me ? e.toId : e.fromId, e]));
+
   const list = convs
-    .map((c) => ({
-      id: c.id,
-      origin: c.origin,
-      createdAt: c.createdAt,
-      user: publicProfile(c.userAId === me ? c.userB : c.userA, viewer),
-      lastMessage: c.messages[0] ? messageDto(c.messages[0]) : null,
-      unreadCount: c._count.messages,
-    }))
+    .map((c) => {
+      const other = c.userAId === me ? c.userB : c.userA;
+      const initiatorId = initiatorOf.get(c.id);
+      const initiator = initiatorId === c.userAId ? c.userA : initiatorId === c.userBId ? c.userB : null;
+      const e = escrowByOther.get(other.id);
+      return {
+        id: c.id,
+        origin: c.origin,
+        createdAt: c.createdAt,
+        user: publicProfile(other, viewer),
+        lastMessage: c.messages[0] ? messageDto(c.messages[0]) : null,
+        unreadCount: c._count.messages,
+        theme: initiator?.profile
+          ? { initiatorId, chatBubbleThemeId: initiator.profile.chatBubbleThemeId, chatBackgroundThemeId: initiator.profile.chatBackgroundThemeId }
+          : null,
+        escrow: e
+          ? {
+              role: e.toId === me ? 'earner' : 'payer',
+              coins: e.price,
+              needed: Math.max(0, economy.requestEscrow.replies - e.qualifiedReplies),
+              replies: economy.requestEscrow.replies,
+              minWords: economy.requestEscrow.minWords,
+              until: e.escrowUntil,
+            }
+          : null,
+      };
+    })
     .sort((a, b) => +(b.lastMessage?.createdAt ?? b.createdAt) - +(a.lastMessage?.createdAt ?? a.createdAt));
   res.json(list);
 });
@@ -151,6 +188,8 @@ async function deliver(conversationId: string, me: string, otherId: string, data
   const message = await prisma.message.create({ data: { conversationId, senderId: me, deliveredAt, ...data } });
   const dto = messageDto(message);
   emitToUser(otherId, 'message:new', dto);
+  // Faz 20: mesaj isteği emaneti — alıcının anlamlı cevapları jetonu alıcıya geçirir
+  if (data.kind === 'text') void recordEscrowReply(me, otherId, data.body).catch((e) => console.error('[emanet]', e));
   void notify(otherId, 'message', me, data.kind === 'photo' ? '📷' : data.body.slice(0, 120), { conversationId });
   await recordFunnelStage(me, 'FIRST_MESSAGE').catch(() => {});
   // Faz 17: "Sosyal cesaret yolculuğu" — İletişim izi

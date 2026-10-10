@@ -80,6 +80,16 @@ export const economy = {
   boostMinutes: 30,
   likesUnlockPrice: 200,
   likesUnlockHours: 24,
+
+  // Faz 20: keşfette beğeni hakkı. Kayan pencerede (likeWindowHours) en fazla likeLimit beğeni;
+  // hak bitince likeResetPrice jetonla anında sıfırlanır (süper beğeni zaten ücretli, sayılmaz).
+  likeLimit: Number(process.env.LIKE_LIMIT ?? 25),
+  likeWindowHours: 24,
+  likeResetPrice: 50,
+
+  // Faz 20: mesaj isteği emaneti. Kabulde jeton alıcıya hemen geçmez; alıcı en az minWords kelimelik
+  // `replies` cevap yazınca geçer, `days` gün içinde yazmazsa gönderene iade edilir.
+  requestEscrow: { minWords: 5, replies: 3, days: 7 },
 };
 
 // Firebase push: servis hesabı JSON dosyasının yolu. Boşsa bildirimler konsola yazılır.
@@ -111,6 +121,9 @@ export const agora = {
 // Arama zamanlamaları (testlerde kısaltılabilir)
 export const callTiming = {
   billingSeconds: Number(process.env.CALL_BILLING_SECONDS ?? 60), // dakika uzunluğu
+  // Faz 20: kabulden sonraki ilk bu kadar saniye ücretsiz (siyah ekran/bağlantı sorunuyla boşa kazanç
+  // olmasın). İlk dakika bu süre dolunca alınır; süre dolmadan biten aramada hiç ücret alınmaz. 0 = kapalı.
+  freeSeconds: Number(process.env.CALL_FREE_SECONDS ?? 30),
   ringSeconds: Number(process.env.CALL_RING_SECONDS ?? 45), // cevapsız sayılma süresi
   disconnectGraceSeconds: Number(process.env.CALL_DISCONNECT_GRACE_SECONDS ?? 20),
   // Faz 15: Agora ayarlıysa, kabulden sonra iki taraf da gerçekten kanala bu süre içinde katılmalı;

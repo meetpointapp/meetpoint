@@ -68,6 +68,10 @@ requestsRouter.get('/requests', async (req, res) => {
   res.json(
     requests.map(({ from, to, ...r }) => ({
       ...r,
+      // Emanetteki isteklerde alıcının kazanmak için yazması gereken cevap sayısı ve kelime şartı
+      escrowNeeded: r.escrow ? Math.max(0, economy.requestEscrow.replies - r.qualifiedReplies) : 0,
+      escrowReplies: economy.requestEscrow.replies,
+      escrowMinWords: economy.requestEscrow.minWords,
       user: publicProfile(box === 'inbox' ? from : to),
     })),
   );
@@ -88,10 +92,20 @@ requestsRouter.post('/requests/:id/accept', async (req, res) => {
     });
     if (count !== 1) throw new HttpError(409, 'request_not_pending');
 
-    // Kesinti yok: bloke edilen jetonun tamamı alıcıya geçer (promosyon jetonu kısmı bozdurulamaz kazanç olur)
-    const hold = await tx.walletEntry.findFirst({ where: { requestId: id, type: 'HOLD', userId: r.fromId } });
-    const held = hold ? heldBuckets(hold) : { paid: r.price, promo: 0, earned: 0, earnedPromo: 0 };
-    await credit(tx, me, earningsFrom(held), 'EARN', { requestId: id, counterpartyId: r.fromId });
+    // Faz 20: mesaj isteğinde jeton emanette kalır (alıcı yeterince cevap yazınca ona geçer, yazmazsa
+    // gönderene iade edilir — bkz. requestService.recordEscrowReply). Eski sesli/görüntülü istek
+    // satırları (artık oluşmaz) eskisi gibi hemen geçer.
+    if (r.kind === 'MESSAGE') {
+      await tx.contactRequest.update({
+        where: { id },
+        data: { escrow: true, escrowUntil: new Date(Date.now() + economy.requestEscrow.days * 86_400_000) },
+      });
+    } else {
+      // Kesinti yok: bloke edilen jetonun tamamı alıcıya geçer (promosyon jetonu kısmı bozdurulamaz kazanç olur)
+      const hold = await tx.walletEntry.findFirst({ where: { requestId: id, type: 'HOLD', userId: r.fromId } });
+      const held = hold ? heldBuckets(hold) : { paid: r.price, promo: 0, earned: 0, earnedPromo: 0 };
+      await credit(tx, me, earningsFrom(held), 'EARN', { requestId: id, counterpartyId: r.fromId });
+    }
 
     let conversationId: string | null = null;
     if (r.kind === 'MESSAGE') {
@@ -112,9 +126,12 @@ requestsRouter.post('/requests/:id/accept', async (req, res) => {
     status: 'ACCEPTED',
     conversationId: result.conversationId,
   });
-  // Faz 19: kazanç heyecanı — etkinlik bonusu ve kilometre taşları
-  await applyEarningEventBonus(me, result.request.price, `request:${id}`).catch(() => {});
-  await checkEarningMilestones(me).catch(() => {});
+  // Faz 19: kazanç heyecanı — etkinlik bonusu ve kilometre taşları. Mesaj isteğinde kazanç emanetten
+  // çıkınca verilir (requestService.releaseEscrow); burası sadece eski, anında ödenen istekler için.
+  if (result.request.kind !== 'MESSAGE') {
+    await applyEarningEventBonus(me, result.request.price, `request:${id}`).catch(() => {});
+    await checkEarningMilestones(me).catch(() => {});
+  }
   res.json({ ok: true, conversationId: result.conversationId });
 });
 

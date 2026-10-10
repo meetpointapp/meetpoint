@@ -20,6 +20,8 @@ export const testEnv: Record<string, string> = {
   REVENUECAT_SECRET_KEY: 'sk_test_local',
   REVENUECAT_API_BASE: `http://localhost:${FAKE_REVENUECAT_PORT}`,
   CALL_BILLING_SECONDS: '3',
+  // Mevcut arama testleri "kabulde ilk dakika alınır" varsayar; ücretsiz süre ayrıca denenir
+  CALL_FREE_SECONDS: '0',
   CALL_RING_SECONDS: '4',
   CALL_DISCONNECT_GRACE_SECONDS: '2',
   // Hata kayıtları testte hızlı yazılsın
