@@ -43,7 +43,7 @@ class _ReconsentScreenState extends ConsumerState<ReconsentScreen> {
     return Scaffold(
       body: SafeArea(
         child: ListView(padding: const EdgeInsets.fromLTRB(24, 48, 24, 24), children: [
-          const Icon(Icons.article_outlined, size: 56, color: Brand.coral),
+          Icon(Icons.article_outlined, size: 56, color: Brand.coral),
           const SizedBox(height: 16),
           Text(l.reconsentTitle, textAlign: TextAlign.center, style: theme.textTheme.headlineSmall),
           const SizedBox(height: 8),

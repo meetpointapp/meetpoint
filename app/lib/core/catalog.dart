@@ -74,7 +74,18 @@ const cardBackgroundGradient = <String, List<Color>>{
 };
 List<String> get cardBackgroundIds => cardBackgroundGradient.keys.toList();
 
-Color themeColorOf(String id) => themeAccent[id] ?? themeAccent['coral']!;
+Color themeColorOf(String id) => themeAccent[id] ?? storePremiumThemeAccent[id] ?? themeAccent['coral']!;
+
+// Faz 20: uygulamanın ana rengi. Kullanıcının seçtiği tema (ücretsiz ya da mağazadan alınan premium)
+// düğmeleri, vurguları ve gradyanları boyar. '' = varsayılan marka rengi (null döner). Düğme/vurgu
+// beyaz yazıyla birlikte kullanıldığı için çok açık tonlar (ör. buz) okunabilirlik için koyulaştırılır.
+Color? appAccentOf(String id) {
+  if (id.isEmpty) return null;
+  final c = themeAccent[id] ?? storePremiumThemeAccent[id];
+  if (c == null) return null;
+  final hsl = HSLColor.fromColor(c);
+  return hsl.lightness > 0.55 ? hsl.withLightness(0.42).toColor() : c;
+}
 List<Color> cardGradientOf(String id) => cardBackgroundGradient[id] ?? cardBackgroundGradient['default']!;
 
 // Faz 16: günlük ruh hali. Serbest metin yok, sadece küçük bir katalog; 24 saatte kaybolur.

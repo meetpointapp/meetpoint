@@ -239,7 +239,7 @@ class _TicketTile extends ConsumerWidget {
         contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
         title: Row(children: [
           if (ticket.unread) ...[
-            Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.coral)),
+            Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.coral)),
             const SizedBox(width: 6),
           ],
           Expanded(
@@ -591,7 +591,7 @@ class _Bubble extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.support_agent_rounded, size: 16, color: Brand.coral),
+                  Icon(Icons.support_agent_rounded, size: 16, color: Brand.coral),
                   const SizedBox(width: 4),
                   Text(l.supportTeam, style: theme.textTheme.labelMedium?.copyWith(color: Brand.coral, fontWeight: FontWeight.w800)),
                 ]),

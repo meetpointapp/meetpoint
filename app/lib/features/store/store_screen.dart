@@ -315,7 +315,7 @@ class _StoreCard extends StatelessWidget {
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(minimumSize: const Size(0, 38), padding: const EdgeInsets.symmetric(horizontal: 10)),
             onPressed: busy ? null : () => onEquip(false),
-            icon: const Icon(Icons.check_circle_rounded, size: 16, color: Brand.coral),
+            icon: Icon(Icons.check_circle_rounded, size: 16, color: Brand.coral),
             label: Text(l.storeInUse),
           )
         else

@@ -2957,4 +2957,93 @@ class AppLocalizationsEn extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get matchesTitle => 'Matches';
+
+  @override
+  String get matchesNew => 'New';
+
+  @override
+  String get matchesEmpty =>
+      'No matches yet. Swipe in Discover; when you both like each other, it shows up here.';
+
+  @override
+  String get matchesDiscoverCta => 'Go to Discover';
+
+  @override
+  String get errLikeLimit =>
+      'You\'re out of likes. Reset them with coins or wait a bit.';
+
+  @override
+  String likeCounterTooltip(int remaining, int limit) {
+    return 'Likes left: $remaining/$limit';
+  }
+
+  @override
+  String get likeLimitTitle => 'You\'re out of likes';
+
+  @override
+  String likeLimitBody(int limit) {
+    return 'You get $limit likes every 24 hours. Refill now to keep going.';
+  }
+
+  @override
+  String likeFreeIn(int hours, int minutes) {
+    return 'One like comes back on its own in ${hours}h ${minutes}m.';
+  }
+
+  @override
+  String likeLimitReset(int price) {
+    return 'Reset for $price coins';
+  }
+
+  @override
+  String get likeLimitWait => 'Later';
+
+  @override
+  String likeResetDone(int limit) {
+    return 'Likes refilled: $limit';
+  }
+
+  @override
+  String callFreeFirst(int seconds) {
+    return 'First $seconds seconds free';
+  }
+
+  @override
+  String callFreeCountdown(int seconds) {
+    return 'Free time: ${seconds}s';
+  }
+
+  @override
+  String requestEscrowEarner(int coins, int minWords, int needed) {
+    return 'Write $needed more replies of $minWords+ words to earn $coins coins';
+  }
+
+  @override
+  String requestEscrowPayer(int done, int replies) {
+    return 'Waiting for a reply ($done/$replies). If none comes, your coins are refunded.';
+  }
+
+  @override
+  String get requestReleased => 'Earnings credited to your account';
+
+  @override
+  String get requestRefunded => 'Refunded because no reply came';
+
+  @override
+  String chatEscrowEarner(int coins, int minWords, int needed) {
+    return 'Write $needed more replies of $minWords+ words to earn $coins coins';
+  }
+
+  @override
+  String chatEscrowPayer(int coins, int needed) {
+    return 'Your $coins coins await a reply: they go to them after $needed meaningful replies, or are refunded if none come.';
+  }
+
+  @override
+  String requestEarnRule(int coins, int replies, int minWords) {
+    return '$coins coins: accept, then write $replies replies of $minWords+ words';
+  }
 }

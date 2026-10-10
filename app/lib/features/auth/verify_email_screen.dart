@@ -116,7 +116,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.coral.withValues(alpha: 0.12)),
-            child: const Icon(Icons.mark_email_unread_outlined, color: Brand.coral, size: 36),
+            child: Icon(Icons.mark_email_unread_outlined, color: Brand.coral, size: 36),
           ),
           const SizedBox(height: 20),
           Text(l.verifyEmailTitle, style: theme.textTheme.headlineMedium),

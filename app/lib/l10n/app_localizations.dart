@@ -4508,6 +4508,132 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{id, select, recent{Son kullanılanlar} smileys{Yüzler} hearts{Kalpler ve aşk} gestures{El hareketleri} fun{Eğlence ve yemek} nature{Hayvanlar ve doğa} other{{id}}}'**
   String emojiCategoryLabel(String id);
+
+  /// No description provided for @matchesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşmeler'**
+  String get matchesTitle;
+
+  /// No description provided for @matchesNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni'**
+  String get matchesNew;
+
+  /// No description provided for @matchesEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz eşleşmen yok. Keşfet\'te kaydır; karşılıklı beğenince burada görünür.'**
+  String get matchesEmpty;
+
+  /// No description provided for @matchesDiscoverCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet\'e git'**
+  String get matchesDiscoverCta;
+
+  /// No description provided for @errLikeLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beğeni hakkın bitti. Jetonla sıfırlayabilir ya da biraz bekleyebilirsin.'**
+  String get errLikeLimit;
+
+  /// No description provided for @likeCounterTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan beğeni hakkın: {remaining}/{limit}'**
+  String likeCounterTooltip(int remaining, int limit);
+
+  /// No description provided for @likeLimitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beğeni hakkın bitti'**
+  String get likeLimitTitle;
+
+  /// No description provided for @likeLimitBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'24 saatte {limit} beğeni atabilirsin. Hemen devam etmek için hakkını yenileyebilirsin.'**
+  String likeLimitBody(int limit);
+
+  /// No description provided for @likeFreeIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir hakkın {hours} sa {minutes} dk sonra kendiliğinden geri gelir.'**
+  String likeFreeIn(int hours, int minutes);
+
+  /// No description provided for @likeLimitReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'{price} jetonla sıfırla'**
+  String likeLimitReset(int price);
+
+  /// No description provided for @likeLimitWait.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha sonra'**
+  String get likeLimitWait;
+
+  /// No description provided for @likeResetDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beğeni hakkın yenilendi: {limit}'**
+  String likeResetDone(int limit);
+
+  /// No description provided for @callFreeFirst.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk {seconds} saniye ücretsiz'**
+  String callFreeFirst(int seconds);
+
+  /// No description provided for @callFreeCountdown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ücretsiz süre: {seconds} sn'**
+  String callFreeCountdown(int seconds);
+
+  /// No description provided for @requestEscrowEarner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{coins} jeton kazanmak için {minWords}+ kelimelik {needed} cevap daha yaz'**
+  String requestEscrowEarner(int coins, int minWords, int needed);
+
+  /// No description provided for @requestEscrowPayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevap bekleniyor ({done}/{replies}). Cevap gelmezse jetonun iade edilir.'**
+  String requestEscrowPayer(int done, int replies);
+
+  /// No description provided for @requestReleased.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazanç hesabına geçti'**
+  String get requestReleased;
+
+  /// No description provided for @requestRefunded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevap gelmediği için iade edildi'**
+  String get requestRefunded;
+
+  /// No description provided for @chatEscrowEarner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{coins} jeton kazanmak için {minWords}+ kelimelik {needed} cevap daha yaz'**
+  String chatEscrowEarner(int coins, int minWords, int needed);
+
+  /// No description provided for @chatEscrowPayer.
+  ///
+  /// In tr, this message translates to:
+  /// **'{coins} jetonun cevap bekliyor: karşı taraf {needed} anlamlı cevap yazınca ona geçer, yazmazsa iade edilir.'**
+  String chatEscrowPayer(int coins, int needed);
+
+  /// No description provided for @requestEarnRule.
+  ///
+  /// In tr, this message translates to:
+  /// **'{coins} jeton: kabul et, {minWords}+ kelimelik {replies} cevap yaz'**
+  String requestEarnRule(int coins, int replies, int minWords);
 }
 
 class _AppLocalizationsDelegate

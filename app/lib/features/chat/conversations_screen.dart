@@ -8,7 +8,10 @@ import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../requests/requests_screen.dart';
 
+// Faz 20: Sohbetler sekmesi iki bölümlü — "Sohbetler" (tüm konuşmalar) ve "İstekler" (gelen/giden
+// mesaj istekleri). Eşleşmeler artık kendi sekmesinde (bkz. features/matches).
 class ConversationsScreen extends ConsumerWidget {
   const ConversationsScreen({super.key});
 
@@ -16,36 +19,57 @@ class ConversationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final convs = ref.watch(conversationsProvider);
+    final pending = ref.watch(requestsProvider(true)).value?.where((r) => r.isPending).length ?? 0;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l.navChats), actions: [
-        IconButton(
-          tooltip: l.callHistory,
-          icon: const Icon(Icons.history_rounded),
-          onPressed: () => context.push('/calls'),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l.navChats),
+          actions: [
+            IconButton(
+              tooltip: l.callHistory,
+              icon: const Icon(Icons.history_rounded),
+              onPressed: () => context.push('/calls'),
+            ),
+            const SizedBox(width: 4),
+          ],
+          bottom: TabBar(tabs: [
+            Tab(text: l.navChats),
+            Tab(
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(l.navRequests),
+                if (pending > 0) ...[
+                  const SizedBox(width: 6),
+                  Badge(label: Text('$pending'), backgroundColor: Brand.coral),
+                ],
+              ]),
+            ),
+          ]),
         ),
-        const SizedBox(width: 4),
-      ]),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(likesProvider);
-          ref.invalidate(conversationsProvider);
-          await ref.read(conversationsProvider.future);
-        },
-        // Konuşma sayısı büyüyebilir: liste ekranda görünen kadarını oluşturur (lazy builder)
-        child: CustomScrollView(physics: const AlwaysScrollableScrollPhysics(), slivers: [
-          const SliverToBoxAdapter(child: _LikesYouTile()),
-          ...convs.when(
-            loading: () => [const SliverToBoxAdapter(child: SizedBox(height: 400, child: ListSkeleton(rows: 5)))],
-            error: (e, _) => [
-              SliverToBoxAdapter(
-                child: SizedBox(height: 400, child: ErrorRetry(error: e, onRetry: () => ref.invalidate(conversationsProvider))),
+        body: TabBarView(children: [
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(likesProvider);
+              ref.invalidate(conversationsProvider);
+              await ref.read(conversationsProvider.future);
+            },
+            // Konuşma sayısı büyüyebilir: liste ekranda görünen kadarını oluşturur (lazy builder)
+            child: CustomScrollView(physics: const AlwaysScrollableScrollPhysics(), slivers: [
+              ...convs.when(
+                loading: () => [const SliverToBoxAdapter(child: SizedBox(height: 400, child: ListSkeleton(rows: 5)))],
+                error: (e, _) => [
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: 400, child: ErrorRetry(error: e, onRetry: () => ref.invalidate(conversationsProvider))),
+                  ),
+                ],
+                data: (list) => list.isEmpty
+                    ? [SliverToBoxAdapter(child: SizedBox(height: 360, child: CenteredMessage(icon: Icons.forum_outlined, text: l.noChats)))]
+                    : [SliverList.builder(itemCount: list.length, itemBuilder: (_, i) => _ConversationTile(list[i]))],
               ),
-            ],
-            data: (list) => list.isEmpty
-                ? [SliverToBoxAdapter(child: SizedBox(height: 360, child: CenteredMessage(icon: Icons.forum_outlined, text: l.noChats)))]
-                : [SliverList.builder(itemCount: list.length, itemBuilder: (_, i) => _ConversationTile(list[i]))],
+            ]),
           ),
+          const RequestsBody(),
         ]),
       ),
     );
@@ -89,56 +113,12 @@ class _ConversationTile extends StatelessWidget {
           const SizedBox(height: 4),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-            decoration: const ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
+            decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
             child: Text('${c.unreadCount}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
           ),
         ],
       ]),
       onTap: () => context.push('/chat/${c.id}'),
-    );
-  }
-}
-
-// Listenin üstünde "Seni beğenenler" girişi
-class _LikesYouTile extends ConsumerWidget {
-  const _LikesYouTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    final likes = ref.watch(likesProvider).value;
-    if (likes == null || likes.count == 0) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-      child: Material(
-        borderRadius: BorderRadius.circular(Brand.radius),
-        clipBehavior: Clip.antiAlias,
-        child: Ink(
-          decoration: const BoxDecoration(gradient: Brand.gradient),
-          child: InkWell(
-            onTap: () => context.push('/likes'),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.25)),
-                  child: Icon(likes.unlocked ? Icons.favorite_rounded : Icons.lock_rounded, color: Colors.white),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(l.likesYou, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-                    Text(l.likesYouCount(likes.count), style: TextStyle(color: Colors.white.withValues(alpha: 0.9))),
-                  ]),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: Colors.white),
-              ]),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

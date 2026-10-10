@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/catalog.dart';
 import 'core/error_reporter.dart';
+import 'core/providers.dart';
 import 'core/push.dart';
 import 'core/session.dart';
 import 'core/theme.dart';
@@ -37,7 +39,14 @@ class MeetPointApp extends ConsumerWidget {
     ErrorReporter.auth = ref.watch(sessionProvider.select((s) => s.value?.auth));
     final router = ref.watch(routerProvider);
     ErrorReporter.currentRoute = () => router.routerDelegate.currentConfiguration.uri.path;
+    // Faz 20: seçili (ya da mağazadan alınan) profil teması uygulamanın ana rengini değiştirir.
+    // Giriş yapılmamışsa varsayılan marka rengi. Renk değişince ağaç yeniden kurulur (Brand renkleri
+    // widget'larda doğrudan okunduğu için sadece ThemeData yenilemek yetmez).
+    final loggedIn = ref.watch(sessionProvider.select((s) => s.value?.auth != null));
+    final themeId = loggedIn ? ref.watch(meProvider.select((m) => m.value?.profile?.themeId ?? '')) : '';
+    Brand.setAccent(appAccentOf(themeId));
     return MaterialApp.router(
+      builder: (context, child) => KeyedSubtree(key: ValueKey('accent-$themeId'), child: child ?? const SizedBox.shrink()),
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light),

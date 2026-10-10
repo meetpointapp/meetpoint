@@ -92,7 +92,7 @@ class MatchOverlay extends StatelessWidget {
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
+                  decoration: BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
                   child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 28),
                 ),
               ]),

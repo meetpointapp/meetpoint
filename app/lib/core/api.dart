@@ -309,10 +309,19 @@ class Api {
       [for (final p in (await _get('/discover/groups/$interestId') as List)) PublicProfile.fromJson(p)];
 
   // direction: like | pass | superlike (süper beğeni jetonla)
-  Future<({bool match, String? conversationId})> swipe(String toId, String direction) async {
+  // Beğenide kalan hak (likes) da döner; hak bittiyse sunucu 403 like_limit_reached verir.
+  Future<({bool match, String? conversationId, LikeStatus? likes})> swipe(String toId, String direction) async {
     final r = await _post('/swipes', {'toId': toId, 'direction': direction});
-    return (match: r['match'] as bool, conversationId: r['conversationId'] as String?);
+    return (
+      match: r['match'] as bool,
+      conversationId: r['conversationId'] as String?,
+      likes: r['likes'] == null ? null : LikeStatus.fromJson(Map<String, dynamic>.from(r['likes'])),
+    );
   }
+
+  // Faz 20: günlük beğeni hakkı sayacı ve jetonla sıfırlama
+  Future<LikeStatus> likeStatus() async => LikeStatus.fromJson(await _get('/discover/like-status'));
+  Future<LikeStatus> resetLikes() async => LikeStatus.fromJson(await _post('/discover/like-reset'));
 
   Future<void> updateLocation(double latitude, double longitude) =>
       _put('/me/location', {'latitude': latitude, 'longitude': longitude});

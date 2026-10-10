@@ -333,13 +333,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: Align(alignment: Alignment.centerLeft, child: Text(l.icebreakerSheetTitle, style: Theme.of(ctx).textTheme.titleMedium)),
           ),
           ListTile(
-            leading: const Icon(Icons.compare_arrows_rounded, color: Brand.coral),
+            leading: Icon(Icons.compare_arrows_rounded, color: Brand.coral),
             title: Text(l.icebreakerThisOrThat),
             subtitle: Text(l.icebreakerThisOrThatHint),
             onTap: () => Navigator.pop(ctx, 'this_or_that'),
           ),
           ListTile(
-            leading: const Icon(Icons.theater_comedy_rounded, color: Brand.coral),
+            leading: Icon(Icons.theater_comedy_rounded, color: Brand.coral),
             title: Text(l.icebreakerTwoTruths),
             subtitle: Text(l.icebreakerTwoTruthsHint),
             onTap: () => Navigator.pop(ctx, 'two_truths'),
@@ -461,10 +461,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     // Faz 17: eşleşme yıldönümü — sadece gerçek eşleşmelerde (istekle açılan sohbetlerde değil)
     final anniversaryDays = conv != null && conv.origin == 'MATCH' ? matchAnniversaryDays(conv.createdAt) : null;
     final messages = _messages;
-    // Faz 16: kozmetik mağaza — sohbet teması sadece benim kendi görünümümü etkiler (kişisel tercih)
+    // Faz 20: sohbet teması = sohbeti ilk başlatanın (ilk mesajı yazanın) balon stili ve arka planı;
+    // iki taraf da aynısını görür. Başlatanın o ayarı boşsa (ya da ilk mesaj henüz yoksa) kendi seçimime düşer.
     final myProfile = ref.watch(meProvider).value?.profile;
-    final myBubbleStyle = storeChatBubbleStyleOf(myProfile?.chatBubbleThemeId ?? '');
-    final myBackdrop = storeChatBackdropStyleOf(myProfile?.chatBackgroundThemeId ?? '');
+    final bubbleId = (conv?.themeBubbleId ?? '').isNotEmpty ? conv!.themeBubbleId : (myProfile?.chatBubbleThemeId ?? '');
+    final backdropId = (conv?.themeBackgroundId ?? '').isNotEmpty ? conv!.themeBackgroundId : (myProfile?.chatBackgroundThemeId ?? '');
+    final myBubbleStyle = storeChatBubbleStyleOf(bubbleId);
+    final myBackdrop = storeChatBackdropStyleOf(backdropId);
+    final escrow = conv?.escrow;
 
     return Scaffold(
       appBar: AppBar(
@@ -489,13 +493,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
       body: Column(children: [
+        // Faz 20: mesaj isteği emaneti — alıcıya kazanç ilerlemesi, gönderene bekleme bilgisi
+        if (escrow != null)
+          Container(
+            width: double.infinity,
+            color: Brand.gold.withValues(alpha: 0.16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(children: [
+              const Icon(Icons.savings_rounded, color: Brand.gold, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  escrow.earner
+                      ? l.chatEscrowEarner(escrow.coins, escrow.minWords, escrow.needed)
+                      : l.chatEscrowPayer(escrow.coins, escrow.needed),
+                  style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ]),
+          ),
         if (anniversaryDays != null && !_anniversaryDismissed)
           Container(
             width: double.infinity,
             color: Brand.coral.withValues(alpha: 0.12),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(children: [
-              const Icon(Icons.celebration_rounded, color: Brand.coral, size: 18),
+              Icon(Icons.celebration_rounded, color: Brand.coral, size: 18),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(_anniversaryLabel(l, anniversaryDays),
@@ -830,7 +853,7 @@ class _IcebreakerBubble extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.casino_rounded, size: 16, color: Brand.coral),
+            Icon(Icons.casino_rounded, size: 16, color: Brand.coral),
             const SizedBox(width: 6),
             Text(game.isThisOrThat ? l.icebreakerThisOrThat : l.icebreakerTwoTruths,
                 style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800, color: Brand.coral)),
@@ -885,7 +908,7 @@ class _TicTacToeBubble extends StatelessWidget {
         ),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.sports_esports_rounded, size: 16, color: Brand.coral),
+            Icon(Icons.sports_esports_rounded, size: 16, color: Brand.coral),
             const SizedBox(width: 6),
             Text('XOX', style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800, color: Brand.coral)),
           ]),

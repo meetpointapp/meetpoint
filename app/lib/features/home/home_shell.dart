@@ -15,6 +15,7 @@ import '../../core/session.dart';
 import '../../core/store.dart';
 import '../../core/tips.dart';
 import '../../core/ui.dart';
+import '../matches/matches_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../moderation/sanction_dialogs.dart';
 import '../onboarding/intro_screen.dart';
@@ -169,6 +170,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final pending = ref.watch(requestsProvider(true)).value?.where((r) => r.isPending).length ?? 0;
+    final newMatches = newMatchCount(ref.watch(conversationsProvider).value ?? const []);
     final unread = ref.watch(unreadCountProvider);
 
     Widget badged(IconData icon, int count) =>
@@ -212,13 +214,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             label: l.navDiscover,
           ),
           NavigationDestination(
-            icon: badged(Icons.mail_outline_rounded, pending),
-            selectedIcon: badged(Icons.mail_rounded, pending),
-            label: l.navRequests,
+            icon: badged(Icons.favorite_border_rounded, newMatches),
+            selectedIcon: badged(Icons.favorite_rounded, newMatches),
+            label: l.matchesTitle,
           ),
           NavigationDestination(
-            icon: badged(Icons.chat_bubble_outline_rounded, unread),
-            selectedIcon: badged(Icons.chat_bubble_rounded, unread),
+            // Sohbetler sekmesi okunmamış mesajları ve bekleyen istekleri birlikte gösterir
+            icon: badged(Icons.chat_bubble_outline_rounded, unread + pending),
+            selectedIcon: badged(Icons.chat_bubble_rounded, unread + pending),
             label: l.navChats,
           ),
           NavigationDestination(

@@ -5,30 +5,61 @@ import 'package:go_router/go_router.dart';
 import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
+import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 
+// Bağımsız sayfa: bildirim/banner bağlantıları için (/requests). Normal kullanım Sohbetler sekmesinin içinde.
 class RequestsScreen extends StatelessWidget {
   const RequestsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l.navRequests),
-          bottom: TabBar(tabs: [Tab(text: l.inbox), Tab(text: l.outbox)]),
-        ),
-        body: const TabBarView(children: [_RequestList(inbox: true), _RequestList(inbox: false)]),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: Text(l.navRequests)),
+      body: const RequestsBody(),
     );
   }
 }
 
+// Gelen / giden istekler. Sohbetler sekmesinin "İstekler" bölümü olarak da kullanılır.
+class RequestsBody extends StatefulWidget {
+  const RequestsBody({super.key});
+
+  @override
+  State<RequestsBody> createState() => _RequestsBodyState();
+}
+
+class _RequestsBodyState extends State<RequestsBody> {
+  bool _inbox = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+        child: SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<bool>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(value: true, label: Text(l.inbox), icon: const Icon(Icons.move_to_inbox_outlined, size: 18)),
+              ButtonSegment(value: false, label: Text(l.outbox), icon: const Icon(Icons.outbox_outlined, size: 18)),
+            ],
+            selected: {_inbox},
+            onSelectionChanged: (v) => setState(() => _inbox = v.first),
+          ),
+        ),
+      ),
+      Expanded(child: _RequestList(key: ValueKey(_inbox), inbox: _inbox)),
+    ]);
+  }
+}
+
 class _RequestList extends ConsumerWidget {
-  const _RequestList({required this.inbox});
+  const _RequestList({super.key, required this.inbox});
   final bool inbox;
 
   @override
@@ -147,7 +178,7 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
           const SizedBox(height: 10),
           if (r.isPending) ...[
             Text(
-              widget.inbox ? '${l.earnOnAccept(r.price)} · ${l.expiresIn(hoursLeft)}' : l.expiresIn(hoursLeft),
+              widget.inbox ? '${l.requestEarnRule(r.price, r.escrowReplies, r.escrowMinWords)} · ${l.expiresIn(hoursLeft)}' : l.expiresIn(hoursLeft),
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
@@ -170,8 +201,22 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
                   child: Text(l.cancelRequest),
                 ),
               ),
-          ] else
+          ] else ...[
             Chip(label: Text(_statusLabel(l, r.status)), visualDensity: VisualDensity.compact),
+            // Faz 20: emanet — jetonun kime ne zaman geçeceği
+            if (r.escrow) ...[
+              const SizedBox(height: 6),
+              Text(
+                widget.inbox
+                    ? l.requestEscrowEarner(r.price, r.escrowMinWords, r.escrowNeeded)
+                    : l.requestEscrowPayer(r.escrowReplies - r.escrowNeeded, r.escrowReplies),
+                style: theme.textTheme.bodySmall?.copyWith(color: Brand.coral, fontWeight: FontWeight.w600),
+              ),
+            ] else if (r.settlement == 'RELEASED' && widget.inbox)
+              Padding(padding: const EdgeInsets.only(top: 6), child: Text(l.requestReleased, style: theme.textTheme.bodySmall?.copyWith(color: Brand.like, fontWeight: FontWeight.w600)))
+            else if (r.settlement == 'REFUNDED')
+              Padding(padding: const EdgeInsets.only(top: 6), child: Text(l.requestRefunded, style: theme.textTheme.bodySmall)),
+          ],
         ]),
       ),
     );

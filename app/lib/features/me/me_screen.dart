@@ -419,7 +419,7 @@ class _StreakCard extends StatelessWidget {
             shape: BoxShape.circle,
             color: Brand.orange.withValues(alpha: 0.14),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.local_fire_department_rounded,
             color: Brand.orange,
           ),
@@ -533,7 +533,7 @@ class _WeeklyDigestCard extends ConsumerWidget {
             shape: BoxShape.circle,
             color: Brand.coral.withValues(alpha: 0.14),
           ),
-          child: const Icon(Icons.insights_rounded, color: Brand.coral),
+          child: Icon(Icons.insights_rounded, color: Brand.coral),
         ),
         title: Text(
           digest.newMatches > 0 ? l.weeklyDigestMatches(digest.newMatches) : l.weeklyDigestTitle,

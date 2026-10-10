@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,11 +38,75 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   int _deckVersion = 0;
   // Faz 20: eşleştirme modu (all | astro | music | interests | vibe)
   String _mode = 'all';
+  // Faz 20: günlük beğeni hakkı (sayaç). null = henüz yüklenmedi (kısıt uygulanmaz, sunucu zaten korur)
+  LikeStatus? _likes;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _loadLikes();
+  }
+
+  Future<void> _loadLikes() async {
+    try {
+      final s = await ref.read(apiProvider).likeStatus();
+      if (mounted) setState(() => _likes = s);
+    } catch (_) {}
+  }
+
+  // Hak bitince: kalan süreyi ve jetonla sıfırlama seçeneğini göster
+  Future<void> _showLikeLimitSheet() async {
+    final l = AppLocalizations.of(context);
+    final status = _likes ?? await ref.read(apiProvider).likeStatus().catchError((_) => const LikeStatus(limit: 25, used: 25, remaining: 0, resetPrice: 50));
+    if (!mounted) return;
+    final left = status.nextFreeAt?.difference(DateTime.now());
+    final reset = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
+              child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 34),
+            ),
+            const SizedBox(height: 14),
+            Text(l.likeLimitTitle, style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 6),
+            Text(l.likeLimitBody(status.limit), textAlign: TextAlign.center),
+            if (left != null && !left.isNegative) ...[
+              const SizedBox(height: 6),
+              Text(l.likeFreeIn(left.inHours, left.inMinutes % 60),
+                  textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodySmall),
+            ],
+            const SizedBox(height: 20),
+            GradientButton(
+              label: l.likeLimitReset(status.resetPrice),
+              icon: Icons.refresh_rounded,
+              onPressed: () => Navigator.pop(ctx, true),
+            ),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.likeLimitWait)),
+          ]),
+        ),
+      ),
+    );
+    if (reset != true || !mounted) return;
+    try {
+      final fresh = await ref.read(apiProvider).resetLikes();
+      ref.invalidate(walletProvider);
+      Fx.success();
+      if (!mounted) return;
+      setState(() => _likes = fresh);
+      showSnack(context, l.likeResetDone(fresh.limit));
+    } catch (e) {
+      if (!mounted) return;
+      final low = e is ApiException && e.code == 'insufficient_balance';
+      showSnack(context, errorText(l, e),
+          action: low ? SnackBarAction(label: l.topUp, onPressed: () => context.go('/wallet')) : null);
+    }
   }
 
   @override
@@ -87,12 +153,20 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       CardSwiperDirection.top => 'superlike',
       _ => 'pass',
     };
+    // Beğeni hakkı bittiyse kart geri döner ve sıfırlama seçeneği sunulur
+    if (action == 'like' && (_likes?.remaining ?? 1) <= 0) {
+      unawaited(_showLikeLimitSheet());
+      return false;
+    }
     Fx.tap();
     final profile = _cards![index];
     try {
       final r = await ref.read(apiProvider).swipe(profile.id, action);
       if (!mounted) return true;
-      setState(() => _current = next ?? index);
+      setState(() {
+        _current = next ?? index;
+        if (r.likes != null) _likes = r.likes;
+      });
       if (action == 'superlike') {
         ref.invalidate(walletProvider);
         showSnack(context, l.superLikeSent);
@@ -105,6 +179,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       return true;
     } catch (e) {
       if (!mounted) return false;
+      if (e is ApiException && e.code == 'like_limit_reached') {
+        _loadLikes();
+        unawaited(_showLikeLimitSheet());
+        return false;
+      }
       final low = e is ApiException && e.code == 'insufficient_balance';
       showSnack(context, errorText(l, e),
           action: low ? SnackBarAction(label: l.topUp, onPressed: () => context.go('/wallet')) : null);
@@ -146,7 +225,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
+              decoration: BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
               child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 36),
             ),
             const SizedBox(height: 14),
@@ -203,54 +282,68 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       body = Column(children: [
         if (me != null && !me.hasLocation) _LocationBar(onEnable: _askLocation),
         Expanded(
-          child: CardSwiper(
-            key: ValueKey(_deckVersion),
-            controller: _controller,
-            cardsCount: cards.length,
-            numberOfCardsDisplayed: cards.length.clamp(1, 2),
-            isLoop: false,
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-            backCardOffset: const Offset(0, 0),
-            scale: 0.94,
-            allowedSwipeDirection: const AllowedSwipeDirection.only(left: true, right: true, up: true),
-            onSwipe: _onSwipe,
-            onEnd: () => setState(() => _finished = true),
-            cardBuilder: (context, index, dx, dy) =>
-                _ProfileCard(profile: cards[index], dx: dx, dy: dy, myInterests: myInterests),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _RoundButton(
-              icon: Icons.close_rounded,
-              color: Brand.nope,
-              tooltip: l.reject,
-              onTap: () => _controller.swipe(CardSwiperDirection.left),
+          child: Stack(children: [
+            CardSwiper(
+              key: ValueKey(_deckVersion),
+              controller: _controller,
+              cardsCount: cards.length,
+              numberOfCardsDisplayed: cards.length.clamp(1, 2),
+              isLoop: false,
+              padding: const EdgeInsets.fromLTRB(10, 2, 10, 8),
+              backCardOffset: const Offset(0, 0),
+              scale: 0.94,
+              allowedSwipeDirection: const AllowedSwipeDirection.only(left: true, right: true, up: true),
+              onSwipe: _onSwipe,
+              onEnd: () => setState(() => _finished = true),
+              cardBuilder: (context, index, dx, dy) =>
+                  _ProfileCard(profile: cards[index], dx: dx, dy: dy, myInterests: myInterests),
             ),
-            const SizedBox(width: 14),
-            _RoundButton(
-              icon: Icons.star_rounded,
-              color: _superBlue,
-              size: 48,
-              tooltip: l.superLike,
-              onTap: () => _controller.swipe(CardSwiperDirection.top),
-            ),
-            const SizedBox(width: 14),
-            _RoundButton(
-              icon: Icons.mail_rounded,
-              color: Brand.gold,
-              size: 48,
-              tooltip: l.messageRequest,
-              onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message),
-            ),
-            const SizedBox(width: 14),
-            _RoundButton(
-              icon: Icons.favorite_rounded,
-              gradient: true,
-              size: 64,
-              tooltip: l.accept,
-              onTap: () => _controller.swipe(CardSwiperDirection.right),
+            // Faz 20: kalan beğeni hakkı sayacı (kartın üstünde, ortada)
+            if (_likes != null)
+              Positioned(
+                top: 20,
+                left: 0,
+                right: 0,
+                child: Center(child: _LikeCounter(status: _likes!, onTap: _showLikeLimitSheet)),
+              ),
+            // Faz 20: kaydırmanın yanında düğmeler — kartın alt kısmına binen, büyük ve belirgin
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 22,
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _RoundButton(
+                  icon: Icons.close_rounded,
+                  color: Brand.nope,
+                  size: 62,
+                  tooltip: l.reject,
+                  onTap: () => _controller.swipe(CardSwiperDirection.left),
+                ),
+                const SizedBox(width: 12),
+                _RoundButton(
+                  icon: Icons.star_rounded,
+                  color: _superBlue,
+                  size: 48,
+                  tooltip: l.superLike,
+                  onTap: () => _controller.swipe(CardSwiperDirection.top),
+                ),
+                const SizedBox(width: 12),
+                _RoundButton(
+                  icon: Icons.mail_rounded,
+                  color: Brand.gold,
+                  size: 48,
+                  tooltip: l.messageRequest,
+                  onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message),
+                ),
+                const SizedBox(width: 12),
+                _RoundButton(
+                  icon: Icons.favorite_rounded,
+                  gradient: true,
+                  size: 68,
+                  tooltip: l.accept,
+                  onTap: () => _controller.swipe(CardSwiperDirection.right),
+                ),
+              ]),
             ),
           ]),
         ),
@@ -268,7 +361,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: Tooltip(
                 message: l.streakTooltip(me.streak.current),
                 child: Chip(
-                  avatar: const Icon(Icons.local_fire_department_rounded, color: Brand.orange, size: 18),
+                  avatar: Icon(Icons.local_fire_department_rounded, color: Brand.orange, size: 18),
                   label: Text('${me.streak.current}'),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -281,7 +374,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: Tooltip(
                 message: l.boostTitle,
                 child: Chip(
-                  avatar: const Icon(Icons.bolt_rounded, color: Brand.coral, size: 18),
+                  avatar: Icon(Icons.bolt_rounded, color: Brand.coral, size: 18),
                   label: Text(l.boostActive(boostLeft)),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -289,6 +382,15 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             )
           else
             IconButton(onPressed: _openBoost, icon: const Icon(Icons.bolt_rounded), tooltip: l.boost),
+          // Faz 20: günlük ruh hali artık üstte yer kaplamıyor; simge olarak burada (paylaşınca emojisi görünür)
+          IconButton(
+            onPressed: () => showMoodSheet(context, ref),
+            tooltip: l.moodSection,
+            icon: Text(
+              (me?.profile?.moodId ?? '').isEmpty ? '💭' : (moodEmoji[me!.profile!.moodId] ?? '💭'),
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
           IconButton(onPressed: _openFilters, icon: const Icon(Icons.tune_rounded), tooltip: l.filters),
         ],
       ),
@@ -296,7 +398,6 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         top: false,
         child: Column(children: [
           ModeBar(mode: _mode, onSelected: _setMode),
-          const _MoodBanner(),
           const _LiveActivityStrip(),
           if (_mode == 'interests') const _GroupsStrip(),
           Expanded(child: body),
@@ -355,40 +456,6 @@ class _GroupsStrip extends ConsumerWidget {
         ),
       ),
     ]);
-  }
-}
-
-// Faz 16: günlük ruh hali "günlük açılışı tetikler" — kaydırma ekranının en üstünde, ruh halini
-// bugün paylaşmamışsan kompakt bir davet çıkar; paylaşınca kaybolur.
-class _MoodBanner extends ConsumerWidget {
-  const _MoodBanner();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final moodId = ref.watch(meProvider).value?.profile?.moodId ?? '';
-    if (moodId.isNotEmpty) return const SizedBox.shrink();
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => showMoodSheet(context, ref),
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(16, 2, 16, 0),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(Brand.radius),
-            color: Brand.coral.withValues(alpha: 0.08),
-          ),
-          child: Row(children: [
-            const Text('💭', style: TextStyle(fontSize: 18)),
-            const SizedBox(width: 10),
-            Expanded(child: Text(l.moodPromptBanner, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall)),
-            const Icon(Icons.chevron_right_rounded, size: 18),
-          ]),
-        ),
-      ),
-    );
   }
 }
 
@@ -553,7 +620,7 @@ class _ProfileCardState extends State<_ProfileCard> {
               Positioned(
                 left: 18,
                 right: 18,
-                bottom: 18,
+                bottom: 100,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   if (p.match != null) MatchBubble(match: p.match!),
                   Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -735,7 +802,7 @@ class _LocationBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(Brand.radius),
       ),
       child: Row(children: [
-        const Icon(Icons.near_me_rounded, color: Brand.coral, size: 20),
+        Icon(Icons.near_me_rounded, color: Brand.coral, size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Text(l.locationRationale, maxLines: 2, overflow: TextOverflow.ellipsis,
@@ -819,4 +886,38 @@ class _DeckSkeleton extends StatelessWidget {
           child: SkeletonBox(height: double.infinity, radius: 24),
         ),
       );
+}
+
+// Faz 20: kalan beğeni hakkı. Azaldıkça renk değişir; 0 olunca dokununca sıfırlama sayfası açılır.
+class _LikeCounter extends StatelessWidget {
+  const _LikeCounter({required this.status, required this.onTap});
+  final LikeStatus status;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final out = status.remaining <= 0;
+    final low = !out && status.remaining <= 5;
+    final color = out ? Brand.nope : (low ? Brand.gold : Colors.white);
+    return Semantics(
+      button: true,
+      label: l.likeCounterTooltip(status.remaining, status.limit),
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          decoration: ShapeDecoration(shape: const StadiumBorder(), color: Colors.black.withValues(alpha: 0.5)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.favorite_rounded, size: 14, color: color),
+            const SizedBox(width: 5),
+            Text('${status.remaining}/${status.limit}',
+                style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 13)),
+          ]),
+        ),
+      ),
+    );
+  }
 }

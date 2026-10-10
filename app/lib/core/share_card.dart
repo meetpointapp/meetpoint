@@ -56,7 +56,7 @@ class ShareTemplate extends StatelessWidget {
     return Container(
       width: 480,
       height: 720,
-      decoration: const BoxDecoration(gradient: Brand.gradient),
+      decoration: BoxDecoration(gradient: Brand.gradient),
       child: Padding(
         padding: const EdgeInsets.all(36),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

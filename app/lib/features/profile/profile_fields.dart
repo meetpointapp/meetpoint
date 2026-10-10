@@ -149,7 +149,7 @@ class ChoiceTiles extends StatelessWidget {
                   AnimatedOpacity(
                     duration: const Duration(milliseconds: 180),
                     opacity: o.id == selected ? 1 : 0,
-                    child: const Icon(Icons.check_circle_rounded, color: Brand.coral),
+                    child: Icon(Icons.check_circle_rounded, color: Brand.coral),
                   ),
                 ]),
               ),
@@ -285,7 +285,7 @@ class _PhotoGridFieldState extends ConsumerState<PhotoGridField> {
                     bottom: 6,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: const ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
+                      decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
                       child: Text(l.cover,
                           style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                     ),
@@ -524,7 +524,7 @@ class _BasicsEditorState extends State<BasicsEditor> {
           for (final (id, label) in options)
             ListTile(
               title: Text(label),
-              trailing: id == current ? const Icon(Icons.check_rounded, color: Brand.coral) : null,
+              trailing: id == current ? Icon(Icons.check_rounded, color: Brand.coral) : null,
               onTap: () => Navigator.pop(ctx, id),
             ),
           if (current.isNotEmpty) ListTile(title: Text(l.clear), onTap: () => Navigator.pop(ctx, '')),

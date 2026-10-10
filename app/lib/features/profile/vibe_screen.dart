@@ -145,7 +145,7 @@ class VibeCard extends StatelessWidget {
         gradient: LinearGradient(colors: [Brand.coral.withValues(alpha: 0.12), Brand.orange.withValues(alpha: 0.06)]),
       ),
       child: Row(children: [
-        const Icon(Icons.auto_awesome_rounded, color: Brand.coral),
+        Icon(Icons.auto_awesome_rounded, color: Brand.coral),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -179,7 +179,7 @@ class VibeCompatNote extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       ),
       child: Row(children: [
-        const Icon(Icons.favorite_rounded, size: 18, color: Brand.coral),
+        Icon(Icons.favorite_rounded, size: 18, color: Brand.coral),
         const SizedBox(width: 8),
         Expanded(child: Text(note, style: theme.textTheme.bodySmall)),
       ]),

@@ -65,7 +65,7 @@ Future<bool> askConsent(BuildContext context, WidgetRef ref, ConsentKind kind, {
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      icon: const Icon(Icons.privacy_tip_outlined, color: Brand.coral, size: 32),
+      icon: Icon(Icons.privacy_tip_outlined, color: Brand.coral, size: 32),
       title: Text(title),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(body, textAlign: TextAlign.center),

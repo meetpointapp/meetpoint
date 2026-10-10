@@ -804,5 +804,140 @@
         "type": "String"
       }
     }
+  },
+  "matchesTitle": "Matches",
+  "matchesNew": "New",
+  "matchesEmpty": "No matches yet. Swipe in Discover; when you both like each other, it shows up here.",
+  "matchesDiscoverCta": "Go to Discover",
+  "errLikeLimit": "You're out of likes. Reset them with coins or wait a bit.",
+  "likeCounterTooltip": "Likes left: {remaining}/{limit}",
+  "@likeCounterTooltip": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "likeLimitTitle": "You're out of likes",
+  "likeLimitBody": "You get {limit} likes every 24 hours. Refill now to keep going.",
+  "@likeLimitBody": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "likeFreeIn": "One like comes back on its own in {hours}h {minutes}m.",
+  "@likeFreeIn": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "likeLimitReset": "Reset for {price} coins",
+  "@likeLimitReset": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "likeLimitWait": "Later",
+  "likeResetDone": "Likes refilled: {limit}",
+  "@likeResetDone": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "callFreeFirst": "First {seconds} seconds free",
+  "@callFreeFirst": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "callFreeCountdown": "Free time: {seconds}s",
+  "@callFreeCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "requestEscrowEarner": "Write {needed} more replies of {minWords}+ words to earn {coins} coins",
+  "@requestEscrowEarner": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "minWords": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "requestEscrowPayer": "Waiting for a reply ({done}/{replies}). If none comes, your coins are refunded.",
+  "@requestEscrowPayer": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "replies": {
+        "type": "int"
+      }
+    }
+  },
+  "requestReleased": "Earnings credited to your account",
+  "requestRefunded": "Refunded because no reply came",
+  "chatEscrowEarner": "Write {needed} more replies of {minWords}+ words to earn {coins} coins",
+  "@chatEscrowEarner": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "minWords": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "chatEscrowPayer": "Your {coins} coins await a reply: they go to them after {needed} meaningful replies, or are refunded if none come.",
+  "@chatEscrowPayer": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "requestEarnRule": "{coins} coins: accept, then write {replies} replies of {minWords}+ words",
+  "@requestEarnRule": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "replies": {
+        "type": "int"
+      },
+      "minWords": {
+        "type": "int"
+      }
+    }
   }
 }

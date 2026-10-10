@@ -409,6 +409,8 @@ class _TopBar extends StatelessWidget {
             call.outgoing ? _Pill(coin: true, label: '-${call.totalCoins}') : _LiveEarningsPill(call: call),
             const SizedBox(width: 8),
             _Pill(label: l.perMinute(call.ratePerMin)),
+            // Faz 20: ilk saniyeler ücretsiz — geri sayım
+            if (call.freeSeconds > 0 && call.billedMinutes == 0) ...[const SizedBox(width: 8), _FreeTimePill(call: call)],
             const Spacer(),
             if (simulated) _Pill(label: l.simulationMode, dim: true),
           ]),
@@ -452,9 +454,14 @@ class _LiveEarningsPillState extends State<_LiveEarningsPill> {
   }
 
   void _tick() {
+    final call = widget.call;
+    // Ücretsiz sürede (ilk dakika henüz alınmadı) kazanç akmaz: sayaç 0'da bekler
+    final inFreeTime = call.freeSeconds > 0 &&
+        call.billedMinutes == 0 &&
+        (call.answeredAt == null || DateTime.now().difference(call.answeredAt!).inSeconds < call.freeSeconds);
     final elapsedMin = DateTime.now().difference(_syncedAt).inMilliseconds / 60000;
     // Bir sonraki dakikanın ücreti henüz kesinleşmedi: tahmini akış asla tam dakikayı geçmesin
-    final projected = _baseCoins + (widget.call.ratePerMin * elapsedMin).clamp(0.0, widget.call.ratePerMin.toDouble());
+    final projected = inFreeTime ? _baseCoins.toDouble() : _baseCoins + (widget.call.ratePerMin * elapsedMin).clamp(0.0, widget.call.ratePerMin.toDouble());
     if (mounted) setState(() => _displayed = projected);
   }
 
@@ -466,6 +473,43 @@ class _LiveEarningsPillState extends State<_LiveEarningsPill> {
 
   @override
   Widget build(BuildContext context) => _Pill(coin: true, label: '+${_displayed.floor()}');
+}
+
+// Faz 20: kabulden sonraki ücretsiz süre geri sayımı (siyah ekran/bağlantı sorunu boşa para kazandırmasın)
+class _FreeTimePill extends StatefulWidget {
+  const _FreeTimePill({required this.call});
+  final CallInfo call;
+
+  @override
+  State<_FreeTimePill> createState() => _FreeTimePillState();
+}
+
+class _FreeTimePillState extends State<_FreeTimePill> {
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final call = widget.call;
+    final answered = call.answeredAt;
+    final left = answered == null ? call.freeSeconds : call.freeSeconds - DateTime.now().difference(answered).inSeconds;
+    if (left <= 0) return const SizedBox.shrink();
+    return _Pill(label: answered == null ? l.callFreeFirst(call.freeSeconds) : l.callFreeCountdown(left));
+  }
 }
 
 class _Pill extends StatelessWidget {
@@ -557,7 +601,7 @@ class _CallerHeroState extends State<_CallerHero> with SingleTickerProviderState
               ),
             Container(
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
+              decoration: BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
               child: Avatar(call.user, radius: 62),
             ),
           ]),

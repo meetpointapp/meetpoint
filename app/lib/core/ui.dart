@@ -76,6 +76,7 @@ String errorText(AppLocalizations l, Object error) {
     'invalid_related' => l.errNotFound,
     'ticket_closed' => l.errTicketClosed,
     'already_answered' => l.errGeneric,
+    'like_limit_reached' => l.errLikeLimit,
     'item_not_owned' => l.errItemNotOwned,
     'already_owned' => l.errAlreadyOwned,
     'invalid_code' => l.errReferralInvalidCode,

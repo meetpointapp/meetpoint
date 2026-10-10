@@ -64,7 +64,7 @@ Future<void> showBannedDialog(BuildContext context, WidgetRef ref, Map<String, d
   final appeal = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      icon: const Icon(Icons.block_rounded, color: Brand.coral, size: 32),
+      icon: Icon(Icons.block_rounded, color: Brand.coral, size: 32),
       title: Text(l.sanctionBanTitle),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(l.errBanned, textAlign: TextAlign.center),

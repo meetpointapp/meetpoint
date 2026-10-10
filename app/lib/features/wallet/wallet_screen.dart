@@ -203,7 +203,7 @@ class _LeaderboardPromo extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return Card(
       child: ListTile(
-        leading: const Icon(Icons.leaderboard_rounded, color: Brand.coral),
+        leading: Icon(Icons.leaderboard_rounded, color: Brand.coral),
         title: Text(l.leaderboardTitle),
         trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () => context.push('/leaderboard'),
@@ -338,7 +338,7 @@ class _PackTile extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Brand.radius),
-        side: pack.popular ? const BorderSide(color: Brand.coral, width: 2) : BorderSide.none,
+        side: pack.popular ? BorderSide(color: Brand.coral, width: 2) : BorderSide.none,
       ),
       child: InkWell(
         onTap: onTap,
@@ -369,7 +369,7 @@ class _PackTile extends StatelessWidget {
         child: Center(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-            decoration: const ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
+            decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
             child: Text(l.mostPopular,
                 style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
           ),

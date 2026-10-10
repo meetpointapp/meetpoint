@@ -66,7 +66,7 @@ class ReferralScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Icon(Icons.link_rounded, size: 20, color: Brand.coral),
+                    Icon(Icons.link_rounded, size: 20, color: Brand.coral),
                     const SizedBox(width: 10),
                     Expanded(child: Text(l.personalLinkTitle, style: theme.textTheme.titleSmall)),
                   ]),
@@ -103,13 +103,13 @@ class ReferralScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Icon(Icons.group_rounded, size: 20, color: Brand.coral),
+                    Icon(Icons.group_rounded, size: 20, color: Brand.coral),
                     const SizedBox(width: 10),
                     Expanded(child: Text(l.referralTotalReferred(stats.totalReferred), style: theme.textTheme.bodyMedium)),
                   ]),
                   const SizedBox(height: 10),
                   Row(children: [
-                    const Icon(Icons.savings_rounded, size: 20, color: Brand.coral),
+                    Icon(Icons.savings_rounded, size: 20, color: Brand.coral),
                     const SizedBox(width: 10),
                     Expanded(child: Text(l.referralTotalEarned(stats.totalEarnedCoins), style: theme.textTheme.bodyMedium)),
                   ]),

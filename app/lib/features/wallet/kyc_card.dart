@@ -67,7 +67,7 @@ class _KycCardState extends ConsumerState<KycCard> {
     final kyc = ref.watch(_kycProvider).value;
     final status = kyc?['status'] as String? ?? 'none';
     if (status == 'pending') {
-      return Card(child: ListTile(leading: const Icon(Icons.hourglass_top_rounded, color: Brand.coral), title: Text(l.kycPending)));
+      return Card(child: ListTile(leading: Icon(Icons.hourglass_top_rounded, color: Brand.coral), title: Text(l.kycPending)));
     }
     final note = (kyc?['last'] as Map?)?['note'] as String? ?? '';
     return Card(
@@ -75,7 +75,7 @@ class _KycCardState extends ConsumerState<KycCard> {
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            const Icon(Icons.badge_outlined, color: Brand.coral),
+            Icon(Icons.badge_outlined, color: Brand.coral),
             const SizedBox(width: 8),
             Text(l.kycTitle, style: theme.textTheme.titleMedium),
           ]),
@@ -125,7 +125,7 @@ Future<void> showEarningsStatement(BuildContext context, WidgetRef ref) async {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.receipt_long_outlined, color: Brand.coral, size: 32),
+        icon: Icon(Icons.receipt_long_outlined, color: Brand.coral, size: 32),
         title: Text(l.earningsStatement),
         content: Text(l.earningsStatementBody(s.year, s.earnedCoins, s.payoutCount, usd(s.grossUsd), usd(s.withholdingUsd), usd(s.netUsd))),
         actions: [FilledButton(onPressed: () => Navigator.pop(ctx), child: Text(l.understood))],

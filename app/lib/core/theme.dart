@@ -7,19 +7,38 @@ import 'fx.dart';
 // MeetPoint marka kimliği: sıcak mercan -> turuncu gradyan, Inter yazı tipi,
 // yuvarlak köşeler ve dolgulu (çerçevesiz) alanlarla sade, kompakt bir görünüm.
 abstract final class Brand {
-  static const coral = Color(0xFFFF4D6D);
-  static const orange = Color(0xFFFF8A5B);
+  static const _defaultCoral = Color(0xFFFF4D6D);
+  static const _defaultOrange = Color(0xFFFF8A5B);
+  static Color _coral = _defaultCoral;
+  static Color _orange = _defaultOrange;
+
+  // Faz 20: uygulamanın ana rengi kullanıcının seçtiği (ya da mağazadan aldığı) temaya göre değişir.
+  // Varsayılan mercan→turuncu; tema seçilince main.dart setAccent() çağırır ve ağacı yeniden kurar.
+  static Color get coral => _coral;
+  static Color get orange => _orange;
   static const gold = Color(0xFFF5A524);
   static const like = Color(0xFF2BD47D);
   static const nope = Color(0xFFFF5A5F);
 
-  static const gradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [coral, orange],
-  );
+  static LinearGradient get gradient => LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [_coral, _orange],
+      );
 
   static const radius = 16.0;
+
+  // accent null = varsayılan marka rengi. İkinci renk, ana rengin tonunu biraz kaydırıp açarak türetilir.
+  static void setAccent(Color? accent) {
+    if (accent == null) {
+      _coral = _defaultCoral;
+      _orange = _defaultOrange;
+      return;
+    }
+    final hsl = HSLColor.fromColor(accent);
+    _coral = accent;
+    _orange = hsl.withHue((hsl.hue + 22) % 360).withLightness((hsl.lightness + 0.08).clamp(0.0, 0.85)).toColor();
+  }
 }
 
 ThemeData buildTheme(Brightness brightness) {
@@ -59,7 +78,7 @@ ThemeData buildTheme(Brightness brightness) {
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(Brand.radius), borderSide: BorderSide.none),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(Brand.radius),
-        borderSide: const BorderSide(color: Brand.coral, width: 1.5),
+        borderSide: BorderSide(color: Brand.coral, width: 1.5),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -150,7 +169,7 @@ class GradientButton extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       opacity: enabled ? 1 : 0.45,
       child: DecoratedBox(
-        decoration: const ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
+        decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
         child: Material(
           color: Colors.transparent,
           shape: const StadiumBorder(),

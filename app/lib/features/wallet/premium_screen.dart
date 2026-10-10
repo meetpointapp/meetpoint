@@ -95,7 +95,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
         const SizedBox(height: 20),
         Card(
           child: ListTile(
-            leading: const Icon(Icons.favorite_rounded, color: Brand.coral),
+            leading: Icon(Icons.favorite_rounded, color: Brand.coral),
             title: Text(l.likesYou),
             subtitle: Text(l.premiumPerkLikes),
           ),

@@ -124,7 +124,7 @@ class _IntroPageView extends StatelessWidget {
         Container(
           width: 108,
           height: 108,
-          decoration: const BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
+          decoration: BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
           child: Icon(page.icon, color: Colors.white, size: 48),
         ),
         const SizedBox(height: 32),

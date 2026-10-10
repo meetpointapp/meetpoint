@@ -633,6 +633,14 @@ class ContactRequest {
   final DateTime createdAt;
   final DateTime expiresAt;
   final PublicProfile? user;
+  // Faz 20: emanet. Kabul edilmiş ama jetonu henüz alıcıya geçmemiş istek; alıcı escrowNeeded kadar
+  // daha (en az escrowMinWords kelimelik) cevap yazınca jeton ona geçer, escrowUntil'e kadar yazmazsa iade.
+  final bool escrow;
+  final DateTime? escrowUntil;
+  final int escrowNeeded;
+  final int escrowReplies;
+  final int escrowMinWords;
+  final String settlement; // '' | RELEASED | REFUNDED
 
   const ContactRequest({
     required this.id,
@@ -643,6 +651,12 @@ class ContactRequest {
     required this.createdAt,
     required this.expiresAt,
     required this.user,
+    this.escrow = false,
+    this.escrowUntil,
+    this.escrowNeeded = 0,
+    this.escrowReplies = 3,
+    this.escrowMinWords = 5,
+    this.settlement = '',
   });
 
   bool get isPending => status == 'PENDING';
@@ -656,6 +670,29 @@ class ContactRequest {
         createdAt: _date(j['createdAt']),
         expiresAt: _date(j['expiresAt']),
         user: j['user'] == null ? null : PublicProfile.fromJson(j['user']),
+        escrow: j['escrow'] ?? false,
+        escrowUntil: j['escrowUntil'] == null ? null : _date(j['escrowUntil']),
+        escrowNeeded: j['escrowNeeded'] ?? 0,
+        escrowReplies: j['escrowReplies'] ?? 3,
+        escrowMinWords: j['escrowMinWords'] ?? 5,
+        settlement: j['settlement'] ?? '',
+      );
+}
+
+// Faz 20: keşfette beğeni hakkı (sayaç). Sunucu: GET /discover/like-status.
+class LikeStatus {
+  final int limit;
+  final int used;
+  final int remaining;
+  final int resetPrice;
+  final DateTime? nextFreeAt; // en eski beğeninin penceresi dolunca bir hak geri gelir
+  const LikeStatus({required this.limit, required this.used, required this.remaining, required this.resetPrice, this.nextFreeAt});
+  factory LikeStatus.fromJson(Map<String, dynamic> j) => LikeStatus(
+        limit: j['limit'],
+        used: j['used'],
+        remaining: j['remaining'],
+        resetPrice: j['resetPrice'],
+        nextFreeAt: j['nextFreeAt'] == null ? null : _date(j['nextFreeAt']),
       );
 }
 
@@ -840,6 +877,12 @@ class Conversation {
   final PublicProfile? user;
   final ChatMessage? lastMessage;
   final int unreadCount;
+  // Faz 20: sohbet teması = sohbeti ilk başlatanın (ilk mesajı yazanın) balon stili ve arka planı.
+  // İki taraf da aynı temayı görür; ilk mesaj yoksa null.
+  final String themeBubbleId;
+  final String themeBackgroundId;
+  // Faz 20: mesaj isteği emaneti (alıcı için kazanç ilerlemesi, gönderen için bekleme bilgisi)
+  final ChatEscrow? escrow;
 
   const Conversation({
     required this.id,
@@ -848,6 +891,9 @@ class Conversation {
     required this.user,
     required this.lastMessage,
     this.unreadCount = 0,
+    this.themeBubbleId = '',
+    this.themeBackgroundId = '',
+    this.escrow,
   });
 
   factory Conversation.fromJson(Map<String, dynamic> j) => Conversation(
@@ -857,6 +903,27 @@ class Conversation {
         user: j['user'] == null ? null : PublicProfile.fromJson(j['user']),
         lastMessage: j['lastMessage'] == null ? null : ChatMessage.fromJson(j['lastMessage']),
         unreadCount: j['unreadCount'] ?? 0,
+        themeBubbleId: j['theme']?['chatBubbleThemeId'] ?? '',
+        themeBackgroundId: j['theme']?['chatBackgroundThemeId'] ?? '',
+        escrow: j['escrow'] == null ? null : ChatEscrow.fromJson(Map<String, dynamic>.from(j['escrow'])),
+      );
+}
+
+class ChatEscrow {
+  final bool earner; // true: jetonu alacak taraf (cevap yazması gereken); false: jetonu ödeyen
+  final int coins;
+  final int needed; // alıcının yazması gereken kalan anlamlı cevap
+  final int replies;
+  final int minWords;
+  final DateTime? until;
+  const ChatEscrow({required this.earner, required this.coins, required this.needed, required this.replies, required this.minWords, this.until});
+  factory ChatEscrow.fromJson(Map<String, dynamic> j) => ChatEscrow(
+        earner: j['role'] == 'earner',
+        coins: j['coins'],
+        needed: j['needed'],
+        replies: j['replies'],
+        minWords: j['minWords'],
+        until: j['until'] == null ? null : _date(j['until']),
       );
 }
 
@@ -953,6 +1020,8 @@ class CallInfo {
   final CallStatus status;
   final String endReason; // hangup | balance | disconnect | server_restart | connect_failed
   final int ratePerMin;
+  // Faz 20: kabulden sonraki ücretsiz süre (saniye). İlk dakika bu süre dolunca alınır.
+  final int freeSeconds;
   final int billedMinutes;
   final int totalCoins;
   final int giftCoins;
@@ -972,6 +1041,7 @@ class CallInfo {
     required this.status,
     this.endReason = '',
     required this.ratePerMin,
+    this.freeSeconds = 0,
     this.billedMinutes = 0,
     this.totalCoins = 0,
     this.giftCoins = 0,
@@ -998,6 +1068,7 @@ class CallInfo {
         status: CallStatus.values.byName((j['status'] as String).toLowerCase()),
         endReason: j['endReason'] ?? '',
         ratePerMin: j['ratePerMin'],
+        freeSeconds: j['freeSeconds'] ?? 0,
         billedMinutes: j['billedMinutes'] ?? 0,
         totalCoins: j['totalCoins'] ?? 0,
         giftCoins: j['giftCoins'] ?? 0,

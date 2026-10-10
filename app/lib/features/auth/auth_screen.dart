@@ -72,7 +72,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: Brand.gradient),
+        decoration: BoxDecoration(gradient: Brand.gradient),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(

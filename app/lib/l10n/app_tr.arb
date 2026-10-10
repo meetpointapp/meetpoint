@@ -1475,5 +1475,140 @@
         "type": "String"
       }
     }
+  },
+  "matchesTitle": "Eşleşmeler",
+  "matchesNew": "Yeni",
+  "matchesEmpty": "Henüz eşleşmen yok. Keşfet'te kaydır; karşılıklı beğenince burada görünür.",
+  "matchesDiscoverCta": "Keşfet'e git",
+  "errLikeLimit": "Beğeni hakkın bitti. Jetonla sıfırlayabilir ya da biraz bekleyebilirsin.",
+  "likeCounterTooltip": "Kalan beğeni hakkın: {remaining}/{limit}",
+  "@likeCounterTooltip": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "likeLimitTitle": "Beğeni hakkın bitti",
+  "likeLimitBody": "24 saatte {limit} beğeni atabilirsin. Hemen devam etmek için hakkını yenileyebilirsin.",
+  "@likeLimitBody": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "likeFreeIn": "Bir hakkın {hours} sa {minutes} dk sonra kendiliğinden geri gelir.",
+  "@likeFreeIn": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "likeLimitReset": "{price} jetonla sıfırla",
+  "@likeLimitReset": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "likeLimitWait": "Daha sonra",
+  "likeResetDone": "Beğeni hakkın yenilendi: {limit}",
+  "@likeResetDone": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "callFreeFirst": "İlk {seconds} saniye ücretsiz",
+  "@callFreeFirst": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "callFreeCountdown": "Ücretsiz süre: {seconds} sn",
+  "@callFreeCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "requestEscrowEarner": "{coins} jeton kazanmak için {minWords}+ kelimelik {needed} cevap daha yaz",
+  "@requestEscrowEarner": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "minWords": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "requestEscrowPayer": "Cevap bekleniyor ({done}/{replies}). Cevap gelmezse jetonun iade edilir.",
+  "@requestEscrowPayer": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "replies": {
+        "type": "int"
+      }
+    }
+  },
+  "requestReleased": "Kazanç hesabına geçti",
+  "requestRefunded": "Cevap gelmediği için iade edildi",
+  "chatEscrowEarner": "{coins} jeton kazanmak için {minWords}+ kelimelik {needed} cevap daha yaz",
+  "@chatEscrowEarner": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "minWords": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "chatEscrowPayer": "{coins} jetonun cevap bekliyor: karşı taraf {needed} anlamlı cevap yazınca ona geçer, yazmazsa iade edilir.",
+  "@chatEscrowPayer": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "requestEarnRule": "{coins} jeton: kabul et, {minWords}+ kelimelik {replies} cevap yaz",
+  "@requestEarnRule": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      },
+      "replies": {
+        "type": "int"
+      },
+      "minWords": {
+        "type": "int"
+      }
+    }
   }
 }

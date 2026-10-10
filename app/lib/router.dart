@@ -23,6 +23,7 @@ import 'features/discover/interest_group_screen.dart';
 import 'features/store/store_screen.dart';
 import 'features/home/home_shell.dart';
 import 'features/likes/likes_screen.dart';
+import 'features/matches/matches_screen.dart';
 import 'features/me/me_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/profile/profile_edit_screen.dart';
@@ -66,6 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/verify-email', builder: (_, _) => const VerifyEmailScreen()),
       GoRoute(path: '/verify-profile', builder: (_, _) => const VerificationScreen()),
       GoRoute(path: '/likes', builder: (_, _) => const LikesScreen()),
+      GoRoute(path: '/requests', builder: (_, _) => const RequestsScreen()),
       GoRoute(path: '/setup', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/me/edit', builder: (_, _) => const ProfileEditScreen()),
       GoRoute(path: '/me/devices', builder: (_, _) => const DevicesScreen()),
@@ -95,7 +97,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _, shell) => HomeShell(shell: shell),
         branches: [
           StatefulShellBranch(routes: [GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/requests', builder: (_, _) => const RequestsScreen())]),
+          StatefulShellBranch(routes: [GoRoute(path: '/matches', builder: (_, _) => const MatchesScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/chats', builder: (_, _) => const ConversationsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/store', builder: (_, _) => const StoreScreen())]),

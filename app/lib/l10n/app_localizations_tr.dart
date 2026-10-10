@@ -2894,4 +2894,93 @@ class AppLocalizationsTr extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get matchesTitle => 'Eşleşmeler';
+
+  @override
+  String get matchesNew => 'Yeni';
+
+  @override
+  String get matchesEmpty =>
+      'Henüz eşleşmen yok. Keşfet\'te kaydır; karşılıklı beğenince burada görünür.';
+
+  @override
+  String get matchesDiscoverCta => 'Keşfet\'e git';
+
+  @override
+  String get errLikeLimit =>
+      'Beğeni hakkın bitti. Jetonla sıfırlayabilir ya da biraz bekleyebilirsin.';
+
+  @override
+  String likeCounterTooltip(int remaining, int limit) {
+    return 'Kalan beğeni hakkın: $remaining/$limit';
+  }
+
+  @override
+  String get likeLimitTitle => 'Beğeni hakkın bitti';
+
+  @override
+  String likeLimitBody(int limit) {
+    return '24 saatte $limit beğeni atabilirsin. Hemen devam etmek için hakkını yenileyebilirsin.';
+  }
+
+  @override
+  String likeFreeIn(int hours, int minutes) {
+    return 'Bir hakkın $hours sa $minutes dk sonra kendiliğinden geri gelir.';
+  }
+
+  @override
+  String likeLimitReset(int price) {
+    return '$price jetonla sıfırla';
+  }
+
+  @override
+  String get likeLimitWait => 'Daha sonra';
+
+  @override
+  String likeResetDone(int limit) {
+    return 'Beğeni hakkın yenilendi: $limit';
+  }
+
+  @override
+  String callFreeFirst(int seconds) {
+    return 'İlk $seconds saniye ücretsiz';
+  }
+
+  @override
+  String callFreeCountdown(int seconds) {
+    return 'Ücretsiz süre: $seconds sn';
+  }
+
+  @override
+  String requestEscrowEarner(int coins, int minWords, int needed) {
+    return '$coins jeton kazanmak için $minWords+ kelimelik $needed cevap daha yaz';
+  }
+
+  @override
+  String requestEscrowPayer(int done, int replies) {
+    return 'Cevap bekleniyor ($done/$replies). Cevap gelmezse jetonun iade edilir.';
+  }
+
+  @override
+  String get requestReleased => 'Kazanç hesabına geçti';
+
+  @override
+  String get requestRefunded => 'Cevap gelmediği için iade edildi';
+
+  @override
+  String chatEscrowEarner(int coins, int minWords, int needed) {
+    return '$coins jeton kazanmak için $minWords+ kelimelik $needed cevap daha yaz';
+  }
+
+  @override
+  String chatEscrowPayer(int coins, int needed) {
+    return '$coins jetonun cevap bekliyor: karşı taraf $needed anlamlı cevap yazınca ona geçer, yazmazsa iade edilir.';
+  }
+
+  @override
+  String requestEarnRule(int coins, int replies, int minWords) {
+    return '$coins jeton: kabul et, $minWords+ kelimelik $replies cevap yaz';
+  }
 }
