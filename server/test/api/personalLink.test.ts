@@ -1,4 +1,4 @@
-// Faz 17 madde 11: kişisel bağlantı linki ("Beni MeetPoint'te bul"). Davet programıyla aynı kodu
+// Faz 17 madde 11: kişisel bağlantı linki ("Beni VibeUpMe'de bul"). Davet programıyla aynı kodu
 // kullanır; tamamen herkese açık (oturum gerekmez), fotoğraf göstermez (gizlilik).
 import { describe, it } from 'vitest';
 import { B, call, check, makeUser } from '../helpers';
@@ -19,7 +19,7 @@ describe('Kişisel bağlantı linki (Faz 17)', () => {
     const page = await fetch(`${B}/u/ZZZZZZZZ?lang=tr`);
     check('genel sayfa da 200 döner (kod sızdırmaz)', page.status === 200);
     const html = await page.text();
-    check('MeetPoint tanıtımı içerir', html.includes('MeetPoint'));
+    check('VibeUpMe tanıtımı içerir', html.includes('VibeUpMe'));
   });
 
   it('İngilizce dil parametresi', async () => {

@@ -10,7 +10,7 @@ export const TEST_PG_PORT = 5434;
 export const testEnv: Record<string, string> = {
   NODE_ENV: 'test',
   PORT: String(TEST_PORT),
-  DATABASE_URL: `postgresql://meetpoint:meetpoint-dev@localhost:${TEST_PG_PORT}/meetpoint_test`,
+  DATABASE_URL: `postgresql://vibeupme:vibeupme-dev@localhost:${TEST_PG_PORT}/vibeupme_test`,
   JWT_SECRET: 'test-only-secret-at-least-32-characters-long',
   UPLOAD_DIR: 'test-data/uploads',
   PRIVATE_UPLOAD_DIR: 'test-data/private-uploads',

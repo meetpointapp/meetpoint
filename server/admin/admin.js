@@ -1,4 +1,4 @@
-// MeetPoint yönetim paneli. Kullanıcı içeriği her zaman esc() ile kaçışlanır (XSS'e karşı).
+// VibeUpMe yönetim paneli. Kullanıcı içeriği her zaman esc() ile kaçışlanır (XSS'e karşı).
 'use strict';
 
 const $ = (sel) => document.querySelector(sel);
@@ -1176,7 +1176,7 @@ $('#breaches').addEventListener('click', async (e) => {
     if (t.dataset.authority) {
       await api('PATCH', `/admin/api/privacy/breaches/${t.dataset.authority}`, { authorityNotified: true });
     } else if (t.dataset.notify) {
-      const subject = prompt('E-posta konusu:', 'MeetPoint: güvenlik bildirimi');
+      const subject = prompt('E-posta konusu:', 'VibeUpMe: güvenlik bildirimi');
       if (!subject) return;
       const message = prompt('E-posta metni (ne oldu, hangi veriler, ne yapmalı):');
       if (!message) return;

@@ -125,7 +125,7 @@ export async function startCall(callerId: string, calleeId: string, kind: CallKi
 
   emitToUser(calleeId, 'call:incoming', callDto(call, calleeId));
   void notify(calleeId, 'call', callerId, kind, { callId: call.id });
-  void notifyVoip(calleeId, call.id, callDto(call, calleeId).user?.displayName ?? 'MeetPoint', kind === 'VIDEO');
+  void notifyVoip(calleeId, call.id, callDto(call, calleeId).user?.displayName ?? 'VibeUpMe', kind === 'VIDEO');
   return callDto(call, callerId);
 }
 

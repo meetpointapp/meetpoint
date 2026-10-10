@@ -36,7 +36,7 @@ adminPrivacyRouter.post('/dsr/:id/answer', async (req, res) => {
   const tr = (r.user?.locale ?? 'tr') === 'tr';
   await sendMail(
     r.email,
-    tr ? 'MeetPoint: KVKK başvurunun yanıtı' : 'MeetPoint: response to your data request',
+    tr ? 'VibeUpMe: KVKK başvurunun yanıtı' : 'VibeUpMe: response to your data request',
     tr
       ? `Merhaba,\n\n${r.createdAt.toLocaleDateString('tr-TR')} tarihli başvurun ${status === 'ANSWERED' ? 'yanıtlandı' : 'reddedildi'}:\n\n${answer}\n\nYanıta itiraz etmek için Kişisel Verileri Koruma Kurulu'na 30 gün içinde şikayette bulunabilirsin.`
       : `Hi,\n\nYour request dated ${r.createdAt.toLocaleDateString('en-GB')} has been ${status === 'ANSWERED' ? 'answered' : 'rejected'}:\n\n${answer}\n\nIf you disagree, you may complain to the Turkish Personal Data Protection Authority within 30 days.`,

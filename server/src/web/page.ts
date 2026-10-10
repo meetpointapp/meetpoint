@@ -12,7 +12,7 @@ export function sendPage(res: Response, lang: 'tr' | 'en', title: string, body: 
   res.status(status).type('html').send(`<!doctype html>
 <html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>${esc(title)} · MeetPoint</title>
+<title>${esc(title)} · VibeUpMe</title>
 <style>
   :root{--coral:#FF4D6D;--ink:#231a1c;--muted:#6b5b5e;--bg:#fffbfa;--card:#fff;--line:#8883}
   @media (prefers-color-scheme:dark){:root{--ink:#f3e9ea;--muted:#b9a9ab;--bg:#16121a;--card:#1f1a23}}

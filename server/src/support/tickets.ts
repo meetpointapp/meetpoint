@@ -149,12 +149,12 @@ export async function readAttachment(messageId: string, userId: string | null) {
 
 const MAIL = {
   tr: (subject: string, body: string) => ({
-    subject: `MeetPoint Destek: ${subject}`,
-    text: `Merhaba,\n\n"${subject}" başlıklı destek talebine yanıt verdik:\n\n${body}\n\nYanıtı ve talep geçmişini uygulamada Profil › Yardım ve destek bölümünde görebilir, oradan cevap yazabilirsin.\n\nMeetPoint Destek`,
+    subject: `VibeUpMe Destek: ${subject}`,
+    text: `Merhaba,\n\n"${subject}" başlıklı destek talebine yanıt verdik:\n\n${body}\n\nYanıtı ve talep geçmişini uygulamada Profil › Yardım ve destek bölümünde görebilir, oradan cevap yazabilirsin.\n\nVibeUpMe Destek`,
   }),
   en: (subject: string, body: string) => ({
-    subject: `MeetPoint Support: ${subject}`,
-    text: `Hi,\n\nWe replied to your support request "${subject}":\n\n${body}\n\nYou can see the reply and the full history in the app under Profile › Help & support, and answer there.\n\nMeetPoint Support`,
+    subject: `VibeUpMe Support: ${subject}`,
+    text: `Hi,\n\nWe replied to your support request "${subject}":\n\n${body}\n\nYou can see the reply and the full history in the app under Profile › Help & support, and answer there.\n\nVibeUpMe Support`,
   }),
 };
 

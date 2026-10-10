@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/core/formatters.dart';
+import 'package:vibeupme/core/formatters.dart';
 
 TextEditingValue _type(TextInputFormatter f, String text) =>
     f.formatEditUpdate(TextEditingValue.empty, TextEditingValue(text: text));

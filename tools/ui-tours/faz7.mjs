@@ -5,7 +5,7 @@ import { WEB, B, call, registerVerified, upload } from './lib.mjs';
 
 const out = new URL('./shots/', import.meta.url).pathname.replace(/^\/(\w:)/, '$1');
 const tag = Date.now();
-const admin = (await call(null, 'POST', '/auth/login', { email: 'admin@meetpoint.dev', password: 'password123' })).token;
+const admin = (await call(null, 'POST', '/auth/login', { email: 'admin@vibeupme.dev', password: 'password123' })).token;
 
 async function makeUser(name, gender, interestedIn) {
   const email = `${name.toLowerCase()}${tag}@test.com`;
@@ -68,7 +68,7 @@ await fetch(`${B}/client-errors`, {
   headers: { 'content-type': 'application/json' },
   body: JSON.stringify({
     message: "Null check operator used on a null value",
-    stack: '#0      _ChatScreenState._send (package:meetpoint/features/chat/chat_screen.dart:212:31)\n#1      _InkResponseState.handleTap',
+    stack: '#0      _ChatScreenState._send (package:vibeupme/features/chat/chat_screen.dart:212:31)\n#1      _InkResponseState.handleTap',
     platform: 'android',
     appVersion: '1.0.0',
     context: '/chat/abc',
@@ -79,7 +79,7 @@ await fetch(`${B}/client-errors`, {
 const b2 = await chromium.launch({ channel: 'msedge', headless: true });
 const ap = await b2.newPage({ viewport: { width: 1280, height: 900 } });
 await ap.goto(`${B}/admin`);
-await ap.fill('#login-email', 'admin@meetpoint.dev');
+await ap.fill('#login-email', 'admin@vibeupme.dev');
 await ap.fill('#login-password', 'password123');
 await ap.click('#login-form button');
 await ap.waitForSelector('.stat');

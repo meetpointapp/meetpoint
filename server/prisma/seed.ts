@@ -1,5 +1,5 @@
 // Lokal test verisi: npm run db:seed
-// Giriş: test@meetpoint.dev / password123 (1000 jeton, gelen istekler, seni beğenmiş profiller)
+// Giriş: test@vibeupme.dev / password123 (1000 jeton, gelen istekler, seni beğenmiş profiller)
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
 import { hashPassword } from '../src/passwords';
@@ -125,22 +125,22 @@ async function main() {
   // Demo hesap şifresi yaygın bir şifre: sadece lokal demo için, kayıt kuralı burada uygulanmaz
   const passwordHash = await hashPassword('password123');
 
-  // Önceki demo ve otomatik test verisini temizle (@meetpoint.dev ve @test.com hesapları), dosyaları dahil
-  const demo = { OR: [{ email: { endsWith: '@meetpoint.dev' } }, { email: { endsWith: '@test.com' } }] };
+  // Önceki demo ve otomatik test verisini temizle (@vibeupme.dev ve @test.com hesapları), dosyaları dahil
+  const demo = { OR: [{ email: { endsWith: '@vibeupme.dev' } }, { email: { endsWith: '@test.com' } }] };
   for (const p of await prisma.photo.findMany({ where: { user: demo } })) await removeProfilePhoto(p.path);
   for (const v of await prisma.verificationRequest.findMany({ where: { user: demo } })) await privateStore.remove(v.selfiePath);
   await prisma.user.deleteMany({
-    where: { OR: [{ email: { endsWith: '@meetpoint.dev' } }, { email: { endsWith: '@test.com' } }] },
+    where: { OR: [{ email: { endsWith: '@vibeupme.dev' } }, { email: { endsWith: '@test.com' } }] },
   });
   // Silinen test hesaplarının para çekme kayıtları (muhasebe için hesap silinse de kalır) ve hata kayıtları
   await prisma.payout.deleteMany({
-    where: { OR: [{ email: { endsWith: '@meetpoint.dev' } }, { email: { endsWith: '@test.com' } }] },
+    where: { OR: [{ email: { endsWith: '@vibeupme.dev' } }, { email: { endsWith: '@test.com' } }] },
   });
   await prisma.errorLog.deleteMany();
 
   const test = await prisma.user.create({
     data: {
-      email: 'test@meetpoint.dev',
+      email: 'test@vibeupme.dev',
       passwordHash,
       emailVerifiedAt: new Date(),
       termsAcceptedAt: new Date(),
@@ -169,7 +169,7 @@ async function main() {
   for (const [i, u] of demoUsers.entries()) {
     const user = await prisma.user.create({
       data: {
-        email: `${u.name.toLowerCase().replace(/[^a-z]/g, '')}${i}@meetpoint.dev`,
+        email: `${u.name.toLowerCase().replace(/[^a-z]/g, '')}${i}@vibeupme.dev`,
         passwordHash,
         emailVerifiedAt: new Date(),
         termsAcceptedAt: new Date(),
@@ -237,7 +237,7 @@ async function main() {
 
   // Yönetim paneli hesabı (profili yok, uygulamada görünmez)
   await prisma.user.create({
-    data: { email: 'admin@meetpoint.dev', passwordHash, isAdmin: true, adminRole: 'super', emailVerifiedAt: new Date(), termsAcceptedAt: new Date() },
+    data: { email: 'admin@vibeupme.dev', passwordHash, isAdmin: true, adminRole: 'super', emailVerifiedAt: new Date(), termsAcceptedAt: new Date() },
   });
 
   // Panel demosu: Zeynep'in bekleyen mavi tik başvurusu (selfie özel klasörde)
@@ -249,7 +249,7 @@ async function main() {
 
   // KVKK: demo hesaplar güncel metinleri onaylamış, eşleştirme ve arama rızası vermiş sayılır.
   // Mavi tikliler ve başvuranlar selfie rızası da vermiş. Test hesabının selfie rızası yok (rıza ekranı denenebilsin).
-  const admin = await prisma.user.findUniqueOrThrow({ where: { email: 'admin@meetpoint.dev' } });
+  const admin = await prisma.user.findUniqueOrThrow({ where: { email: 'admin@vibeupme.dev' } });
   for (const id of [test.id, admin.id, ...created.map((c) => c.id)]) {
     await prisma.$transaction(async (tx) => {
       await acceptLegal(tx, id, 'seed');
@@ -267,7 +267,7 @@ async function main() {
     data: { fromId: selin.id, toId: can.id, reason: 'fake_profile', details: 'Fotoğraflar internetten alınmış gibi görünüyor.' },
   });
 
-  console.log(`Seed tamam: ${created.length + 1} kullanıcı. Giriş: test@meetpoint.dev / password123 · Panel: admin@meetpoint.dev / password123 (ilk girişte 2FA kurulur)`);
+  console.log(`Seed tamam: ${created.length + 1} kullanıcı. Giriş: test@vibeupme.dev / password123 · Panel: admin@vibeupme.dev / password123 (ilk girişte 2FA kurulur)`);
 }
 
 main().finally(() => prisma.$disconnect());

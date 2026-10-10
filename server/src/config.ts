@@ -21,7 +21,7 @@ export const config = {
   // Sunucunun dışarıdan görünen adresi (e-postadaki indirme bağlantıları için)
   publicUrl: process.env.PUBLIC_URL ?? `http://localhost:${process.env.PORT ?? 4000}`,
 
-  // Faz 17 madde 11: kişisel bağlantı linki ("Beni MeetPoint'te bul") — mağaza yayınlanana kadar boş;
+  // Faz 17 madde 11: kişisel bağlantı linki ("Beni VibeUpMe'de bul") — mağaza yayınlanana kadar boş;
   // boşsa iniş sayfası indirme düğmesi yerine düz metin gösterir.
   appStoreUrl: process.env.APP_STORE_URL ?? '',
   playStoreUrl: process.env.PLAY_STORE_URL ?? '',
@@ -37,7 +37,7 @@ export const config = {
     port: Number(process.env.SMTP_PORT ?? 587),
     user: process.env.SMTP_USER ?? '',
     pass: process.env.SMTP_PASS ?? '',
-    from: process.env.MAIL_FROM ?? 'MeetPoint <no-reply@meetpoint.app>',
+    from: process.env.MAIL_FROM ?? 'VibeUpMe <no-reply@vibeupme.app>',
   },
 };
 
@@ -93,12 +93,12 @@ export const revenueCat = {
   apiBase: process.env.REVENUECAT_API_BASE ?? 'https://api.revenuecat.com/v1',
 };
 
-// Faz 16: MeetPoint+ — RevenueCat üzerinden aylık abonelik (mevcut IAP altyapısına ek, gerçek
+// Faz 16: VibeUpMe+ — RevenueCat üzerinden aylık abonelik (mevcut IAP altyapısına ek, gerçek
 // para — jetonla alınan özelliklerden farklı). Fiyat ($7.99/ay) App Store Connect/Play Console
 // tarafında ayarlanır; burada sadece webhook eşleştirmesi için ürün kimliği var. Perk: "seni
 // beğenenler" her zaman açık (bkz. src/routes/boosts.ts).
 export const subscription = {
-  productId: process.env.MEETPOINT_PLUS_PRODUCT_ID || 'meetpoint_plus_monthly',
+  productId: process.env.VIBEUPME_PLUS_PRODUCT_ID || 'vibeupme_plus_monthly',
 };
 
 // Agora (ses/görüntü). Boşsa aramalar "simülasyon modunda" çalışır: akış ve ücretlendirme
@@ -181,7 +181,7 @@ export const consumer = {
   supportFirstResponseHours: Number(process.env.SUPPORT_SLA_HOURS ?? 48), // ilk yanıt hedefi
   supportMaxOpenTickets: 5, // aynı anda açık talep sınırı (kötüye kullanıma karşı)
   // Mağaza incelemesi için demo hesabın e-postası (scripts/review-account.ts)
-  reviewAccountEmail: process.env.REVIEW_ACCOUNT_EMAIL ?? 'review@meetpoint.app',
+  reviewAccountEmail: process.env.REVIEW_ACCOUNT_EMAIL ?? 'review@vibeupme.app',
 };
 
 // Zamanlayıcı (scheduler.ts): tur aralığı, liderlik deneme aralığı, bağlantı taraması aralığı

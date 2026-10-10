@@ -10,7 +10,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appName => 'MeetPoint';
+  String get appName => 'VibeUpMe';
 
   @override
   String get tagline => 'Tanış, konuş, kazan.';
@@ -368,7 +368,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errUnderage =>
-      'MeetPoint\'i kullanmak için 18 yaşından büyük olmalısın.';
+      'VibeUpMe\'yi kullanmak için 18 yaşından büyük olmalısın.';
 
   @override
   String get errInsufficientBalance => 'Yeterli jetonun yok.';
@@ -1968,7 +1968,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get writeReply => 'Yanıt yaz…';
 
   @override
-  String get supportTeam => 'MeetPoint Destek';
+  String get supportTeam => 'VibeUpMe Destek';
 
   @override
   String get supportCatCoins => 'Jeton ve ödeme';
@@ -2678,7 +2678,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errAlreadyOwned => 'Bu öğeye zaten sahipsin.';
 
   @override
-  String get premiumTitle => 'MeetPoint+';
+  String get premiumTitle => 'VibeUpMe+';
 
   @override
   String get premiumTagline => 'Seni beğenenleri her zaman gör';
@@ -2696,7 +2696,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumSubscribe => 'Abone ol';
 
   @override
-  String get premiumActive => 'MeetPoint+ üyesisin';
+  String get premiumActive => 'VibeUpMe+ üyesisin';
 
   @override
   String premiumActiveUntil(String date) {
@@ -2789,7 +2789,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get personalLinkHint =>
-      '\"Beni MeetPoint\'te bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.';
+      '\"Beni VibeUpMe\'de bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.';
 
   @override
   String get shareButton => 'Paylaş';
@@ -2803,5 +2803,5 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get shareProfileTagline => 'MeetPoint\'te profilim';
+  String get shareProfileTagline => 'VibeUpMe\'de profilim';
 }

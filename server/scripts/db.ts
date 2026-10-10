@@ -9,7 +9,7 @@ async function main() {
   const { pg, url, fresh } = await startPostgres({
     dataDir: path.resolve(__dirname, '..', '.pgdata'),
     port: PORT,
-    database: 'meetpoint',
+    database: 'vibeupme',
     persistent: true,
   });
   console.log(`PostgreSQL hazır: ${url}`);

@@ -28,7 +28,7 @@ const html = `<html><head><style>
   figure{margin:0} img{width:100%;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.14);display:block}
   figcaption{text-align:center;margin-top:8px;font-size:15px;font-weight:600;color:#3a2e30}
 </style></head><body>
-<h1>MeetPoint · Faz 3 önizleme</h1>
+<h1>VibeUpMe · Faz 3 önizleme</h1>
 <p>Güven ve güvenlik: e-posta doğrulama, şifre sıfırlama, koşul onayı, mavi tik, hesap silme, yasaklama, yönetim paneli</p>
 <div class="grid">${phones.map((p) => fig(p, 'phone')).join('')}</div>
 <div class="wide">${admin.map((p) => fig(p, 'admin')).join('')}</div>

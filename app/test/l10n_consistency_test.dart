@@ -14,7 +14,7 @@ const _identicalAllowed = {
   'newMessageFrom', // "{name}: {text}": biçim, içerik değil
   'avatarSection', // "Avatar": iki dilde de aynı kelime
   'bonusCoins', // "+{count} bonus": "bonus" kelimesi TR'de de kullanılıyor
-  'premiumTitle', // "MeetPoint+": marka/ürün adı, çevrilmez
+  'premiumTitle', // "VibeUpMe+": marka/ürün adı, çevrilmez
   'milestoneCountShort', // "{n}/9": sadece sayı
   'icebreakerTheyChose', // "{name}: {choice}": newMessageFrom ile aynı biçim, içerik değil
 };

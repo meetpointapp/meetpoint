@@ -77,7 +77,7 @@ class CoinStore {
   }
 }
 
-// Faz 16: MeetPoint+ — abonelik iptali/yönetimi bizim API'mizden değil, mağazanın kendi
+// Faz 16: VibeUpMe+ — abonelik iptali/yönetimi bizim API'mizden değil, mağazanın kendi
 // ayarlarından yapılır (App Store / Google Play); burada sadece ilgili sayfaya yönlendiriyoruz.
 void launchSubscriptionManagement() {
   final url = defaultTargetPlatform == TargetPlatform.iOS

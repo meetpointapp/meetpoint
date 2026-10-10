@@ -1,4 +1,4 @@
-package com.meetpoint.meetpoint
+package com.vibeupme.vibeupme
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -24,7 +24,7 @@ const html = `<html><head><style>
   figure{margin:0} img{width:100%;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.14);display:block}
   figcaption{text-align:center;margin-top:8px;font-size:15px;font-weight:600;color:#3a2e30}
 </style></head><body>
-<h1>MeetPoint · Faz 5 önizleme</h1>
+<h1>VibeUpMe · Faz 5 önizleme</h1>
 <p>Gerçek ödeme altyapısı: RevenueCat webhook ve senkronizasyon, bonuslar, iade, yerel fiyatlar, satış raporu</p>
 <div class="row phones">${phones.map(fig).join('')}</div>
 <div class="row admin">${admin.map(fig).join('')}</div>

@@ -1,4 +1,4 @@
-# MeetPoint · Yayın öncesi yol haritası (Faz 8–19)
+# VibeUpMe · Yayın öncesi yol haritası (Faz 8–19)
 
 Faz 1–7 çalışan bir ürün çıkardı. Bu seri, ürünü **arka planda kusursuz, hukuki gereklilikleri uygulamanın içinde karşılayan ve kullanması basit** hale getirir.
 
@@ -329,7 +329,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 4. ✅ **Günlük ruh hali.** Basit, ücretsiz bir "bugün nasılsın" paylaşımı (24 saatte kaybolur); günlük açılışı ve sohbeti tetikler.
 5. ✅ **İlgi alanı bazlı keşif.** Salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar (ör. "kahve tutkunları", "gezginler"); daha sosyal, daha az hızlı-tüketim hissi.
 6. ✅ **Kozmetik mağaza.** Jetonla alınan profil çerçeveleri, temalar, rozetler, oda mobilyaları, avatar kıyafetleri ve sohbet temaları (baloncuk rengi, sohbet arka planı). Bu jetonlar kullanıcıdan kullanıcıya geçmediği için tamamı platform geliri — en yüksek marjlı özellik.
-7. ✅ **Abonelik katmanı (MeetPoint+).** RevenueCat üzerinden $7.99/ay abonelik ürünü (mevcut IAP altyapısına ek). Tek perk (karar sorusuyla netleşti): "seni beğenenler" her zaman açık, jetonla açmaya gerek yok. Durum webhook olaylarından (RENEWAL/EXPIRATION/CANCELLATION) güncellenir; webhook kaçırılırsa `/wallet/sync` RevenueCat sunucusundan yakalar.
+7. ✅ **Abonelik katmanı (VibeUpMe+).** RevenueCat üzerinden $7.99/ay abonelik ürünü (mevcut IAP altyapısına ek). Tek perk (karar sorusuyla netleşti): "seni beğenenler" her zaman açık, jetonla açmaya gerek yok. Durum webhook olaylarından (RENEWAL/EXPIRATION/CANCELLATION) güncellenir; webhook kaçırılırsa `/wallet/sync` RevenueCat sunucusundan yakalar.
 8. ✅ **Cilalı mikro-etkileşimler.** Haptik geri bildirim + kısa ses efektleri (sık dokunuşlarda sadece haptik, seyrek anlamlı onaylarda haptik+ses, eşleşmede güçlü haptik+kutlama); bu fazdaki ve var olan tüm akışlara uygulandı (birincil butonlar, beğen/geç kartları, satın alma/kilit açma/abonelik onayları, eşleşme kutlaması — artık kaydırma dışında "seni beğenenler" ve "ilgi alanı keşfi" akışlarında da aynı kalitede). Cüzdan bakiyesi sayarak akıyor.
 
 ## Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme ✅
@@ -346,7 +346,7 @@ Veri envanteri: [kvkk/veri-envanteri.md](kvkk/veri-envanteri.md) (koddan üretil
 8. ✅ **Davet programı.** Her kullanıcının benzersiz bir davet kodu vardır; e-posta doğrulanmadan önce girilebilir, doğrulama tamamlanınca hem davet eden hem davet edilen bozdurulamaz promo jeton kazanır (kayıt hediyesiyle aynı mekanik — gerçek maliyeti yok). Kendi kodunu kendine veya ikinci kez uygulama engellenir.
 9. ✅ **Paylaşılabilir anlar.** Eşleşme anını, profil kartını veya vibe kartını marka şablonumuzla (gradyan arkaplan, logo) çevrimdışı bir görsele dönüştürüp cihazın yerel paylaşım sayfasından (Instagram/WhatsApp vb.) paylaşma; dış servis yok. ⏭ Görsel yakalama `dart:io`/`path_provider` gerektirdiğinden yalnızca iOS/Android'de çalışır, web'de kapsam dışı.
 10. ✅ **Odanı sergile.** Oda düzenleyicisinde isteğe bağlı bir anahtar ile odanı herkese açık vitrine dahil edebilirsin (varsayılan kapalı — gizlilik modeli bozulmadı); son 7 günde güncellenen, en çok eşyalı 10 oda bir galeri ekranında listelenir, engelli/engelleyen kullanıcılar her durumda filtrelenir.
-11. ✅ **Kişisel bağlantı linki.** "Beni MeetPoint'te bul" — davet programındaki aynı kodu kullanan `/u/:kod` bağlantısı, sunucuda basit bir HTML sayfası olarak render edilir ve mağaza bağlantısına yönlendirir; davet koduyla aynı alan yeniden kullanıldığı için ayrı bir şema alanı gerekmedi.
+11. ✅ **Kişisel bağlantı linki.** "Beni VibeUpMe'de bul" — davet programındaki aynı kodu kullanan `/u/:kod` bağlantısı, sunucuda basit bir HTML sayfası olarak render edilir ve mağaza bağlantısına yönlendirir; davet koduyla aynı alan yeniden kullanıldığı için ayrı bir şema alanı gerekmedi.
 
 ## Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans ✅
 

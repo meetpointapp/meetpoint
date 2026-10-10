@@ -66,7 +66,7 @@ export async function applySanction(input: {
   const [trText, enText] = LEVEL_TEXT[level];
   await sendMail(
     user.email,
-    tr ? 'MeetPoint: hesabınla ilgili bir karar' : 'MeetPoint: a decision about your account',
+    tr ? 'VibeUpMe: hesabınla ilgili bir karar' : 'VibeUpMe: a decision about your account',
     tr
       ? `Merhaba,\n\nHesabın topluluk kurallarını ihlal ettiği için ${trText}.${input.note ? `\n\nAçıklama: ${input.note}` : ''}\n\nBu karara uygulamadan bir kez itiraz edebilirsin.`
       : `Hi,\n\nYour account ${enText} for breaking our community rules.${input.note ? `\n\nNote: ${input.note}` : ''}\n\nYou can appeal this decision once in the app.`,

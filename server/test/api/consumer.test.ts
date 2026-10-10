@@ -59,7 +59,7 @@ describe('Faz 14: tüketici ve destek', () => {
     const before = await call(mod.t, 'GET', '/admin/api/support/company');
     check('everyone sees missing fields', Array.isArray(before.missing));
     check('moderator cannot edit', (await call(mod.t, 'PUT', '/admin/api/support/company', { legalName: 'X' })).http === 403);
-    const name = `MeetPoint Teknoloji A.Ş. ${uniqueTag()}`;
+    const name = `VibeUpMe Teknoloji A.Ş. ${uniqueTag()}`;
     const r = await call(sup.t, 'PUT', '/admin/api/support/company', { legalName: name, mersisNo: '0123456789000015' });
     check('super edits', r.http === 200 && r.legalName === name && !r.missing.includes('legalName'));
     await waitFor(async () => (await fetch(`${B}/legal/imprint?lang=tr`)).text(), (h) => h.includes(name), 8000, 250);

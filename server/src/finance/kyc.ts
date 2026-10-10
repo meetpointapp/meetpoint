@@ -104,7 +104,7 @@ export async function decideKyc(id: string, approve: boolean, note: string, by: 
   const tr = sub.user.locale === 'tr';
   await sendMail(
     sub.user.email,
-    tr ? 'MeetPoint: kimlik doğrulaman' : 'MeetPoint: your identity verification',
+    tr ? 'VibeUpMe: kimlik doğrulaman' : 'VibeUpMe: your identity verification',
     tr
       ? approve
         ? 'Merhaba,\n\nKimliğin doğrulandı; artık kazancını çekebilirsin.'

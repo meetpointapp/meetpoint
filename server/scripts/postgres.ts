@@ -10,8 +10,8 @@ export type PgOptions = {
   log?: boolean;
 };
 
-export const PG_USER = 'meetpoint';
-export const PG_PASSWORD = 'meetpoint-dev';
+export const PG_USER = 'vibeupme';
+export const PG_PASSWORD = 'vibeupme-dev';
 
 export const databaseUrl = (port: number, database: string) =>
   `postgresql://${PG_USER}:${PG_PASSWORD}@localhost:${port}/${database}`;

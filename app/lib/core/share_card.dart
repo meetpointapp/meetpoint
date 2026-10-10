@@ -10,7 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import 'theme.dart';
 
 // Faz 17 madde 9: paylaşılabilir anlar. Dış servis yok — sadece cihazın kendi paylaşım sayfası
-// (share_plus, işletim sistemi düzeyinde bir arayüz; hiçbir şey bir MeetPoint sunucusuna veya
+// (share_plus, işletim sistemi düzeyinde bir arayüz; hiçbir şey bir VibeUpMe sunucusuna veya
 // üçüncü bir servise gönderilmez). Verilen kart widget'ı ekran dışında (Overlay, sol tarafta
 // -10000px) render edilir, boyanması beklenir, PNG'ye dönüştürülüp paylaşım sayfası açılır.
 Future<void> shareCardImage(BuildContext context, {required Widget card, String? text}) async {
@@ -35,7 +35,7 @@ Future<void> shareCardImage(BuildContext context, {required Widget card, String?
     final image = await boundary.toImage(pixelRatio: 2.5);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/meetpoint-share-${DateTime.now().millisecondsSinceEpoch}.png');
+    final file = File('${dir.path}/vibeupme-share-${DateTime.now().millisecondsSinceEpoch}.png');
     await file.writeAsBytes(bytes!.buffer.asUint8List());
     await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: text));
   } finally {
@@ -44,7 +44,7 @@ Future<void> shareCardImage(BuildContext context, {required Widget card, String?
 }
 
 // Üç paylaşılabilir an (eşleşme, profil, vibe) için ortak marka şablonu: gradyan zemin, ortada
-// içerik, altta MeetPoint logosu. "Kendi şablonumuz" — dış bir tasarım servisi kullanılmaz.
+// içerik, altta VibeUpMe logosu. "Kendi şablonumuz" — dış bir tasarım servisi kullanılmaz.
 class ShareTemplate extends StatelessWidget {
   const ShareTemplate({super.key, required this.hero, required this.title, this.subtitle});
   final Widget hero;

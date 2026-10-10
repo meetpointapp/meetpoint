@@ -19,7 +19,7 @@ await page.locator('flt-semantics-placeholder').dispatchEvent('click');
 await page.waitForTimeout(800);
 await shot('01-login');
 
-await page.getByRole('textbox', { name: 'E-posta' }).fill('test@meetpoint.dev');
+await page.getByRole('textbox', { name: 'E-posta' }).fill('test@vibeupme.dev');
 await page.getByRole('textbox', { name: 'Şifre' }).fill('password123');
 await page.getByRole('button', { name: 'Giriş yap' }).click();
 await page.waitForTimeout(2500);

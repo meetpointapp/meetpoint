@@ -122,7 +122,7 @@ legalRouter.get('/:doc', async (req, res) => {
 
   res.type('html').send(`<!doctype html>
 <html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${TITLES[doc][lang]} · MeetPoint</title>
+<title>${TITLES[doc][lang]} · VibeUpMe</title>
 <style>
   :root{--coral:#FF4D6D;--ink:#231a1c;--muted:#6b5b5e;--bg:#fffbfa;--card:#fff}
   @media (prefers-color-scheme:dark){:root{--ink:#f3e9ea;--muted:#b9a9ab;--bg:#16121a;--card:#1f1a23}}
@@ -136,7 +136,7 @@ legalRouter.get('/:doc', async (req, res) => {
 </style></head><body><main>
 <a class="lang" href="?lang=${other}">${other === 'en' ? 'English' : 'Türkçe'}</a>
 <h1>${TITLES[doc][lang]}</h1>
-<div class="meta">MeetPoint · ${lang === 'tr' ? 'Sürüm' : 'Version'} ${versionOf(doc)}</div>
+<div class="meta">VibeUpMe · ${lang === 'tr' ? 'Sürüm' : 'Version'} ${versionOf(doc)}</div>
 ${config.isProduction ? '' : `<div class="draft">${DRAFT[lang]}</div>`}
 ${body}
 </main></body></html>`);

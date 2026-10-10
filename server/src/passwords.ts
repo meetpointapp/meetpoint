@@ -42,14 +42,14 @@ const COMMON = new Set(
     'superman', 'trustno1', 'letmein1', 'dragon12', 'monkey12', 'zaq12wsx', 'aa123456', 'a1234567', 'q1w2e3r4',
     'sifre123', 'sifre1234', 'parola123', 'parola12', 'sifresifre', 'galatasaray', 'fenerbahce', 'besiktas',
     'trabzonspor', 'galatasaray1905', 'fenerbahce1907', 'besiktas1903', 'istanbul', 'istanbul34', 'ankara06',
-    'izmir3535', 'turkiye1', 'seniseviyorum', 'askim123', 'bitanem1', 'meetpoint', 'meetpoint1',
+    'izmir3535', 'turkiye1', 'seniseviyorum', 'askim123', 'bitanem1', 'vibeupme', 'vibeupme1',
   ].map((p) => p.toLowerCase()),
 );
 
 async function breachCount(password: string): Promise<number> {
   const sha1 = crypto.createHash('sha1').update(password).digest('hex').toUpperCase();
   const res = await fetch(`${passwordPolicy.pwnedApiBase}/range/${sha1.slice(0, 5)}`, {
-    headers: { 'Add-Padding': 'true', 'User-Agent': 'MeetPoint-server' },
+    headers: { 'Add-Padding': 'true', 'User-Agent': 'VibeUpMe-server' },
     signal: AbortSignal.timeout(2500),
   });
   if (!res.ok) throw new Error(`HIBP ${res.status}`);

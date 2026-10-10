@@ -94,9 +94,9 @@ export async function setup(project?: TestProject) {
   // Her çalıştırma kendi klasörü ve ilk boş port ile: yarım kalmış bir önceki çalıştırma engel olmaz
   const port = await freePort(TEST_PG_PORT);
   pgDir = path.join(dataRoot, `pg-${Date.now()}`);
-  const started = await startPostgres({ dataDir: pgDir, port, database: 'meetpoint_test', persistent: false });
+  const started = await startPostgres({ dataDir: pgDir, port, database: 'vibeupme_test', persistent: false });
   pg = started.pg;
-  testEnv.DATABASE_URL = databaseUrl(port, 'meetpoint_test');
+  testEnv.DATABASE_URL = databaseUrl(port, 'vibeupme_test');
 
   const env = { ...process.env, ...testEnv };
   execSync('npx prisma migrate deploy', { cwd: root, env, stdio: 'pipe' });

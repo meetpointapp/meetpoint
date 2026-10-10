@@ -17,7 +17,7 @@ const lang = (v: unknown) => (v === 'en' ? 'en' : 'tr') as 'tr' | 'en';
 const T = {
   tr: {
     title: 'Hesap silme',
-    intro: `MeetPoint hesabını ve verilerini silmek için e-posta adresini ve şifreni gir. Hesabın hemen gizlenir ve <b>${retention.deletionGraceDays} gün</b> içinde giriş yapmazsan kalıcı olarak silinir: profil, fotoğraflar, eşleşmeler, mesajlar, jeton bakiyesi ve diğer tüm veriler. Yasal saklama yükümlülüğü olan kayıtlar (ör. satın alma ve ödeme kayıtları) kanuni süre boyunca ayrı saklanır.`,
+    intro: `VibeUpMe hesabını ve verilerini silmek için e-posta adresini ve şifreni gir. Hesabın hemen gizlenir ve <b>${retention.deletionGraceDays} gün</b> içinde giriş yapmazsan kalıcı olarak silinir: profil, fotoğraflar, eşleşmeler, mesajlar, jeton bakiyesi ve diğer tüm veriler. Yasal saklama yükümlülüğü olan kayıtlar (ör. satın alma ve ödeme kayıtları) kanuni süre boyunca ayrı saklanır.`,
     app: 'Uygulamaya girebiliyorsan <b>Profil › Hesabı sil</b> bölümünü de kullanabilirsin.',
     email: 'E-posta',
     password: 'Şifre',
@@ -30,7 +30,7 @@ const T = {
   },
   en: {
     title: 'Delete account',
-    intro: `Enter your email and password to delete your MeetPoint account and data. Your account is hidden immediately and permanently deleted unless you sign in within <b>${retention.deletionGraceDays} days</b>: profile, photos, matches, messages, coin balance and all other data. Records we must keep by law (e.g. purchase and payout records) are kept separately for the legal period.`,
+    intro: `Enter your email and password to delete your VibeUpMe account and data. Your account is hidden immediately and permanently deleted unless you sign in within <b>${retention.deletionGraceDays} days</b>: profile, photos, matches, messages, coin balance and all other data. Records we must keep by law (e.g. purchase and payout records) are kept separately for the legal period.`,
     app: 'If you can sign in, you can also use <b>Profile › Delete account</b> in the app.',
     email: 'Email',
     password: 'Password',

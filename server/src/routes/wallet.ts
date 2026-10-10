@@ -100,7 +100,7 @@ walletRouter.post('/wallet/sync', async (req, res) => {
     }
   }
 
-  // Faz 16: MeetPoint+ — RevenueCat sunucusundan da abonelik durumu senkronize edilir (webhook
+  // Faz 16: VibeUpMe+ — RevenueCat sunucusundan da abonelik durumu senkronize edilir (webhook
   // gecikirse veya kaçırılırsa yakalanır). En son bilinen bitiş tarihinden ileriyse güncellenir.
   const subExpires = body.subscriber?.subscriptions?.[subscription.productId]?.expires_date;
   if (subExpires) {
@@ -131,7 +131,7 @@ walletRouter.post('/wallet/dev-topup', async (req, res) => {
   res.json({ balance: await getBalance(userId), coins: result.coins, bonus: result.bonus });
 });
 
-// GEÇİCİ: Faz 16 MeetPoint+ — gerçek RevenueCat sandbox akışı bağlanana kadar test için abonelik
+// GEÇİCİ: Faz 16 VibeUpMe+ — gerçek RevenueCat sandbox akışı bağlanana kadar test için abonelik
 // başlatma. Gerçek akışta bu, RevenueCat webhook'unun INITIAL_PURCHASE olayıyla yapılır
 // (src/routes/revenuecat.ts). Yayında bu uç kapalıdır.
 walletRouter.post('/wallet/dev-subscribe', async (req, res) => {

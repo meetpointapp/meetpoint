@@ -38,7 +38,7 @@ async function handleInactiveAccounts() {
     const tr = u.locale === 'tr';
     await sendMail(
       u.email,
-      tr ? 'MeetPoint: hesabın silinecek' : 'MeetPoint: your account will be deleted',
+      tr ? 'VibeUpMe: hesabın silinecek' : 'VibeUpMe: your account will be deleted',
       tr
         ? `Merhaba,\n\nHesabına uzun süredir giriş yapılmadı. Kişisel verilerini gereğinden uzun saklamamak için hesabın ${retention.inactiveWarnDays} gün sonra silinecek.\n\nHesabını korumak istiyorsan uygulamaya giriş yapman yeterli.`
         : `Hi,\n\nYou haven't signed in for a long time. So we don't keep your personal data longer than needed, your account will be deleted in ${retention.inactiveWarnDays} days.\n\nTo keep your account, just sign in to the app.`,

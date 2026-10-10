@@ -37,7 +37,7 @@ export async function isOnline(userId: string) {
 // PostgreSQL adaptörü sayesinde bir sunucudan gönderilen olay, kullanıcı hangi sunucuya bağlıysa ona ulaşır.
 export function initRealtime(server: HttpServer) {
   io = new Server(server, { cors: { origin: config.isProduction ? corsOrigins : '*' } });
-  io.adapter(createAdapter(pool, { channelPrefix: 'meetpoint' }));
+  io.adapter(createAdapter(pool, { channelPrefix: 'vibeupme' }));
 
   io.use(async (socket, next) => {
     try {

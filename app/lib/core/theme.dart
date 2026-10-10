@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'fx.dart';
 
-// MeetPoint marka kimliği: sıcak mercan -> turuncu gradyan, Inter yazı tipi,
+// VibeUpMe marka kimliği: sıcak mercan -> turuncu gradyan, Inter yazı tipi,
 // yuvarlak köşeler ve dolgulu (çerçevesiz) alanlarla sade, kompakt bir görünüm.
 abstract final class Brand {
   static const coral = Color(0xFFFF4D6D);
@@ -184,7 +184,7 @@ class BrandLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.inter(fontSize: size, fontWeight: FontWeight.w900, letterSpacing: -size * 0.04);
-    final text = Text('meetpoint', style: style.copyWith(color: Colors.white));
+    final text = Text('vibeupme', style: style.copyWith(color: Colors.white));
     if (light) return text;
     return ShaderMask(
       shaderCallback: (r) => Brand.gradient.createShader(r),

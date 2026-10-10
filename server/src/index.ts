@@ -141,7 +141,7 @@ const server = http.createServer(app);
 initRealtime(server);
 
 server.listen(config.port, () => {
-  console.log(`MeetPoint server http://localhost:${config.port}`);
+  console.log(`VibeUpMe server http://localhost:${config.port}`);
   if (schedulerConfig.enabled) startScheduler();
   // Yardım merkezi boşsa varsayılan SSS metinleri
   ensureHelpArticles().catch((e) => console.error('help seed', e));

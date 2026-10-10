@@ -24,7 +24,7 @@ const html = `<html><head><style>
   figure{margin:0} img{width:100%;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.14);display:block}
   figcaption{text-align:center;margin-top:8px;font-size:14px;font-weight:600;color:#3a2e30}
 </style></head><body>
-<h1>MeetPoint · Faz 4 önizleme</h1>
+<h1>VibeUpMe · Faz 4 önizleme</h1>
 <p>Etkileşim: konum ve mesafe, filtreler, süper beğeni, öne çıkarma, seni beğenenler, okundu, yazıyor, tek seferlik fotoğraf, bildirimler</p>
 <div class="grid">${items.map(([f, l]) => `<figure><img src="${img(f)}"><figcaption>${l}</figcaption></figure>`).join('')}</div>
 </body></html>`;

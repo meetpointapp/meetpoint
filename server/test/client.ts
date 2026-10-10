@@ -60,7 +60,7 @@ export async function latestCode(email: string) {
 }
 
 // Testlerde açılan hesapların şifresi (yaygın şifreler kayıtta reddedilir).
-// Seed hesapları (test@, aye0@, admin@meetpoint.dev) eski demo şifresiyle girer: SEED_PASSWORD.
+// Seed hesapları (test@, aye0@, admin@vibeupme.dev) eski demo şifresiyle girer: SEED_PASSWORD.
 export const TEST_PASSWORD = 'Meet-Point-Test-2026!';
 export const SEED_PASSWORD = 'password123';
 

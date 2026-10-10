@@ -356,7 +356,7 @@ class Api {
 
   Future<int> syncWallet() async => (await _post('/wallet/sync'))['credited'] as int;
 
-  // Faz 16: MeetPoint+ — test modu abonelik başlatma (mağaza bağlı değilken)
+  // Faz 16: VibeUpMe+ — test modu abonelik başlatma (mağaza bağlı değilken)
   Future<void> devSubscribe() => _post('/wallet/dev-subscribe');
 
   // İletişim istekleri

@@ -28,7 +28,7 @@ function isPremium(user: { premiumUntil: Date | null }) {
   return !!user.premiumUntil && user.premiumUntil > new Date();
 }
 
-// Seni beğenenler: kilitliyken sadece sayı döner, açıkken profiller. MeetPoint+ abonesiyse
+// Seni beğenenler: kilitliyken sadece sayı döner, açıkken profiller. VibeUpMe+ abonesiyse
 // (Faz 16) jetonla açmaya gerek yok — her zaman açık, bu abonelik fazın tek perki.
 boostsRouter.get('/likes', async (req, res) => {
   const me = await prisma.user.findUniqueOrThrow({ where: { id: uid(req) }, include: { profile: true } });
@@ -69,7 +69,7 @@ boostsRouter.post('/likes/unlock', async (req, res) => {
   const until = await prisma.$transaction(async (tx) => {
     await lockWallet(tx, userId);
     const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
-    if (isPremium(user)) return null; // MeetPoint+ zaten her zaman açık, jeton harcanmaz
+    if (isPremium(user)) return null; // VibeUpMe+ zaten her zaman açık, jeton harcanmaz
     if (user.likesUnlockedUntil && user.likesUnlockedUntil > new Date()) return user.likesUnlockedUntil;
     await debit(tx, userId, economy.likesUnlockPrice, 'SPEND', { note: 'likes_unlock' });
     const next = new Date(Date.now() + economy.likesUnlockHours * 3600_000);

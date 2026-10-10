@@ -21,7 +21,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     if (Firebase.apps.isEmpty) await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     await showIncomingCallUi(
       callId: callId,
-      callerName: message.data['callerName'] as String? ?? 'MeetPoint',
+      callerName: message.data['callerName'] as String? ?? 'VibeUpMe',
       isVideo: message.data['callKind'] == 'VIDEO',
     );
   } catch (e) {

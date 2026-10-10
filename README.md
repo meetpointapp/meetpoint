@@ -1,9 +1,9 @@
-# MeetPoint
+# VibeUpMe
 
 Tanış, konuş, kazan. Flutter (Android + iOS) arkadaşlık uygulaması + Node.js sunucu.
 
 ```
-meetpoint/
+vibeupme/
   app/      Flutter uygulaması (TR + EN)
   server/   Node.js + Express + Prisma + Socket.IO + PostgreSQL
     admin/    Web yönetim paneli (http://localhost:4000/admin)
@@ -33,8 +33,8 @@ npm run dev
 
 Sunucu `http://localhost:4000` adresinde çalışır. Seed hesapları (şifre hepsinde `password123`):
 
-- **Uygulama:** `test@meetpoint.dev`. Hesapta 1000 jeton, 2 gelen istek ve seni önceden beğenmiş 2 profil var.
-- **Yönetim paneli:** `admin@meetpoint.dev`. Adres: http://localhost:4000/admin. Panelde bekleyen 1 mavi tik başvurusu ve 1 açık şikayet var. Sekmeler: özet, şikayetler, mavi tik, kullanıcılar, satışlar, ödemeler, hatalar.
+- **Uygulama:** `test@vibeupme.dev`. Hesapta 1000 jeton, 2 gelen istek ve seni önceden beğenmiş 2 profil var.
+- **Yönetim paneli:** `admin@vibeupme.dev`. Adres: http://localhost:4000/admin. Panelde bekleyen 1 mavi tik başvurusu ve 1 açık şikayet var. Sekmeler: özet, şikayetler, mavi tik, kullanıcılar, satışlar, ödemeler, hatalar.
 
 **E-postalar:** Lokalde e-posta sunucusu yok. Doğrulama ve şifre sıfırlama kodları `server/dev-mails/` klasörüne yazılır ve sunucu konsoluna basılır.
 
@@ -96,7 +96,7 @@ Uygulamayı "sağlam bir Tinder/Bumble klonu" olmaktan çıkarıp kullanıcını
 - **Günlük ruh hali** (`server/src/routes/profile.ts`: `/me/mood`; `app/lib/features/profile/mood_widgets.dart`): serbest metin yok, küçük bir katalogdan seçim, 24 saatte kendiliğinden kaybolur.
 - **İlgi alanı bazlı keşif** (`server/src/routes/discover.ts`: `/discover/groups`; `app/lib/features/discover/interest_group_screen.dart`): salt kaydırma yerine ortak ilgiye göre vitrinler/gruplar.
 - **Kozmetik mağaza** (`server/src/routes/store.ts`, `server/src/catalog.ts`: `STORE_*`; `app/lib/features/store/store_screen.dart`): jetonla alınan çerçeve, rozet, tema, oda mobilyası, avatar kıyafeti ve sohbet teması; kullanıcıdan kullanıcıya geçmez, tamamı platform geliri.
-- **Abonelik katmanı — MeetPoint+** (`server/src/routes/revenuecat.ts`, `server/src/routes/wallet.ts`, `server/src/routes/boosts.ts`; `app/lib/features/wallet/premium_screen.dart`): RevenueCat üzerinden $7.99/ay abonelik (mevcut jeton IAP altyapısına ek). Tek perk: "seni beğenenler" her zaman açık. Durum webhook olaylarından güncellenir; `/wallet/sync` kaçırılan olayları RevenueCat sunucusundan yakalar.
+- **Abonelik katmanı — VibeUpMe+** (`server/src/routes/revenuecat.ts`, `server/src/routes/wallet.ts`, `server/src/routes/boosts.ts`; `app/lib/features/wallet/premium_screen.dart`): RevenueCat üzerinden $7.99/ay abonelik (mevcut jeton IAP altyapısına ek). Tek perk: "seni beğenenler" her zaman açık. Durum webhook olaylarından güncellenir; `/wallet/sync` kaçırılan olayları RevenueCat sunucusundan yakalar.
 - **Cilalı mikro-etkileşimler** (`app/lib/core/fx.dart`, `app/lib/core/celebration.dart`): haptik geri bildirim + kısa üretilmiş ses efektleri (sık dokunuşlarda sadece haptik, seyrek onaylarda haptik+ses, eşleşmede güçlü haptik+kutlama); eşleşme kutlaması artık kaydırma dışında "seni beğenenler" ve "ilgi alanı keşfi" akışlarında da aynı kalitede; cüzdan bakiyesi sayarak akıyor (`AnimatedCoinAmount`, `core/ui.dart`).
 - Arayüz turu: `tools/ui-tours/faz16b.mjs` (`faz16.mjs` adı fazlar yeniden numaralandırılmadan önce eski Faz 16'ya — bugünkü Faz 18'e — verildiği için `b` eki kullanıldı).
 
@@ -211,7 +211,7 @@ Madde madde denetim: [docs/guvenlik-denetimi.md](docs/guvenlik-denetimi.md).
 
 Uygulama açıkken gelen anlık bildirimler zaten çalışıyor. Uygulama kapalıyken bildirim gelmesi için bir Firebase projesi gerekiyor.
 
-1. https://console.firebase.google.com adresinde **Proje ekle**'ye tıklayıp `meetpoint` adıyla bir proje oluştur.
+1. https://console.firebase.google.com adresinde **Proje ekle**'ye tıklayıp `vibeupme` adıyla bir proje oluştur.
 2. Terminalde (`app\` klasöründe) şu komutları çalıştır:
 
 ```bash
@@ -316,7 +316,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19)
 - [x] **Faz 13 · Para akışı güvenliği ve finans kayıtları:** kazanç olgunlaşma, kimlik ve IBAN eşleşmesi, dolandırıcılık kuralları, vergi alanları, finans raporları
 - [x] **Faz 14 · Tüketici hakları, destek ve mağaza uyumu:** mesafeli satış, destek talepleri, yardım merkezi, künye, mağaza kontrol listesi
 - [x] **Faz 15 · Gerçek zamanlı iletişim kalitesi:** yerel gelen arama ekranı, adil ücretlendirme, jeton yenileme, mesaj teslim garantisi
-- [x] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar + ziyaret (Sanalika esinli, statik), "Kendini Keşfet" vibe sistemi, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (MeetPoint+), mikro-etkileşimler
+- [x] **Faz 16 · Kimlik, premium katman ve mağaza:** profil vitrini, kendi odan + avatar + ziyaret (Sanalika esinli, statik), "Kendini Keşfet" vibe sistemi, günlük ruh hali, ilgi alanı toplulukları, kozmetik mağaza (oda/avatar/sohbet temaları dahil), abonelik (VibeUpMe+), mikro-etkileşimler
 - [x] **Faz 17 · Oyunlaştırma, alışkanlık ve organik büyüme:** giriş serisi, sosyal cesaret yolculuğu, "Gelişimim" ekranı, sohbet içi mini oyunlar, eşleşme yıldönümü, haftalık özet, davet programı, paylaşılabilir anlar, oda galerisi, kişisel bağlantı linki
 - [x] **Faz 18 · Kullanım kolaylığı, erişilebilirlik ve performans:** ilk kullanım rehberi, durum ekranları, erişilebilirlik, düşük segment performansı
 - [ ] **Faz 19 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
@@ -324,4 +324,4 @@ Yayın öncesi seri: önce uygulama (Faz 8–18), dış işler en sonda (Faz 19)
 ## Notlar
 
 - SQLite'ta Prisma `Json @default("[]")` alanları için hatalı bir varsayılan değer üretiyor (`DEFAULT []`). Uygulama her zaman değer gönderdiği için sorun olmuyor; eski satırlar `fix_json_defaults` migration'ı ile onarıldı. PostgreSQL'e geçince bu durum ortadan kalkacak.
-- `npm run db:seed`, `@meetpoint.dev` ve `@test.com` hesaplarını silip demo verisini yeniden oluşturur.
+- `npm run db:seed`, `@vibeupme.dev` ve `@test.com` hesaplarını silip demo verisini yeniden oluşturur.

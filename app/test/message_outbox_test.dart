@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/core/api.dart';
-import 'package:meetpoint/core/auth_tokens.dart';
-import 'package:meetpoint/core/session.dart';
-import 'package:meetpoint/features/chat/message_outbox.dart';
+import 'package:vibeupme/core/api.dart';
+import 'package:vibeupme/core/auth_tokens.dart';
+import 'package:vibeupme/core/session.dart';
+import 'package:vibeupme/features/chat/message_outbox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Sahte ağ: her istek sıradaki adımı uygular (ağ hatası ya da yanıt). api_retry_test.dart'taki

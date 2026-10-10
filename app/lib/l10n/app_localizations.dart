@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In tr, this message translates to:
-  /// **'MeetPoint'**
+  /// **'VibeUpMe'**
   String get appName;
 
   /// No description provided for @tagline.
@@ -767,7 +767,7 @@ abstract class AppLocalizations {
   /// No description provided for @errUnderage.
   ///
   /// In tr, this message translates to:
-  /// **'MeetPoint\'i kullanmak için 18 yaşından büyük olmalısın.'**
+  /// **'VibeUpMe\'yi kullanmak için 18 yaşından büyük olmalısın.'**
   String get errUnderage;
 
   /// No description provided for @errInsufficientBalance.
@@ -3342,7 +3342,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportTeam.
   ///
   /// In tr, this message translates to:
-  /// **'MeetPoint Destek'**
+  /// **'VibeUpMe Destek'**
   String get supportTeam;
 
   /// No description provided for @supportCatCoins.
@@ -4188,7 +4188,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumTitle.
   ///
   /// In tr, this message translates to:
-  /// **'MeetPoint+'**
+  /// **'VibeUpMe+'**
   String get premiumTitle;
 
   /// No description provided for @premiumTagline.
@@ -4218,7 +4218,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumActive.
   ///
   /// In tr, this message translates to:
-  /// **'MeetPoint+ üyesisin'**
+  /// **'VibeUpMe+ üyesisin'**
   String get premiumActive;
 
   /// No description provided for @premiumActiveUntil.
@@ -4374,7 +4374,7 @@ abstract class AppLocalizations {
   /// No description provided for @personalLinkHint.
   ///
   /// In tr, this message translates to:
-  /// **'\"Beni MeetPoint\'te bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.'**
+  /// **'\"Beni VibeUpMe\'de bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.'**
   String get personalLinkHint;
 
   /// No description provided for @shareButton.
@@ -4398,7 +4398,7 @@ abstract class AppLocalizations {
   /// No description provided for @shareProfileTagline.
   ///
   /// In tr, this message translates to:
-  /// **'MeetPoint\'te profilim'**
+  /// **'VibeUpMe\'de profilim'**
   String get shareProfileTagline;
 }
 

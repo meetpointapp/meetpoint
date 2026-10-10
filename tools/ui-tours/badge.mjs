@@ -3,7 +3,7 @@ import { chromium } from 'playwright-core';
 import { WEB, call } from './lib.mjs';
 
 const out = new URL('./shots/', import.meta.url).pathname.replace(/^\/(\w:)/, '$1');
-const login = await call(null, 'POST', '/auth/login', { email: 'test@meetpoint.dev', password: 'password123' });
+const login = await call(null, 'POST', '/auth/login', { email: 'test@vibeupme.dev', password: 'password123' });
 const cards = await call(login.token, 'GET', '/discover');
 const ayse = cards._arr.find((c) => c.displayName === 'Ayşe');
 // Ayşe'den öncekileri geç, böylece keşfette Ayşe en önde olsun
@@ -18,7 +18,7 @@ await page.goto(WEB);
 await page.waitForSelector('flt-semantics-placeholder', { state: 'attached', timeout: 30000 });
 await page.locator('flt-semantics-placeholder').dispatchEvent('click');
 await page.waitForTimeout(3000);
-await page.getByRole('textbox', { name: 'E-posta' }).fill('test@meetpoint.dev');
+await page.getByRole('textbox', { name: 'E-posta' }).fill('test@vibeupme.dev');
 await page.getByRole('textbox', { name: 'Şifre' }).fill('password123');
 await page.getByRole('button', { name: 'Giriş yap' }).click();
 await page.waitForTimeout(4000);
@@ -31,7 +31,7 @@ await page2.goto(WEB);
 await page2.waitForSelector('flt-semantics-placeholder', { state: 'attached', timeout: 30000 });
 await page2.locator('flt-semantics-placeholder').dispatchEvent('click');
 await page2.waitForTimeout(3000);
-await page2.getByRole('textbox', { name: 'E-posta' }).fill('test@meetpoint.dev');
+await page2.getByRole('textbox', { name: 'E-posta' }).fill('test@vibeupme.dev');
 await page2.getByRole('textbox', { name: 'Şifre' }).fill('password123');
 await page2.getByRole('button', { name: 'Giriş yap' }).click();
 await page2.waitForTimeout(2500);

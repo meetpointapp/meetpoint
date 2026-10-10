@@ -25,11 +25,11 @@ Future<void> main() async {
   }
   ErrorReporter.install();
   // Otomatik tekrar denemeyi kapat: hatalar ekranda "Yenile" ile yönetiliyor
-  runApp(ProviderScope(retry: (_, _) => null, child: const MeetPointApp()));
+  runApp(ProviderScope(retry: (_, _) => null, child: const VibeUpMeApp()));
 }
 
-class MeetPointApp extends ConsumerWidget {
-  const MeetPointApp({super.key});
+class VibeUpMeApp extends ConsumerWidget {
+  const VibeUpMeApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

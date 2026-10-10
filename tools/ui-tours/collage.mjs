@@ -29,7 +29,7 @@ const html = `<html><head><style>
   figure{margin:0}
   img{width:260px;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.14);display:block}
   figcaption{text-align:center;margin-top:8px;font-size:15px;font-weight:600;color:#3a2e30}
-</style></head><body><h1>MeetPoint · Faz 2 önizleme</h1><p>Görünüm ve ilk izlenim: marka, adım adım kayıt, zengin profiller, yeni keşfet kartı, karanlık mod</p><div class="grid">${cells}</div></body></html>`;
+</style></head><body><h1>VibeUpMe · Faz 2 önizleme</h1><p>Görünüm ve ilk izlenim: marka, adım adım kayıt, zengin profiller, yeni keşfet kartı, karanlık mod</p><div class="grid">${cells}</div></body></html>`;
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
 const page = await browser.newPage({ viewport: { width: 1476, height: 1400 }, deviceScaleFactor: 1 });

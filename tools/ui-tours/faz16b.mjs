@@ -1,6 +1,6 @@
 // Faz 16 UI turu (duman testi, "Kimlik, premium katman ve mağaza"): kişisel vitrin, oda +
 // avatar + ziyaret, "Kendini Keşfet" vibe testi, günlük ruh hali, ilgi alanı bazlı keşif,
-// kozmetik mağaza, MeetPoint+ abonelik ve eşleşme kutlaması (cilalı mikro-etkileşimler).
+// kozmetik mağaza, VibeUpMe+ abonelik ve eşleşme kutlaması (cilalı mikro-etkileşimler).
 // `faz16.mjs` adı, yol haritası fazları yeniden numaralandırılmadan önce alındığı için (eski
 // Faz 16 = bugünkü Faz 18 içeriği) bu betik `faz16b` olarak adlandırıldı.
 // Gerçek mağaza (RevenueCat) ve gerçek cihaz bu ortamda test edilemez; abonelik/satın alma
@@ -159,7 +159,7 @@ await shot('16b-16-store', 1500);
 await page.getByText(/^\d+ jeton$/).first().click();
 await shot('16b-17-store-purchased', 1200);
 
-// --- Madde 7: MeetPoint+ abonelik (mağaza bağlı değilken dev-subscribe yolu)
+// --- Madde 7: VibeUpMe+ abonelik (mağaza bağlı değilken dev-subscribe yolu)
 await page.goto(`${WEB}/#/premium`);
 await shot('16b-18-premium', 1200);
 await page.getByRole('button', { name: 'Abone ol' }).click();

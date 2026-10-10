@@ -465,7 +465,7 @@ class Me {
   final int cashable;
   final DateTime? boostedUntil;
   final DateTime? likesUnlockedUntil;
-  // Faz 16: MeetPoint+ abonelik bitişi (gerçek para, RevenueCat). null = abone değil.
+  // Faz 16: VibeUpMe+ abonelik bitişi (gerçek para, RevenueCat). null = abone değil.
   final DateTime? premiumUntil;
   final bool hasLocation;
   final DiscoverFilters filters;
@@ -944,7 +944,7 @@ class Conversation {
 class LikesInfo {
   final bool unlocked;
   final DateTime? unlockedUntil;
-  // Faz 16: MeetPoint+ abonesiyse jetonla açmaya gerek yok, her zaman açık
+  // Faz 16: VibeUpMe+ abonesiyse jetonla açmaya gerek yok, her zaman açık
   final bool premium;
   final int count;
   final List<PublicProfile> users;

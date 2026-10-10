@@ -121,7 +121,7 @@ await shot('17-08-tictactoe-move', 1000);
 
 // --- Madde 6: eşleşme yıldönümü — konuşmayı 7 gün öncesine çek, banner'ı doğrula
 execSync(
-  `PGPASSWORD=meetpoint-dev psql -h localhost -p 5433 -U meetpoint -d meetpoint -c "UPDATE \\"Conversation\\" SET \\"createdAt\\" = now() - interval '7 days' WHERE id = '${conversationId}'"`,
+  `PGPASSWORD=vibeupme-dev psql -h localhost -p 5433 -U vibeupme -d vibeupme -c "UPDATE \\"Conversation\\" SET \\"createdAt\\" = now() - interval '7 days' WHERE id = '${conversationId}'"`,
   { stdio: 'ignore' },
 );
 await page.goto(`${WEB}/#/discover`);

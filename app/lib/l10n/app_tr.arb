@@ -1,6 +1,6 @@
 {
   "@@locale": "tr",
-  "appName": "MeetPoint",
+  "appName": "VibeUpMe",
   "tagline": "Tanış, konuş, kazan.",
   "loginTitle": "Tekrar hoş geldin",
   "registerTitle": "Hesap oluştur",
@@ -181,7 +181,7 @@
   "errNetwork": "Sunucuya ulaşılamadı.",
   "errInvalidCredentials": "E-posta veya şifre hatalı.",
   "errEmailTaken": "Bu e-posta zaten kayıtlı.",
-  "errUnderage": "MeetPoint'i kullanmak için 18 yaşından büyük olmalısın.",
+  "errUnderage": "VibeUpMe'yi kullanmak için 18 yaşından büyük olmalısın.",
   "errInsufficientBalance": "Yeterli jetonun yok.",
   "errAlreadyPending": "Bu kişiye zaten bekleyen bir isteğin var.",
   "errAlreadyInConversation": "Bu kişiyle zaten sohbetin var.",
@@ -1029,7 +1029,7 @@
   "closeTicket": "Talebi kapat",
   "closeTicketConfirm": "Sorunun çözüldüyse talebi kapatabilirsin. Kapanan talebe mesaj yazılamaz.",
   "writeReply": "Yanıt yaz…",
-  "supportTeam": "MeetPoint Destek",
+  "supportTeam": "VibeUpMe Destek",
   "supportCatCoins": "Jeton ve ödeme",
   "supportCatCalls": "Arama ve hediye",
   "supportCatCashout": "Para çekme",
@@ -1323,12 +1323,12 @@
   "storePurchased": "Satın alındı!",
   "errItemNotOwned": "Bu öğeyi henüz satın almadın.",
   "errAlreadyOwned": "Bu öğeye zaten sahipsin.",
-  "premiumTitle": "MeetPoint+",
+  "premiumTitle": "VibeUpMe+",
   "premiumTagline": "Seni beğenenleri her zaman gör",
   "premiumPerkLikes": "Seni beğenenler her zaman açık — jetonla açmana gerek yok",
   "premiumPriceMonthly": "{price}/ay",
   "premiumSubscribe": "Abone ol",
-  "premiumActive": "MeetPoint+ üyesisin",
+  "premiumActive": "VibeUpMe+ üyesisin",
   "premiumActiveUntil": "Aboneliğin {date} tarihine kadar aktif",
   "premiumManage": "Aboneliği yönet",
   "premiumSubscribed": "Abone oldun!",
@@ -1403,7 +1403,7 @@
   "referralApply": "Uygula",
   "referralApplied": "Kod uygulandı!",
   "personalLinkTitle": "Kişisel bağlantın",
-  "personalLinkHint": "\"Beni MeetPoint'te bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.",
+  "personalLinkHint": "\"Beni VibeUpMe'de bul\" — bu bağlantıyı paylaş, tıklayan kişi seni ve uygulamayı keşfetsin.",
   "shareButton": "Paylaş",
   "shareMatchTitle": "Eşleştik! 💕",
   "shareMatchWith": "{name} ile",
@@ -1414,5 +1414,5 @@
       }
     }
   },
-  "shareProfileTagline": "MeetPoint'te profilim"
+  "shareProfileTagline": "VibeUpMe'de profilim"
 }

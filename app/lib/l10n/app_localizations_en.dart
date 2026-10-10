@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'MeetPoint';
+  String get appName => 'VibeUpMe';
 
   @override
   String get tagline => 'Meet, talk, earn.';
@@ -367,7 +367,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errEmailTaken => 'This email is already registered.';
 
   @override
-  String get errUnderage => 'You must be 18 or older to use MeetPoint.';
+  String get errUnderage => 'You must be 18 or older to use VibeUpMe.';
 
   @override
   String get errInsufficientBalance => 'You don\'t have enough coins.';
@@ -1987,7 +1987,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get writeReply => 'Write a reply…';
 
   @override
-  String get supportTeam => 'MeetPoint Support';
+  String get supportTeam => 'VibeUpMe Support';
 
   @override
   String get supportCatCoins => 'Coins & payment';
@@ -2720,7 +2720,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errAlreadyOwned => 'You already own this item.';
 
   @override
-  String get premiumTitle => 'MeetPoint+';
+  String get premiumTitle => 'VibeUpMe+';
 
   @override
   String get premiumTagline => 'Always see who likes you';
@@ -2738,7 +2738,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumSubscribe => 'Subscribe';
 
   @override
-  String get premiumActive => 'You\'re a MeetPoint+ member';
+  String get premiumActive => 'You\'re a VibeUpMe+ member';
 
   @override
   String premiumActiveUntil(String date) {
@@ -2854,7 +2854,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personalLinkHint =>
-      '\"Find me on MeetPoint\" — share this link, whoever taps it discovers you and the app.';
+      '\"Find me on VibeUpMe\" — share this link, whoever taps it discovers you and the app.';
 
   @override
   String get shareButton => 'Share';
@@ -2868,5 +2868,5 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get shareProfileTagline => 'My MeetPoint profile';
+  String get shareProfileTagline => 'My VibeUpMe profile';
 }

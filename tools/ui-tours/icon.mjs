@@ -1,4 +1,4 @@
-// MeetPoint uygulama ikonu: mercan->turuncu gradyan üzerinde beyaz konum iğnesi, içinde kalp.
+// VibeUpMe uygulama ikonu: mercan->turuncu gradyan üzerinde beyaz konum iğnesi, içinde kalp.
 // Üç PNG üretir: tam ikon (iOS/genel), Android adaptive arka plan ve ön plan.
 import fs from 'node:fs';
 import { chromium } from 'playwright-core';

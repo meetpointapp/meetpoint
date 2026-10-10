@@ -1,6 +1,6 @@
 {
-    "name": "MeetPoint",
-    "short_name": "MeetPoint",
+    "name": "VibeUpMe",
+    "short_name": "VibeUpMe",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FF4D6D",

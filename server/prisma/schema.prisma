@@ -1,4 +1,4 @@
-// MeetPoint veritabanı şeması (PostgreSQL).
+// VibeUpMe veritabanı şeması (PostgreSQL).
 // Geliştirmede gömülü PostgreSQL: npm run db (server/scripts/db.ts)
 
 generator client {
@@ -78,7 +78,7 @@ model User {
   boostedUntil       DateTime? // öne çıkarma bitişi
   likesUnlockedUntil DateTime? // "seni beğenenler" erişimi bitişi
 
-  // Faz 16: MeetPoint+ (RevenueCat aylık abonelik, gerçek para — jetonla alınan özelliklerden
+  // Faz 16: VibeUpMe+ (RevenueCat aylık abonelik, gerçek para — jetonla alınan özelliklerden
   // farklı). Perk: "seni beğenenler" her zaman açık (bkz. src/routes/boosts.ts). Süresi
   // src/routes/revenuecat.ts RENEWAL/EXPIRATION olaylarıyla güncellenir.
   premiumUntil DateTime?
@@ -995,7 +995,7 @@ model SupportMessage {
   ticketId   String
   ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   fromStaff  Boolean       @default(false)
-  staffId    String        @default("") // yanıtlayan ekip üyesi (kullanıcıya "MeetPoint Destek" görünür)
+  staffId    String        @default("") // yanıtlayan ekip üyesi (kullanıcıya "VibeUpMe Destek" görünür)
   body       String
   attachment String        @default("") // ekran görüntüsü (özel depo anahtarı)
   createdAt  DateTime      @default(now())

@@ -25,14 +25,14 @@ const nav = async (x) => {
 };
 
 // Ayşe'nin oturumu (karşı taraf)
-const ayse = await call(null, 'POST', '/auth/login', { email: 'aye0@meetpoint.dev', password: 'password123' });
+const ayse = await call(null, 'POST', '/auth/login', { email: 'aye0@vibeupme.dev', password: 'password123' });
 if (!ayse.token) throw new Error('Ayşe login failed');
 
 await page.goto(WEB);
 await page.waitForSelector('flt-semantics-placeholder', { state: 'attached', timeout: 30000 });
 await page.locator('flt-semantics-placeholder').dispatchEvent('click');
 await page.waitForTimeout(3000);
-await page.getByRole('textbox', { name: 'E-posta' }).fill('test@meetpoint.dev');
+await page.getByRole('textbox', { name: 'E-posta' }).fill('test@vibeupme.dev');
 await page.getByRole('textbox', { name: 'Şifre' }).fill('password123');
 await page.getByRole('button', { name: 'Giriş yap' }).click();
 await shot('c1-discover-superliked', 4000);
@@ -66,7 +66,7 @@ await shot('c8-likes-unlocked', 2500);
 // Ayşe'yi geri beğen -> eşleşme -> sohbet
 const likeButtons = page.getByRole('button');
 await page.mouse.click(0, 0);
-const likes = await call(null, 'POST', '/auth/login', { email: 'test@meetpoint.dev', password: 'password123' });
+const likes = await call(null, 'POST', '/auth/login', { email: 'test@vibeupme.dev', password: 'password123' });
 const likeInfo = await call(likes.token, 'GET', '/likes');
 console.log('likes listed:', likeInfo._arr ? 0 : likeInfo.users.length);
 await page.goBack();

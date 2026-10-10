@@ -21,7 +21,7 @@ describe('Hata takibi (Faz 7)', () => {
       });
 
     const msg = `Null check operator used on a null value #${tag}`;
-    const stack = (line) => `#0      _DiscoverState.build (package:meetpoint/features/discover/discover_screen.dart:${line}:12)\n#1      StatefulElement.build`;
+    const stack = (line) => `#0      _DiscoverState.build (package:vibeupme/features/discover/discover_screen.dart:${line}:12)\n#1      StatefulElement.build`;
 
     const r1 = await send({ message: msg, stack: stack(120), platform: 'android', appVersion: '1.0.0', context: '/discover' });
     check('anonymous report accepted', r1.status === 204);

@@ -112,7 +112,7 @@ adminFinanceRouter.get('/eft', FIN, async (req, res) => {
   const lines = ['Alici Adi;IBAN;Tutar TL;Tutar USD (net);Aciklama;Talep No'];
   for (const p of list) {
     const net = p.netUsd || p.usd;
-    lines.push([esc(decryptField(p.accountName)), decryptField(p.accountValue), (net * usdTry).toFixed(2), net.toFixed(2), `MeetPoint kazanc odemesi ${p.id.slice(-8)}`, p.id].join(';'));
+    lines.push([esc(decryptField(p.accountName)), decryptField(p.accountValue), (net * usdTry).toFixed(2), net.toFixed(2), `VibeUpMe kazanc odemesi ${p.id.slice(-8)}`, p.id].join(';'));
   }
   await prisma.payout.updateMany({ where: { id: { in: list.map((p) => p.id) } }, data: { exportedAt: new Date() } });
   await audit(req, 'payout.eft_export', 'payout', '', { count: list.length, usdTry, ids: list.map((p) => p.id).join(',') });

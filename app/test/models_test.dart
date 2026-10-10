@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meetpoint/core/catalog.dart';
-import 'package:meetpoint/core/models.dart';
-import 'package:meetpoint/core/vibe.dart';
+import 'package:vibeupme/core/catalog.dart';
+import 'package:vibeupme/core/models.dart';
+import 'package:vibeupme/core/vibe.dart';
 
 // Sunucu yanıt biçimleriyle (server/src/*Dto) birebir örnekler
 Map<String, dynamic> profileJson({String id = 'u1', String name = 'Deren'}) => {
@@ -218,7 +218,7 @@ void main() {
     });
   });
 
-  group('MeetPoint+ abonelik (Faz 16)', () {
+  group('VibeUpMe+ abonelik (Faz 16)', () {
     Map<String, dynamic> meJson({Object? premiumUntil}) =>
         {'id': 'u1', 'email': 'a@b.com', 'locale': 'tr', 'balance': 0, 'cashable': 0, 'premiumUntil': premiumUntil};
 

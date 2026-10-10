@@ -158,7 +158,7 @@ profileRouter.get('/me', async (req, res) => {
     verificationPose: user.verificationPose,
     boostedUntil: user.boostedUntil && user.boostedUntil > new Date() ? user.boostedUntil : null,
     likesUnlockedUntil: user.likesUnlockedUntil && user.likesUnlockedUntil > new Date() ? user.likesUnlockedUntil : null,
-    // Faz 16: MeetPoint+ abonelik durumu (gerçek para, RevenueCat)
+    // Faz 16: VibeUpMe+ abonelik durumu (gerçek para, RevenueCat)
     premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
     // Faz 17: günlük giriş serisi
     streak: { current: streak.current, longest: streak.longest },
