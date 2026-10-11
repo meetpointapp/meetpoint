@@ -109,11 +109,11 @@ class _OptInCard extends StatelessWidget {
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(optedIn ? l.leaderboardOptedIn : l.leaderboardOptInBanner,
-                style: theme.textTheme.titleSmall?.copyWith(color: optedIn ? null : Colors.white, fontWeight: FontWeight.w800)),
+                style: theme.textTheme.titleSmall?.copyWith(color: optedIn ? null : Brand.onAccent, fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
             Text(
               optedIn && you != null ? '#${you!.rank} · ≈\$${you!.approxUsd}' : l.leaderboardOptInHint,
-              style: theme.textTheme.bodySmall?.copyWith(color: optedIn ? theme.colorScheme.onSurfaceVariant : Colors.white.withValues(alpha: 0.9)),
+              style: theme.textTheme.bodySmall?.copyWith(color: optedIn ? theme.colorScheme.onSurfaceVariant : Brand.onAccent.withValues(alpha: 0.9)),
             ),
           ]),
         ),

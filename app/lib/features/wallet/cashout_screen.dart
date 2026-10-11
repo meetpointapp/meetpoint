@@ -111,23 +111,23 @@ class _AvailableCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), gradient: Brand.gradient),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l.cashoutAvailable, style: theme.textTheme.titleSmall?.copyWith(color: Colors.white)),
+        Text(l.cashoutAvailable, style: theme.textTheme.titleSmall?.copyWith(color: Brand.onAccent)),
         const SizedBox(height: 4),
         Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
           Text(rules.usdOf(wallet.cashable),
-              style: theme.textTheme.displaySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+              style: theme.textTheme.displaySmall?.copyWith(color: Brand.onAccent, fontWeight: FontWeight.w800)),
           const SizedBox(width: 10),
-          CoinAmount(wallet.cashable, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+          CoinAmount(wallet.cashable, iconColor: Brand.onAccent, style: TextStyle(color: Brand.onAccent, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 8),
         // Küçük yazı + renkli zemin: okunabilirlik için tam beyaz (Faz 16: kontrast)
         Text(l.cashoutMinInfo(rules.minCoins, rules.usdOf(rules.minCoins)),
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
+            style: theme.textTheme.bodySmall?.copyWith(color: Brand.onAccent, fontWeight: FontWeight.w500)),
         if (wallet.promoEarnings > 0) ...[
           const SizedBox(height: 10),
           Text(l.promoEarnings(wallet.promoEarnings),
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
-          Text(l.promoEarningsInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
+              style: theme.textTheme.bodySmall?.copyWith(color: Brand.onAccent, fontWeight: FontWeight.w600)),
+          Text(l.promoEarningsInfo, style: theme.textTheme.bodySmall?.copyWith(color: Brand.onAccent, fontWeight: FontWeight.w500)),
         ],
       ]),
     );

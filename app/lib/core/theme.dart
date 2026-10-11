@@ -45,7 +45,7 @@ abstract final class Brand {
   static AppPalette? get palette => _palette;
 
   // Gradyanlı/dolu düğmelerin üstündeki yazı rengi: açık renkli vurguda (ör. altın) koyu, aksi hâlde beyaz
-  static Color get onAccent => (_coral.computeLuminance() + _orange.computeLuminance()) / 2 > 0.5 ? const Color(0xFF1B1400) : Colors.white;
+  static Color get onAccent => (_coral.computeLuminance() + _orange.computeLuminance()) / 2 > 0.40 ? const Color(0xFF1B1400) : Colors.white;
 
   static void setPalette(AppPalette? p) {
     _palette = p;
@@ -61,7 +61,10 @@ abstract final class Brand {
     }
     final hsl = HSLColor.fromColor(accent);
     _coral = accent;
-    _orange = hsl.withHue((hsl.hue + 22) % 360).withLightness((hsl.lightness + 0.08).clamp(0.0, 0.85)).toColor();
+    // Sarı-yeşil aralığında (altın gibi) +22° limona kaçar: o tonlarda turuncuya doğru kaydır
+    final warm = hsl.hue >= 35 && hsl.hue <= 110;
+    final hue = (hsl.hue + (warm ? -20 : 22) + 360) % 360;
+    _orange = hsl.withHue(hue).withLightness((hsl.lightness + (warm ? 0.0 : 0.08)).clamp(0.0, 0.85)).toColor();
   }
 }
 
@@ -156,10 +159,17 @@ ThemeData buildTheme(Brightness systemBrightness) {
         (s) => IconThemeData(color: s.contains(WidgetState.selected) ? Brand.coral : scheme.onSurfaceVariant),
       ),
     ),
-    dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24))),
-    bottomSheetTheme: const BottomSheetThemeData(
+    // Diyalog ve alt sayfalar temanın yüzey rengini alır (koyu premium temalarda gri kalmasın)
+    dialogTheme: DialogThemeData(
+      backgroundColor: surfaceColor,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: surfaceColor,
+      surfaceTintColor: Colors.transparent,
       showDragHandle: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     ),
     snackBarTheme: SnackBarThemeData(behavior: SnackBarBehavior.floating, shape: shape),
     pageTransitionsTheme: const PageTransitionsTheme(

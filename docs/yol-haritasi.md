@@ -429,7 +429,27 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 4. 🛠 **Maliyet görünürlüğü.** Arama dakikaları ve tahmini Agora maliyeti yönetim panelinde görünür (jeton geliri ile karşılaştırma); beklenmedik kullanımda uyarı.
 5. 🛠 **Kalite ve güvenilirlik.** Zayıf ağda çözünürlük/bit hızı uyarlaması, jeton yenilemenin 1 saatten uzun gerçek aramada doğrulanması, ortam doğrulaması (iki taraf da katılmadıysa ücret yok) gerçek akışla sınanması.
 
-## Faz 22 · Dış süreçler ve yayın
+## Faz 22 · Sosyal akış (yazı tabanlı)
+
+**Amaç:** Uygulamaya ilk dönem Twitter gibi sadece yazı paylaşılan, altına yorum yapılan hafif bir akış eklemek. Akış ayrı bir ürün değil, tanışmanın yeni kapısı: yazarın profil kartından beğeni, süper beğeni ve mesaj isteğine geçilir.
+
+**Kararlar (2026-10-12):**
+- **Kapsam:** herkese açık tek akış; üstte "Herkes / İlgi alanlarım / Eşleşmelerim" sekmeleri. Takip sistemi ilk sürümde yok (boş akış sorununu azaltır).
+- **Kim yazar:** sadece mavi tikli (doğrulanmış) hesaplar paylaşır; herkes okur ve yorum yapar. Spam, taciz ve sahte hesap yükü azalır.
+- **Alt menü:** Keşfet · Eşleşmeler · **Akış (ortada, öne çıkan)** · Sohbetler · Cüzdan · Profil. Mağaza Profil içine taşınır; bakiye hapı üst çubukta kalır ve mağazaya götürür (jeton satışı gözden uzaklaşmasın).
+- **İlk sürüm sınırları:** 280 karakter, düz yorum listesi (iç içe yok), beğeni var; takip, hashtag, alıntılama ve görsel paylaşım yok.
+
+1. 🛠 **Veri modeli ve akış.** `Post`, `PostLike`, `PostComment` tabloları; gönderi ≤280 karakter, ilgi alanı etiketi, gizleme alanı. Sayfalamalı akış sorgusu (herkes / ortak ilgi alanı / eşleşmeler); engellenen, silinen, yasaklı ve kısıtlı hesaplar hariç. Kotalar: günde 5 gönderi, 60 yorum; rate limit ve Idempotency-Key.
+2. 🛠 **Güvenlik ve moderasyon.** İletişim bilgisi ve spam tespiti (`detect.ts` yeniden kullanılır), gönderi/yorum şikâyeti ve yaptırımla paylaşım kısıtı (`requireNotRestricted`), panelde "Gönderiler" sekmesi (gizle, sil, kullanıcıya yaptırım), trafik kaydı, KVKK envanteri + dışa aktarma + hesap silinince silme, topluluk kuralları metni.
+3. 🛠 **Akış ekranı ve paylaşım.** Sonsuz kaydırmalı akış, gönderi kartı (yazarın rozetleri, avatar çerçevesi, ilgi etiketi), beğeni, yorum sayısı; paylaşım kutusu (karakter sayacı, ilgi alanı seçimi); gönderi detayı ve yorumlar; kendi gönderisini silme; şikâyet/engelle menüsü.
+4. 🛠 **Alt menü ve gezinti.** Ortada Akış sekmesi, Mağaza'nın Profil içine alınması (kart + hızlı erişim), bakiye hapından mağazaya geçiş, eski bağlantıların (`/store`) yönlendirilmesi.
+5. 🛠 **Bildirimler ve bağlantı.** Gönderine yorum/beğeni bildirimi (tür bazlı tercih ve sessiz saatlere uyar), yazardan profile geçiş (beğen, süper beğeni, mesaj isteği), profilde "Gönderilerim", yeni gönderi sayacı rozeti.
+6. 🛠 **Gelir ve büyüme.** Gönderiyi jetonla öne çıkarma (süreli) ve profile sabitleme; paylaşılabilir gönderi kartı (kendi şablonumuzla, harici API yok).
+7. 🛠 **Test ve belgeler.** Sunucu testleri (kota, yetki, engelleme, silme), UI turu, yol haritası/README güncellemesi.
+
+**Süre tahmini:** 7–10 gün. **Açık riskler:** içerik moderasyonu iş yükü (5651 sorumluluğu avukat aşamasında netleşir), akışın başlangıçta boş görünmesi (ilgi alanı filtresi ve ruh hali gibi hafif içeriklerle canlı tutulur).
+
+## Faz 23 · Dış süreçler ve yayın
 
 **Amaç:** Uygulama bittikten sonra, hepsi bir arada.
 

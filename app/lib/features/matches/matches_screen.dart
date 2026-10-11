@@ -128,7 +128,7 @@ class _MatchCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                     decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
-                    child: Text(l.matchesNew, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11)),
+                    child: Text(l.matchesNew, style: TextStyle(color: Brand.onAccent, fontWeight: FontWeight.w800, fontSize: 11)),
                   ),
                 ),
               if (c.unreadCount > 0)
@@ -194,17 +194,17 @@ class _LikesYouTile extends ConsumerWidget {
                 Container(
                   width: 46,
                   height: 46,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.25)),
-                  child: Icon(likes.unlocked ? Icons.favorite_rounded : Icons.lock_rounded, color: Colors.white),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.onAccent.withValues(alpha: 0.2)),
+                  child: Icon(likes.unlocked ? Icons.favorite_rounded : Icons.lock_rounded, color: Brand.onAccent),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(l.likesYou, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-                    Text(l.likesYouCount(likes.count), style: TextStyle(color: Colors.white.withValues(alpha: 0.9))),
+                    Text(l.likesYou, style: TextStyle(color: Brand.onAccent, fontWeight: FontWeight.w800, fontSize: 16)),
+                    Text(l.likesYouCount(likes.count), style: TextStyle(color: Brand.onAccent.withValues(alpha: 0.9))),
                   ]),
                 ),
-                const Icon(Icons.chevron_right_rounded, color: Colors.white),
+                Icon(Icons.chevron_right_rounded, color: Brand.onAccent),
               ]),
             ),
           ),

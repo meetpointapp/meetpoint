@@ -163,7 +163,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                         ),
                         child: Text('$emoji  ${_categoryTitle(l, id)}',
                             style: theme.textTheme.labelLarge?.copyWith(
-                              color: on ? Colors.white : theme.colorScheme.onSurface,
+                              color: on ? Brand.onAccent : theme.colorScheme.onSurface,
                               fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                             )),
                       ),

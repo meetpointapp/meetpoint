@@ -109,9 +109,9 @@ class _Body extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.lightbulb_rounded,
-                              color: Colors.white,
+                              color: Brand.onAccent,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -121,7 +121,7 @@ class _Body extends ConsumerWidget {
                                   Text(
                                     l.journeyNextStepTitle,
                                     style: theme.textTheme.labelLarge?.copyWith(
-                                      color: Colors.white70,
+                                      color: Brand.onAccent.withValues(alpha: 0.75),
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -131,16 +131,16 @@ class _Body extends ConsumerWidget {
                                       l.interestLabel(h.interestId),
                                     ),
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
+                                      color: Brand.onAccent,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right_rounded,
-                              color: Colors.white,
+                              color: Brand.onAccent,
                             ),
                           ],
                         ),

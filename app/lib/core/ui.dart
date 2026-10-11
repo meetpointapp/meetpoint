@@ -272,16 +272,18 @@ class Avatar extends StatelessWidget {
 }
 
 class CoinAmount extends StatelessWidget {
-  const CoinAmount(this.amount, {super.key, this.style, this.signed = false});
+  const CoinAmount(this.amount, {super.key, this.style, this.signed = false, this.iconColor});
   final int amount;
   final TextStyle? style;
   final bool signed;
+  // Altın zemin üstünde (ör. bakiye kartı) altın jeton görünmez: simge rengi değiştirilebilir
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final text = signed && amount > 0 ? '+$amount' : '$amount';
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(Icons.toll_rounded, size: (style?.fontSize ?? 14) + 2, color: Brand.gold),
+      Icon(Icons.toll_rounded, size: (style?.fontSize ?? 14) + 2, color: iconColor ?? Brand.gold),
       const SizedBox(width: 4),
       Text(text, style: style),
     ]);
@@ -292,16 +294,17 @@ class CoinAmount extends StatelessWidget {
 // akar (0'dan başlayıp ilk açılışta da yumuşakça belirir). Sadece görsel; değeri her zaman
 // doğru gösterir, animasyon bittiğinde de.
 class AnimatedCoinAmount extends StatelessWidget {
-  const AnimatedCoinAmount(this.amount, {super.key, this.style});
+  const AnimatedCoinAmount(this.amount, {super.key, this.style, this.iconColor});
   final int amount;
   final TextStyle? style;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) => TweenAnimationBuilder<int>(
         tween: IntTween(begin: 0, end: amount),
         duration: const Duration(milliseconds: 600),
         curve: Curves.easeOutCubic,
-        builder: (_, value, _) => CoinAmount(value, style: style),
+        builder: (_, value, _) => CoinAmount(value, style: style, iconColor: iconColor),
       );
 }
 

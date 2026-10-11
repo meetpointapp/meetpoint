@@ -185,8 +185,8 @@ class _EventBanner extends ConsumerWidget {
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(l.eventBannerTitle(event.title, event.multiplier.toStringAsFixed(event.multiplier == event.multiplier.roundToDouble() ? 0 : 1)),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-            Text(l.eventEndsIn(hm), style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+                style: TextStyle(color: Brand.onAccent, fontWeight: FontWeight.w800)),
+            Text(l.eventEndsIn(hm), style: TextStyle(color: Brand.onAccent.withValues(alpha: 0.85), fontSize: 12)),
           ]),
         ),
       ]),
@@ -241,7 +241,7 @@ class _BalanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    const onCard = Colors.white;
+    final onCard = Brand.onAccent;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), gradient: Brand.gradient),
@@ -249,8 +249,9 @@ class _BalanceCard extends StatelessWidget {
         Text(l.balance, style: theme.textTheme.titleSmall?.copyWith(color: onCard)),
         const SizedBox(height: 4),
         AnimatedCoinAmount(wallet.balance,
+            iconColor: onCard,
             style: theme.textTheme.displaySmall?.copyWith(color: onCard, fontWeight: FontWeight.w800)),
-        const Divider(color: Colors.white38, height: 28),
+        Divider(color: onCard.withValues(alpha: 0.35), height: 28),
         Row(children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -260,12 +261,12 @@ class _BalanceCard extends StatelessWidget {
                 style: theme.textTheme.titleMedium?.copyWith(color: onCard, fontWeight: FontWeight.w700),
               ),
               // Küçük yazı + renkli zemin: okunabilirlik için tam beyaz (Faz 16: kontrast)
-              Text(l.cashableInfo, style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
+              Text(l.cashableInfo, style: theme.textTheme.bodySmall?.copyWith(color: onCard, fontWeight: FontWeight.w500)),
               // Olgunlaşan kazanç: iade süresi dolunca bozdurulabilir
               if (wallet.maturingEarnings > 0 && wallet.nextMatureAt != null) ...[
                 const SizedBox(height: 6),
                 Text(l.maturingEarnings(wallet.maturingEarnings, DateFormat.MMMd(l.localeName).format(wallet.nextMatureAt!)),
-                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+                    style: theme.textTheme.bodySmall?.copyWith(color: onCard, fontWeight: FontWeight.w600)),
               ],
               if (wallet.promoEarnings > 0) ...[
                 const SizedBox(height: 6),
@@ -275,10 +276,10 @@ class _BalanceCard extends StatelessWidget {
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Flexible(
                       child: Text(l.promoEarnings(wallet.promoEarnings),
-                          style: theme.textTheme.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+                          style: theme.textTheme.bodySmall?.copyWith(color: onCard, fontWeight: FontWeight.w600)),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.info_outline_rounded, size: 14, color: Colors.white70),
+                    Icon(Icons.info_outline_rounded, size: 14, color: onCard.withValues(alpha: 0.75)),
                   ]),
                 ),
               ],
@@ -288,8 +289,8 @@ class _BalanceCard extends StatelessWidget {
           FilledButton.tonal(
             onPressed: () => context.push('/wallet/cashout'),
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.white.withValues(alpha: 0.22),
-              foregroundColor: Colors.white,
+              backgroundColor: onCard.withValues(alpha: 0.22),
+              foregroundColor: onCard,
             ),
             child: Text(l.cashout),
           ),
@@ -371,7 +372,7 @@ class _PackTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
             decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
             child: Text(l.mostPopular,
-                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                style: TextStyle(color: Brand.onAccent, fontSize: 11, fontWeight: FontWeight.w800)),
           ),
         ),
       ),

@@ -69,33 +69,52 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(gradient: Brand.gradient),
-        child: SafeArea(
+    // Giriş ekranı her zaman koyu marka sahnesinde: ikon ve açılış ekranıyla aynı görünüm
+    final theme = buildTheme(Brightness.dark);
+    return Theme(
+      data: theme,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF160A1F),
+        body: Stack(children: [
+          // Yumuşak gül ve mor ışıklar: düz zemin değil, derinlik
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, -0.62),
+                  radius: 0.95,
+                  colors: [const Color(0xFFFF4D6D).withValues(alpha: 0.30), Colors.transparent],
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(-1.0, 1.05),
+                  radius: 1.0,
+                  colors: [const Color(0xFF8B2FE0).withValues(alpha: 0.28), Colors.transparent],
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(children: [
-                  Container(
-                    width: 88,
-                    height: 88,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(26),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 18, offset: const Offset(0, 6))],
-                    ),
-                    child: const BrandMark(height: 60),
+                  // Görselin kenar boşluğu fazla: yüksekliği kırp, logo büyük ve wordmark'a yakın dursun
+                  Align(
+                    heightFactor: 0.66,
+                    child: Image.asset('assets/icon/splash_logo.png', width: 210, height: 210, filterQuality: FilterQuality.medium),
                   ),
-                  const SizedBox(height: 14),
-                  const BrandLogo(size: 36, light: true),
-                  const SizedBox(height: 4),
-                  Text(l.tagline, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85))),
-                  const SizedBox(height: 32),
+                  const BrandLogo(size: 34, light: true),
+                  const SizedBox(height: 6),
+                  Text(l.tagline, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white.withValues(alpha: 0.72))),
+                  const SizedBox(height: 28),
                   if (ref.watch(sessionProvider).value?.notice == 'banned')
                     Container(
                       width: double.infinity,
@@ -111,6 +130,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ]),
                     ),
                   Card(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.10)),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(22),
                       child: Form(
@@ -201,6 +225,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ),
           ),
         ),
+        ]),
       ),
     );
   }
@@ -286,10 +311,10 @@ class _LanguageToggle extends ConsumerWidget {
         showSelectedIcon: false,
         expandedInsets: EdgeInsets.zero,
         style: SegmentedButton.styleFrom(
-          foregroundColor: Colors.white,
-          selectedForegroundColor: Brand.coral,
-          selectedBackgroundColor: Colors.white,
-          side: const BorderSide(color: Colors.white70),
+          foregroundColor: Colors.white70,
+          selectedForegroundColor: Colors.white,
+          selectedBackgroundColor: Colors.white.withValues(alpha: 0.16),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
         ),
         segments: const [
           ButtonSegment(value: 'tr', label: Text('Türkçe', maxLines: 1, softWrap: false)),

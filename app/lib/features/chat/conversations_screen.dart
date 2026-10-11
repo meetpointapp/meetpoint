@@ -115,7 +115,7 @@ class _ConversationTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
             decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
-            child: Text('${c.unreadCount}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+            child: Text('${c.unreadCount}', style: TextStyle(color: Brand.onAccent, fontSize: 12, fontWeight: FontWeight.w700)),
           ),
         ],
       ]),

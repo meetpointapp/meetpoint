@@ -287,7 +287,7 @@ class _PhotoGridFieldState extends ConsumerState<PhotoGridField> {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: ShapeDecoration(shape: StadiumBorder(), gradient: Brand.gradient),
                       child: Text(l.cover,
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                          style: TextStyle(color: Brand.onAccent, fontSize: 11, fontWeight: FontWeight.w700)),
                     ),
                   ),
               ]),

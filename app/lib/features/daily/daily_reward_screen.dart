@@ -79,8 +79,8 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen> {
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.22)),
-                  child: const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 30),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.onAccent.withValues(alpha: 0.18)),
+                  child: Icon(Icons.local_fire_department_rounded, color: Brand.onAccent, size: 30),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -95,7 +95,7 @@ class _DailyRewardScreenState extends ConsumerState<DailyRewardScreen> {
               const SizedBox(height: 14),
               if (r.claimable)
                 Material(
-                  color: Colors.white,
+                  color: Brand.onAccent,
                   borderRadius: BorderRadius.circular(30),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(30),

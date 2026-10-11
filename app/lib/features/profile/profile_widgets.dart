@@ -200,7 +200,7 @@ class MiniButton extends StatelessWidget {
               Fx.tap();
               onTap();
             },
-            child: SizedBox(height: 34, child: Icon(icon, size: 20, color: gradient ? Colors.white : color)),
+            child: SizedBox(height: 34, child: Icon(icon, size: 20, color: gradient ? Brand.onAccent : color)),
           ),
         ),
       );

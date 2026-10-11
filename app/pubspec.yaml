@@ -93,6 +93,7 @@ flutter:
     - assets/sfx/
     - assets/icon/icon.png
     - assets/icon/logo.png
+    - assets/icon/splash_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -131,11 +132,14 @@ flutter_launcher_icons:
   web:
     generate: true
     image_path: "assets/icon/icon.png"
-    background_color: "#FF4D6D"
+    background_color: "#160A1F"
+    theme_color: "#160A1F"
 
 flutter_native_splash:
-  color: "#FF4D6D"
-  image: assets/icon/icon_fg.png
+  # Koyu mürdüm zemin + parıltılı logo (uygulama ikonuyla aynı sahne); uygulamanın kendi yükleme
+  # ekranı (router.dart _Splash) aynı renkte olduğu için geçişte beyaz/pembe flaş olmaz.
+  color: "#160A1F"
+  image: assets/icon/splash_logo.png
   android_12:
-    color: "#FF4D6D"
-    image: assets/icon/icon_fg.png
+    color: "#160A1F"
+    image: assets/icon/splash_logo.png

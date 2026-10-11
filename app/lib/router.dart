@@ -110,16 +110,68 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class _Splash extends ConsumerWidget {
+// Native açılış ekranıyla (flutter_native_splash) aynı sahne: koyu mürdüm zemin + parıltılı logo.
+// Oturum yüklenirken beyaz/pembe flaş yerine kesintisiz bir geçiş sağlar; logo hafifçe nefes alır.
+class _Splash extends ConsumerStatefulWidget {
   const _Splash();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_Splash> createState() => _SplashState();
+}
+
+class _SplashState extends ConsumerState<_Splash> with SingleTickerProviderStateMixin {
+  static const _bg = Color(0xFF160A1F);
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1700))
+    ..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final session = ref.watch(sessionProvider);
+    if (session.hasError) {
+      // Hata ekranı koyu zeminde okunaklı kalsın
+      return Theme(
+        data: ThemeData.dark(useMaterial3: true),
+        child: Scaffold(
+          backgroundColor: _bg,
+          body: ErrorRetry(error: session.error!, onRetry: () => ref.invalidate(sessionProvider)),
+        ),
+      );
+    }
+    final scale = Tween<double>(begin: 0.97, end: 1.03).animate(CurvedAnimation(parent: _pulse, curve: Curves.easeInOut));
     return Scaffold(
-      body: session.hasError
-          ? ErrorRetry(error: session.error!, onRetry: () => ref.invalidate(sessionProvider))
-          : const Center(child: CircularProgressIndicator()),
+      backgroundColor: _bg,
+      body: Stack(children: [
+        Center(
+          child: ScaleTransition(
+            scale: scale,
+            child: Image.asset('assets/icon/splash_logo.png', width: 288, height: 288, filterQuality: FilterQuality.medium),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: MediaQuery.paddingOf(context).bottom + 72,
+          child: Center(
+            child: SizedBox(
+              width: 96,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: LinearProgressIndicator(
+                  minHeight: 2.5,
+                  color: const Color(0xFFFF4D6D),
+                  backgroundColor: Colors.white.withValues(alpha: 0.10),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }

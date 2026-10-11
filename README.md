@@ -306,7 +306,7 @@ Her faz en az 5 adımdan oluşur. Ekran önizlemeleri `docs/` klasöründe.
 - [x] **Faz 6 · Sesli ve görüntülü arama:** dakika başı ücret (sesli 15, görüntülü 30 jeton/dk), Agora altyapısı ve test modu, gelen/giden/görüşme ekranları, bulanık başlayan görüntü, arama içi hediyeler, arama sonrası puan ve sorun bildirimi, arama geçmişi, yönetimde arama istatistikleri
 - [x] **Faz 7 · Para çekme ve yayın hazırlığı:** manuel onaylı para çekme (IBAN/PayPal, min. $20, mavi tik şartı), yönetimde Ödemeler ve Hatalar sekmeleri, uygulama ve sunucu hata takibi, yayında eksik ayarla açılmayan sunucu, `.env.example`, yayın rehberi, mağaza metinleri (TR/EN), yasal taslak güncellemeleri, GitHub özel depo
 
-Yayın öncesi seri: önce uygulama (Faz 8–21), dış işler en sonda (Faz 22). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
+Yayın öncesi seri: önce uygulama (Faz 8–22), dış işler en sonda (Faz 23). Ayrıntılar, tespit edilen açıklar ve süre tahmini: [docs/yol-haritasi.md](docs/yol-haritasi.md)
 
 - [x] **Faz 8 · Test altyapısı ve CI:** testler repoya, test veritabanı, birim ve Flutter testleri, arayüz turları, GitHub Actions, yük testi
 - [x] **Faz 9 · Veri ve altyapı sağlamlaştırma:** PostgreSQL, kilitli cüzdan, kalıcı iş kuyruğu, çift işlem önleme, Redis, fotoğraf depolama
@@ -322,7 +322,8 @@ Yayın öncesi seri: önce uygulama (Faz 8–21), dış işler en sonda (Faz 22)
 - [x] **Faz 19 · Kazanç heyecanı:** kazananlar sıralaması, canlı aktivite göstergesi, arama içi gerçek zamanlı kazanç sayacı, kazanç kilometre taşları, zaman sınırlı etkinlikler
 - [x] **Faz 20 · Eşleştirme modları, mağaza ve görsel yenileme:** astroloji/müzik/ilgi/vibe modları ve "neden bu kişi" açıklaması, oda kaldırıldı, mağaza sekmesi (10 balon, 10 arka plan, canlı önizleme, doğrudan kullan), kompakt profil + fotoğraf görüntüleyici, görsel yenileme
 - [ ] **Faz 21 · Agora altyapısı:** gerçek sesli/görüntülü arama için Agora hesabı ve anahtarları, gerçek cihaz testi, maliyet görünürlüğü, kalite
-- [ ] **Faz 22 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
+- [ ] **Faz 22 · Sosyal akış:** yazı tabanlı akış (mavi tikliler paylaşır, herkes yorumlar), ortada Akış sekmesi, mağaza Profil içinde, moderasyon ve bildirimler
+- [ ] **Faz 23 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar
 
