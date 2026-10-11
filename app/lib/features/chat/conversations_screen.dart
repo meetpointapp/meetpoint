@@ -8,6 +8,7 @@ import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import '../matches/matches_screen.dart';
 import '../requests/requests_screen.dart';
 
 // Faz 20: Sohbetler sekmesi iki bölümlü — "Sohbetler" (tüm konuşmalar) ve "İstekler" (gelen/giden
@@ -20,9 +21,10 @@ class ConversationsScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final convs = ref.watch(conversationsProvider);
     final pending = ref.watch(requestsProvider(true)).value?.where((r) => r.isPending).length ?? 0;
+    final newMatches = newMatchCount(convs.value ?? const []);
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.navChats),
@@ -36,6 +38,15 @@ class ConversationsScreen extends ConsumerWidget {
           ],
           bottom: TabBar(tabs: [
             Tab(text: l.navChats),
+            Tab(
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(l.matchesTitle),
+                if (newMatches > 0) ...[
+                  const SizedBox(width: 6),
+                  Badge(label: Text('$newMatches'), backgroundColor: Brand.coral),
+                ],
+              ]),
+            ),
             Tab(
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text(l.navRequests),
@@ -69,6 +80,7 @@ class ConversationsScreen extends ConsumerWidget {
               ),
             ]),
           ),
+          const MatchesBody(),
           const RequestsBody(),
         ]),
       ),

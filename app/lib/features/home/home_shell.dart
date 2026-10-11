@@ -205,41 +205,60 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         ),
       ]),
       // Faz 20: Tinder tarzı yüzen hap alt menü — seçili sekme etiketiyle genişler, diğerleri sadece simge
+      // Beş eşit yuva: Keşfet · Sohbetler · [Akış, büyük ve çubuğun üstüne taşan] · Cüzdan · Profil.
+      // Ortadaki yuva boş bırakılır, Akış düğmesi tam ortasında yüzer; seçili öğe kayıp genişlemez.
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-          child: Container(
-            height: 64,
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(34),
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 22, offset: const Offset(0, 8))],
-            ),
-            child: Row(children: [
-              for (final (i, d) in [
-                (Icons.style_outlined, Icons.style_rounded, l.navDiscover, 0, false),
-                (Icons.favorite_border_rounded, Icons.favorite_rounded, l.matchesTitle, newMatches, false),
-                (Icons.dynamic_feed_outlined, Icons.dynamic_feed_rounded, l.navFeed, 0, false),
-                (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, l.navChats, unread + pending, false),
-                (Icons.account_balance_wallet_outlined, Icons.account_balance_wallet_rounded, l.navWallet, 0, false),
-                (Icons.person_outline_rounded, Icons.person_rounded, l.navProfile, 0, dailyDot),
-              ].indexed)
-                Expanded(
-                  flex: i == 2 ? 3 : (widget.shell.currentIndex == i ? 6 : 2),
-                  child: _NavItem(
-                    icon: d.$1,
-                    selectedIcon: d.$2,
-                    label: d.$3,
-                    badge: d.$4,
-                    dot: d.$5,
-                    center: i == 2,
-                    selected: widget.shell.currentIndex == i,
-                    onTap: () => widget.shell.goBranch(i, initialLocation: i == widget.shell.currentIndex),
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+          child: SizedBox(
+            height: 84,
+            child: Stack(clipBehavior: Clip.none, alignment: Alignment.bottomCenter, children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 64,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(34),
+                    border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 22, offset: const Offset(0, 8))],
                   ),
+                  child: Row(children: [
+                    for (final (i, d) in [
+                      (Icons.style_outlined, Icons.style_rounded, l.navDiscover, 0, false),
+                      (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, l.navChats, unread + pending + newMatches, false),
+                      null, // Akış için boş yuva
+                      (Icons.account_balance_wallet_outlined, Icons.account_balance_wallet_rounded, l.navWallet, 0, false),
+                      (Icons.person_outline_rounded, Icons.person_rounded, l.navProfile, 0, dailyDot),
+                    ].indexed)
+                      Expanded(
+                        child: d == null
+                            ? const SizedBox.shrink()
+                            : _NavItem(
+                                icon: d.$1,
+                                selectedIcon: d.$2,
+                                label: d.$3,
+                                badge: d.$4,
+                                dot: d.$5,
+                                selected: widget.shell.currentIndex == i,
+                                onTap: () => widget.shell.goBranch(i, initialLocation: i == widget.shell.currentIndex),
+                              ),
+                      ),
+                  ]),
                 ),
+              ),
+              // Akış: diğerlerinden büyük, çubuğun üstüne taşan gradyanlı yuvarlak
+              Positioned(
+                bottom: 8,
+                child: _FeedButton(
+                  label: l.navFeed,
+                  selected: widget.shell.currentIndex == 2,
+                  onTap: () => widget.shell.goBranch(2, initialLocation: widget.shell.currentIndex == 2),
+                ),
+              ),
             ]),
           ),
         ),
@@ -248,50 +267,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 }
 
-class _NavItem extends StatelessWidget {
-  const _NavItem({required this.icon, required this.selectedIcon, required this.label, required this.badge, required this.dot, required this.selected, required this.onTap, this.center = false});
-  final IconData icon;
-  final IconData selectedIcon;
+class _FeedButton extends StatelessWidget {
+  const _FeedButton({required this.label, required this.selected, required this.onTap});
   final String label;
-  final int badge;
-  // Sayı yerine sadece kırmızı nokta (ör. günlük ödül hazır)
-  final bool dot;
   final bool selected;
-  // Ortadaki Akış düğmesi: her zaman gradyanlı yuvarlak, etiketsiz
-  final bool center;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final color = selected ? Brand.coral : scheme.onSurfaceVariant;
-    if (center) {
-      return Semantics(
-        button: true,
-        selected: selected,
-        label: label,
-        excludeSemantics: true,
-        onTap: onTap,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              width: selected ? 54 : 50,
-              height: selected ? 54 : 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: Brand.gradient,
-                boxShadow: [BoxShadow(color: Brand.coral.withValues(alpha: selected ? 0.5 : 0.32), blurRadius: selected ? 18 : 12, offset: const Offset(0, 5))],
-              ),
-              child: Icon(selected ? selectedIcon : icon, color: Brand.onAccent, size: 26),
-            ),
-          ),
-        ),
-      );
-    }
+    final size = selected ? 68.0 : 64.0;
     return Semantics(
       button: true,
       selected: selected,
@@ -301,32 +285,70 @@ class _NavItem extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            height: 46,
-            padding: EdgeInsets.symmetric(horizontal: selected ? 14 : 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(26),
-              color: selected ? Brand.coral.withValues(alpha: 0.14) : Colors.transparent,
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Badge(
-                isLabelVisible: badge > 0 || dot,
-                smallSize: badge > 0 ? null : 10,
-                backgroundColor: const Color(0xFFE5383B),
-                textColor: Colors.white,
-                label: badge > 0 ? Text(badge > 99 ? '99+' : '$badge') : null,
-                child: Icon(selected ? selectedIcon : icon, color: color, size: 24),
-              ),
-              if (selected) ...[
-                const SizedBox(width: 6),
-                Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 12.5))),
-              ],
-            ]),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: Brand.gradient,
+            // Çubuktan ayrışması için zemin renginde halka
+            border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 4),
+            boxShadow: [BoxShadow(color: Brand.coral.withValues(alpha: selected ? 0.55 : 0.38), blurRadius: selected ? 22 : 16, offset: const Offset(0, 6))],
           ),
+          child: Icon(selected ? Icons.dynamic_feed_rounded : Icons.dynamic_feed_outlined, color: Brand.onAccent, size: 30),
         ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({required this.icon, required this.selectedIcon, required this.label, required this.badge, required this.dot, required this.selected, required this.onTap});
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final int badge;
+  // Sayı yerine sadece kırmızı nokta (ör. günlük ödül hazır)
+  final bool dot;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final color = selected ? Brand.coral : scheme.onSurfaceVariant;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Badge(
+            isLabelVisible: badge > 0 || dot,
+            smallSize: badge > 0 ? null : 10,
+            backgroundColor: const Color(0xFFE5383B),
+            textColor: Colors.white,
+            label: badge > 0 ? Text(badge > 99 ? '99+' : '$badge') : null,
+            child: AnimatedScale(
+              duration: const Duration(milliseconds: 180),
+              scale: selected ? 1.12 : 1,
+              child: Icon(selected ? selectedIcon : icon, color: color, size: 25),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: color, fontWeight: selected ? FontWeight.w800 : FontWeight.w600, fontSize: 10.5),
+          ),
+        ]),
       ),
     );
   }

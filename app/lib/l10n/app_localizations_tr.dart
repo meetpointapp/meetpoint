@@ -3400,4 +3400,66 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errContactInfo =>
       'Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz.';
+
+  @override
+  String get postBoost => 'Öne çıkar';
+
+  @override
+  String postBoostExtend(int n) {
+    return '$n saat daha uzat';
+  }
+
+  @override
+  String get postBoostExtendShort => 'Öne çıkarmayı uzat';
+
+  @override
+  String get postBoostTitle => 'Gönderini öne çıkar';
+
+  @override
+  String postBoostBody(int n) {
+    return 'Gönderin $n saat boyunca \"Herkes\" akışının en üstünde durur. Süren bir öne çıkarma uzatılabilir.';
+  }
+
+  @override
+  String get postBoosted => 'Gönderin öne çıkarıldı';
+
+  @override
+  String get postBoostedTag => 'Öne çıkarıldı';
+
+  @override
+  String get postPin => 'Profile sabitle';
+
+  @override
+  String get postUnpin => 'Sabitlemeyi kaldır';
+
+  @override
+  String get postPinned => 'Sabitlenmiş';
+
+  @override
+  String get postPinnedDone => 'Gönderi profiline sabitlendi';
+
+  @override
+  String get postUnpinned => 'Sabitleme kaldırıldı';
+
+  @override
+  String get postShareImage => 'Görsel olarak paylaş';
+
+  @override
+  String get sharePostSubtitle => 'VibeUpMe\'da paylaştı';
+
+  @override
+  String get adSponsored => 'SPONSORLU';
+
+  @override
+  String get adOpenFailed => 'Bağlantı açılamadı';
+
+  @override
+  String get premiumPerkNoAdsTitle => 'Reklamsız akış';
+
+  @override
+  String get premiumPerkNoAds => 'Akışta sponsorlu içerik görmezsin';
+
+  @override
+  String get errPostBoostMax =>
+      'Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin.';
 }

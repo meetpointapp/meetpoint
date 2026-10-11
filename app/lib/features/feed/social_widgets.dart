@@ -3,8 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/models.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../core/api.dart';
+import '../../core/fx.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
+import '../../core/share_card.dart';
+import '../../core/share_templates.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
@@ -167,12 +173,13 @@ class _FollowButtonState extends ConsumerState<FollowButton> {
 
 // Akıştaki / profildeki / detaydaki gönderi kartı
 class PostCard extends ConsumerStatefulWidget {
-  const PostCard({super.key, required this.post, required this.onChanged, this.onDeleted, this.onTap, this.detail = false});
+  const PostCard({super.key, required this.post, required this.onChanged, this.onDeleted, this.onTap, this.detail = false, this.showPinned = false});
   final Post post;
   final ValueChanged<Post> onChanged;
   final VoidCallback? onDeleted;
   final VoidCallback? onTap;
   final bool detail; // gönderi detayında: yazı büyük, kart çerçevesiz
+  final bool showPinned; // "Sabitlenmiş" etiketi sadece profil listelerinde gösterilir
 
   @override
   ConsumerState<PostCard> createState() => _PostCardState();
@@ -223,6 +230,78 @@ class _PostCardState extends ConsumerState<PostCard> {
     }
   }
 
+  // Jetonla öne çıkar: "Herkes" akışının en üstüne taşır (süreli); sürenler uzatılır
+  Future<void> _boost() async {
+    final l = AppLocalizations.of(context);
+    final prices = (await ref.read(walletProvider.future)).featurePrices;
+    if (!mounted) return;
+    final ok = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(shape: BoxShape.circle, gradient: Brand.gradient),
+              child: Icon(Icons.rocket_launch_rounded, color: Brand.onAccent, size: 32),
+            ),
+            const SizedBox(height: 14),
+            Text(l.postBoostTitle, style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 6),
+            Text(l.postBoostBody(prices.postBoostHours), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            GradientButton(
+              label: widget.post.boosted ? l.postBoostExtend(prices.postBoostHours) : l.postBoost,
+              icon: Icons.bolt_rounded,
+              coin: prices.postBoost,
+              onPressed: () => Navigator.pop(ctx, true),
+            ),
+          ]),
+        ),
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      final updated = await ref.read(apiProvider).boostPost(widget.post.id);
+      ref.invalidate(walletProvider);
+      ref.invalidate(meProvider);
+      Fx.success();
+      widget.onChanged(updated);
+      if (mounted) showSnack(context, l.postBoosted);
+    } catch (e) {
+      if (!mounted) return;
+      final low = e is ApiException && e.code == 'insufficient_balance';
+      showSnack(context, errorText(l, e), action: low ? SnackBarAction(label: l.topUp, onPressed: () => context.go('/wallet')) : null);
+    }
+  }
+
+  Future<void> _togglePin() async {
+    final l = AppLocalizations.of(context);
+    final p = widget.post;
+    try {
+      if (p.pinned) {
+        await ref.read(apiProvider).unpinPost(p.id);
+      } else {
+        await ref.read(apiProvider).pinPost(p.id);
+      }
+      widget.onChanged(p.copyWith(pinned: !p.pinned));
+      if (mounted) showSnack(context, p.pinned ? l.postUnpinned : l.postPinnedDone);
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(l, e));
+    }
+  }
+
+  Future<void> _share() async {
+    final l = AppLocalizations.of(context);
+    try {
+      await shareCardImage(context, card: postShareCard(l, widget.post));
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(l, e));
+    }
+  }
+
   Future<void> _block() async {
     final l = AppLocalizations.of(context);
     final name = widget.post.author.displayName;
@@ -259,6 +338,15 @@ class _PostCardState extends ConsumerState<PostCard> {
     final content = Padding(
       padding: EdgeInsets.fromLTRB(14, 12, 6, detail ? 8 : 6),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if ((p.pinned && widget.showPinned) || p.boosted)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [
+              if (p.pinned && widget.showPinned) _Tag(icon: Icons.push_pin_rounded, label: l.postPinned, color: theme.colorScheme.onSurfaceVariant),
+              if (p.pinned && widget.showPinned && p.boosted) const SizedBox(width: 8),
+              if (p.boosted) _Tag(icon: Icons.bolt_rounded, label: l.postBoostedTag, color: Brand.coral),
+            ]),
+          ),
         Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           GestureDetector(onTap: () => context.push('/user/${a.id}'), child: Avatar(a, radius: 22)),
           const SizedBox(width: 10),
@@ -284,6 +372,12 @@ class _PostCardState extends ConsumerState<PostCard> {
               switch (v) {
                 case 'delete':
                   _delete();
+                case 'boost':
+                  _boost();
+                case 'pin':
+                  _togglePin();
+                case 'share':
+                  _share();
                 case 'report':
                   reportContent(context, ref, type: 'posts', id: p.id);
                 case 'block':
@@ -296,6 +390,9 @@ class _PostCardState extends ConsumerState<PostCard> {
               }
             },
             itemBuilder: (_) => [
+              if (p.mine) PopupMenuItem(value: 'boost', child: Text(p.boosted ? l.postBoostExtendShort : l.postBoost)),
+              if (p.mine) PopupMenuItem(value: 'pin', child: Text(p.pinned ? l.postUnpin : l.postPin)),
+              PopupMenuItem(value: 'share', child: Text(l.postShareImage)),
               if (p.mine) PopupMenuItem(value: 'delete', child: Text(l.postDelete)),
               if (!p.mine && p.following) PopupMenuItem(value: 'unfollow', child: Text(l.unfollow)),
               if (!p.mine) PopupMenuItem(value: 'report', child: Text(l.postReport)),
@@ -476,6 +573,7 @@ class _PostsPreviewState extends ConsumerState<PostsPreview> {
       ),
       for (var i = 0; i < posts.length; i++) ...[
         PostCard(
+          showPinned: true,
           post: posts[i],
           onChanged: (u) => setState(() => posts[i] = u),
           onDeleted: () => setState(() => posts.removeAt(i)),
@@ -484,5 +582,84 @@ class _PostsPreviewState extends ConsumerState<PostsPreview> {
         const SizedBox(height: 10),
       ],
     ]);
+  }
+}
+
+class _Tag extends StatelessWidget {
+  const _Tag({required this.icon, required this.label, required this.color});
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 11.5)),
+      ]);
+}
+
+// Akıştaki "Sponsorlu" reklam kartı. Görününce bir gösterim, düğmeye basınca bir tıklama sayılır.
+class AdCard extends ConsumerStatefulWidget {
+  const AdCard({super.key, required this.ad});
+  final AdItem ad;
+
+  @override
+  ConsumerState<AdCard> createState() => _AdCardState();
+}
+
+class _AdCardState extends ConsumerState<AdCard> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(apiProvider).adImpression(widget.ad.id).catchError((_) {});
+  }
+
+  Future<void> _open() async {
+    final l = AppLocalizations.of(context);
+    ref.read(apiProvider).adClick(widget.ad.id).catchError((_) {});
+    final uri = Uri.tryParse(widget.ad.url);
+    final ok = uri != null && uri.scheme == 'https' && await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && mounted) showSnack(context, l.adOpenFailed);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final ad = widget.ad;
+    final colors = storyGradientOf(ad.accent);
+    final fg = storyTextColorOf(ad.accent);
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(Brand.radius),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(color: fg.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(10)),
+            child: Text(l.adSponsored, style: TextStyle(color: fg, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Text(ad.advertiser, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: fg.withValues(alpha: 0.9), fontWeight: FontWeight.w700, fontSize: 13))),
+        ]),
+        const SizedBox(height: 10),
+        Text(ad.title, style: TextStyle(color: fg, fontWeight: FontWeight.w900, fontSize: 19, height: 1.2)),
+        if (ad.body.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(ad.body, style: TextStyle(color: fg.withValues(alpha: 0.92), fontSize: 14.5, height: 1.35)),
+        ],
+        if (ad.ctaLabel.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: _open,
+            style: FilledButton.styleFrom(backgroundColor: fg, foregroundColor: colors.first, minimumSize: const Size(0, 40), shape: const StadiumBorder()),
+            child: Text(ad.ctaLabel, style: const TextStyle(fontWeight: FontWeight.w800)),
+          ),
+        ],
+      ]),
+    );
   }
 }

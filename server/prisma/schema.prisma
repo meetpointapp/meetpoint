@@ -1198,3 +1198,25 @@ model StoryView {
   @@id([storyId, userId])
   @@index([userId, createdAt])
 }
+
+// Faz 22: dış reklam alanı. Akışta "Sponsorlu" etiketiyle gösterilir; VibeUpMe+ üyelere gösterilmez.
+// Reklamlar yönetim panelinden (Reklamlar sekmesi) oluşturulur; gösterim ve tıklama sayaçları tutulur.
+model Ad {
+  id          String    @id @default(cuid())
+  advertiser  String // reklam veren (etikette görünür)
+  title       String
+  body        String    @default("")
+  ctaLabel    String    @default("")
+  url         String // https bağlantı (tıklayınca harici tarayıcıda açılır)
+  accent      String    @default("sunset") // zemin rengi kimliği (hikaye gradyanlarıyla aynı)
+  active      Boolean   @default(true)
+  weight      Int       @default(1) // dönüşümde ağırlık
+  startsAt    DateTime  @default(now())
+  endsAt      DateTime?
+  impressions Int       @default(0)
+  clicks      Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([active, startsAt])
+}

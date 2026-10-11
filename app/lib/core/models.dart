@@ -1126,6 +1126,9 @@ class FeaturePrices {
   final int boostMinutes;
   final int likesUnlock;
   final int likesUnlockHours;
+  // Faz 22: gönderiyi akışta öne çıkarma
+  final int postBoost;
+  final int postBoostHours;
 
   const FeaturePrices({
     required this.superLike,
@@ -1133,6 +1136,8 @@ class FeaturePrices {
     required this.boostMinutes,
     required this.likesUnlock,
     required this.likesUnlockHours,
+    this.postBoost = 60,
+    this.postBoostHours = 6,
   });
 
   factory FeaturePrices.fromJson(Map<String, dynamic> j) => FeaturePrices(
@@ -1141,6 +1146,8 @@ class FeaturePrices {
         boostMinutes: j['boostMinutes'],
         likesUnlock: j['likesUnlock'],
         likesUnlockHours: j['likesUnlockHours'],
+        postBoost: j['postBoost'] ?? 60,
+        postBoostHours: j['postBoostHours'] ?? 6,
       );
 }
 
@@ -1760,6 +1767,9 @@ class Post {
   final bool mine;
   final PublicProfile author;
   final bool following; // yazarı takip ediyorum
+  final bool boosted; // jetonla öne çıkarılmış
+  final DateTime? boostedUntil; // sadece sahibine
+  final bool pinned; // profile sabitlenmiş
   const Post({
     required this.id,
     required this.body,
@@ -1771,6 +1781,9 @@ class Post {
     required this.mine,
     required this.author,
     required this.following,
+    this.boosted = false,
+    this.boostedUntil,
+    this.pinned = false,
   });
   factory Post.fromJson(Map<String, dynamic> j) => Post(
         id: j['id'],
@@ -1783,8 +1796,11 @@ class Post {
         mine: j['mine'] ?? false,
         author: PublicProfile.fromJson(Map<String, dynamic>.from(j['author'])),
         following: j['following'] ?? false,
+        boosted: j['boosted'] ?? false,
+        boostedUntil: j['boostedUntil'] == null ? null : _date(j['boostedUntil']),
+        pinned: j['pinned'] ?? false,
       );
-  Post copyWith({int? likeCount, int? commentCount, bool? likedByMe, bool? following}) => Post(
+  Post copyWith({int? likeCount, int? commentCount, bool? likedByMe, bool? following, bool? pinned}) => Post(
         id: id,
         body: body,
         interest: interest,
@@ -1795,6 +1811,9 @@ class Post {
         mine: mine,
         author: author,
         following: following ?? this.following,
+        boosted: boosted,
+        boostedUntil: boostedUntil,
+        pinned: pinned ?? this.pinned,
       );
 }
 
@@ -1816,13 +1835,36 @@ class PostComment {
       );
 }
 
+// Akışta "Sponsorlu" etiketiyle görünen dış reklam
+class AdItem {
+  final String id;
+  final String advertiser;
+  final String title;
+  final String body;
+  final String ctaLabel;
+  final String url;
+  final String accent;
+  const AdItem({required this.id, required this.advertiser, required this.title, this.body = '', this.ctaLabel = '', required this.url, this.accent = 'sunset'});
+  factory AdItem.fromJson(Map<String, dynamic> j) => AdItem(
+        id: j['id'],
+        advertiser: j['advertiser'],
+        title: j['title'],
+        body: j['body'] ?? '',
+        ctaLabel: j['ctaLabel'] ?? '',
+        url: j['url'],
+        accent: j['accent'] ?? 'sunset',
+      );
+}
+
 class FeedPage {
   final List<Post> posts;
   final String? next;
-  const FeedPage(this.posts, this.next);
+  final AdItem? ad;
+  const FeedPage(this.posts, this.next, [this.ad]);
   factory FeedPage.fromJson(Map<String, dynamic> j) => FeedPage(
         [for (final p in (j['posts'] as List? ?? const [])) Post.fromJson(Map<String, dynamic>.from(p))],
         j['next'] as String?,
+        j['ad'] == null ? null : AdItem.fromJson(Map<String, dynamic>.from(j['ad'])),
       );
 }
 

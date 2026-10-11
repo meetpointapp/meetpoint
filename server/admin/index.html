@@ -65,6 +65,7 @@
         <button data-tab="purchases" data-roles="finance" class="tab">Satışlar</button>
         <button data-tab="payouts" data-roles="finance" class="tab">Ödemeler <span id="count-payouts" class="count"></span></button>
         <button data-tab="finance" data-roles="finance" class="tab">Finans <span id="count-kyc" class="count"></span></button>
+        <button data-tab="ads" data-roles="finance" class="tab">Reklamlar</button>
         <button data-tab="errors" data-roles="" class="tab">Hatalar <span id="count-errors" class="count"></span></button>
         <button data-tab="kvkk" data-roles="" class="tab">KVKK <span id="count-dsr" class="count"></span></button>
         <button data-tab="legal" data-roles="" class="tab">Resmi talepler <span id="count-legal" class="count"></span></button>
@@ -329,6 +330,29 @@
         <p class="muted">Yönetim ekibinin yaptığı her işlem ve hassas veri görüntülemesi (IBAN, selfie). Kayıtlar değiştirilemez ve silinemez.</p>
         <div id="audit" class="list"></div>
         <div class="actions center"><button id="audit-more" class="btn soft hidden">Daha eski kayıtlar</button></div>
+      </div>
+
+      <div id="tab-ads" class="panel hidden">
+        <div class="card" style="margin-bottom:12px">
+          <div class="item-title">Yeni reklam</div>
+          <p class="muted small">Akışta "Sponsorlu" etiketiyle görünür; VibeUpMe+ üyelere gösterilmez. Bağlantı https olmalı.</p>
+          <form id="ad-form" style="display:grid;gap:8px;margin-top:8px">
+            <input name="advertiser" placeholder="Reklam veren (ör. Kafe Moda)" maxlength="60" required>
+            <input name="title" placeholder="Başlık" maxlength="80" required>
+            <input name="body" placeholder="Açıklama (isteğe bağlı)" maxlength="200">
+            <input name="ctaLabel" placeholder="Düğme yazısı (ör. Göz at)" maxlength="24">
+            <input name="url" type="url" placeholder="https://…" required>
+            <select name="accent">
+              <option value="sunset">Gün batımı</option><option value="ocean">Okyanus</option><option value="forest">Orman</option>
+              <option value="grape">Üzüm</option><option value="night">Gece</option><option value="rose">Gül</option><option value="gold">Altın</option>
+            </select>
+            <label class="muted small">Ağırlık (1-10) <input name="weight" type="number" min="1" max="10" value="1" style="width:70px"></label>
+            <label class="muted small">Başlangıç <input name="startsAt" type="datetime-local"></label>
+            <label class="muted small">Bitiş (boşsa süresiz) <input name="endsAt" type="datetime-local"></label>
+            <button class="btn" type="submit">Reklamı ekle</button>
+          </form>
+        </div>
+        <div id="ads" class="list"></div>
       </div>
 
       <div id="tab-users" class="panel hidden">

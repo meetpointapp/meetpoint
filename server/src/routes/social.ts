@@ -12,6 +12,8 @@ import { fileReport, REPORT_REASONS } from '../moderation/reports';
 import { requireNotRestricted } from '../moderation/sanctions';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
+import { economy } from '../config';
+import { debit, lockWallet } from '../wallet';
 import { blockedIdsOf, cursorOf, dayAgo, parseCursor, requireVerified, snippet, social, socialStats, visibleAuthor } from '../social';
 import { publicProfile } from './profile';
 
@@ -49,6 +51,10 @@ function postDto(p: PostRow, me: string, liked: Set<string>, following: Set<stri
     mine: p.authorId === me,
     author,
     following: following.has(p.authorId),
+    // Faz 22: jetonla öne çıkarılmış mı / profile sabitlenmiş mi
+    boosted: !!p.boostedUntil && p.boostedUntil.getTime() > Date.now(),
+    boostedUntil: p.authorId === me && p.boostedUntil && p.boostedUntil.getTime() > Date.now() ? p.boostedUntil : null,
+    pinned: p.pinnedAt !== null,
   };
 }
 
@@ -98,6 +104,19 @@ socialRouter.get('/feed', async (req, res) => {
   const cursor = parseCursor(q.before);
   if (cursor) and.push({ OR: [{ createdAt: { lt: cursor.createdAt } }, { createdAt: cursor.createdAt, id: { lt: cursor.id } }] });
 
+  // Faz 22: "Herkes" sekmesinde öne çıkarılan gönderiler sadece ilk sayfada en üstte durur;
+  // kronolojik sorgudan çıkarılır (sayfalar arasında tekrar görünmesin)
+  const now = new Date();
+  let boosted: PostRow[] = [];
+  if (q.tab === 'all') {
+    and.push({ OR: [{ boostedUntil: null }, { boostedUntil: { lte: now } }] });
+    if (!cursor) {
+      const base: Prisma.PostWhereInput[] = [{ hiddenAt: null }, { author: visibleAuthor }, { boostedUntil: { gt: now } }];
+      if (blocked.length) base.push({ authorId: { notIn: blocked } });
+      boosted = await prisma.post.findMany({ where: { AND: base }, orderBy: [{ boostedUntil: 'desc' }], take: 3, include: { author: authorInclude } });
+    }
+  }
+
   const rows = await prisma.post.findMany({
     where: { AND: and },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -105,8 +124,26 @@ socialRouter.get('/feed', async (req, res) => {
     include: { author: authorInclude },
   });
   const page = rows.slice(0, q.limit);
-  res.json({ posts: await hydratePosts(page, me), next: rows.length > q.limit ? cursorOf(page[page.length - 1]) : null });
+  const ad = q.tab === 'all' || q.tab === 'interests' ? await pickAd(me) : null;
+  res.json({
+    posts: await hydratePosts([...boosted, ...page], me),
+    next: rows.length > q.limit ? cursorOf(page[page.length - 1]) : null,
+    ad,
+  });
 });
+
+// Reklam seçimi: aktif ve tarih aralığındakiler arasından ağırlıklı rastgele. VibeUpMe+ üyelere reklam gösterilmez.
+async function pickAd(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { premiumUntil: true } });
+  if (user?.premiumUntil && user.premiumUntil > new Date()) return null;
+  const now = new Date();
+  const ads = await prisma.ad.findMany({ where: { active: true, startsAt: { lte: now }, OR: [{ endsAt: null }, { endsAt: { gt: now } }] } });
+  if (ads.length === 0) return null;
+  const total = ads.reduce((sum, a) => sum + Math.max(1, a.weight), 0);
+  let r = Math.random() * total;
+  const ad = ads.find((a) => (r -= Math.max(1, a.weight)) < 0) ?? ads[0];
+  return { id: ad.id, advertiser: ad.advertiser, title: ad.title, body: ad.body, ctaLabel: ad.ctaLabel, url: ad.url, accent: ad.accent };
+}
 
 // Bir kullanıcının gönderileri (profildeki "Gönderiler")
 socialRouter.get('/users/:id/posts', async (req, res) => {
@@ -116,6 +153,12 @@ socialRouter.get('/users/:id/posts', async (req, res) => {
   if (target !== me && (await isBlockedEitherWay(me, target))) throw new HttpError(404, 'not_found');
   const and: Prisma.PostWhereInput[] = [{ authorId: target }, { hiddenAt: null }, { author: visibleAuthor }];
   const cursor = parseCursor(q.before);
+  // Faz 22: sabitlenen gönderi ilk sayfada en üstte durur, kronolojik listeden çıkarılır
+  let pinned: PostRow[] = [];
+  if (!cursor) {
+    pinned = await prisma.post.findMany({ where: { AND: [...and, { pinnedAt: { not: null } }] }, orderBy: { pinnedAt: 'desc' }, take: 1, include: { author: authorInclude } });
+  }
+  and.push({ pinnedAt: null });
   if (cursor) and.push({ OR: [{ createdAt: { lt: cursor.createdAt } }, { createdAt: cursor.createdAt, id: { lt: cursor.id } }] });
   const rows = await prisma.post.findMany({
     where: { AND: and },
@@ -124,7 +167,7 @@ socialRouter.get('/users/:id/posts', async (req, res) => {
     include: { author: authorInclude },
   });
   const page = rows.slice(0, q.limit);
-  res.json({ posts: await hydratePosts(page, me), next: rows.length > q.limit ? cursorOf(page[page.length - 1]) : null });
+  res.json({ posts: await hydratePosts([...pinned, ...page], me), next: rows.length > q.limit ? cursorOf(page[page.length - 1]) : null });
 });
 
 // ---------------------------------------------------------------- Gönderi
@@ -177,6 +220,57 @@ socialRouter.delete('/posts/:id', async (req, res) => {
   const post = await prisma.post.findFirst({ where: { id: pid(req), authorId: uid(req) } });
   if (!post) throw new HttpError(404, 'not_found');
   await prisma.post.delete({ where: { id: post.id } });
+  res.json({ ok: true });
+});
+
+// ---------------------------------------------------------------- Öne çıkarma ve sabitleme (Faz 22)
+// Jetonla gönderiyi "Herkes" akışının en üstüne taşır (süreli). Süren öne çıkarma uzatılabilir, toplam süre sınırlıdır.
+socialRouter.post('/posts/:id/boost', requireNotRestricted, socialWriteLimiter, async (req, res) => {
+  const me = uid(req);
+  const post = await prisma.post.findFirst({ where: { id: pid(req), authorId: me, hiddenAt: null } });
+  if (!post) throw new HttpError(404, 'not_found');
+  await prisma.$transaction(async (tx) => {
+    await lockWallet(tx, me);
+    const fresh = await tx.post.findUniqueOrThrow({ where: { id: post.id } });
+    const now = Date.now();
+    const active = fresh.boostedUntil && fresh.boostedUntil.getTime() > now ? fresh.boostedUntil.getTime() : null;
+    const add = economy.postBoostHours * 3_600_000;
+    if (active && active - now + add > economy.postBoostMaxHours * 3_600_000) throw new HttpError(409, 'post_boost_max_reached');
+    await debit(tx, me, economy.postBoostPrice, 'SPEND', { note: active ? 'post_boost_extend' : 'post_boost' });
+    await tx.post.update({ where: { id: post.id }, data: { boostedUntil: new Date((active ?? now) + add) } });
+  });
+  const fresh = await prisma.post.findUniqueOrThrow({ where: { id: post.id }, include: { author: authorInclude } });
+  const [dto] = await hydratePosts([fresh], me);
+  res.json(dto);
+});
+
+// Profile sabitleme: en fazla bir gönderi; yenisi öncekini kaldırır
+socialRouter.put('/posts/:id/pin', async (req, res) => {
+  const me = uid(req);
+  const post = await prisma.post.findFirst({ where: { id: pid(req), authorId: me, hiddenAt: null } });
+  if (!post) throw new HttpError(404, 'not_found');
+  await prisma.$transaction([
+    prisma.post.updateMany({ where: { authorId: me, pinnedAt: { not: null } }, data: { pinnedAt: null } }),
+    prisma.post.update({ where: { id: post.id }, data: { pinnedAt: new Date() } }),
+  ]);
+  res.json({ pinned: true });
+});
+
+socialRouter.delete('/posts/:id/pin', async (req, res) => {
+  await prisma.post.updateMany({ where: { id: pid(req), authorId: uid(req) }, data: { pinnedAt: null } });
+  res.json({ pinned: false });
+});
+
+// Reklam sayaçları: uygulama reklam görününce ve tıklanınca çağırır (kullanıcı kimliği saklanmaz)
+socialRouter.post('/ads/:id/impression', socialWriteLimiter, async (req, res) => {
+  const { count } = await prisma.ad.updateMany({ where: { id: pid(req), active: true }, data: { impressions: { increment: 1 } } });
+  if (count === 0) throw new HttpError(404, 'not_found');
+  res.json({ ok: true });
+});
+
+socialRouter.post('/ads/:id/click', socialWriteLimiter, async (req, res) => {
+  const { count } = await prisma.ad.updateMany({ where: { id: pid(req), active: true }, data: { clicks: { increment: 1 } } });
+  if (count === 0) throw new HttpError(404, 'not_found');
   res.json({ ok: true });
 });
 

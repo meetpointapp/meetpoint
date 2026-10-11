@@ -98,6 +98,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/stories/user/:id', builder: (_, s) => StoryByUserScreen(userId: s.pathParameters['id']!)),
       GoRoute(path: '/story/new', builder: (_, _) => const StoryComposerScreen()),
       GoRoute(path: '/store', builder: (_, _) => const StoreScreen()),
+      GoRoute(path: '/matches', builder: (_, _) => const MatchesScreen()),
       GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
       GoRoute(path: '/discover/groups/:interestId', builder: (_, s) => InterestGroupScreen(interestId: s.pathParameters['interestId']!)),
       GoRoute(
@@ -115,9 +116,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _, shell) => HomeShell(shell: shell),
         branches: [
           StatefulShellBranch(routes: [GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/matches', builder: (_, _) => const MatchesScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/feed', builder: (_, _) => const FeedScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/chats', builder: (_, _) => const ConversationsScreen())]),
+          StatefulShellBranch(routes: [GoRoute(path: '/feed', builder: (_, _) => const FeedScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/me', builder: (_, _) => const MeScreen())]),
         ],

@@ -1922,5 +1922,38 @@
   "errCommentLimit": "Bugünkü yorum hakkın doldu. Yarın tekrar yorum yapabilirsin.",
   "errStoryLimit": "Bugünkü hikaye hakkın doldu.",
   "errDuplicatePost": "Bu gönderiyi zaten paylaştın.",
-  "errContactInfo": "Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz."
+  "errContactInfo": "Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz.",
+  "postBoost": "Öne çıkar",
+  "postBoostExtend": "{n} saat daha uzat",
+  "@postBoostExtend": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "postBoostExtendShort": "Öne çıkarmayı uzat",
+  "postBoostTitle": "Gönderini öne çıkar",
+  "postBoostBody": "Gönderin {n} saat boyunca \"Herkes\" akışının en üstünde durur. Süren bir öne çıkarma uzatılabilir.",
+  "@postBoostBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "postBoosted": "Gönderin öne çıkarıldı",
+  "postBoostedTag": "Öne çıkarıldı",
+  "postPin": "Profile sabitle",
+  "postUnpin": "Sabitlemeyi kaldır",
+  "postPinned": "Sabitlenmiş",
+  "postPinnedDone": "Gönderi profiline sabitlendi",
+  "postUnpinned": "Sabitleme kaldırıldı",
+  "postShareImage": "Görsel olarak paylaş",
+  "sharePostSubtitle": "VibeUpMe'da paylaştı",
+  "adSponsored": "SPONSORLU",
+  "adOpenFailed": "Bağlantı açılamadı",
+  "premiumPerkNoAdsTitle": "Reklamsız akış",
+  "premiumPerkNoAds": "Akışta sponsorlu içerik görmezsin",
+  "errPostBoostMax": "Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin."
 }

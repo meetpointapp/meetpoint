@@ -436,16 +436,16 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 **Kararlar (2026-10-12):**
 - **Kapsam:** herkese açık tek akış; sekmeler "Herkes / Takip / İlgi alanlarım / Eşleşmelerim". Tek yönlü takip (karşılıklı takip = "takipleşme").
 - **Kim yazar:** gönderi, yorum ve hikaye sadece **mavi tikli** hesaplara açık; okuma, beğeni ve takip herkese açık. Spam, taciz ve sahte hesap yükü azalır.
-- **Alt menü:** Keşfet · Eşleşmeler · **Akış (ortada, gradyanlı yuvarlak)** · Sohbetler · Cüzdan · Profil. Mağaza Profil içine taşındı (büyük kart).
-- **İlk sürüm sınırları:** 280 karakter, düz yorum listesi (iç içe yok), görsel paylaşım sadece hikayede.
+- **Alt menü:** Keşfet · Sohbetler · **Akış (tam ortada, diğerlerinden büyük, çubuğun üstüne taşan gradyanlı yuvarlak)** · Cüzdan · Profil; beş eşit yuva. Mağaza Profil içine taşındı (büyük kart); Eşleşmeler Sohbetler ekranında "Sohbetler / Eşleşmeler / İstekler" sekmesi oldu (yeni eşleşme sayısı Sohbetler rozetine eklenir).
+- **İlk sürüm sınırları:** 280 karakter, düz yorum listesi (iç içe yok), görsel paylaşım sadece hikayede. Gönderi öne çıkarma/sabitleme ve reklam alanı Faz 22'nin ikinci turunda tamamlandı.
 
 1. ✅ **Veri modeli ve akış.** `Post`, `PostLike`, `PostComment`, `Follow`, `Story`, `StoryView` (migration `20261012120000_faz22_social`); sayfalamalı akış (`GET /feed?tab=`), engellenen/silinen/yasaklı hesaplar hariç. Kotalar: günde 5 gönderi, 60 yorum, 10 hikaye; aynı metin 24 saatte tekrar atılamaz; Idempotency-Key ve rate limit.
 2. ✅ **Güvenlik ve moderasyon.** Telefon/e-posta/bağlantı/sosyal hesap içeren metin reddedilir (`contact_info_not_allowed`); gönderi, yorum ve hikaye şikayeti (`Report.subjectType/subjectId/subjectText`, içerik silinse de panelde görünür); yaptırımla kısıt; fotoğraf hikayesinde ten oranı şüphesi gizler ve kuyruğa düşürür; panelde kuyruktaki şikayetlerde "İçeriği kaldır"; engelleme takipleri düşürür; KVKK envanteri, dışa aktarma ve hesap silme.
 3. ✅ **Akış ekranı ve paylaşım.** Hikaye halkaları, sekmeli sonsuz akış, "Aklından ne geçiyor?" kutusu, paylaşım sayfası (karakter sayacı, ilgi alanı etiketi), gönderi detayı ve yorumlar, kendi gönderisini silme, şikayet/engelle menüsü, mavi tik kapısı (doğrulanmamışa açıklama + doğrulama yönlendirmesi).
 4. ✅ **Alt menü ve gezinti.** Ortada Akış düğmesi; mağaza `/store` olarak Profil'den açılır; cüzdan alt menüde kaldı.
 5. ✅ **Bildirimler ve bağlantı.** Beğeni/yorum/yeni takipçi bildirimi (yeni "Sosyal akış" tercihi, sessiz saatlere uyar); profilde takipçi/takip/gönderi sayıları, takip düğmesi, son gönderiler ve hikaye halkası; takipçi/takip listeleri; kendi profilimde sayaçlar.
-6. ⏳ **Gelir ve büyüme (sonraya).** Gönderiyi jetonla öne çıkarma ve profile sabitleme (`Post.boostedUntil/pinnedAt` alanları hazır), paylaşılabilir gönderi kartı, dış reklam alanı (`Post.kind = 'ad'`).
-7. ✅ **Test ve belgeler.** Sunucu API testi (`test/api/social.test.ts`), canlı kontrol betiği (`tools/ui-tours/social-api.mjs`), demo veri (`social-seed.mjs`), UI turu (`feed-tour.mjs`).
+6. ✅ **Gelir ve büyüme.** Gönderiyi jetonla öne çıkarma (60 jeton, 6 saat, en fazla 24 saat birikir; "Herkes" akışının en üstünde "Öne çıkarıldı" etiketiyle durur); profile sabitleme (tek gönderi, profilde ilk sırada "Sabitlenmiş"); görsel olarak paylaşılabilir gönderi kartı (kendi şablonumuz); dış reklam alanı: `Ad` modeli, yönetim panelinde "Reklamlar" sekmesi (oluştur/durdur/sil, gösterim-tıklama-TO), akışta ağırlıklı dönüşümle "Sponsorlu" kart, VibeUpMe+ üyelere gösterilmez (yeni paket avantajı: reklamsız akış).
+7. ✅ **Test ve belgeler.** Sunucu API testi (`test/api/social.test.ts`), canlı kontrol betikleri (`tools/ui-tours/social-api.mjs`, `social-extras-api.mjs`), demo veri (`social-seed.mjs`), UI turu (`feed-tour.mjs`).
 
 **Açık riskler:** içerik moderasyonu iş yükü (5651 sorumluluğu avukat aşamasında netleşir); akışın başlangıçta boş görünmesi (ilgi alanı filtresi, hikayeler ve demo içerikle canlı tutulur).
 

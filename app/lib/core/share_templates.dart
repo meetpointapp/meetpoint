@@ -63,3 +63,23 @@ Widget vibeShareCard(AppLocalizations l, String archetypeId) => ShareTemplate(
       title: l.vibeArchetypeName(archetypeId),
       subtitle: l.vibeArchetypeDesc(archetypeId),
     );
+
+// Faz 22: gönderi kartı — yazı büyük ve okunur, altta yazar ve marka
+Widget postShareCard(AppLocalizations l, Post post) => ShareTemplate(
+      hero: Container(
+        width: 400,
+        padding: const EdgeInsets.fromLTRB(26, 22, 26, 26),
+        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(30)),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Icon(Icons.format_quote_rounded, color: Colors.white70, size: 46),
+          Text(
+            post.body,
+            maxLines: 9,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w700, height: 1.3),
+          ),
+        ]),
+      ),
+      title: post.author.displayName,
+      subtitle: l.sharePostSubtitle,
+    );

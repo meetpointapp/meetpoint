@@ -128,6 +128,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                         margin: EdgeInsets.zero,
                         child: PostCard(
                           post: post,
+                          showPinned: true,
                           detail: true,
                           onChanged: (p) => setState(() => _post = p),
                           onDeleted: () {
@@ -316,6 +317,7 @@ class _UserPostsScreenState extends ConsumerState<UserPostsScreen> {
                       itemBuilder: (_, i) {
                         final p = _posts[i];
                         return PostCard(
+                          showPinned: true,
                           post: p,
                           onChanged: (u) => setState(() => _posts[i] = u),
                           onDeleted: () => setState(() => _posts.removeAt(i)),

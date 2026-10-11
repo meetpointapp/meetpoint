@@ -46,6 +46,12 @@ if (steps.includes('feed')) {
   await page.getByRole('tab', { name: 'Takip', exact: true }).or(page.getByRole('button', { name: 'Takip', exact: true })).first().click({ timeout: 4000 }).catch(() => {});
   await shot('02-feed-following', 1800);
 }
+if (steps.includes('ads')) {
+  await go('/feed');
+  await page.mouse.move(195, 600);
+  await page.mouse.wheel(0, 1300);
+  await shot('09-ad', 1500);
+}
 if (steps.includes('detail') && post) {
   await go(`/post/${post.id}`);
   await shot('03-detail');

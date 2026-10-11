@@ -113,6 +113,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
           subtitle: l.premiumPerkLikeLimit(perks?.likeLimitPremium ?? 50, perks?.likeLimitFree ?? 25),
         ),
         _Perk(icon: Icons.workspace_premium_rounded, color: const Color(0xFFD99A0B), title: l.premiumBadgeShort, subtitle: l.premiumPerkBadge),
+        _Perk(icon: Icons.block_rounded, color: const Color(0xFF2F80ED), title: l.premiumPerkNoAdsTitle, subtitle: l.premiumPerkNoAds),
         const SizedBox(height: 8),
         Text(l.premiumMonthlyNote, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 24),

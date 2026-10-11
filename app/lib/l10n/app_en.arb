@@ -1251,5 +1251,38 @@
   "errCommentLimit": "You've reached today's comment limit. Try again tomorrow.",
   "errStoryLimit": "You've reached today's story limit.",
   "errDuplicatePost": "You already shared this post.",
-  "errContactInfo": "Phone numbers, emails, links and social handles can't be shared in public."
+  "errContactInfo": "Phone numbers, emails, links and social handles can't be shared in public.",
+  "postBoost": "Boost",
+  "postBoostExtend": "Add {n} more hours",
+  "@postBoostExtend": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "postBoostExtendShort": "Extend boost",
+  "postBoostTitle": "Boost your post",
+  "postBoostBody": "Your post stays at the top of the \"Everyone\" feed for {n} hours. A running boost can be extended.",
+  "@postBoostBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "postBoosted": "Your post is boosted",
+  "postBoostedTag": "Boosted",
+  "postPin": "Pin to profile",
+  "postUnpin": "Unpin",
+  "postPinned": "Pinned",
+  "postPinnedDone": "Post pinned to your profile",
+  "postUnpinned": "Post unpinned",
+  "postShareImage": "Share as image",
+  "sharePostSubtitle": "Shared on VibeUpMe",
+  "adSponsored": "SPONSORED",
+  "adOpenFailed": "Couldn't open the link",
+  "premiumPerkNoAdsTitle": "Ad-free feed",
+  "premiumPerkNoAds": "You won't see sponsored content in the feed",
+  "errPostBoostMax": "The boost can't be extended further. You can extend it again as time runs down."
 }

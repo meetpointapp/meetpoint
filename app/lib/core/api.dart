@@ -471,6 +471,15 @@ class Api {
 
   Future<void> deletePost(String id) => _delete('/posts/$id');
 
+  // Jetonla öne çıkar (Herkes akışının en üstü, süreli) ve profile sabitle
+  Future<Post> boostPost(String id) async => Post.fromJson(await _post('/posts/$id/boost'));
+  Future<void> pinPost(String id) => _put('/posts/$id/pin');
+  Future<void> unpinPost(String id) => _delete('/posts/$id/pin');
+
+  // Reklam sayaçları (kullanıcı kimliği tutulmaz)
+  Future<void> adImpression(String id) => _post('/ads/$id/impression');
+  Future<void> adClick(String id) => _post('/ads/$id/click');
+
   Future<({bool liked, int likeCount})> likePost(String id) async {
     final r = await _put('/posts/$id/like');
     return (liked: true, likeCount: (r['likeCount'] ?? 0) as int);

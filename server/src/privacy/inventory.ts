@@ -88,6 +88,15 @@ export const INVENTORY: InventoryEntry[] = [
     recipients: 'Diğer kullanıcılar (akış herkese açık); şikayet halinde moderasyon ekibi',
   },
   {
+    category: 'Reklam kayıtları',
+    tables: ['Ad'],
+    data: 'Reklam içeriği, bağlantı ve toplu gösterim/tıklama sayaçları (kişisel veri içermez; hangi kullanıcının gördüğü tutulmaz)',
+    purpose: 'Akışta sponsorlu içerik gösterimi ve raporlama',
+    basis: ['meşru'],
+    retention: 'Kampanya süresince; yönetim panelinden silinebilir',
+    recipients: 'Aktarılmaz',
+  },
+  {
     category: 'Sesli ve görüntülü arama',
     tables: ['Call', 'CallGift', 'CallDispute'],
     data: 'Arama zamanı, süresi, ücreti, hediyeler, puanlama, ücret itirazları ve incelemesi (ses/görüntü kaydedilmez)',

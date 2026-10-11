@@ -260,6 +260,7 @@ const loaders = {
   kvkk: () => loadKvkk(),
   support: () => loadSupport(),
   audit: () => loadAudit(),
+  ads: () => loadAds(),
 };
 let errorsResolved = '0';
 let payoutStatus = 'PENDING';
@@ -1424,6 +1425,12 @@ $('#staff').addEventListener('click', async (e) => {
 
 // ---------- İşlem kaydı ----------
 const ACTIONS = {
+  'ad.create': 'Reklam eklendi',
+  'ad.update': 'Reklam güncellendi',
+  'ad.delete': 'Reklam silindi',
+  'post.hide': 'Gönderi kaldırıldı',
+  'comment.hide': 'Yorum kaldırıldı',
+  'story.hide': 'Hikaye kaldırıldı',
   'user.ban': 'Kullanıcı yasakladı',
   'user.unban': 'Yasağı kaldırdı',
   'report.ban': 'Şikayetle yasakladı',
@@ -1797,3 +1804,67 @@ if (token) {
 } else {
   showLogin();
 }
+
+
+// ---------- Reklamlar (Faz 22) ----------
+async function loadAds() {
+  const list = await api('GET', '/admin/api/ads');
+  $('#ads').innerHTML = list.length
+    ? list
+        .map(
+          (a) => `<div class="card item" data-ad="${esc(a.id)}">
+      <div class="item-head"><div><span class="item-title">${esc(a.title)}</span>
+        <span class="pill ${a.active ? 'green' : ''}">${a.active ? 'Yayında' : 'Durdu'}</span>
+        <span class="muted">· ${esc(a.advertiser)} · ağırlık ${a.weight}</span></div>
+        <div class="muted small">${fmtDate(a.startsAt)}${a.endsAt ? ' → ' + fmtDate(a.endsAt) : ' → süresiz'}</div></div>
+      ${a.body ? `<div class="detail">${esc(a.body)}</div>` : ''}
+      <div class="muted small"><a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.url)}</a></div>
+      <div class="muted small">Gösterim: <b>${a.impressions}</b> · Tıklama: <b>${a.clicks}</b> · TO: <b>%${a.ctr}</b></div>
+      <div class="actions">
+        <button class="btn soft" data-ad-toggle="${esc(a.id)}" data-active="${a.active ? '0' : '1'}">${a.active ? 'Durdur' : 'Yayınla'}</button>
+        <button class="btn red" data-ad-delete="${esc(a.id)}">Sil</button>
+      </div></div>`,
+        )
+        .join('')
+    : '<div class="card empty">Henüz reklam yok</div>';
+}
+
+$('#ad-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const body = {
+    advertiser: f.get('advertiser'),
+    title: f.get('title'),
+    body: f.get('body') || '',
+    ctaLabel: f.get('ctaLabel') || '',
+    url: f.get('url'),
+    accent: f.get('accent'),
+    weight: Number(f.get('weight') || 1),
+  };
+  if (f.get('startsAt')) body.startsAt = new Date(f.get('startsAt')).toISOString();
+  if (f.get('endsAt')) body.endsAt = new Date(f.get('endsAt')).toISOString();
+  try {
+    await api('POST', '/admin/api/ads', body);
+    e.target.reset();
+    toast('Reklam eklendi');
+    loadAds();
+  } catch (err) {
+    toast(errText(err));
+  }
+});
+
+$('#ads').addEventListener('click', async (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  try {
+    if (t.dataset.adToggle) {
+      await api('PUT', `/admin/api/ads/${t.dataset.adToggle}`, { active: t.dataset.active === '1' });
+    } else if (t.dataset.adDelete) {
+      if (!confirm('Bu reklam silinsin mi?')) return;
+      await api('DELETE', `/admin/api/ads/${t.dataset.adDelete}`);
+    } else return;
+    loadAds();
+  } catch (err) {
+    toast(errText(err));
+  }
+});

@@ -5330,6 +5330,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz.'**
   String get errContactInfo;
+
+  /// No description provided for @postBoost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öne çıkar'**
+  String get postBoost;
+
+  /// No description provided for @postBoostExtend.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} saat daha uzat'**
+  String postBoostExtend(int n);
+
+  /// No description provided for @postBoostExtendShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öne çıkarmayı uzat'**
+  String get postBoostExtendShort;
+
+  /// No description provided for @postBoostTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderini öne çıkar'**
+  String get postBoostTitle;
+
+  /// No description provided for @postBoostBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderin {n} saat boyunca \"Herkes\" akışının en üstünde durur. Süren bir öne çıkarma uzatılabilir.'**
+  String postBoostBody(int n);
+
+  /// No description provided for @postBoosted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderin öne çıkarıldı'**
+  String get postBoosted;
+
+  /// No description provided for @postBoostedTag.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öne çıkarıldı'**
+  String get postBoostedTag;
+
+  /// No description provided for @postPin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profile sabitle'**
+  String get postPin;
+
+  /// No description provided for @postUnpin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabitlemeyi kaldır'**
+  String get postUnpin;
+
+  /// No description provided for @postPinned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabitlenmiş'**
+  String get postPinned;
+
+  /// No description provided for @postPinnedDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi profiline sabitlendi'**
+  String get postPinnedDone;
+
+  /// No description provided for @postUnpinned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabitleme kaldırıldı'**
+  String get postUnpinned;
+
+  /// No description provided for @postShareImage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görsel olarak paylaş'**
+  String get postShareImage;
+
+  /// No description provided for @sharePostSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'VibeUpMe\'da paylaştı'**
+  String get sharePostSubtitle;
+
+  /// No description provided for @adSponsored.
+  ///
+  /// In tr, this message translates to:
+  /// **'SPONSORLU'**
+  String get adSponsored;
+
+  /// No description provided for @adOpenFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı açılamadı'**
+  String get adOpenFailed;
+
+  /// No description provided for @premiumPerkNoAdsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız akış'**
+  String get premiumPerkNoAdsTitle;
+
+  /// No description provided for @premiumPerkNoAds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Akışta sponsorlu içerik görmezsin'**
+  String get premiumPerkNoAds;
+
+  /// No description provided for @errPostBoostMax.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin.'**
+  String get errPostBoostMax;
 }
 
 class _AppLocalizationsDelegate

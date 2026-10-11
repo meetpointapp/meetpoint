@@ -3464,4 +3464,66 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errContactInfo =>
       'Phone numbers, emails, links and social handles can\'t be shared in public.';
+
+  @override
+  String get postBoost => 'Boost';
+
+  @override
+  String postBoostExtend(int n) {
+    return 'Add $n more hours';
+  }
+
+  @override
+  String get postBoostExtendShort => 'Extend boost';
+
+  @override
+  String get postBoostTitle => 'Boost your post';
+
+  @override
+  String postBoostBody(int n) {
+    return 'Your post stays at the top of the \"Everyone\" feed for $n hours. A running boost can be extended.';
+  }
+
+  @override
+  String get postBoosted => 'Your post is boosted';
+
+  @override
+  String get postBoostedTag => 'Boosted';
+
+  @override
+  String get postPin => 'Pin to profile';
+
+  @override
+  String get postUnpin => 'Unpin';
+
+  @override
+  String get postPinned => 'Pinned';
+
+  @override
+  String get postPinnedDone => 'Post pinned to your profile';
+
+  @override
+  String get postUnpinned => 'Post unpinned';
+
+  @override
+  String get postShareImage => 'Share as image';
+
+  @override
+  String get sharePostSubtitle => 'Shared on VibeUpMe';
+
+  @override
+  String get adSponsored => 'SPONSORED';
+
+  @override
+  String get adOpenFailed => 'Couldn\'t open the link';
+
+  @override
+  String get premiumPerkNoAdsTitle => 'Ad-free feed';
+
+  @override
+  String get premiumPerkNoAds => 'You won\'t see sponsored content in the feed';
+
+  @override
+  String get errPostBoostMax =>
+      'The boost can\'t be extended further. You can extend it again as time runs down.';
 }

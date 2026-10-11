@@ -28,6 +28,7 @@ class _Pager {
   bool loading = false;
   bool loaded = false;
   Object? error;
+  AdItem? ad;
 }
 
 const _tabs = ['all', 'following', 'interests', 'matches'];
@@ -70,6 +71,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         p.posts = more ? [...p.posts, ...page.posts] : page.posts;
         p.next = page.next;
         p.loaded = true;
+        p.ad = more ? (p.ad ?? page.ad) : page.ad;
       });
     } catch (e) {
       if (mounted) setState(() => p.error = e);
@@ -266,9 +268,13 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 110),
                   sliver: SliverList.separated(
-                    itemCount: pg.posts.length + (pg.loading || pg.next != null ? 1 : 0),
+                    itemCount: pg.posts.length + (pg.ad != null ? 1 : 0) + (pg.loading || pg.next != null ? 1 : 0),
                     separatorBuilder: (_, _) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) {
+                    itemBuilder: (_, rawIndex) {
+                      // Reklam: ilk üç gönderiden sonra (gönderi azsa sona) tek bir "Sponsorlu" kart
+                      final adAt = pg.ad == null ? -1 : (pg.posts.length >= 3 ? 3 : pg.posts.length);
+                      if (rawIndex == adAt) return AdCard(key: ValueKey('ad-${pg.ad!.id}'), ad: pg.ad!);
+                      final i = adAt >= 0 && rawIndex > adAt ? rawIndex - 1 : rawIndex;
                       if (i >= pg.posts.length) {
                         return const Padding(padding: EdgeInsets.all(16), child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.5))));
                       }

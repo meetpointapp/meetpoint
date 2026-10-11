@@ -11,17 +11,24 @@ import '../../l10n/app_localizations.dart';
 // Faz 20: "Eşleşmeler" kendi sekmesi. Karşılıklı beğeniyle açılan tüm sohbetler büyük fotoğraf
 // kartlarında; henüz mesajlaşılmamış (yeni) eşleşmeler önde ve "Yeni" etiketli. İstek yoluyla açılan
 // sohbetler (mesaj isteği) burada değil, Sohbetler sekmesinde durur.
-class MatchesScreen extends ConsumerWidget {
+class MatchesScreen extends StatelessWidget {
   const MatchesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      Scaffold(appBar: AppBar(title: Text(AppLocalizations.of(context).matchesTitle)), body: const MatchesBody());
+}
+
+// Faz 22: alt menüde Akış ortaya geldiği için Eşleşmeler, Sohbetler ekranında bir sekme olarak da gösterilir.
+class MatchesBody extends ConsumerWidget {
+  const MatchesBody({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final convs = ref.watch(conversationsProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l.matchesTitle)),
-      body: RefreshIndicator(
+    return RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(likesProvider);
           ref.invalidate(conversationsProvider);
@@ -70,7 +77,6 @@ class MatchesScreen extends ConsumerWidget {
             },
           ),
         ]),
-      ),
     );
   }
 }

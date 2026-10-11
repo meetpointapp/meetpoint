@@ -93,6 +93,24 @@ describe('Sosyal akış (Faz 22)', () => {
     check('blocked author hidden', (await call(deniz.t, 'GET', `/posts/${p1.id}`)).http === 404);
     check('block drops follows', (await call(aye.t, 'PUT', `/users/${deniz.id}/follow`)).http === 404);
 
+    // --- Öne çıkarma, sabitleme, reklam (Faz 22 ek)
+    await call(aye.t, 'POST', '/wallet/dev-topup', { packId: 'coins_500' });
+    const p2 = await call(aye.t, 'POST', '/posts', { body: `Öne çıkar ${tag}` }).catch(() => null);
+    // Günlük kota dolmuş olabilir: bu durumda mevcut gönderiyle devam edilir
+    const target = p2?.id ? p2 : p1;
+    const b1 = await call(aye.t, 'POST', `/posts/${target.id}/boost`);
+    check('post boost', b1.http === 200 && b1.boosted === true, `${b1.http} ${b1.error ?? ''}`);
+    check('boosted first in feed', (await call(mert.t, 'GET', '/feed?tab=all')).posts?.[0]?.id === target.id);
+    check('pin', (await call(aye.t, 'PUT', `/posts/${target.id}/pin`)).pinned === true);
+    check('pinned first on profile', (await call(mert.t, 'GET', `/users/${aye.id}/posts`)).posts?.[0]?.id === target.id);
+    const ad = await db.ad.create({ data: { advertiser: 'Test', title: 'Reklam', url: 'https://example.com' } });
+    check('ad in feed for free user', (await call(mert.t, 'GET', '/feed?tab=all')).ad?.id === ad.id);
+    await call(mert.t, 'POST', `/ads/${ad.id}/click`);
+    check('ad click counted', (await db.ad.findUnique({ where: { id: ad.id } }))?.clicks === 1);
+    await db.user.update({ where: { id: mert.id }, data: { premiumUntil: new Date(Date.now() + 86_400_000) } });
+    check('no ads for premium', (await call(mert.t, 'GET', '/feed?tab=all')).ad === null);
+    await db.ad.delete({ where: { id: ad.id } });
+
     // --- Silme
     check('author deletes post', (await call(aye.t, 'DELETE', `/posts/${p1.id}`)).http === 200);
     check('deleted post gone', (await call(mert.t, 'GET', `/posts/${p1.id}`)).http === 404);

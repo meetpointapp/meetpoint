@@ -23,6 +23,7 @@ import { personalLinkRouter } from './routes/personalLink';
 import { helpRouter } from './routes/help';
 import { engagementRouter } from './routes/engagement';
 import { socialRouter } from './routes/social';
+import { adminAdsRouter } from './routes/adminAds';
 import { notificationsRouter } from './routes/notifications';
 import { supportRouter } from './routes/support';
 import { ensureHelpArticles } from './support/help';
@@ -100,6 +101,7 @@ app.use('/admin/api/privacy', requireAuth, requireAdmin, adminPrivacyRouter);
 app.use('/admin/api/moderation', requireAuth, requireAdmin, adminModerationRouter);
 app.use('/admin/api/finance', requireAuth, requireAdmin, adminFinanceRouter);
 app.use('/admin/api/support', requireAuth, requireAdmin, adminSupportRouter);
+app.use('/admin/api/ads', requireAuth, requireAdmin, adminAdsRouter);
 app.use('/admin/api', requireAuth, requireAdmin, adminRouter);
 app.use(
   requireAuth,

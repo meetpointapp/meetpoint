@@ -57,6 +57,8 @@ walletRouter.get('/wallet', async (req, res) => {
       superLike: Math.round(Math.min(...economy.superLike.packs.map((p) => p.price / p.count))),
       boost: economy.boostPrice,
       boostMinutes: economy.boostMinutes,
+      postBoost: economy.postBoostPrice,
+      postBoostHours: economy.postBoostHours,
       likesUnlock: economy.likesUnlockPrice,
       likesUnlockHours: economy.likesUnlockHours,
     },

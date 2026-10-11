@@ -92,6 +92,10 @@ export const economy = {
   boostMinutes: 30,
   // Faz 20: süren öne çıkarma uzatılabilir; kalan süre bu değeri aşamaz
   boostMaxMinutes: 120,
+  // Faz 22: gönderiyi akışta öne çıkarma (jeton). Süren öne çıkarma uzatılabilir; kalan süre sınırlıdır.
+  postBoostPrice: 60,
+  postBoostHours: 6,
+  postBoostMaxHours: 24,
   likesUnlockPrice: 200,
   likesUnlockHours: 24,
 
