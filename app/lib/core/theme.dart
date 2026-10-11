@@ -6,6 +6,18 @@ import 'fx.dart';
 
 // VibeUpMe marka kimliği: sıcak mercan -> turuncu gradyan, Inter yazı tipi,
 // yuvarlak köşeler ve dolgulu (çerçevesiz) alanlarla sade, kompakt bir görünüm.
+// Faz 20: premium (ve ücretsiz) temanın tam paleti — sadece ana renk değil sayfa zemini, kart yüzeyi ve
+// aydınlık/karanlık da değişir. null palet = standart tema (beyaz zemin, mercan-turuncu vurgu).
+class AppPalette {
+  const AppPalette({required this.accent, this.background, this.surface, this.dark = false, this.glowA, this.glowB});
+  final Color accent; // düğmeler, vurgular, gradyan
+  final Color? background; // sayfa zemini
+  final Color? surface; // kart / alt menü yüzeyi
+  final bool dark; // sistem temasından bağımsız koyu tema
+  final Color? glowA; // zemindeki iki yumuşak ışık
+  final Color? glowB;
+}
+
 abstract final class Brand {
   static const _defaultCoral = Color(0xFFFF4D6D);
   static const _defaultOrange = Color(0xFFFF8A5B);
@@ -28,6 +40,18 @@ abstract final class Brand {
 
   static const radius = 16.0;
 
+  // Aktif tam tema paleti (null = standart beyaz tema)
+  static AppPalette? _palette;
+  static AppPalette? get palette => _palette;
+
+  // Gradyanlı/dolu düğmelerin üstündeki yazı rengi: açık renkli vurguda (ör. altın) koyu, aksi hâlde beyaz
+  static Color get onAccent => (_coral.computeLuminance() + _orange.computeLuminance()) / 2 > 0.5 ? const Color(0xFF1B1400) : Colors.white;
+
+  static void setPalette(AppPalette? p) {
+    _palette = p;
+    setAccent(p?.accent);
+  }
+
   // accent null = varsayılan marka rengi. İkinci renk, ana rengin tonunu biraz kaydırıp açarak türetilir.
   static void setAccent(Color? accent) {
     if (accent == null) {
@@ -41,14 +65,19 @@ abstract final class Brand {
   }
 }
 
-ThemeData buildTheme(Brightness brightness) {
-  final dark = brightness == Brightness.dark;
+ThemeData buildTheme(Brightness systemBrightness) {
+  // Tam tema seçiliyse onun aydınlık/karanlık tercihi sistem temasını geçer
+  final palette = Brand.palette;
+  final dark = palette?.dark ?? (systemBrightness == Brightness.dark);
+  final brightness = dark ? Brightness.dark : Brightness.light;
+  final background = palette?.background ?? (dark ? const Color(0xFF130F17) : Colors.white);
+  final surfaceColor = palette?.surface ?? (dark ? const Color(0xFF1F1A23) : Colors.white);
   final scheme = ColorScheme.fromSeed(
     seedColor: Brand.coral,
     brightness: brightness,
     primary: Brand.coral,
     secondary: Brand.orange,
-    surface: dark ? const Color(0xFF16121A) : const Color(0xFFFFFBFA),
+    surface: background,
   );
   final base = ThemeData(colorScheme: scheme, useMaterial3: true, brightness: brightness);
   final text = GoogleFonts.interTextTheme(base.textTheme).copyWith(
@@ -57,12 +86,12 @@ ThemeData buildTheme(Brightness brightness) {
     titleLarge: GoogleFonts.inter(textStyle: base.textTheme.titleLarge, fontWeight: FontWeight.w700),
     titleMedium: GoogleFonts.inter(textStyle: base.textTheme.titleMedium, fontWeight: FontWeight.w600),
   );
-  final field = dark ? const Color(0xFF241E28) : const Color(0xFFF5EEEE);
+  final field = dark ? Color.lerp(surfaceColor, Colors.white, 0.08)! : (palette == null ? const Color(0xFFF3F3F5) : Color.lerp(const Color(0xFFF3F3F5), Brand.coral, 0.07)!);
   final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(Brand.radius));
 
   return base.copyWith(
     textTheme: text,
-    scaffoldBackgroundColor: dark ? const Color(0xFF130F17) : const Color(0xFFFFF8F6),
+    scaffoldBackgroundColor: background,
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -85,7 +114,7 @@ ThemeData buildTheme(Brightness brightness) {
       style: FilledButton.styleFrom(
         // Karanlık modda da marka rengi + beyaz yazı
         backgroundColor: Brand.coral,
-        foregroundColor: Colors.white,
+        foregroundColor: Brand.onAccent,
         minimumSize: const Size(64, 48),
         textStyle: text.titleMedium,
         shape: const StadiumBorder(),
@@ -97,11 +126,11 @@ ThemeData buildTheme(Brightness brightness) {
     cardTheme: CardThemeData(
       // Yumuşak, hafif renkli gölge: düz görünen kartlara derinlik verir
       elevation: dark ? 0 : 2,
-      shadowColor: Brand.coral.withValues(alpha: 0.22),
-      color: dark ? const Color(0xFF1F1A23) : Colors.white,
+      shadowColor: palette == null ? Colors.black.withValues(alpha: 0.14) : Brand.coral.withValues(alpha: 0.22),
+      color: surfaceColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: (dark ? Colors.white : Brand.coral).withValues(alpha: dark ? 0.06 : 0.07)),
+        side: BorderSide(color: (dark ? Colors.white : Colors.black).withValues(alpha: dark ? 0.07 : 0.06)),
       ),
       clipBehavior: Clip.antiAlias,
       margin: EdgeInsets.zero,
@@ -119,7 +148,7 @@ ThemeData buildTheme(Brightness brightness) {
       elevation: 12,
       shadowColor: Brand.coral.withValues(alpha: 0.4),
       surfaceTintColor: Colors.transparent,
-      backgroundColor: dark ? const Color(0xFF1B161F) : Colors.white,
+      backgroundColor: surfaceColor,
       indicatorShape: const StadiumBorder(),
       indicatorColor: Brand.coral.withValues(alpha: 0.16),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
@@ -144,8 +173,10 @@ ThemeData buildTheme(Brightness brightness) {
 
 // Gradyanlı ana buton (en önemli eylemler için: devam et, eşleşme vb.)
 class GradientButton extends StatelessWidget {
-  const GradientButton({super.key, required this.label, required this.onPressed, this.busy = false, this.icon, this.dense = false});
+  const GradientButton({super.key, required this.label, required this.onPressed, this.busy = false, this.icon, this.dense = false, this.coin});
   final String label;
+  // Verilirse etiketin yanında jeton simgesiyle fiyat gösterilir
+  final int? coin;
   final VoidCallback? onPressed;
   final bool busy;
   final IconData? icon;
@@ -157,7 +188,7 @@ class GradientButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: label,
+      label: coin == null ? label : '$label $coin',
       excludeSemantics: true,
       onTap: enabled ? onPressed : null,
       child: _buildButton(context, enabled),
@@ -190,11 +221,17 @@ class GradientButton extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                       )
                     : Row(mainAxisSize: MainAxisSize.min, children: [
-                        if (icon != null) ...[Icon(icon, color: Colors.white, size: 20), const SizedBox(width: 8)],
+                        if (icon != null) ...[Icon(icon, color: Brand.onAccent, size: 20), const SizedBox(width: 8)],
                         Text(
                           label,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Brand.onAccent),
                         ),
+                        if (coin != null) ...[
+                          Text(' · ', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Brand.onAccent)),
+                          Icon(Icons.toll_rounded, color: Brand.onAccent, size: 20),
+                          const SizedBox(width: 3),
+                          Text('$coin', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Brand.onAccent, fontWeight: FontWeight.w800)),
+                        ],
                       ]),
               ),
             ),
@@ -222,4 +259,15 @@ class BrandLogo extends StatelessWidget {
       child: text,
     );
   }
+}
+
+// Faz 20: uygulama logosu (kalp + kamera) — şeffaf zeminli, yazıdan bağımsız küçük işaret. [height] ile
+// yüksekliği verilir, genişlik oranla (498x386) hesaplanır.
+class BrandMark extends StatelessWidget {
+  const BrandMark({super.key, this.height = 34});
+  final double height;
+
+  @override
+  Widget build(BuildContext context) =>
+      Image.asset('assets/icon/logo.png', height: height, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
 }

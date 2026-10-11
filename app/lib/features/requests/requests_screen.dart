@@ -153,7 +153,7 @@ class _RequestCardState extends ConsumerState<_RequestCard> {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 NameWithBadge(user == null ? '—' : '${user.displayName}, ${user.age}',
-                    verified: user?.verified ?? false, style: theme.textTheme.titleMedium),
+                    verified: user?.verified ?? false, premium: user?.premium ?? false, style: theme.textTheme.titleMedium),
                 Row(children: [
                   Icon(requestKindIcon(r.kind), size: 16, color: theme.colorScheme.primary),
                   const SizedBox(width: 4),

@@ -56,7 +56,12 @@ Future<void> startCallFlow(BuildContext context, WidgetRef ref, PublicProfile pr
         FilledButton.icon(
           onPressed: () => Navigator.pop(ctx, true),
           icon: Icon(callKindIcon(kind), size: 18),
-          label: Text('${l.callAction} · ${l.perMinute(rate)}'),
+          label: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text('${l.callAction} · '),
+            const Icon(Icons.toll_rounded, size: 16, color: Brand.gold),
+            const SizedBox(width: 3),
+            Text(l.perMinute(rate)),
+          ]),
         ),
       ],
     ),

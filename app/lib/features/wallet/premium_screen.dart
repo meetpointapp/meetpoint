@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/config.dart';
 import '../../core/fx.dart';
+import '../../core/models.dart';
 import '../../core/providers.dart';
 import '../../core/session.dart';
 import '../../core/store.dart';
@@ -75,31 +76,45 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
     final theme = Theme.of(context);
     final me = ref.watch(meProvider);
     final priceText = ref.watch(_premiumPriceProvider).value;
+    final perks = ref.watch(_perkStatusProvider).value;
     final premiumUntil = me.value?.premiumUntil;
     final active = premiumUntil != null;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.premiumTitle)),
       body: ListView(padding: const EdgeInsets.all(20), children: [
+        // Altın başlık: VibeUpMe+ premium bir üyelik hissi verir
         Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(Brand.radius), gradient: Brand.gradient),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: premiumGradient,
+            boxShadow: [BoxShadow(color: const Color(0xFFD99A0B).withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
+          ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 28),
-            const SizedBox(height: 12),
-            Text(l.premiumTitle, style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+            const Icon(Icons.workspace_premium_rounded, color: Color(0xFF4A3200), size: 34),
+            const SizedBox(height: 10),
+            Text(l.premiumTitle, style: theme.textTheme.headlineSmall?.copyWith(color: const Color(0xFF4A3200), fontWeight: FontWeight.w900)),
             const SizedBox(height: 4),
-            Text(l.premiumTagline, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white)),
+            Text(l.premiumTagline, style: theme.textTheme.bodyMedium?.copyWith(color: const Color(0xFF4A3200))),
           ]),
         ),
-        const SizedBox(height: 20),
-        Card(
-          child: ListTile(
-            leading: Icon(Icons.favorite_rounded, color: Brand.coral),
-            title: Text(l.likesYou),
-            subtitle: Text(l.premiumPerkLikes),
-          ),
+        const SizedBox(height: 16),
+        _Perk(icon: Icons.favorite_rounded, title: l.likesYou, subtitle: l.premiumPerkLikes),
+        _Perk(
+          icon: Icons.star_rounded,
+          color: const Color(0xFF2F80ED),
+          title: l.superLike,
+          subtitle: l.premiumPerkSuperLikes(perks?.premiumDaily ?? 10, perks?.freeDaily ?? 3),
         ),
+        _Perk(
+          icon: Icons.swipe_rounded,
+          title: l.premiumPerkLikeLimitTitle,
+          subtitle: l.premiumPerkLikeLimit(perks?.likeLimitPremium ?? 50, perks?.likeLimitFree ?? 25),
+        ),
+        _Perk(icon: Icons.workspace_premium_rounded, color: const Color(0xFFD99A0B), title: l.premiumBadgeShort, subtitle: l.premiumPerkBadge),
+        const SizedBox(height: 8),
+        Text(l.premiumMonthlyNote, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 24),
         if (active) ...[
           Row(children: [
@@ -128,6 +143,36 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
           ),
         ],
       ]),
+    );
+  }
+}
+
+final _perkStatusProvider = FutureProvider.autoDispose<SuperLikeStatus>((ref) => ref.watch(apiProvider).superLikeStatus());
+
+class _Perk extends StatelessWidget {
+  const _Perk({required this.icon, required this.title, required this.subtitle, this.color});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final c = color ?? Brand.coral;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        dense: true,
+        leading: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: c.withValues(alpha: 0.14)),
+          child: Icon(icon, color: c, size: 20),
+        ),
+        title: Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+        subtitle: Text(subtitle),
+      ),
     );
   }
 }

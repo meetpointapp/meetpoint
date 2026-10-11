@@ -32,6 +32,9 @@ String errorText(AppLocalizations l, Object error) {
     'already_verified' => l.errAlreadyVerified,
     'verification_pending' => l.errVerificationPending,
     'already_boosted' => l.errAlreadyBoosted,
+    'boost_max_reached' => l.errBoostMax,
+    'calls_disabled' => l.errCallsDisabled,
+    'calls_matches_only' => l.errCallsMatchesOnly,
     'already_viewed' => l.errAlreadyViewed,
     'busy' => l.errBusy,
     'already_in_call' => l.errAlreadyInCall,
@@ -77,6 +80,7 @@ String errorText(AppLocalizations l, Object error) {
     'ticket_closed' => l.errTicketClosed,
     'already_answered' => l.errGeneric,
     'like_limit_reached' => l.errLikeLimit,
+    'superlike_limit_reached' => l.errSuperLikeLimit,
     'item_not_owned' => l.errItemNotOwned,
     'already_owned' => l.errAlreadyOwned,
     'invalid_code' => l.errReferralInvalidCode,
@@ -109,17 +113,23 @@ class VerifiedBadge extends StatelessWidget {
 
 // İsim + (varsa) mavi tik
 class NameWithBadge extends StatelessWidget {
-  const NameWithBadge(this.text, {super.key, required this.verified, this.style, this.onPhoto = false, this.badgeId = ''});
+  const NameWithBadge(this.text, {super.key, required this.verified, this.style, this.onPhoto = false, this.badgeId = '', this.premium = false});
   final String text;
   final bool verified;
   final TextStyle? style;
   final bool onPhoto;
   // Faz 16: kozmetik mağaza rozeti (satın alınmış, isim yanında küçük bir emoji)
   final String badgeId;
+  // Faz 20: VibeUpMe+ abonesi — isim yanında altın rozet
+  final bool premium;
 
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
         Flexible(child: Text(text, style: style, overflow: TextOverflow.ellipsis)),
+        if (premium) ...[
+          const SizedBox(width: 6),
+          PremiumBadge(size: (style?.fontSize ?? 16) * 0.95),
+        ],
         if (verified) ...[
           const SizedBox(width: 6),
           VerifiedBadge(size: (style?.fontSize ?? 16) * 0.9, onPhoto: onPhoto),
@@ -129,6 +139,25 @@ class NameWithBadge extends StatelessWidget {
           Text(storeBadgeEmoji[badgeId] ?? '', style: TextStyle(fontSize: (style?.fontSize ?? 16) * 0.9)),
         ],
       ]);
+}
+
+// Faz 20: VibeUpMe+ aboneleri için altın rozet (isim yanında, kart ve sohbetlerde)
+const premiumGradient = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFFE08A), Color(0xFFD99A0B)]);
+
+class PremiumBadge extends StatelessWidget {
+  const PremiumBadge({super.key, this.size = 18});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: 'VibeUpMe+',
+        child: Container(
+          width: size,
+          height: size,
+          decoration: const BoxDecoration(shape: BoxShape.circle, gradient: premiumGradient),
+          child: Icon(Icons.workspace_premium_rounded, size: size * 0.66, color: const Color(0xFF4A3200)),
+        ),
+      );
 }
 
 // Faz 17: "Sosyal cesaret yolculuğu" — herkese görünen toplam kademe rozeti (profilde, keşfet
@@ -218,16 +247,25 @@ class Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final frameId = profile?.frameId ?? '';
+    final diameter = radius * 2;
+    // Çerçeve fotoğrafın DIŞINA taşmaz: toplam boyut her zaman 2*radius (ListTile.leading gibi sabit
+    // kutularda kırpılmasın), fotoğraf halkanın içinde küçülür.
+    const ring = 2.5;
+    final inner = (frameId.isEmpty && !(profile?.premium ?? false)) ? diameter : diameter - ring * 2;
     final photo = ClipOval(
       child: SizedBox.square(
-        dimension: radius * 2,
-        child: NetPhoto(profile?.coverThumbUrl, width: radius * 2, height: radius * 2),
+        dimension: inner,
+        child: NetPhoto(profile?.coverThumbUrl, width: inner, height: inner),
       ),
     );
-    if (frameId.isEmpty) return photo;
+    // Çerçeve seçilmemişse VibeUpMe+ aboneleri altın halka alır
+    final premiumRing = frameId.isEmpty && (profile?.premium ?? false);
+    if (frameId.isEmpty && !premiumRing) return SizedBox.square(dimension: diameter, child: photo);
     return Container(
-      padding: const EdgeInsets.all(2.5),
-      decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: storeFrameGradientOf(frameId))),
+      width: diameter,
+      height: diameter,
+      padding: const EdgeInsets.all(ring),
+      decoration: BoxDecoration(shape: BoxShape.circle, gradient: premiumRing ? premiumGradient : LinearGradient(colors: storeFrameGradientOf(frameId))),
       child: photo,
     );
   }
@@ -437,18 +475,14 @@ class AppBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final palette = Brand.palette;
+    // Standart açık tema düz beyazdır (ışık yok); koyu standartta ve paletli temalarda iki yumuşak ışık
+    final a = palette?.glowA ?? (dark ? Brand.coral : null);
+    final b = palette?.glowB ?? (dark ? const Color(0xFF7C3AED) : null);
     return Stack(fit: StackFit.expand, children: [
       ColoredBox(color: Theme.of(context).scaffoldBackgroundColor),
-      Positioned(
-        top: -140,
-        left: -120,
-        child: _Glow(color: Brand.coral, size: 420, alpha: dark ? 0.16 : 0.13),
-      ),
-      Positioned(
-        bottom: -160,
-        right: -140,
-        child: _Glow(color: dark ? const Color(0xFF7C3AED) : Brand.orange, size: 460, alpha: dark ? 0.14 : 0.12),
-      ),
+      if (a != null) Positioned(top: -140, left: -120, child: _Glow(color: a, size: 420, alpha: dark ? 0.2 : 0.16)),
+      if (b != null) Positioned(bottom: -160, right: -140, child: _Glow(color: b, size: 460, alpha: dark ? 0.16 : 0.12)),
       child,
     ]);
   }

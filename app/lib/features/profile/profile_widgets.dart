@@ -30,11 +30,11 @@ class InterestChip extends StatelessWidget {
       fg = highlighted ? Brand.coral : scheme.onSurface;
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: ShapeDecoration(shape: const StadiumBorder(), color: bg),
       child: Text(
         '${interestEmoji[id] ?? ''} ${l.interestLabel(id)}',
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: fg, fontWeight: FontWeight.w600),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: fg, fontWeight: FontWeight.w600, fontSize: 12),
       ),
     );
   }
@@ -50,11 +50,12 @@ class PromptCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+        // Faz 20: kompakt (Bumble tarzı) — küçük soru etiketi, orta boy cevap
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(l.promptQuestion(prompt.id), style: theme.textTheme.labelLarge?.copyWith(color: Brand.coral)),
-          const SizedBox(height: 6),
-          Text(prompt.answer, style: theme.textTheme.titleLarge?.copyWith(height: 1.3)),
+          Text(l.promptQuestion(prompt.id), style: theme.textTheme.labelMedium?.copyWith(color: Brand.coral, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 3),
+          Text(prompt.answer, style: theme.textTheme.titleSmall?.copyWith(height: 1.3, fontWeight: FontWeight.w600, fontSize: 15)),
         ]),
       ),
     );
@@ -84,23 +85,23 @@ class BasicsChips extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       if (showBio && p.bio.isNotEmpty) ...[
-        Text(p.bio, style: Theme.of(context).textTheme.bodyLarge),
-        const SizedBox(height: 12),
+        Text(p.bio, style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.4)),
+        const SizedBox(height: 10),
       ],
       if (items.isEmpty)
         Text(l.notSpecified, style: TextStyle(color: scheme.outline))
       else
-        Wrap(spacing: 6, runSpacing: 6, children: [
+        Wrap(spacing: 5, runSpacing: 5, children: [
           for (final (icon, text) in items)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: ShapeDecoration(
                 shape: StadiumBorder(side: BorderSide(color: scheme.outlineVariant)),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icon, size: 15, color: scheme.onSurfaceVariant),
-                const SizedBox(width: 5),
-                Text(text, style: Theme.of(context).textTheme.labelMedium),
+                Icon(icon, size: 13, color: scheme.onSurfaceVariant),
+                const SizedBox(width: 4),
+                Text(text, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 12, fontWeight: FontWeight.w600)),
               ]),
             ),
         ]),

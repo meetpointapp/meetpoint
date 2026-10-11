@@ -7,7 +7,12 @@ import { prisma } from './db';
 // o andan başlar. Ayrı sayaç tutulmaz — var olan Swipe satırlarından hesaplanır (tutarlı, yarışsız).
 
 export async function likeStatus(userId: string) {
-  const profile = await prisma.profile.findUnique({ where: { userId }, select: { likesResetAt: true } });
+  const [profile, user] = await Promise.all([
+    prisma.profile.findUnique({ where: { userId }, select: { likesResetAt: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { premiumUntil: true } }),
+  ]);
+  const premium = !!user?.premiumUntil && user.premiumUntil > new Date();
+  const limit = premium ? economy.likeLimitPremium : economy.likeLimit;
   const windowMs = economy.likeWindowHours * 3_600_000;
   const windowStart = new Date(Date.now() - windowMs);
   const since = profile?.likesResetAt && profile.likesResetAt > windowStart ? profile.likesResetAt : windowStart;
@@ -17,9 +22,9 @@ export async function likeStatus(userId: string) {
     prisma.swipe.findFirst({ where, orderBy: { createdAt: 'asc' }, select: { createdAt: true } }),
   ]);
   return {
-    limit: economy.likeLimit,
+    limit,
     used,
-    remaining: Math.max(0, economy.likeLimit - used),
+    remaining: Math.max(0, limit - used),
     resetPrice: economy.likeResetPrice,
     // En eski beğeninin penceresi dolunca bir hak kendiliğinden geri gelir
     nextFreeAt: oldest ? new Date(oldest.createdAt.getTime() + windowMs) : null,

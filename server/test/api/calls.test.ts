@@ -36,8 +36,28 @@ describe('Aramalar (Faz 6)', () => {
     const self = await call(caller.t, 'POST', '/calls', { toId: caller.id, kind: 'VOICE' });
     check('cannot call yourself', self.http === 400);
 
-    // --- Normal arama akışı
+    // --- Gelen arama tercihi: kapalıysa o türde arama başlamaz (diğer tür etkilenmez)
+    let meCallee = await call(callee.t, 'GET', '/me');
+    check('call settings default on', meCallee.callSettings?.voice === true && meCallee.callSettings?.video === true);
+    const off = await call(callee.t, 'PUT', '/me/call-settings', { voice: false });
+    check('voice calls turned off', off.http === 200 && off.voice === false && off.video === true, JSON.stringify(off));
+    const seen = await call(caller.t, 'GET', `/users/${callee.id}`);
+    check('profile exposes accepts flags', seen.acceptsVoice === false && seen.acceptsVideo === true, JSON.stringify({ v: seen.acceptsVoice, vd: seen.acceptsVideo }));
     await call(caller.t, 'POST', '/wallet/dev-topup', { packId: 'coins_500' }); // 50 + 500 + 250 = 800
+    const optedOut = await call(caller.t, 'POST', '/calls', { toId: callee.id, kind: 'VOICE' });
+    check('voice call to opted-out user -> 409 calls_disabled', optedOut.http === 409 && optedOut.error === 'calls_disabled', `${optedOut.http} ${optedOut.error}`);
+    check('blocked call is not charged', (await bal(caller)) === 800);
+    await call(callee.t, 'PUT', '/me/call-settings', { voice: true });
+
+    // "Sadece eşleştiklerim": sohbeti olmayan arayamaz (ücret alınmadan), tercih kapatılınca yeniden arayabilir
+    const mo = await call(callee.t, 'PUT', '/me/call-settings', { matchesOnly: true });
+    check('matches-only turned on', mo.http === 200 && mo.matchesOnly === true && mo.voice === true, JSON.stringify(mo));
+    const noConv = await call(caller.t, 'POST', '/calls', { toId: callee.id, kind: 'VOICE' });
+    check('call from non-match -> 409 calls_matches_only', noConv.http === 409 && noConv.error === 'calls_matches_only', `${noConv.http} ${noConv.error}`);
+    check('matches-only block is not charged', (await bal(caller)) === 800);
+    await call(callee.t, 'PUT', '/me/call-settings', { matchesOnly: false });
+
+    // --- Normal arama akışı
     check('caller starts with 800', (await bal(caller)) === 800);
     const calleeSock = await listen(callee.t);
     const callerSock = await listen(caller.t);

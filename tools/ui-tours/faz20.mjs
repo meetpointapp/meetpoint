@@ -1,18 +1,18 @@
 // Faz 20 UI turu: eşleştirme modları (astroloji/müzik/ilgi/vibe), mağaza sekmesi, kompakt profil,
-// görsel yenileme. Seed'li demo hesapla (mert6@vibeupme.dev) giriş yapar, ekran görüntüsü alır.
+// görsel yenileme. Seed'li demo hesapla (mert6@meetpoint.dev) giriş yapar, ekran görüntüsü alır.
 import fs from 'node:fs';
 import { chromium } from 'playwright-core';
 import { WEB, call } from './lib.mjs';
 
 const out = new URL('./shots/', import.meta.url).pathname.replace(/^\/(\w:)/, '$1');
 fs.mkdirSync(out, { recursive: true });
-const email = process.env.TOUR_EMAIL ?? 'mert6@vibeupme.dev';
+const email = process.env.TOUR_EMAIL ?? 'mert6@meetpoint.dev';
 const password = process.env.TOUR_PASSWORD ?? 'password123';
 
 // Hazırlık: mert ile deniz arasında sohbet aç (demo hesaplar, yoksa eşleştir) ve birkaç mesaj yaz
 const login = async (mail) => (await call(null, 'POST', '/auth/login', { email: mail, password })).token;
 const mert = await login(email);
-const deniz = await login('deniz5@vibeupme.dev');
+const deniz = await login('deniz5@meetpoint.dev');
 const mertId = (await call(mert, 'GET', '/me')).id;
 const denizId = (await call(deniz, 'GET', '/me')).id;
 await call(deniz, 'POST', '/swipes', { toId: mertId, direction: 'like' });
@@ -70,6 +70,8 @@ await page.getByRole('button', { name: 'Atla' }).click({ timeout: 4000 }).catch(
 await page.waitForTimeout(1500);
 
 await shot('01-discover');
+// Günlük ödül ekranı (açılışta kendiliğinden açılmış olabilir)
+await shot('15-daily-or-home', 400);
 for (const [mode, tag] of [['Astroloji', '02-astro'], ['Müzik', '03-music'], ['İlgi', '04-interests'], ['Vibe', '05-vibe']]) {
   await tap(mode, { exact: true });
   await shot(tag, 1800);

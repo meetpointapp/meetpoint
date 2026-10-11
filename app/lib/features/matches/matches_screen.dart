@@ -149,6 +149,7 @@ class _MatchCard extends StatelessWidget {
                   NameWithBadge(
                     user == null ? '—' : '${user.displayName}, ${user.age}',
                     verified: user?.verified ?? false,
+                    premium: user?.premium ?? false,
                     onPhoto: true,
                     style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
                   ),

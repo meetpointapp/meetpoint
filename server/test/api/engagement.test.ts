@@ -45,16 +45,28 @@ describe('Etkileşim (Faz 4)', () => {
     check('unknown-location profiles still shown', !!find(deck, noloc));
     await call(me.t, 'PUT', '/me/filters', { minAge: 18, maxAge: 80, maxKm: 0 });
 
-    // --- 3. Süper beğeni
-    // 50 hediye jetonla bir süper beğeni (30) yapılabilir; ikincisine (kalan 20) yetmez
+    // --- 3. Süper beğeni (Faz 20): günlük 3 ücretsiz hak, sonra satın alınmış hak, yoksa 403 + paketler
     const sl = await call(me.t, 'POST', '/swipes', { toId: far.id, direction: 'superlike' });
-    check('superlike ok with signup gift', sl.http === 200 && sl.match === false);
+    check('superlike ok (free daily allowance)', sl.http === 200 && sl.match === false && sl.superLikes?.freeRemaining === 2, JSON.stringify(sl.superLikes));
     await call(me.t, 'POST', '/swipes', { toId: far.id, direction: 'superlike' });
     let w = await call(me.t, 'GET', '/wallet');
-    check('superlike charged once (30)', w.balance === 20, `balance=${w.balance}`);
-    const poorSuper = await call(me.t, 'POST', '/swipes', { toId: noloc.id, direction: 'superlike' });
-    check('superlike needs coins', poorSuper.http === 402);
-    await call(me.t, 'POST', '/wallet/dev-topup', { packId: 'coins_1000' }); // 20 + 1000 + 500 bonus = 1520
+    check('superlike no longer spends coins and repeat is free', w.balance === 50, `balance=${w.balance}`);
+    const st = await call(me.t, 'GET', '/superlikes/status');
+    check('status: 3 daily, 1 used, 4 packs with falling unit price', st.daily === 3 && st.used === 1 && st.packs.length === 4 && st.packs[3].unitPrice < st.packs[0].unitPrice, JSON.stringify(st.packs));
+    // Kalan 2 ücretsiz hakkı bitir, sonraki reddedilir
+    await call(me.t, 'POST', '/swipes', { toId: noloc.id, direction: 'superlike' });
+    await call(me.t, 'POST', '/swipes', { toId: near.id, direction: 'superlike' });
+    const noneLeft = await call(me.t, 'POST', '/swipes', { toId: old.id, direction: 'superlike' });
+    check('superlike blocked when allowance and credits are gone', noneLeft.http === 403 && noneLeft.error === 'superlike_limit_reached', `${noneLeft.http} ${noneLeft.error}`);
+    const poorBuy = await call(me.t, 'POST', '/superlikes/buy', { packId: 'sl_60' });
+    check('buying a pack needs coins', poorBuy.http === 402);
+    await call(me.t, 'POST', '/wallet/dev-topup', { packId: 'coins_1000' }); // 50 + 1000 + 500 bonus = 1550
+    const bought = await call(me.t, 'POST', '/superlikes/buy', { packId: 'sl_3' });
+    check('pack adds credits and costs 75', bought.http === 200 && bought.credits === 3, JSON.stringify(bought));
+    const viaCredit = await call(me.t, 'POST', '/swipes', { toId: old.id, direction: 'superlike' });
+    check('superlike works with a purchased credit', viaCredit.http === 200 && viaCredit.superLikes?.credits === 2, JSON.stringify(viaCredit.superLikes));
+    w = await call(me.t, 'GET', '/wallet');
+    check('pack purchase charged once', w.balance === 1550 - 75, `balance=${w.balance}`);
     const farDeck = await call(far.t, 'GET', '/discover');
     check('superliker shown first to target', farDeck._arr?.[0]?.id === me.id && farDeck._arr[0].superLikedMe === true);
     const back = await call(far.t, 'POST', '/swipes', { toId: me.id, direction: 'like' });
@@ -66,11 +78,17 @@ describe('Etkileşim (Faz 4)', () => {
     await call(near.t, 'POST', '/wallet/dev-topup', { packId: 'coins_500' });
     const boosted = await call(near.t, 'POST', '/boost');
     check('boost ok', boosted.http === 200 && !!boosted.boostedUntil);
-    const again = await call(near.t, 'POST', '/boost');
-    check('double boost rejected', again.http === 409);
+    // Süren öne çıkarma uzatılabilir (kalana eklenir); toplam kalan süre boostMaxMinutes (120) ile sınırlı
+    const firstUntil = new Date(boosted.boostedUntil).getTime();
+    const extended = await call(near.t, 'POST', '/boost');
+    check('boost can be extended', extended.http === 200 && new Date(extended.boostedUntil).getTime() - firstUntil === 30 * 60_000, JSON.stringify(extended));
+    await call(near.t, 'POST', '/boost');
+    await call(near.t, 'POST', '/boost');
+    const capped = await call(near.t, 'POST', '/boost');
+    check('boost extension capped', capped.http === 409 && capped.error === 'boost_max_reached', `${capped.http} ${capped.error}`);
     w = await call(near.t, 'GET', '/wallet');
-    // 50 hediye + 500 + 250 bonus - 150 = 650
-    check('boost charged 150', w.balance === 650, `balance=${w.balance}`);
+    // 50 hediye + 500 + 250 bonus - 4 x 150 = 200 (ilk alım + 3 uzatma)
+    check('boost + extensions charged 150 each', w.balance === 200, `balance=${w.balance}`);
     const viewer2 = await mk('Viewer2', 'male', 'female', '1994-01-01', { latitude: 38.42, longitude: 27.14 }); // İzmir
     const v2deck = await call(viewer2.t, 'GET', '/discover');
     check('boosted profile ranked above closer ones', v2deck._arr?.[0]?.id === near.id, v2deck._arr?.map((p) => p.displayName).join(','));
@@ -84,7 +102,7 @@ describe('Etkileşim (Faz 4)', () => {
     check('unlock ok', unlock.http === 200 && !!unlock.unlockedUntil);
     await call(me.t, 'POST', '/likes/unlock');
     w = await call(me.t, 'GET', '/wallet');
-    check('unlock charged once (200)', w.balance === 1320, `balance=${w.balance}`);
+    check('unlock charged once (200)', w.balance === 1550 - 75 - 200, `balance=${w.balance}`);
     likes = await call(me.t, 'GET', '/likes');
     check('likes unlocked: profiles listed', likes.unlocked === true && likes.users.length === 2);
     await call(me.t, 'POST', '/swipes', { toId: noloc.id, direction: 'pass' });

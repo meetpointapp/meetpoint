@@ -54,6 +54,12 @@ model User {
   quietEnd    Int?
   tzOffsetMin Int  @default(180) // cihazın UTC farkı (dakika), sessiz saati hesaplamak için
 
+  // Faz 20: gelen arama tercihi. Kapalıysa o türde arama ve arama isteği alınmaz (herkes için).
+  acceptVoiceCalls Boolean @default(true)
+  acceptVideoCalls Boolean @default(true)
+  // Açıksa sadece eşleştiği / sohbet ettiği kişiler arayabilir
+  callsMatchesOnly Boolean @default(false)
+
   // Saklama ve imha
   lastActiveAt        DateTime  @default(now()) // 2 yıl hareketsiz hesaplar silinir
   inactivityWarnedAt  DateTime?
@@ -95,6 +101,7 @@ model User {
   // taraf da bir kerelik bonus jeton kazanır (promosyon kovası — kayıt hediyesiyle aynı mekanik,
   // bkz. src/referral.ts). Eski hesaplarda kod yok (null) — sorun değil, sadece yeni özellik.
   referralCode String? @unique
+  dailyClaims  DailyClaim[]
   referredById String?
   referredBy   User?   @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
   referrals    User[]  @relation("Referrals")
@@ -171,6 +178,8 @@ model Profile {
   // Faz 20: günlük beğeni hakkı. Son likesResetAt'tan (ya da son 24 saatten, hangisi yakınsa) beri atılan
   // beğeniler sayılır; jetonla "sıfırla" bu alanı şimdiye çeker.
   likesResetAt DateTime?
+  // Faz 20: satın alınmış süper beğeni hakları (günlük ücretsiz haktan sonra bunlardan düşülür)
+  superLikeCredits Int @default(0)
   smoking     String   @default("") // no | sometimes | yes
   drinking     String   @default("") // no | sometimes | yes
 
@@ -259,6 +268,8 @@ model Swipe {
   from      User     @relation("SwipeFrom", fields: [fromId], references: [id], onDelete: Cascade)
   to        User     @relation("SwipeTo", fields: [toId], references: [id], onDelete: Cascade)
   direction String // "like" | "pass" | "superlike" (jetonla; eşleşme açısından beğeni sayılır)
+  // Faz 20: süper beğeni satın alınmış haktan mı gitti (günlük ücretsiz hak sayımına katılmaz)
+  superPaid Boolean @default(false)
   createdAt DateTime @default(now())
 
   @@unique([fromId, toId])
@@ -1067,4 +1078,21 @@ model EarningEvent {
   createdAt  DateTime @default(now())
 
   @@index([startAt, endAt])
+}
+
+// Faz 20: günlük giriş ödülü. Kullanıcının yerel gününe (src/streak.ts localDateStr) göre günde bir kez
+// alınır; (userId, day) tekil olduğu için aynı gün iki kez ödül alınamaz. Jeton "promo" kovasına girer
+// (harcanabilir, bozdurulamaz). streakDay: ödül alınırken serinin kaçıncı günüydü.
+model DailyClaim {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  day        String // YYYY-MM-DD (kullanıcının yerel günü)
+  streakDay  Int
+  coins      Int // alınan toplam (günlük + seri bonusu)
+  bonusCoins Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, day])
+  @@index([userId, createdAt])
 }

@@ -139,19 +139,19 @@ class VibeCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Brand.radius),
         gradient: LinearGradient(colors: [Brand.coral.withValues(alpha: 0.12), Brand.orange.withValues(alpha: 0.06)]),
       ),
       child: Row(children: [
-        Icon(Icons.auto_awesome_rounded, color: Brand.coral),
-        const SizedBox(width: 12),
+        Icon(Icons.auto_awesome_rounded, color: Brand.coral, size: 20),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(l.vibeArchetypeName(archetypeId), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Text(l.vibeArchetypeDesc(archetypeId), style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            Text(l.vibeArchetypeName(archetypeId), style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 2),
+            Text(l.vibeArchetypeDesc(archetypeId), style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontSize: 12)),
           ]),
         ),
       ]),

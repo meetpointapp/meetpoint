@@ -5,6 +5,8 @@ import { prisma } from '../db';
 import { activeEarningEvent, eventDto } from '../events';
 import { getFinance } from '../finance/settings';
 import { photoUrls } from '../images';
+import { claimDailyReward, dailyRewardState } from '../dailyReward';
+import { requireNotRestricted } from '../moderation/sanctions';
 
 // Faz 19: kazanç heyecanı — kazananlar sıralaması, canlı aktivite göstergesi, aktif etkinlik.
 // Hepsi var olan tablolardan (WalletEntry, Call, Swipe) okunur; yeni veri saklamaz.
@@ -68,6 +70,16 @@ engagementRouter.put('/me/leaderboard', async (req, res) => {
   const { optIn } = z.object({ optIn: z.boolean() }).parse(req.body);
   await prisma.profile.update({ where: { userId: uid(req) }, data: { leaderboardOptIn: optIn } });
   res.json({ optIn });
+});
+
+// ---------- Faz 20: günlük giriş ödülü (takvim + seri bonusu)
+engagementRouter.get('/me/daily-reward', async (req, res) => {
+  const { month } = z.object({ month: z.string().regex(/^\d{4}-\d{2}$/).optional() }).parse(req.query);
+  res.json(await dailyRewardState(uid(req), month));
+});
+
+engagementRouter.post('/me/daily-reward/claim', requireNotRestricted, async (req, res) => {
+  res.json(await claimDailyReward(uid(req)));
 });
 
 // ---------- Canlı aktivite göstergesi

@@ -15,9 +15,14 @@ boostsRouter.post('/boost', async (req, res) => {
     // Önce cüzdan kilitlenir: eşzamanlı iki istek aynı kontrolü birlikte geçemez
     await lockWallet(tx, userId);
     const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
-    if (user.boostedUntil && user.boostedUntil > new Date()) throw new HttpError(409, 'already_boosted');
-    await debit(tx, userId, economy.boostPrice, 'SPEND', { note: 'boost' });
-    const until = new Date(Date.now() + economy.boostMinutes * 60_000);
+    const now = Date.now();
+    const active = user.boostedUntil && user.boostedUntil.getTime() > now ? user.boostedUntil.getTime() : null;
+    // Faz 20: süren öne çıkarma uzatılabilir (kalan süreye eklenir); toplam kalan süre sınırlıdır
+    if (active && active - now + economy.boostMinutes * 60_000 > economy.boostMaxMinutes * 60_000) {
+      throw new HttpError(409, 'boost_max_reached');
+    }
+    await debit(tx, userId, economy.boostPrice, 'SPEND', { note: active ? 'boost_extend' : 'boost' });
+    const until = new Date((active ?? now) + economy.boostMinutes * 60_000);
     await tx.user.update({ where: { id: userId }, data: { boostedUntil: until } });
     return until;
   });

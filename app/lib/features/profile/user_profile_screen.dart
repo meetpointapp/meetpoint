@@ -61,7 +61,7 @@ class _ProfileBody extends ConsumerWidget {
       blocks.add(Padding(
         padding: const EdgeInsets.only(bottom: 14),
         child: SizedBox(
-          height: 148,
+          height: 108,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: photos.length,
@@ -87,21 +87,21 @@ class _ProfileBody extends ConsumerWidget {
       }
     }
     blocks.add(gap(BasicsChips(profile: p)));
-    if (p.bio.isNotEmpty) blocks.add(gap(Card(child: Padding(padding: const EdgeInsets.all(18), child: Text(p.bio, style: theme.textTheme.bodyLarge)))));
+    if (p.bio.isNotEmpty) blocks.add(gap(Card(child: Padding(padding: const EdgeInsets.all(12), child: Text(p.bio, style: theme.textTheme.bodyMedium?.copyWith(height: 1.4))))));
     if (prompts.isNotEmpty) blocks.add(gap(PromptCard(prompt: prompts[0])));
     if (p.interests.isNotEmpty) {
       final common = p.interests.where(mine.contains).length;
       blocks.add(gap(Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Expanded(child: Text(l.interests, style: theme.textTheme.titleSmall)),
+              Expanded(child: Text(l.interests, style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800))),
               if (common > 0)
                 Text(l.commonInterests(common), style: theme.textTheme.labelMedium?.copyWith(color: Brand.coral)),
             ]),
-            const SizedBox(height: 10),
-            Wrap(spacing: 6, runSpacing: 6, children: [
+            const SizedBox(height: 8),
+            Wrap(spacing: 5, runSpacing: 5, children: [
               for (final id in p.interests) InterestChip(id, highlighted: mine.contains(id)),
             ]),
           ]),
@@ -111,17 +111,17 @@ class _ProfileBody extends ConsumerWidget {
     if (p.musicGenres.isNotEmpty) {
       blocks.add(gap(Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(l.musicTaste, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 10),
+            Text(l.musicTaste, style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
             Wrap(spacing: 6, runSpacing: 6, children: [
               for (final id in p.musicGenres)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                   decoration: ShapeDecoration(shape: const StadiumBorder(), color: theme.colorScheme.surfaceContainerHighest),
                   child: Text('${musicEmoji[id] ?? ''} ${l.musicGenreLabel(id)}',
-                      style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
+                      style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600, fontSize: 12)),
                 ),
             ]),
           ]),
@@ -132,8 +132,9 @@ class _ProfileBody extends ConsumerWidget {
       blocks.add(gap(PromptCard(prompt: prompts[i])));
     }
 
-    final banner = cardGradientOf(p.cardBackgroundId.isEmpty ? 'default' : p.cardBackgroundId);
-    final bannerHeight = MediaQuery.paddingOf(context).top + 116;
+    // VibeUpMe+ aboneleri altın başlık bandı alır
+    final banner = p.premium ? const [Color(0xFFFFD86B), Color(0xFFC88A0A)] : cardGradientOf(p.cardBackgroundId.isEmpty ? 'default' : p.cardBackgroundId);
+    final bannerHeight = MediaQuery.paddingOf(context).top + 88;
     // Başlık (banner + avatar) tek bir kutuda: avatar banner'ın üstüne taşar ama kutunun içinde kalır,
     // geri/menü düğmeleri en üstte sabit durur.
     return Stack(children: [
@@ -149,17 +150,18 @@ class _ProfileBody extends ConsumerWidget {
               ]),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(16 + 96 + 14, bannerHeight + 10, 16, 8),
+              padding: EdgeInsets.fromLTRB(16 + 82 + 12, bannerHeight + 8, 16, 6),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 56),
+                constraints: const BoxConstraints(minHeight: 44),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   NameWithBadge(
                     '${p.displayName}, ${p.age}',
                     verified: p.verified,
+                    premium: p.premium,
                     badgeId: p.badgeId,
-                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800, fontSize: 18),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Wrap(spacing: 10, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
                     if (p.online)
                       Row(mainAxisSize: MainAxisSize.min, children: [
@@ -176,7 +178,7 @@ class _ProfileBody extends ConsumerWidget {
             ),
             Positioned(
               left: 16,
-              top: bannerHeight - 48,
+              top: bannerHeight - 40,
               child: GestureDetector(
                 onTap: () => showPhotoViewer(context, photos),
                 child: Container(
@@ -187,12 +189,12 @@ class _ProfileBody extends ConsumerWidget {
                     border: p.themeId.isEmpty ? null : Border.all(color: themeColorOf(p.themeId), width: 2.5),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 12, offset: const Offset(0, 4))],
                   ),
-                  child: Avatar(p, radius: 45),
+                  child: Avatar(p, radius: 38),
                 ),
               ),
             ),
             // Alt boşluk: avatar (96px) başlık kutusundan taşmasın
-            SizedBox(height: bannerHeight + 10 + 56 + 8),
+            SizedBox(height: bannerHeight + 8 + 44 + 6),
           ]),
         ),
         SliverPadding(
@@ -263,31 +265,53 @@ class _RequestBar extends ConsumerWidget {
     final prices = wallet?.requestPrices;
     final rates = wallet?.callRates;
     final theme = Theme.of(context);
+    // Zaten sohbet varsa mesaj isteği/ücret yok: doğrudan sohbete gidilir; "sadece eşleşmeler" aramasına da izin verir
+    final convId = ref.watch(conversationsProvider).value?.where((c) => c.user?.id == profile.id).firstOrNull?.id;
+    final hasConv = convId != null;
 
-    Widget callButton(CallKind kind) => SizedBox(
-          width: 64,
-          child: Material(
-            color: theme.colorScheme.surfaceContainerHighest,
+    Widget callButton(CallKind kind) {
+      final video = kind == CallKind.video;
+      // Karşı taraf bu türde arama almayı kapattıysa düğme pasif görünür
+      final typeOn = video ? profile.acceptsVideo : profile.acceptsVoice;
+      final needsMatch = typeOn && profile.callsMatchesOnly && !hasConv;
+      final enabled = typeOn && !needsMatch;
+      final rate = rates?[kind];
+      return SizedBox(
+        width: 72,
+        child: Material(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(Brand.radius),
+          child: InkWell(
             borderRadius: BorderRadius.circular(Brand.radius),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(Brand.radius),
-              onTap: () => startCallFlow(context, ref, profile, kind),
-              child: Semantics(
-                button: true,
-                label: callKindLabel(l, kind),
-                child: SizedBox(
-                  height: 52,
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(callKindIcon(kind), size: 20, color: Brand.coral),
-                    if (rates?[kind] != null)
-                      Text(l.perMinute(rates![kind]!),
-                          style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
-                  ]),
-                ),
+            onTap: enabled
+                ? () => startCallFlow(context, ref, profile, kind)
+                : () => showSnack(context, needsMatch ? l.errCallsMatchesOnly : l.errCallsDisabled),
+            child: Semantics(
+              button: true,
+              label: callKindLabel(l, kind),
+              child: SizedBox(
+                height: 52,
+                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(
+                    enabled ? callKindIcon(kind) : (video ? Icons.videocam_off_rounded : Icons.phone_disabled_rounded),
+                    size: 20,
+                    color: enabled ? Brand.coral : theme.colorScheme.onSurfaceVariant,
+                  ),
+                  if (!enabled)
+                    Text(needsMatch ? l.callsMatchesOnlyLabel : l.callsOffLabel, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant))
+                  else if (rate != null)
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.toll_rounded, size: 12, color: Brand.gold),
+                      const SizedBox(width: 2),
+                      Text(l.perMinute(rate), style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
+                    ]),
+                ]),
               ),
             ),
           ),
-        );
+        ),
+      );
+    }
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -302,10 +326,11 @@ class _RequestBar extends ConsumerWidget {
             Expanded(
               child: GradientButton(
                 icon: Icons.mail_rounded,
-                label: prices?[RequestKind.message] == null
-                    ? l.messageRequest
-                    : '${l.messageRequest} · ${prices![RequestKind.message]}',
-                onPressed: () => sendContactRequest(context, ref, profile, RequestKind.message),
+                label: hasConv ? l.sendMessage : l.messageRequest,
+                coin: hasConv ? null : prices?[RequestKind.message],
+                onPressed: () => hasConv
+                    ? context.push('/chat/$convId')
+                    : sendContactRequest(context, ref, profile, RequestKind.message),
               ),
             ),
             const SizedBox(width: 8),

@@ -12,11 +12,13 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
+import 'superlike_packs.dart';
 
 // Faz 16/20: kozmetik mağaza. Jetonla alınan sohbet balonu/arka planı, çerçeve, rozet, premium tema — kullanıcıdan kullanıcıya geçmez, tamamı platform geliri. Alt menüde kendi
 // sekmesi var; her ürün canlı önizlemeyle gösterilir ve alındıktan sonra doğrudan buradan "Kullan"
 // ile uygulanır (profil düzenlemeye gitmeye gerek yok).
 const _categories = <(String, String)>[
+  ('superLike', '⭐'),
   ('chatBubble', '💬'),
   ('chatBackground', '🖼️'),
   ('frame', '⭕'),
@@ -32,7 +34,7 @@ class StoreScreen extends ConsumerStatefulWidget {
 }
 
 class _StoreScreenState extends ConsumerState<StoreScreen> {
-  String _category = 'chatBubble';
+  String _category = 'superLike';
   String? _busy;
 
   Future<void> _buy(StoreItem item) async {
@@ -101,6 +103,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
         'theme' => l.storeCategoryTheme,
         'chatBubble' => l.storeCategoryChatBubble,
         'chatBackground' => l.storeCategoryChatBackground,
+        'superLike' => l.storeCategorySuperLike,
         _ => category,
       };
 
@@ -169,6 +172,12 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                 ),
               ),
             ),
+            if (_category == 'superLike')
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                sliver: const SliverToBoxAdapter(child: _SuperLikeShelf()),
+              )
+            else
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
               sliver: SliverGrid.builder(
@@ -194,6 +203,68 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
           ]);
         },
       ),
+    );
+  }
+}
+
+
+// Mağazanın "Süper beğeni" bölümü: günlük ücretsiz hak durumu + paketler (toplu alım daha ucuz)
+class _SuperLikeShelf extends ConsumerStatefulWidget {
+  const _SuperLikeShelf();
+
+  @override
+  ConsumerState<_SuperLikeShelf> createState() => _SuperLikeShelfState();
+}
+
+class _SuperLikeShelfState extends ConsumerState<_SuperLikeShelf> {
+  String? _busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final st = ref.watch(superLikeStatusProvider);
+    return st.when(
+      loading: () => const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator())),
+      error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(superLikeStatusProvider)),
+      data: (s) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)),
+          child: Row(children: [
+            const Icon(Icons.star_rounded, color: Color(0xFF2F80ED)),
+            const SizedBox(width: 10),
+            Expanded(child: Text(l.superLikeBalance(s.freeRemaining, s.daily, s.credits), style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600))),
+          ]),
+        ),
+        SuperLikePackTiles(
+          status: s,
+          busyId: _busy,
+          onBuy: (p) async {
+            setState(() => _busy = p.id);
+            try {
+              await ref.read(apiProvider).buySuperLikePack(p.id);
+              ref.invalidate(superLikeStatusProvider);
+              ref.invalidate(walletProvider);
+              ref.invalidate(meProvider);
+              Fx.success();
+              // ignore: use_build_context_synchronously
+              if (mounted) showSnack(context, l.superLikeBought(p.count));
+            } catch (e) {
+              if (mounted) {
+                final low = e is ApiException && e.code == 'insufficient_balance';
+                // ignore: use_build_context_synchronously
+                showSnack(context, errorText(l, e),
+                    // ignore: use_build_context_synchronously
+                    action: low ? SnackBarAction(label: l.topUp, onPressed: () => context.go('/wallet')) : null);
+              }
+            } finally {
+              if (mounted) setState(() => _busy = null);
+            }
+          },
+        ),
+      ]),
     );
   }
 }

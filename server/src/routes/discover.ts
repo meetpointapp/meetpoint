@@ -15,6 +15,7 @@ import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { debit, lockWallet } from '../wallet';
 import { likeStatus } from '../likeLimit';
+import { superLikeStatus } from '../superLikes';
 import { MATCH_MODES, matchReason } from '../matching';
 import { publicProfile, withOnlineMany } from './profile';
 
@@ -224,23 +225,35 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
     }
   }
 
+  // Süper beğeni: önce günlük ücretsiz hak, bitince satın alınmış haklar; ikisi de yoksa 403 + paketler.
+  // Aynı kişiye ikinci süper beğeni yeni hak harcamaz.
+  let superLikeUsesCredit = false;
+  if (direction === 'superlike') {
+    const prior = await prisma.swipe.findUnique({ where: { fromId_toId: { fromId: me, toId } }, select: { direction: true } });
+    if (prior?.direction !== 'superlike') {
+      const status = await superLikeStatus(me);
+      if (status.total <= 0) throw new HttpError(403, 'superlike_limit_reached', { superLikes: status });
+      superLikeUsesCredit = status.freeRemaining <= 0;
+    }
+  }
+
   await prisma.$transaction(async (tx) => {
-    // Süper beğenide önce cüzdan kilitlenir: eşzamanlı iki istek çift ücret alamaz
-    if (direction === 'superlike') await lockWallet(tx, me);
-    const existing = await tx.swipe.findUnique({ where: { fromId_toId: { fromId: me, toId } } });
-    // Süper beğeni jetonla: aynı kişiye ikinci kez ücret alınmaz
-    if (direction === 'superlike' && existing?.direction !== 'superlike') {
-      await debit(tx, me, economy.superLikePrice, 'SPEND', { note: 'superlike' });
+    if (superLikeUsesCredit) {
+      // Satın alınmış hak: koşullu azaltma, eşzamanlı iki istek aynı hakkı iki kez kullanamaz
+      const { count } = await tx.profile.updateMany({ where: { userId: me, superLikeCredits: { gt: 0 } }, data: { superLikeCredits: { decrement: 1 } } });
+      if (count !== 1) throw new HttpError(403, 'superlike_limit_reached');
     }
     await tx.swipe.upsert({
       where: { fromId_toId: { fromId: me, toId } },
-      create: { fromId: me, toId, direction },
-      update: { direction },
+      create: { fromId: me, toId, direction, superPaid: superLikeUsesCredit },
+      // Beğeniden süper beğeniye yükseltmede zaman damgası yenilenir (günlük hak sayımı doğru kalsın)
+      update: { direction, ...(direction === 'superlike' ? { createdAt: new Date(), superPaid: superLikeUsesCredit } : {}) },
     });
   });
 
   // Uygulama sayacı güncel tutsun diye beğeni sonrası kalan hak da döner
   const likes = direction === 'like' ? await likeStatus(me) : undefined;
+  const superLikes = direction === 'superlike' ? await superLikeStatus(me) : undefined;
   if (direction === 'pass') return res.json({ match: false });
 
   const reverse = await prisma.swipe.findUnique({ where: { fromId_toId: { fromId: toId, toId: me } } });
@@ -250,7 +263,7 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
       emitToUser(toId, 'superlike', { fromId: me });
       void notify(toId, 'superlike', me);
     }
-    return res.json({ match: false, likes });
+    return res.json({ match: false, likes, superLikes });
   }
 
   // Karşılıklı beğeni: ücretsiz sohbet açılır
@@ -267,7 +280,25 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
   // Faz 17: "Sosyal cesaret yolculuğu" — Bağlantı izi
   await unlockMilestone(me, 'first_match');
   await unlockMilestone(toId, 'first_match');
-  res.json({ match: true, conversationId: conversation.id, likes });
+  res.json({ match: true, conversationId: conversation.id, likes, superLikes });
+});
+
+// Faz 20: süper beğeni hakları ve paket satın alma
+discoverRouter.get('/superlikes/status', async (req, res) => {
+  res.json(await superLikeStatus(uid(req)));
+});
+
+discoverRouter.post('/superlikes/buy', requireNotRestricted, async (req, res) => {
+  const { packId } = z.object({ packId: z.string() }).parse(req.body);
+  const me = uid(req);
+  const pack = economy.superLike.packs.find((p) => p.id === packId);
+  if (!pack) throw new HttpError(400, 'invalid_pack');
+  await prisma.$transaction(async (tx) => {
+    await lockWallet(tx, me);
+    await debit(tx, me, pack.price, 'SPEND', { note: `superlike_pack:${pack.id}` });
+    await tx.profile.update({ where: { userId: me }, data: { superLikeCredits: { increment: pack.count } } });
+  });
+  res.json(await superLikeStatus(me));
 });
 
 // Faz 20: beğeni hakkı durumu (sayaç) ve jetonla sıfırlama

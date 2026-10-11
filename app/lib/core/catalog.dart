@@ -2,6 +2,8 @@
 // çeviriler l10n dosyalarındaki select mesajlarında (interestLabel vb.).
 import 'package:flutter/material.dart';
 
+import 'theme.dart';
+
 const interestEmoji = <String, String>{
   'coffee': '☕', 'travel': '✈️', 'music': '🎵', 'concerts': '🎤', 'movies': '🎬',
   'series': '📺', 'books': '📚', 'photography': '📷', 'art': '🎨', 'cooking': '🍳',
@@ -75,6 +77,51 @@ const cardBackgroundGradient = <String, List<Color>>{
 List<String> get cardBackgroundIds => cardBackgroundGradient.keys.toList();
 
 Color themeColorOf(String id) => themeAccent[id] ?? storePremiumThemeAccent[id] ?? themeAccent['coral']!;
+
+// Faz 20: premium temaların TAM paleti (zemin, yüzey, koyu/açık, ışıklar). Ücretsiz temalar sadece ana rengi
+// değiştirir ve zemini ona hafifçe tonlar; boş tema ('') standart beyaz temadır.
+const _premiumPalettes = <String, AppPalette>{
+  'theme_galaxy': AppPalette(
+    accent: Color(0xFFA855F7),
+    background: Color(0xFF0D0A24),
+    surface: Color(0xFF1B1640),
+    dark: true,
+    glowA: Color(0xFF7C3AED),
+    glowB: Color(0xFFEC4899),
+  ),
+  'theme_fire': AppPalette(
+    accent: Color(0xFFFF5A1F),
+    background: Color(0xFF190D08),
+    surface: Color(0xFF2A1810),
+    dark: true,
+    glowA: Color(0xFFFF4500),
+    glowB: Color(0xFFFFB000),
+  ),
+  'theme_ice': AppPalette(
+    accent: Color(0xFF1CA7D0),
+    background: Color(0xFFEAF6FD),
+    surface: Color(0xFFFFFFFF),
+    glowA: Color(0xFF7FDBFF),
+    glowB: Color(0xFFB8E6FF),
+  ),
+  'theme_royal': AppPalette(
+    accent: Color(0xFFE2B33C),
+    background: Color(0xFF0E1330),
+    surface: Color(0xFF1A2145),
+    dark: true,
+    glowA: Color(0xFFE2B33C),
+    glowB: Color(0xFF3B5BDB),
+  ),
+};
+
+AppPalette? appPaletteOf(String id) {
+  if (id.isEmpty) return null;
+  final premium = _premiumPalettes[id];
+  if (premium != null) return premium;
+  final accent = appAccentOf(id);
+  if (accent == null) return null;
+  return AppPalette(accent: accent, background: Color.lerp(Colors.white, accent, 0.05), glowA: accent, glowB: Color.lerp(accent, Colors.white, 0.4));
+}
 
 // Faz 20: uygulamanın ana rengi. Kullanıcının seçtiği tema (ücretsiz ya da mağazadan alınan premium)
 // düğmeleri, vurguları ve gradyanları boyar. '' = varsayılan marka rengi (null döner). Düğme/vurgu

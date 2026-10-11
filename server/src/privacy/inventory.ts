@@ -89,7 +89,7 @@ export const INVENTORY: InventoryEntry[] = [
   },
   {
     category: 'Finans',
-    tables: ['Wallet', 'WalletEntry', 'Purchase', 'StorePurchase', 'Payout'],
+    tables: ['Wallet', 'WalletEntry', 'Purchase', 'StorePurchase', 'Payout', 'DailyClaim'],
     data: 'Jeton bakiyesi ve hareketleri, satın almalar, kozmetik mağaza alımları, para çekme talepleri, IBAN/PayPal (şifreli)',
     purpose: 'Ödeme, muhasebe ve vergi yükümlülükleri, dolandırıcılık önleme',
     basis: ['sözleşme', 'yasal'],

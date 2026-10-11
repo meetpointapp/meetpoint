@@ -10,10 +10,28 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 
+// Bu kullanıcıyla zaten bir sohbet varsa kimliği (yoksa null). Sohbet listesi önbellekten gelir.
+Future<String?> existingConversationId(WidgetRef ref, String userId) async {
+  try {
+    final list = await ref.read(conversationsProvider.future);
+    return list.where((c) => c.user?.id == userId).firstOrNull?.id;
+  } catch (_) {
+    return null;
+  }
+}
+
 // Ücretli iletişim isteği gönderme akışı (profil sayfası ve keşfet kartı ortak kullanır).
 // Başarılıysa true döner.
 Future<bool> sendContactRequest(BuildContext context, WidgetRef ref, PublicProfile profile, RequestKind kind) async {
   final l = AppLocalizations.of(context);
+  // Zaten sohbet varsa (eşleşme veya kabul edilmiş istek) yeniden jeton ödenmez: doğrudan sohbete gidilir
+  if (kind == RequestKind.message) {
+    final convId = await existingConversationId(ref, profile.id);
+    if (convId != null) {
+      if (context.mounted) context.push('/chat/$convId');
+      return false;
+    }
+  }
   final WalletInfo wallet;
   try {
     wallet = await ref.read(walletProvider.future);
@@ -57,6 +75,16 @@ Future<bool> sendContactRequest(BuildContext context, WidgetRef ref, PublicProfi
     if (context.mounted) showSnack(context, l.requestSent);
     return true;
   } catch (e) {
+    if (!context.mounted) return false;
+    // Liste eskiydi ama sohbet zaten var (jeton alınmadı): sohbeti aç
+    if (e is ApiException && e.code == 'already_in_conversation') {
+      ref.invalidate(conversationsProvider);
+      final convId = await existingConversationId(ref, profile.id);
+      if (convId != null && context.mounted) {
+        context.push('/chat/$convId');
+        return false;
+      }
+    }
     if (!context.mounted) return false;
     final lowBalance = e is ApiException && e.code == 'insufficient_balance';
     showSnack(
@@ -112,7 +140,8 @@ class _MessageRequestSheetState extends State<_MessageRequestSheet> {
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 16),
         GradientButton(
-          label: '${l.send} · ${l.coins(widget.price)}',
+          label: l.send,
+          coin: widget.price,
           icon: Icons.send_rounded,
           onPressed: _text.text.trim().isEmpty ? null : () => Navigator.pop(context, _text.text.trim()),
         ),

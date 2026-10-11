@@ -68,6 +68,10 @@ export function publicProfile(
   user: {
     id: string;
     verificationStatus: string;
+    premiumUntil?: Date | null;
+    acceptVoiceCalls?: boolean;
+    acceptVideoCalls?: boolean;
+    callsMatchesOnly?: boolean;
     profile: Profile | null;
     photos: { id: string; path: string; position: number; hiddenAt?: Date | null }[];
   },
@@ -79,6 +83,12 @@ export function publicProfile(
   return {
     id: user.id,
     verified: user.verificationStatus === 'approved',
+    // Faz 20: VibeUpMe+ abonesi (herkese görünür: rozet, altın çerçeve)
+    premium: !!user.premiumUntil && user.premiumUntil > new Date(),
+    // Faz 20: bu türde arama alıyor mu (kapalıysa profilde arama düğmesi pasif görünür)
+    acceptsVoice: user.acceptVoiceCalls ?? true,
+    acceptsVideo: user.acceptVideoCalls ?? true,
+    callsMatchesOnly: user.callsMatchesOnly ?? false,
     distanceKm: roundedDistance(viewer, p),
     displayName: p.displayName,
     age: ageOf(p.birthDate),
@@ -127,6 +137,21 @@ export async function withOnlineMany<T extends { id: string }>(profiles: T[]): P
   return Promise.all(profiles.map(withOnline));
 }
 
+// Faz 20: gelen sesli/görüntülü aramayı aç/kapat. Kapalıyken o türde arama ve arama isteği alınmaz.
+profileRouter.put('/me/call-settings', async (req, res) => {
+  const body = z.object({ voice: z.boolean().optional(), video: z.boolean().optional(), matchesOnly: z.boolean().optional() }).parse(req.body);
+  const u = await prisma.user.update({
+    where: { id: uid(req) },
+    data: {
+      ...(body.voice !== undefined && { acceptVoiceCalls: body.voice }),
+      ...(body.video !== undefined && { acceptVideoCalls: body.video }),
+      ...(body.matchesOnly !== undefined && { callsMatchesOnly: body.matchesOnly }),
+    },
+    select: { acceptVoiceCalls: true, acceptVideoCalls: true, callsMatchesOnly: true },
+  });
+  res.json({ voice: u.acceptVoiceCalls, video: u.acceptVideoCalls, matchesOnly: u.callsMatchesOnly });
+});
+
 profileRouter.get('/me', async (req, res) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: uid(req) },
@@ -148,6 +173,8 @@ profileRouter.get('/me', async (req, res) => {
     premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
     // Faz 17: günlük giriş serisi
     streak: { current: streak.current, longest: streak.longest },
+    // Faz 20: gelen arama tercihi
+    callSettings: { voice: user.acceptVoiceCalls, video: user.acceptVideoCalls, matchesOnly: user.callsMatchesOnly },
     // Faz 17 madde 8: davet programı — kendi kodu (eski hesaplarda null olabilir)
     referralCode: user.referralCode,
     // Faz 17: "Sosyal cesaret yolculuğu" — üç izin ayrıntılı kademe durumu

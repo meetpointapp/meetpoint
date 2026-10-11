@@ -14,6 +14,7 @@ import '../../core/push.dart';
 import '../../core/session.dart';
 import '../../core/store.dart';
 import '../../core/tips.dart';
+import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../matches/matches_screen.dart';
 import '../../l10n/app_localizations.dart';
@@ -172,9 +173,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final pending = ref.watch(requestsProvider(true)).value?.where((r) => r.isPending).length ?? 0;
     final newMatches = newMatchCount(ref.watch(conversationsProvider).value ?? const []);
     final unread = ref.watch(unreadCountProvider);
-
-    Widget badged(IconData icon, int count) =>
-        Badge(isLabelVisible: count > 0, label: Text('$count'), child: Icon(icon));
+    // Günlük giriş ödülü alınmadıysa profil simgesinde kırmızı nokta
+    final dailyDot = ref.watch(dailyClaimableProvider).value ?? false;
 
     return Scaffold(
       body: Column(children: [
@@ -204,42 +204,99 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ),
         ),
       ]),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: widget.shell.currentIndex,
-        onDestinationSelected: (i) => widget.shell.goBranch(i, initialLocation: i == widget.shell.currentIndex),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.style_outlined),
-            selectedIcon: const Icon(Icons.style_rounded),
-            label: l.navDiscover,
+      // Faz 20: Tinder tarzı yüzen hap alt menü — seçili sekme etiketiyle genişler, diğerleri sadece simge
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+          child: Container(
+            height: 64,
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardTheme.color,
+              borderRadius: BorderRadius.circular(34),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 22, offset: const Offset(0, 8))],
+            ),
+            child: Row(children: [
+              for (final (i, d) in [
+                (Icons.style_outlined, Icons.style_rounded, l.navDiscover, 0, false),
+                (Icons.favorite_border_rounded, Icons.favorite_rounded, l.matchesTitle, newMatches, false),
+                (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, l.navChats, unread + pending, false),
+                (Icons.account_balance_wallet_outlined, Icons.account_balance_wallet_rounded, l.navWallet, 0, false),
+                (Icons.storefront_outlined, Icons.storefront_rounded, l.navStore, 0, false),
+                (Icons.person_outline_rounded, Icons.person_rounded, l.navProfile, 0, dailyDot),
+              ].indexed)
+                Expanded(
+                  flex: widget.shell.currentIndex == i ? 6 : 2,
+                  child: _NavItem(
+                    icon: d.$1,
+                    selectedIcon: d.$2,
+                    label: d.$3,
+                    badge: d.$4,
+                    dot: d.$5,
+                    selected: widget.shell.currentIndex == i,
+                    onTap: () => widget.shell.goBranch(i, initialLocation: i == widget.shell.currentIndex),
+                  ),
+                ),
+            ]),
           ),
-          NavigationDestination(
-            icon: badged(Icons.favorite_border_rounded, newMatches),
-            selectedIcon: badged(Icons.favorite_rounded, newMatches),
-            label: l.matchesTitle,
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({required this.icon, required this.selectedIcon, required this.label, required this.badge, required this.dot, required this.selected, required this.onTap});
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final int badge;
+  // Sayı yerine sadece kırmızı nokta (ör. günlük ödül hazır)
+  final bool dot;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final color = selected ? Brand.coral : scheme.onSurfaceVariant;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            height: 46,
+            padding: EdgeInsets.symmetric(horizontal: selected ? 14 : 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              color: selected ? Brand.coral.withValues(alpha: 0.14) : Colors.transparent,
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Badge(
+                isLabelVisible: badge > 0 || dot,
+                smallSize: badge > 0 ? null : 10,
+                backgroundColor: const Color(0xFFE5383B),
+                textColor: Colors.white,
+                label: badge > 0 ? Text(badge > 99 ? '99+' : '$badge') : null,
+                child: Icon(selected ? selectedIcon : icon, color: color, size: 24),
+              ),
+              if (selected) ...[
+                const SizedBox(width: 6),
+                Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 12.5))),
+              ],
+            ]),
           ),
-          NavigationDestination(
-            // Sohbetler sekmesi okunmamış mesajları ve bekleyen istekleri birlikte gösterir
-            icon: badged(Icons.chat_bubble_outline_rounded, unread + pending),
-            selectedIcon: badged(Icons.chat_bubble_rounded, unread + pending),
-            label: l.navChats,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-            label: l.navWallet,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.storefront_outlined),
-            selectedIcon: const Icon(Icons.storefront_rounded),
-            label: l.navStore,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline_rounded),
-            selectedIcon: const Icon(Icons.person_rounded),
-            label: l.navProfile,
-          ),
-        ],
+        ),
       ),
     );
   }

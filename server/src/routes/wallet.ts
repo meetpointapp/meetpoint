@@ -53,7 +53,8 @@ walletRouter.get('/wallet', async (req, res) => {
     callRates: economy.callRates,
     gifts: economy.gifts,
     featurePrices: {
-      superLike: economy.superLikePrice,
+      // Süper beğeni artık paketlerle satılır (GET /superlikes/status); burada en ucuz birim fiyat gösterilir
+      superLike: Math.round(Math.min(...economy.superLike.packs.map((p) => p.price / p.count))),
       boost: economy.boostPrice,
       boostMinutes: economy.boostMinutes,
       likesUnlock: economy.likesUnlockPrice,

@@ -81,13 +81,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(children: [
                   Container(
-                    width: 72,
-                    height: 72,
+                    width: 88,
+                    height: 88,
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(22),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(26),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 18, offset: const Offset(0, 6))],
                     ),
-                    child: const Icon(Icons.favorite_rounded, size: 40, color: Colors.white),
+                    child: const BrandMark(height: 60),
                   ),
                   const SizedBox(height: 14),
                   const BrandLogo(size: 36, light: true),

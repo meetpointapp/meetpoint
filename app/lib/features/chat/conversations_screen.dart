@@ -97,6 +97,7 @@ class _ConversationTile extends StatelessWidget {
       title: NameWithBadge(
         c.user?.displayName ?? '—',
         verified: c.user?.verified ?? false,
+        premium: c.user?.premium ?? false,
         style: theme.textTheme.titleMedium?.copyWith(fontWeight: unread ? FontWeight.w800 : FontWeight.w600),
       ),
       subtitle: Text(

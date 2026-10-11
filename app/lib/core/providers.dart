@@ -36,6 +36,17 @@ final interestGroupMembersProvider = FutureProvider.autoDispose.family<List<Publ
 // Faz 16: kozmetik mağaza
 final storeItemsProvider = FutureProvider.autoDispose<List<StoreItem>>((ref) => ref.watch(apiProvider).storeItems());
 
+// Faz 20: süper beğeni hakları — keşfet ve mağaza aynı durumu paylaşır; satın alma/gönderme sonrası
+// geçersiz kılınınca ikisi de güncel hakkı görür
+final superLikeStatusProvider = FutureProvider<SuperLikeStatus>((ref) => ref.watch(apiProvider).superLikeStatus());
+
+// Faz 20: bugünkü giriş ödülü alınabilir mi (profil sekmesindeki kırmızı nokta). Seri /me çağrısında
+// işlendiği için önce /me beklenir.
+final dailyClaimableProvider = FutureProvider<bool>((ref) async {
+  await ref.watch(meProvider.future);
+  return (await ref.watch(apiProvider).dailyReward()).claimable;
+});
+
 // Okunmamış toplam mesaj sayısı (alt menü rozeti için)
 final unreadCountProvider = Provider<int>((ref) =>
     ref.watch(conversationsProvider).value?.fold<int>(0, (sum, c) => sum + c.unreadCount) ?? 0);

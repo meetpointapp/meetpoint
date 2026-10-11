@@ -4634,6 +4634,276 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{coins} jeton: kabul et, {minWords}+ kelimelik {replies} cevap yaz'**
   String requestEarnRule(int coins, int replies, int minWords);
+
+  /// No description provided for @likeInfoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan beğeni hakkın: {remaining}/{limit}'**
+  String likeInfoTitle(int remaining, int limit);
+
+  /// No description provided for @closeAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get closeAction;
+
+  /// No description provided for @dailyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük ödül'**
+  String get dailyTitle;
+
+  /// No description provided for @dailyStreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} günlük seri'**
+  String dailyStreak(int days);
+
+  /// No description provided for @dailyClaim.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ödülünü al · +{coins} jeton'**
+  String dailyClaim(int coins);
+
+  /// No description provided for @dailyClaimedToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün ödülünü aldın'**
+  String get dailyClaimedToday;
+
+  /// No description provided for @dailyComeBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yarın tekrar gel, serin büyüsün'**
+  String get dailyComeBack;
+
+  /// No description provided for @dailyDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n}. gün'**
+  String dailyDay(int n);
+
+  /// No description provided for @dailyNextBonus.
+  ///
+  /// In tr, this message translates to:
+  /// **'{streak}. günde +{coins} jeton bonus'**
+  String dailyNextBonus(int streak, int coins);
+
+  /// No description provided for @dailyMonthTotal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay {coins} jeton kazandın'**
+  String dailyMonthTotal(int coins);
+
+  /// No description provided for @dailyClaimedSnack.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{coins} jeton hesabına eklendi'**
+  String dailyClaimedSnack(int coins);
+
+  /// No description provided for @dailyBonusLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seri bonusu dahil +{coins}'**
+  String dailyBonusLine(int coins);
+
+  /// No description provided for @dailyInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün gir, seri yap: ödüller seriyle büyür. Jetonlar harcanır ama nakde çevrilmez.'**
+  String get dailyInfo;
+
+  /// No description provided for @dailyOpenTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük ödül ve seri takvimi'**
+  String get dailyOpenTooltip;
+
+  /// No description provided for @errSuperLikeLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süper beğeni hakkın bitti. Paket alabilirsin.'**
+  String get errSuperLikeLimit;
+
+  /// No description provided for @storeCategorySuperLike.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süper beğeni'**
+  String get storeCategorySuperLike;
+
+  /// No description provided for @superLikeLimitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süper beğeni hakkın bitti'**
+  String get superLikeLimitTitle;
+
+  /// No description provided for @superLikeLimitBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde {n} ücretsiz süper beğeni hakkın var. Daha fazlası için paket al: ne kadar çok alırsan adet fiyatı o kadar düşer.'**
+  String superLikeLimitBody(int n);
+
+  /// No description provided for @superLikePackCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} süper beğeni'**
+  String superLikePackCount(int n);
+
+  /// No description provided for @superLikeUnit.
+  ///
+  /// In tr, this message translates to:
+  /// **'{price} jeton/adet'**
+  String superLikeUnit(String price);
+
+  /// No description provided for @superLikeBestValue.
+  ///
+  /// In tr, this message translates to:
+  /// **'En avantajlı'**
+  String get superLikeBestValue;
+
+  /// No description provided for @superLikeBought.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} süper beğeni eklendi'**
+  String superLikeBought(int n);
+
+  /// No description provided for @superLikeBalance.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü ücretsiz hakkın: {free}/{daily} · Satın alınan: {credits}'**
+  String superLikeBalance(int free, int daily, int credits);
+
+  /// No description provided for @superLikeFreeIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours} sa {minutes} dk sonra 1 ücretsiz hakkın geri gelir'**
+  String superLikeFreeIn(int hours, int minutes);
+
+  /// No description provided for @premiumPerkSuperLikes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde {n} süper beğeni (ücretsiz üyelerde {free})'**
+  String premiumPerkSuperLikes(int n, int free);
+
+  /// No description provided for @premiumPerkLikeLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde {n} beğeni hakkı (ücretsiz üyelerde {free})'**
+  String premiumPerkLikeLimit(int n, int free);
+
+  /// No description provided for @premiumPerkBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilinde, kartında ve sohbetlerde altın VibeUpMe+ rozeti ve altın çerçeve'**
+  String get premiumPerkBadge;
+
+  /// No description provided for @premiumMonthlyNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık üyelik: her ay otomatik yenilenir, istediğin zaman iptal edebilirsin. Süre bitince avantajlar sona erer.'**
+  String get premiumMonthlyNote;
+
+  /// No description provided for @premiumBadgeShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'VibeUpMe+'**
+  String get premiumBadgeShort;
+
+  /// No description provided for @premiumUntilShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'{date} tarihine kadar'**
+  String premiumUntilShort(String date);
+
+  /// No description provided for @premiumPerkLikeLimitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha fazla beğeni'**
+  String get premiumPerkLikeLimitTitle;
+
+  /// No description provided for @boostRunningTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öne çıkarman sürüyor'**
+  String get boostRunningTitle;
+
+  /// No description provided for @boostRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan süre: {minutes} dk'**
+  String boostRemaining(int minutes);
+
+  /// No description provided for @boostExtendBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süreyi uzatırsan {minutes} dk kalan süreye eklenir.'**
+  String boostExtendBody(int minutes);
+
+  /// No description provided for @boostExtend.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dk uzat'**
+  String boostExtend(int minutes);
+
+  /// No description provided for @errBoostMax.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin.'**
+  String get errBoostMax;
+
+  /// No description provided for @errCallsDisabled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kişi şu an bu türde arama almıyor.'**
+  String get errCallsDisabled;
+
+  /// No description provided for @callSettingVoice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sesli arama al'**
+  String get callSettingVoice;
+
+  /// No description provided for @callSettingVideo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görüntülü arama al'**
+  String get callSettingVideo;
+
+  /// No description provided for @callSettingHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapalıyken kimse seni bu türde arayamaz. Toplum içindeyken rahatsız edilmezsin.'**
+  String get callSettingHint;
+
+  /// No description provided for @callsOffLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapalı'**
+  String get callsOffLabel;
+
+  /// No description provided for @callSettingMatchesOnly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sadece eşleştiklerim arayabilsin'**
+  String get callSettingMatchesOnly;
+
+  /// No description provided for @callSettingMatchesOnlyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleştiğin veya sohbet ettiğin kişiler dışında kimse seni arayamaz.'**
+  String get callSettingMatchesOnlyHint;
+
+  /// No description provided for @errCallsMatchesOnly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kişi sadece eşleştiği kişilerden arama alıyor. Önce eşleşmen veya sohbet etmen gerekir.'**
+  String get errCallsMatchesOnly;
+
+  /// No description provided for @callsMatchesOnlyLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşme'**
+  String get callsMatchesOnlyLabel;
 }
 
 class _AppLocalizationsDelegate

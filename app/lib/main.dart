@@ -44,7 +44,7 @@ class VibeUpMeApp extends ConsumerWidget {
     // widget'larda doğrudan okunduğu için sadece ThemeData yenilemek yetmez).
     final loggedIn = ref.watch(sessionProvider.select((s) => s.value?.auth != null));
     final themeId = loggedIn ? ref.watch(meProvider.select((m) => m.value?.profile?.themeId ?? '')) : '';
-    Brand.setAccent(appAccentOf(themeId));
+    Brand.setPalette(appPaletteOf(themeId));
     return MaterialApp.router(
       builder: (context, child) => KeyedSubtree(key: ValueKey('accent-$themeId'), child: child ?? const SizedBox.shrink()),
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,

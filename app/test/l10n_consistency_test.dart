@@ -12,6 +12,7 @@ const _identicalAllowed = {
   'heightCm', // "{cm} cm": birim evrensel
   'stepOf', // "{step}/{total}": sadece sayı
   'newMessageFrom', // "{name}: {text}": biçim, içerik değil
+  'premiumBadgeShort', // "VibeUpMe+": marka adı, iki dilde de aynı
   'emojiButton', // "Emoji": iki dilde de aynı kelime
   'discoverModeVibe', // "Vibe": iki dilde de aynı kelime
   'bonusCoins', // "+{count} bonus": "bonus" kelimesi TR'de de kullanılıyor

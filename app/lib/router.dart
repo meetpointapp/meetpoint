@@ -22,6 +22,7 @@ import 'features/discover/discover_screen.dart';
 import 'features/discover/interest_group_screen.dart';
 import 'features/store/store_screen.dart';
 import 'features/home/home_shell.dart';
+import 'features/daily/daily_reward_screen.dart';
 import 'features/likes/likes_screen.dart';
 import 'features/matches/matches_screen.dart';
 import 'features/me/me_screen.dart';
@@ -67,6 +68,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/verify-email', builder: (_, _) => const VerifyEmailScreen()),
       GoRoute(path: '/verify-profile', builder: (_, _) => const VerificationScreen()),
       GoRoute(path: '/likes', builder: (_, _) => const LikesScreen()),
+      GoRoute(path: '/daily', builder: (_, _) => const DailyRewardScreen()),
       GoRoute(path: '/requests', builder: (_, _) => const RequestsScreen()),
       GoRoute(path: '/setup', builder: (_, _) => const OnboardingScreen()),
       GoRoute(path: '/me/edit', builder: (_, _) => const ProfileEditScreen()),

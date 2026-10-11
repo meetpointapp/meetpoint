@@ -17,6 +17,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../profile/mood_widgets.dart';
+import '../store/superlike_packs.dart';
 import 'match_modes.dart';
 import '../profile/profile_widgets.dart';
 import '../profile/request_actions.dart';
@@ -40,12 +41,16 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   String _mode = 'all';
   // Faz 20: günlük beğeni hakkı (sayaç). null = henüz yüklenmedi (kısıt uygulanmaz, sunucu zaten korur)
   LikeStatus? _likes;
+  // Faz 20: süper beğeni hakları (günlük ücretsiz + satın alınmış)
+  SuperLikeStatus? _superLikes;
+  String? _buyingPack;
 
   @override
   void initState() {
     super.initState();
     _load();
     _loadLikes();
+    _loadSuperLikes();
   }
 
   Future<void> _loadLikes() async {
@@ -55,8 +60,86 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     } catch (_) {}
   }
 
+  // Durum keşfet ve mağaza arasında paylaşılır (superLikeStatusProvider): mağazadan alınan hak anında burada görünür
+  Future<SuperLikeStatus?> _loadSuperLikes({bool fresh = false}) async {
+    try {
+      if (fresh) ref.invalidate(superLikeStatusProvider);
+      final s = await ref.read(superLikeStatusProvider.future);
+      if (mounted) setState(() => _superLikes = s);
+      return s;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Süper beğeni hakkı bitince: paketleri göster (toplu alım daha ucuz), satın alınca hakkı ekle
+  Future<void> _showSuperLikeSheet() async {
+    final l = AppLocalizations.of(context);
+    final SuperLikeStatus status = _superLikes ?? await ref.read(superLikeStatusProvider.future);
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) {
+          final cur = _superLikes ?? status;
+          final left = cur.nextFreeAt?.difference(DateTime.now());
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: _superBlue),
+                  child: const Icon(Icons.star_rounded, color: Colors.white, size: 34),
+                ),
+                const SizedBox(height: 12),
+                Text(l.superLikeLimitTitle, style: Theme.of(ctx).textTheme.titleLarge),
+                const SizedBox(height: 6),
+                Text(l.superLikeLimitBody(cur.daily), textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodyMedium),
+                if (left != null && !left.isNegative && cur.freeRemaining == 0) ...[
+                  const SizedBox(height: 4),
+                  Text(l.superLikeFreeIn(left.inHours, left.inMinutes % 60),
+                      textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodySmall),
+                ],
+                const SizedBox(height: 14),
+                SuperLikePackTiles(
+                  status: cur,
+                  busyId: _buyingPack,
+                  onBuy: (p) async {
+                    setSheet(() => _buyingPack = p.id);
+                    try {
+                      final fresh = await ref.read(apiProvider).buySuperLikePack(p.id);
+                      ref.invalidate(walletProvider);
+                      ref.invalidate(superLikeStatusProvider);
+                      Fx.success();
+                      if (mounted) setState(() => _superLikes = fresh);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (mounted) showSnack(context, l.superLikeBought(p.count));
+                    } catch (e) {
+                      if (mounted) {
+                        final low = e is ApiException && e.code == 'insufficient_balance';
+                        // ignore: use_build_context_synchronously
+                        showSnack(context, errorText(l, e),
+                            // ignore: use_build_context_synchronously
+                            action: low ? SnackBarAction(label: l.topUp, onPressed: () => context.go('/wallet')) : null);
+                      }
+                    } finally {
+                      if (mounted) setSheet(() => _buyingPack = null);
+                    }
+                  },
+                ),
+              ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   // Hak bitince: kalan süreyi ve jetonla sıfırlama seçeneğini göster
-  Future<void> _showLikeLimitSheet() async {
+  Future<void> _showLikeLimitSheet({bool info = false}) async {
     final l = AppLocalizations.of(context);
     final status = _likes ?? await ref.read(apiProvider).likeStatus().catchError((_) => const LikeStatus(limit: 25, used: 25, remaining: 0, resetPrice: 50));
     if (!mounted) return;
@@ -74,7 +157,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 34),
             ),
             const SizedBox(height: 14),
-            Text(l.likeLimitTitle, style: Theme.of(ctx).textTheme.titleLarge),
+            // Sayaca dokununca (hak bitmediyse) bilgi, hak bittiğinde "bitti" başlığı
+            Text(info && status.remaining > 0 ? l.likeInfoTitle(status.remaining, status.limit) : l.likeLimitTitle,
+                style: Theme.of(ctx).textTheme.titleLarge),
             const SizedBox(height: 6),
             Text(l.likeLimitBody(status.limit), textAlign: TextAlign.center),
             if (left != null && !left.isNegative) ...[
@@ -83,12 +168,14 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodySmall),
             ],
             const SizedBox(height: 20),
-            GradientButton(
-              label: l.likeLimitReset(status.resetPrice),
-              icon: Icons.refresh_rounded,
-              onPressed: () => Navigator.pop(ctx, true),
-            ),
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.likeLimitWait)),
+            // Hiç hak kullanılmadıysa yenilenecek bir şey yok: düğme gösterilmez
+            if (status.used > 0)
+              GradientButton(
+                label: l.likeLimitReset(status.resetPrice),
+                icon: Icons.refresh_rounded,
+                onPressed: () => Navigator.pop(ctx, true),
+              ),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(info ? l.closeAction : l.likeLimitWait)),
           ]),
         ),
       ),
@@ -158,17 +245,31 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       unawaited(_showLikeLimitSheet());
       return false;
     }
+    // Süper beğeni hakkı (günlük ücretsiz + satın alınmış) bittiyse paket sayfası açılır.
+    // Yerel bilgi eski olabilir (ör. mağazadan yeni alındı): önce sunucudan teyit edilir.
+    if (action == 'superlike' && _superLikes != null && _superLikes!.total <= 0) {
+      final fresh = await _loadSuperLikes(fresh: true);
+      if (!mounted) return false;
+      if (fresh == null || fresh.total <= 0) {
+        unawaited(_showSuperLikeSheet());
+        return false;
+      }
+    }
     Fx.tap();
     final profile = _cards![index];
+    // Sıradaki kartın bilgileri hemen görünsün; istek başarısız olursa geri alınır
+    final before = _current;
+    setState(() => _current = next ?? index);
     try {
       final r = await ref.read(apiProvider).swipe(profile.id, action);
       if (!mounted) return true;
       setState(() {
-        _current = next ?? index;
         if (r.likes != null) _likes = r.likes;
+        if (r.superLikes != null) _superLikes = r.superLikes;
       });
       if (action == 'superlike') {
         ref.invalidate(walletProvider);
+        ref.invalidate(superLikeStatusProvider);
         showSnack(context, l.superLikeSent);
       }
       if (r.match) {
@@ -179,6 +280,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       return true;
     } catch (e) {
       if (!mounted) return false;
+      setState(() => _current = before);
+      if (e is ApiException && e.code == 'superlike_limit_reached') {
+        _loadSuperLikes(fresh: true);
+        unawaited(_showSuperLikeSheet());
+        return false;
+      }
       if (e is ApiException && e.code == 'like_limit_reached') {
         _loadLikes();
         unawaited(_showLikeLimitSheet());
@@ -216,6 +323,10 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final l = AppLocalizations.of(context);
     final prices = (await ref.read(walletProvider.future)).featurePrices;
     if (!mounted) return;
+    // Süren öne çıkarma: kalan süre gösterilir, istenirse süre uzatılır (kalana eklenir)
+    final until = ref.read(meProvider).value?.boostedUntil;
+    final leftMin = until == null ? 0 : (until.difference(DateTime.now()).inSeconds / 60).ceil();
+    final active = leftMin > 0;
     final ok = await showModalBottomSheet<bool>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -229,15 +340,23 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 36),
             ),
             const SizedBox(height: 14),
-            Text(l.boostTitle, style: Theme.of(ctx).textTheme.titleLarge),
+            Text(active ? l.boostRunningTitle : l.boostTitle, style: Theme.of(ctx).textTheme.titleLarge),
             const SizedBox(height: 6),
-            Text(l.boostBody(prices.boostMinutes), textAlign: TextAlign.center),
+            if (active) ...[
+              Text(l.boostRemaining(leftMin),
+                  style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(color: Brand.coral, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 6),
+              Text(l.boostExtendBody(prices.boostMinutes), textAlign: TextAlign.center),
+            ] else
+              Text(l.boostBody(prices.boostMinutes), textAlign: TextAlign.center),
             const SizedBox(height: 20),
             GradientButton(
-              label: '${l.boost} · ${l.coins(prices.boost)}',
-              icon: Icons.bolt_rounded,
+              label: active ? l.boostExtend(prices.boostMinutes) : l.boost,
+              coin: prices.boost,
+              icon: active ? Icons.add_rounded : Icons.bolt_rounded,
               onPressed: () => Navigator.pop(ctx, true),
             ),
+            if (active) TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.closeAction)),
           ]),
         ),
       ),
@@ -259,6 +378,10 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    ref.listen<AsyncValue<SuperLikeStatus>>(superLikeStatusProvider, (_, next) {
+      final v = next.value;
+      if (v != null && mounted) setState(() => _superLikes = v);
+    });
     final cards = _cards;
     final me = ref.watch(meProvider).value;
     final myInterests = me?.profile?.interests.toSet() ?? const <String>{};
@@ -289,61 +412,56 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               cardsCount: cards.length,
               numberOfCardsDisplayed: cards.length.clamp(1, 2),
               isLoop: false,
-              padding: const EdgeInsets.fromLTRB(10, 2, 10, 8),
+              padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
               backCardOffset: const Offset(0, 0),
-              scale: 0.94,
+              scale: 0.95,
               allowedSwipeDirection: const AllowedSwipeDirection.only(left: true, right: true, up: true),
               onSwipe: _onSwipe,
               onEnd: () => setState(() => _finished = true),
               cardBuilder: (context, index, dx, dy) =>
-                  _ProfileCard(profile: cards[index], dx: dx, dy: dy, myInterests: myInterests),
+                  _ProfileCard(profile: cards[index], dx: dx, dy: dy, myInterests: myInterests, showInfo: index <= _current),
             ),
-            // Faz 20: kalan beğeni hakkı sayacı (kartın üstünde, ortada)
-            if (_likes != null)
-              Positioned(
-                top: 20,
-                left: 0,
-                right: 0,
-                child: Center(child: _LikeCounter(status: _likes!, onTap: _showLikeLimitSheet)),
-              ),
-            // Faz 20: kaydırmanın yanında düğmeler — kartın alt kısmına binen, büyük ve belirgin
+            // Kartın üstünde cam rozetler: kalan beğeni hakkı (solda), seri ve ruh hali (sağda)
             Positioned(
-              left: 0,
-              right: 0,
-              bottom: 22,
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                _RoundButton(
-                  icon: Icons.close_rounded,
-                  color: Brand.nope,
-                  size: 62,
-                  tooltip: l.reject,
-                  onTap: () => _controller.swipe(CardSwiperDirection.left),
-                ),
-                const SizedBox(width: 12),
-                _RoundButton(
-                  icon: Icons.star_rounded,
-                  color: _superBlue,
-                  size: 48,
-                  tooltip: l.superLike,
-                  onTap: () => _controller.swipe(CardSwiperDirection.top),
-                ),
-                const SizedBox(width: 12),
-                _RoundButton(
-                  icon: Icons.mail_rounded,
-                  color: Brand.gold,
-                  size: 48,
-                  tooltip: l.messageRequest,
-                  onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message),
-                ),
-                const SizedBox(width: 12),
-                _RoundButton(
-                  icon: Icons.favorite_rounded,
-                  gradient: true,
-                  size: 68,
-                  tooltip: l.accept,
-                  onTap: () => _controller.swipe(CardSwiperDirection.right),
+              top: 22,
+              left: 20,
+              right: 20,
+              child: Row(children: [
+                if (_likes != null) _LikeCounter(status: _likes!, onTap: () => _showLikeLimitSheet(info: true)),
+                const Spacer(),
+                _GlassChip(
+                  onTap: () => showMoodSheet(context, ref),
+                  child: Text(
+                    (me?.profile?.moodId ?? '').isEmpty ? '💭' : (moodEmoji[me!.profile!.moodId] ?? '💭'),
+                    style: const TextStyle(fontSize: 15),
+                  ),
                 ),
               ]),
+            ),
+            // Tinder tarzı: kartın içinde, cam bir çubukta eylem düğmeleri
+            Positioned(
+              left: 18,
+              right: 18,
+              bottom: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.36),
+                  borderRadius: BorderRadius.circular(44),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                ),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  _GlassButton(icon: Icons.close_rounded, size: 60, iconColor: Colors.white, tooltip: l.reject,
+                      onTap: () => _controller.swipe(CardSwiperDirection.left)),
+                  _GlassButton(icon: Icons.star_rounded, size: 46, iconColor: const Color(0xFF7FB2FF), tooltip: l.superLike,
+                      badge: _superLikes == null ? null : '${_superLikes!.total}', badgeLow: (_superLikes?.total ?? 1) <= 0,
+                      onTap: () => _controller.swipe(CardSwiperDirection.top)),
+                  _GlassButton(icon: Icons.favorite_rounded, size: 66, iconColor: Brand.coral, ring: true, tooltip: l.accept,
+                      onTap: () => _controller.swipe(CardSwiperDirection.right)),
+                  _GlassButton(icon: Icons.send_rounded, size: 46, iconColor: Colors.white, tooltip: l.messageRequest,
+                      onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message)),
+                ]),
+              ),
             ),
           ]),
         ),
@@ -351,54 +469,38 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const BrandLogo(size: 26),
-        actions: [
-          // Faz 17: günlük giriş serisi — her açılışta ilk göze çarpan yer
-          if (me != null && me.streak.current > 0)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Tooltip(
-                message: l.streakTooltip(me.streak.current),
-                child: Chip(
-                  avatar: Icon(Icons.local_fire_department_rounded, color: Brand.orange, size: 18),
-                  label: Text('${me.streak.current}'),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
-            ),
-          if (boostLeft > 0)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              // Kompakt sayaç: logo sığsın diye sadece kalan süre
-              child: Tooltip(
-                message: l.boostTitle,
-                child: Chip(
-                  avatar: Icon(Icons.bolt_rounded, color: Brand.coral, size: 18),
-                  label: Text(l.boostActive(boostLeft)),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
-            )
-          else
-            IconButton(onPressed: _openBoost, icon: const Icon(Icons.bolt_rounded), tooltip: l.boost),
-          // Faz 20: günlük ruh hali artık üstte yer kaplamıyor; simge olarak burada (paylaşınca emojisi görünür)
-          IconButton(
-            onPressed: () => showMoodSheet(context, ref),
-            tooltip: l.moodSection,
-            icon: Text(
-              (me?.profile?.moodId ?? '').isEmpty ? '💭' : (moodEmoji[me!.profile!.moodId] ?? '💭'),
-              style: const TextStyle(fontSize: 20),
-            ),
-          ),
-          IconButton(onPressed: _openFilters, icon: const Icon(Icons.tune_rounded), tooltip: l.filters),
-        ],
-      ),
       body: SafeArea(
-        top: false,
+        bottom: false,
         child: Column(children: [
-          ModeBar(mode: _mode, onSelected: _setMode),
-          const _LiveActivityStrip(),
+          // Tinder tarzı sade başlık: logo, metin sekmeleri (modlar), şimşek (öne çıkar), filtre
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 4, 6, 4),
+            child: Row(children: [
+              IconButton(onPressed: _openFilters, icon: const Icon(Icons.tune_rounded), tooltip: l.filters),
+              Expanded(child: ModeBar(mode: _mode, onSelected: _setMode)),
+              if (boostLeft > 0)
+                Tooltip(
+                  message: l.boostRunningTitle,
+                  child: GestureDetector(
+                    onTap: _openBoost,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: ShapeDecoration(shape: const StadiumBorder(), color: Brand.coral.withValues(alpha: 0.14)),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.bolt_rounded, color: Brand.coral, size: 16),
+                        const SizedBox(width: 2),
+                        Text(l.boostActive(boostLeft), style: TextStyle(color: Brand.coral, fontWeight: FontWeight.w800, fontSize: 12)),
+                        const SizedBox(width: 2),
+                        Icon(Icons.add_rounded, color: Brand.coral, size: 14),
+                      ]),
+                    ),
+                  ),
+                )
+              else
+                IconButton(onPressed: _openBoost, icon: Icon(Icons.bolt_rounded, color: Brand.coral), tooltip: l.boost),
+            ]),
+          ),
           if (_mode == 'interests') const _GroupsStrip(),
           Expanded(child: body),
         ]),
@@ -459,42 +561,14 @@ class _GroupsStrip extends ConsumerWidget {
   }
 }
 
-// Faz 19: canlı aktivite göstergesi — uygulamanın canlı/kalabalık hissetmesi. Sinyal yoksa (gece,
-// düşük trafik) hiç gösterilmez; "0 kişi" demek tam tersi bir izlenim bırakır.
-final _activityProvider = FutureProvider.autoDispose<LiveActivity>((ref) => ref.watch(apiProvider).activity());
-
-class _LiveActivityStrip extends ConsumerWidget {
-  const _LiveActivityStrip();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activity = ref.watch(_activityProvider).value;
-    if (activity == null || !activity.hasSignal) return const SizedBox.shrink();
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-      child: Row(children: [
-        Container(width: 6, height: 6, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1FA463))),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            l.liveActivityBanner(activity.activeCalls, activity.recentMatches),
-            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ]),
-    );
-  }
-}
-
 class _ProfileCard extends StatefulWidget {
-  const _ProfileCard({required this.profile, required this.dx, required this.dy, required this.myInterests});
+  const _ProfileCard({required this.profile, required this.dx, required this.dy, required this.myInterests, this.showInfo = true});
   final PublicProfile profile;
   final int dx; // kaydırma yönü/yüzdesi: +sağ (beğen), -sol (geç)
   final int dy; // -yukarı (süper beğeni)
   final Set<String> myInterests;
+  // Arkadaki (sıradaki) kartta bilgiler gizlenir: sürüklerken iki kartın yazısı üst üste binmesin
+  final bool showInfo;
 
   @override
   State<_ProfileCard> createState() => _ProfileCardState();
@@ -503,13 +577,11 @@ class _ProfileCard extends StatefulWidget {
 class _ProfileCardState extends State<_ProfileCard> {
   int _photo = 0;
 
-  // Kartın sol/sağ yarısına dokununca fotoğraflar arasında geç
-  void _tap(TapUpDetails d, double width) {
+  // Karta her dokunuşta bir sonraki fotoğraf; sonuncudan sonra ilk fotoğrafa dönülür
+  void _tap() {
     final count = widget.profile.photos.length;
     if (count < 2) return;
-    setState(() {
-      _photo = d.localPosition.dx < width / 2 ? (_photo - 1).clamp(0, count - 1) : (_photo + 1).clamp(0, count - 1);
-    });
+    setState(() => _photo = (_photo + 1) % count);
   }
 
   @override
@@ -524,16 +596,26 @@ class _ProfileCardState extends State<_ProfileCard> {
 
     return LayoutBuilder(
       builder: (context, box) => GestureDetector(
-        onTapUp: (d) => _tap(d, box.maxWidth),
+        behavior: HitTestBehavior.opaque,
+        onTap: _tap,
         child: DecoratedBox(
           // Faz 16: kişisel profil vitrini — özel bir renk seçilmişse kartın çerçevesinde görünür
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: p.themeId.isEmpty ? null : Border.all(color: themeColorOf(p.themeId), width: 3),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 16, offset: const Offset(0, 6))],
+            borderRadius: BorderRadius.circular(28),
+            // VibeUpMe+ aboneleri altın çerçeve ve sıcak bir parıltı alır (tema rengi çerçevesinin önüne geçer)
+            border: p.premium
+                ? Border.all(color: const Color(0xFFE9B949), width: 3)
+                : (p.themeId.isEmpty ? null : Border.all(color: themeColorOf(p.themeId), width: 3)),
+            boxShadow: [
+              BoxShadow(
+                color: p.premium ? const Color(0xFFE9B949).withValues(alpha: 0.38) : Colors.black.withValues(alpha: 0.12),
+                blurRadius: p.premium ? 22 : 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(28),
             child: Stack(fit: StackFit.expand, children: [
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 150),
@@ -570,35 +652,6 @@ class _ProfileCardState extends State<_ProfileCard> {
                       ),
                   ]),
                 ),
-              if (p.online)
-                Positioned(
-                  top: 20,
-                  right: 14,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: ShapeDecoration(shape: const StadiumBorder(), color: Colors.black.withValues(alpha: 0.45)),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.like)),
-                      const SizedBox(width: 6),
-                      Text(l.activeNow, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
-                    ]),
-                  ),
-                ),
-              if (p.superLikedMe)
-                Positioned(
-                  top: 20,
-                  left: 14,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: const ShapeDecoration(shape: StadiumBorder(), color: _superBlue),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      const Icon(Icons.star_rounded, color: Colors.white, size: 16),
-                      const SizedBox(width: 4),
-                      Text(l.superLikedYou,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
-                    ]),
-                  ),
-                ),
               // Kaydırma etiketi: yukarı = süper beğeni, sağ = beğen, sol = geç
               if (widget.dy < -10 && widget.dy.abs() > widget.dx.abs())
                 Positioned(
@@ -617,12 +670,24 @@ class _ProfileCardState extends State<_ProfileCard> {
                     opacity: (widget.dx.abs() / 100).clamp(0.0, 1.0),
                   ),
                 ),
-              Positioned(
-                left: 18,
-                right: 18,
-                bottom: 100,
+              if (widget.showInfo)
+                Positioned(
+                left: 22,
+                right: 22,
+                bottom: 104,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   if (p.match != null) MatchBubble(match: p.match!),
+                  if (p.superLikedMe)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: const ShapeDecoration(shape: StadiumBorder(), color: _superBlue),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        const Icon(Icons.star_rounded, color: Colors.white, size: 15),
+                        const SizedBox(width: 4),
+                        Text(l.superLikedYou, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                      ]),
+                    ),
                   Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                     Expanded(
                       child: Text.rich(
@@ -633,6 +698,11 @@ class _ProfileCardState extends State<_ProfileCard> {
                               alignment: PlaceholderAlignment.middle,
                               child: Padding(padding: EdgeInsets.only(left: 8), child: VerifiedBadge(size: 24, onPhoto: true)),
                             ),
+                          if (p.premium)
+                            const WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Padding(padding: EdgeInsets.only(left: 8), child: PremiumBadge(size: 24)),
+                            ),
                           TextSpan(text: '  ${p.age}', style: const TextStyle(fontWeight: FontWeight.w400)),
                         ]),
                         style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white),
@@ -641,14 +711,17 @@ class _ProfileCardState extends State<_ProfileCard> {
                     _InfoButton(onTap: () => context.push('/user/${p.id}')),
                   ]),
                   const SizedBox(height: 4),
-                  Wrap(spacing: 12, runSpacing: 4, children: [
+                  Wrap(spacing: 14, runSpacing: 5, children: [
+                    if (p.online) _Meta(dot: true, text: l.activeNow),
                     // Mesafe biliniyorsa onu, değilse şehri göster
                     if (p.distanceKm != null)
                       _Meta(icon: Icons.near_me_outlined, text: l.kmAway(p.distanceKm!))
                     else if (p.location.isNotEmpty)
                       _Meta(icon: Icons.place_outlined, text: p.location),
+                    if (p.heightCm != null) _Meta(icon: Icons.straighten_rounded, text: l.heightCm(p.heightCm!)),
                     if (p.lookingFor.isNotEmpty)
                       _Meta(emoji: lookingForEmoji[p.lookingFor], text: l.lookingForLabel(p.lookingFor)),
+                    if (p.job.isNotEmpty) _Meta(icon: Icons.work_outline_rounded, text: p.job),
                     if (p.milestoneCount > 0) MilestoneBadge(p.milestoneCount, onPhoto: true),
                   ]),
                   if (interests.isNotEmpty) ...[
@@ -669,13 +742,15 @@ class _ProfileCardState extends State<_ProfileCard> {
 }
 
 class _Meta extends StatelessWidget {
-  const _Meta({this.icon, this.emoji, required this.text});
+  const _Meta({this.icon, this.emoji, this.dot = false, required this.text});
   final IconData? icon;
   final String? emoji;
+  final bool dot; // yeşil "aktif" noktası
   final String text;
 
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+        if (dot) Container(width: 8, height: 8, margin: const EdgeInsets.only(right: 2), decoration: const BoxDecoration(shape: BoxShape.circle, color: Brand.like)),
         if (icon != null) Icon(icon, size: 16, color: Colors.white70),
         if (emoji != null) Text(emoji!, style: const TextStyle(fontSize: 13)),
         const SizedBox(width: 4),
@@ -693,17 +768,17 @@ class _InfoButton extends StatelessWidget {
         label: AppLocalizations.of(context).viewProfile,
         excludeSemantics: true,
         onTap: onTap,
-        child: Material(
-          color: Colors.white.withValues(alpha: 0.2),
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onTap,
-            child: const SizedBox(
-              width: 44,
-              height: 44,
-              child: Center(child: Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white, size: 22)),
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black.withValues(alpha: 0.3),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.4),
             ),
+            child: const Icon(Icons.info_outline_rounded, color: Colors.white, size: 22),
           ),
         ),
       );
@@ -739,51 +814,6 @@ class _Stamp extends StatelessWidget {
       ),
     );
   }
-}
-
-class _RoundButton extends StatelessWidget {
-  const _RoundButton({
-    required this.icon,
-    required this.onTap,
-    required this.tooltip,
-    this.color,
-    this.gradient = false,
-    this.size = 56,
-  });
-  final IconData icon;
-  final Color? color;
-  final bool gradient;
-  final VoidCallback onTap;
-  final double size;
-  final String tooltip;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: tooltip,
-        excludeSemantics: true,
-        onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: gradient ? Brand.gradient : null,
-            color: gradient ? null : Theme.of(context).cardTheme.color,
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 3))],
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            shape: const CircleBorder(),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: onTap,
-              child: SizedBox.square(
-                dimension: size,
-                child: Icon(icon, color: gradient ? Colors.white : color, size: size * 0.46),
-              ),
-            ),
-          ),
-        ),
-      );
 }
 
 // Konum izni yoksa destenin üstünde ince bir çubuk
@@ -888,7 +918,28 @@ class _DeckSkeleton extends StatelessWidget {
       );
 }
 
-// Faz 20: kalan beğeni hakkı. Azaldıkça renk değişir; 0 olunca dokununca sıfırlama sayfası açılır.
+// Kartın üstündeki yarı saydam (cam) küçük rozet
+class _GlassChip extends StatelessWidget {
+  const _GlassChip({required this.child, this.onTap});
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.42),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          ),
+          child: child,
+        ),
+      );
+}
+
+// Faz 20: kalan beğeni hakkı. Azaldıkça renk değişir; dokununca bilgi/yenileme sayfası açılır.
 class _LikeCounter extends StatelessWidget {
   const _LikeCounter({required this.status, required this.onTap});
   final LikeStatus status;
@@ -905,19 +956,65 @@ class _LikeCounter extends StatelessWidget {
       label: l.likeCounterTooltip(status.remaining, status.limit),
       excludeSemantics: true,
       onTap: onTap,
-      child: GestureDetector(
+      child: _GlassChip(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: ShapeDecoration(shape: const StadiumBorder(), color: Colors.black.withValues(alpha: 0.5)),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.favorite_rounded, size: 14, color: color),
-            const SizedBox(width: 5),
-            Text('${status.remaining}/${status.limit}',
-                style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 13)),
-          ]),
-        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.favorite_rounded, size: 14, color: color),
+          const SizedBox(width: 5),
+          Text('${status.remaining}/${status.limit}', style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 13)),
+        ]),
       ),
     );
   }
+}
+
+// Cam çubuktaki yuvarlak eylem düğmesi (Tinder tarzı: ince çerçeveli, yarı saydam)
+class _GlassButton extends StatelessWidget {
+  const _GlassButton({required this.icon, required this.onTap, required this.tooltip, required this.size, required this.iconColor, this.ring = false, this.badge, this.badgeLow = false});
+  final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
+  final double size;
+  final Color iconColor;
+  final bool ring; // vurgulu çerçeve (beğen)
+  final String? badge; // sağ üstte küçük sayı (kalan süper beğeni)
+  final bool badgeLow; // 0 kaldıysa vurgulu
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: tooltip,
+        excludeSemantics: true,
+        onTap: onTap,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Stack(clipBehavior: Clip.none, children: [
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black.withValues(alpha: ring ? 0.25 : 0.18),
+                border: Border.all(color: ring ? iconColor.withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.28), width: ring ? 2 : 1),
+              ),
+              child: Icon(icon, color: iconColor, size: size * 0.5),
+            ),
+            if (badge != null)
+              Positioned(
+                top: -3,
+                right: -3,
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(10),
+                    color: badgeLow ? Brand.nope : _superBlue,
+                  ),
+                  child: Text(badge!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11)),
+                ),
+              ),
+          ]),
+        ),
+      );
 }

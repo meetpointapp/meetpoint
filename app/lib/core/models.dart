@@ -42,6 +42,13 @@ class MatchInfo {
 class PublicProfile {
   final String id;
   final bool verified;
+  // Faz 20: VibeUpMe+ abonesi (herkese görünür: rozet, altın çerçeve)
+  final bool premium;
+  // Faz 20: bu türde arama alıyor mu (kapalıysa arama düğmesi pasif)
+  final bool acceptsVoice;
+  final bool acceptsVideo;
+  // Sadece eşleştiği / sohbet ettiği kişilerden arama alır
+  final bool callsMatchesOnly;
   final int? distanceKm; // yaklaşık mesafe; konum bilinmiyorsa null
   final bool superLikedMe;
   final String displayName;
@@ -81,6 +88,10 @@ class PublicProfile {
   const PublicProfile({
     required this.id,
     this.verified = false,
+    this.premium = false,
+    this.acceptsVoice = true,
+    this.acceptsVideo = true,
+    this.callsMatchesOnly = false,
     this.distanceKm,
     this.superLikedMe = false,
     required this.displayName,
@@ -118,6 +129,10 @@ class PublicProfile {
   factory PublicProfile.fromJson(Map<String, dynamic> j) => PublicProfile(
         id: j['id'],
         verified: j['verified'] ?? false,
+        premium: j['premium'] ?? false,
+        acceptsVoice: j['acceptsVoice'] ?? true,
+        acceptsVideo: j['acceptsVideo'] ?? true,
+        callsMatchesOnly: j['callsMatchesOnly'] ?? false,
         distanceKm: j['distanceKm'],
         superLikedMe: j['superLikedMe'] ?? false,
         displayName: j['displayName'],
@@ -168,6 +183,10 @@ class MyProfile extends PublicProfile {
         super(
           id: j['id'],
           verified: j['verified'] ?? false,
+          premium: j['premium'] ?? false,
+          acceptsVoice: j['acceptsVoice'] ?? true,
+          acceptsVideo: j['acceptsVideo'] ?? true,
+          callsMatchesOnly: j['callsMatchesOnly'] ?? false,
           displayName: j['displayName'],
           age: j['age'],
           gender: j['gender'],
@@ -403,6 +422,10 @@ class Me {
   final Achievements achievements;
   // Faz 17 madde 8: davet programı — kendi davet kodu (eski hesaplarda null olabilir)
   final String? referralCode;
+  // Faz 20: gelen sesli/görüntülü arama tercihi
+  final bool acceptVoiceCalls;
+  final bool acceptVideoCalls;
+  final bool callsMatchesOnly;
 
   const Me({
     required this.id,
@@ -425,6 +448,9 @@ class Me {
     this.streak = const Streak(),
     this.achievements = const Achievements(),
     this.referralCode,
+    this.acceptVoiceCalls = true,
+    this.acceptVideoCalls = true,
+    this.callsMatchesOnly = false,
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -448,6 +474,9 @@ class Me {
         streak: j['streak'] == null ? const Streak() : Streak.fromJson(j['streak']),
         achievements: j['achievements'] == null ? const Achievements() : Achievements.fromJson(j['achievements']),
         referralCode: j['referralCode'],
+        acceptVoiceCalls: (j['callSettings'] as Map?)?['voice'] ?? true,
+        acceptVideoCalls: (j['callSettings'] as Map?)?['video'] ?? true,
+        callsMatchesOnly: (j['callSettings'] as Map?)?['matchesOnly'] ?? false,
       );
 }
 
@@ -678,6 +707,126 @@ class ContactRequest {
         escrowReplies: j['escrowReplies'] ?? 3,
         escrowMinWords: j['escrowMinWords'] ?? 5,
         settlement: j['settlement'] ?? '',
+      );
+}
+
+// Faz 20: süper beğeni hakları: günlük ücretsiz + satın alınmış; paketler (toplu alım daha ucuz)
+class SuperLikePack {
+  final String id;
+  final int count;
+  final int price;
+  final double unitPrice;
+  const SuperLikePack({required this.id, required this.count, required this.price, required this.unitPrice});
+  factory SuperLikePack.fromJson(Map<String, dynamic> j) => SuperLikePack(
+        id: j['id'],
+        count: j['count'],
+        price: j['price'],
+        unitPrice: (j['unitPrice'] as num).toDouble(),
+      );
+}
+
+class SuperLikeStatus {
+  final int daily;
+  final int used;
+  final int freeRemaining;
+  final int credits;
+  final int total;
+  final bool premium;
+  final int freeDaily;
+  final int premiumDaily;
+  final int likeLimitFree;
+  final int likeLimitPremium;
+  final DateTime? nextFreeAt;
+  final List<SuperLikePack> packs;
+  const SuperLikeStatus({
+    required this.daily,
+    required this.used,
+    required this.freeRemaining,
+    required this.credits,
+    required this.total,
+    required this.premium,
+    required this.freeDaily,
+    required this.premiumDaily,
+    required this.likeLimitFree,
+    required this.likeLimitPremium,
+    this.nextFreeAt,
+    required this.packs,
+  });
+  factory SuperLikeStatus.fromJson(Map<String, dynamic> j) => SuperLikeStatus(
+        daily: j['daily'],
+        used: j['used'],
+        freeRemaining: j['freeRemaining'],
+        credits: j['credits'],
+        total: j['total'],
+        premium: j['premium'] ?? false,
+        freeDaily: j['freeDaily'] ?? 3,
+        premiumDaily: j['premiumDaily'] ?? 10,
+        likeLimitFree: j['likeLimitFree'] ?? 25,
+        likeLimitPremium: j['likeLimitPremium'] ?? 50,
+        nextFreeAt: j['nextFreeAt'] == null ? null : _date(j['nextFreeAt']),
+        packs: [for (final p in (j['packs'] as List? ?? const [])) SuperLikePack.fromJson(Map<String, dynamic>.from(p))],
+      );
+}
+
+// Faz 20: günlük giriş ödülü (takvim + seri bonusu). Sunucu: GET /me/daily-reward, POST .../claim.
+class DailyCycleDay {
+  final int day;
+  final int coins;
+  const DailyCycleDay({required this.day, required this.coins});
+}
+
+class DailyReward {
+  final String today; // YYYY-MM-DD (kullanıcının yerel günü)
+  final int streak;
+  final int longest;
+  final bool claimedToday;
+  final bool claimable;
+  final int todayCoins;
+  final List<DailyCycleDay> cycle;
+  final int cycleDay; // 1-7
+  final int? nextBonusStreak;
+  final int nextBonusCoins;
+  final String month; // YYYY-MM
+  final List<int> claimedDays;
+  final int monthCoins;
+  // Sadece "al" yanıtında: az önce alınan toplam ve içindeki seri bonusu
+  final int claimedCoins;
+  final int claimedBonus;
+
+  const DailyReward({
+    required this.today,
+    required this.streak,
+    required this.longest,
+    required this.claimedToday,
+    required this.claimable,
+    required this.todayCoins,
+    required this.cycle,
+    required this.cycleDay,
+    this.nextBonusStreak,
+    this.nextBonusCoins = 0,
+    required this.month,
+    required this.claimedDays,
+    required this.monthCoins,
+    this.claimedCoins = 0,
+    this.claimedBonus = 0,
+  });
+
+  factory DailyReward.fromJson(Map<String, dynamic> j) => DailyReward(
+        today: j['today'],
+        streak: j['streak'] ?? 0,
+        longest: j['longest'] ?? 0,
+        claimedToday: j['claimedToday'] ?? false,
+        claimable: j['claimable'] ?? false,
+        todayCoins: j['todayCoins'] ?? 0,
+        cycle: [for (final c in (j['cycle'] as List? ?? const [])) DailyCycleDay(day: c['day'], coins: c['coins'])],
+        cycleDay: j['cycleDay'] ?? 1,
+        nextBonusStreak: j['nextBonus']?['streak'],
+        nextBonusCoins: j['nextBonus']?['coins'] ?? 0,
+        month: j['month'],
+        claimedDays: [for (final d in (j['claimedDays'] as List? ?? const [])) d as int],
+        monthCoins: j['monthCoins'] ?? 0,
+        claimedCoins: j['coins'] ?? 0,
+        claimedBonus: j['bonusCoins'] ?? 0,
       );
 }
 

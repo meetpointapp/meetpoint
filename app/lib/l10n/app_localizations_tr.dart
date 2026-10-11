@@ -2983,4 +2983,187 @@ class AppLocalizationsTr extends AppLocalizations {
   String requestEarnRule(int coins, int replies, int minWords) {
     return '$coins jeton: kabul et, $minWords+ kelimelik $replies cevap yaz';
   }
+
+  @override
+  String likeInfoTitle(int remaining, int limit) {
+    return 'Kalan beğeni hakkın: $remaining/$limit';
+  }
+
+  @override
+  String get closeAction => 'Kapat';
+
+  @override
+  String get dailyTitle => 'Günlük ödül';
+
+  @override
+  String dailyStreak(int days) {
+    return '$days günlük seri';
+  }
+
+  @override
+  String dailyClaim(int coins) {
+    return 'Ödülünü al · +$coins jeton';
+  }
+
+  @override
+  String get dailyClaimedToday => 'Bugünün ödülünü aldın';
+
+  @override
+  String get dailyComeBack => 'Yarın tekrar gel, serin büyüsün';
+
+  @override
+  String dailyDay(int n) {
+    return '$n. gün';
+  }
+
+  @override
+  String dailyNextBonus(int streak, int coins) {
+    return '$streak. günde +$coins jeton bonus';
+  }
+
+  @override
+  String dailyMonthTotal(int coins) {
+    return 'Bu ay $coins jeton kazandın';
+  }
+
+  @override
+  String dailyClaimedSnack(int coins) {
+    return '+$coins jeton hesabına eklendi';
+  }
+
+  @override
+  String dailyBonusLine(int coins) {
+    return 'Seri bonusu dahil +$coins';
+  }
+
+  @override
+  String get dailyInfo =>
+      'Her gün gir, seri yap: ödüller seriyle büyür. Jetonlar harcanır ama nakde çevrilmez.';
+
+  @override
+  String get dailyOpenTooltip => 'Günlük ödül ve seri takvimi';
+
+  @override
+  String get errSuperLikeLimit =>
+      'Süper beğeni hakkın bitti. Paket alabilirsin.';
+
+  @override
+  String get storeCategorySuperLike => 'Süper beğeni';
+
+  @override
+  String get superLikeLimitTitle => 'Süper beğeni hakkın bitti';
+
+  @override
+  String superLikeLimitBody(int n) {
+    return 'Günde $n ücretsiz süper beğeni hakkın var. Daha fazlası için paket al: ne kadar çok alırsan adet fiyatı o kadar düşer.';
+  }
+
+  @override
+  String superLikePackCount(int n) {
+    return '$n süper beğeni';
+  }
+
+  @override
+  String superLikeUnit(String price) {
+    return '$price jeton/adet';
+  }
+
+  @override
+  String get superLikeBestValue => 'En avantajlı';
+
+  @override
+  String superLikeBought(int n) {
+    return '$n süper beğeni eklendi';
+  }
+
+  @override
+  String superLikeBalance(int free, int daily, int credits) {
+    return 'Bugünkü ücretsiz hakkın: $free/$daily · Satın alınan: $credits';
+  }
+
+  @override
+  String superLikeFreeIn(int hours, int minutes) {
+    return '$hours sa $minutes dk sonra 1 ücretsiz hakkın geri gelir';
+  }
+
+  @override
+  String premiumPerkSuperLikes(int n, int free) {
+    return 'Günde $n süper beğeni (ücretsiz üyelerde $free)';
+  }
+
+  @override
+  String premiumPerkLikeLimit(int n, int free) {
+    return 'Günde $n beğeni hakkı (ücretsiz üyelerde $free)';
+  }
+
+  @override
+  String get premiumPerkBadge =>
+      'Profilinde, kartında ve sohbetlerde altın VibeUpMe+ rozeti ve altın çerçeve';
+
+  @override
+  String get premiumMonthlyNote =>
+      'Aylık üyelik: her ay otomatik yenilenir, istediğin zaman iptal edebilirsin. Süre bitince avantajlar sona erer.';
+
+  @override
+  String get premiumBadgeShort => 'VibeUpMe+';
+
+  @override
+  String premiumUntilShort(String date) {
+    return '$date tarihine kadar';
+  }
+
+  @override
+  String get premiumPerkLikeLimitTitle => 'Daha fazla beğeni';
+
+  @override
+  String get boostRunningTitle => 'Öne çıkarman sürüyor';
+
+  @override
+  String boostRemaining(int minutes) {
+    return 'Kalan süre: $minutes dk';
+  }
+
+  @override
+  String boostExtendBody(int minutes) {
+    return 'Süreyi uzatırsan $minutes dk kalan süreye eklenir.';
+  }
+
+  @override
+  String boostExtend(int minutes) {
+    return '$minutes dk uzat';
+  }
+
+  @override
+  String get errBoostMax =>
+      'Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin.';
+
+  @override
+  String get errCallsDisabled => 'Bu kişi şu an bu türde arama almıyor.';
+
+  @override
+  String get callSettingVoice => 'Sesli arama al';
+
+  @override
+  String get callSettingVideo => 'Görüntülü arama al';
+
+  @override
+  String get callSettingHint =>
+      'Kapalıyken kimse seni bu türde arayamaz. Toplum içindeyken rahatsız edilmezsin.';
+
+  @override
+  String get callsOffLabel => 'Kapalı';
+
+  @override
+  String get callSettingMatchesOnly => 'Sadece eşleştiklerim arayabilsin';
+
+  @override
+  String get callSettingMatchesOnlyHint =>
+      'Eşleştiğin veya sohbet ettiğin kişiler dışında kimse seni arayamaz.';
+
+  @override
+  String get errCallsMatchesOnly =>
+      'Bu kişi sadece eşleştiği kişilerden arama alıyor. Önce eşleşmen veya sohbet etmen gerekir.';
+
+  @override
+  String get callsMatchesOnlyLabel => 'Eşleşme';
 }

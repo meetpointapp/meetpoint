@@ -310,14 +310,25 @@ class Api {
 
   // direction: like | pass | superlike (süper beğeni jetonla)
   // Beğenide kalan hak (likes) da döner; hak bittiyse sunucu 403 like_limit_reached verir.
-  Future<({bool match, String? conversationId, LikeStatus? likes})> swipe(String toId, String direction) async {
+  Future<({bool match, String? conversationId, LikeStatus? likes, SuperLikeStatus? superLikes})> swipe(String toId, String direction) async {
     final r = await _post('/swipes', {'toId': toId, 'direction': direction});
     return (
       match: r['match'] as bool,
       conversationId: r['conversationId'] as String?,
       likes: r['likes'] == null ? null : LikeStatus.fromJson(Map<String, dynamic>.from(r['likes'])),
+      superLikes: r['superLikes'] == null ? null : SuperLikeStatus.fromJson(Map<String, dynamic>.from(r['superLikes'])),
     );
   }
+
+  // Faz 20: süper beğeni hakları ve paket satın alma (jetonla)
+  Future<SuperLikeStatus> superLikeStatus() async => SuperLikeStatus.fromJson(await _get('/superlikes/status'));
+  Future<SuperLikeStatus> buySuperLikePack(String packId) async =>
+      SuperLikeStatus.fromJson(await _post('/superlikes/buy', {'packId': packId}));
+
+  // Faz 20: günlük giriş ödülü
+  Future<DailyReward> dailyReward({String? month}) async =>
+      DailyReward.fromJson(await _get('/me/daily-reward${month == null ? '' : '?month=$month'}'));
+  Future<DailyReward> claimDailyReward() async => DailyReward.fromJson(await _post('/me/daily-reward/claim'));
 
   // Faz 20: günlük beğeni hakkı sayacı ve jetonla sıfırlama
   Future<LikeStatus> likeStatus() async => LikeStatus.fromJson(await _get('/discover/like-status'));
@@ -329,6 +340,10 @@ class Api {
   Future<void> saveFilters(DiscoverFilters f) => _put('/me/filters', f.toJson());
 
   // Jetonla alınan özellikler
+  // Faz 20: gelen arama tercihi (sesli / görüntülü)
+  Future<void> setCallSettings({bool? voice, bool? video, bool? matchesOnly}) async =>
+      _put('/me/call-settings', {'voice': ?voice, 'video': ?video, 'matchesOnly': ?matchesOnly});
+
   Future<DateTime> boost() async => DateTime.parse((await _post('/boost'))['boostedUntil'] as String).toLocal();
 
   Future<LikesInfo> likes() async => LikesInfo.fromJson(await _get('/likes'));

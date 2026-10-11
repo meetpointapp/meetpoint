@@ -5,7 +5,7 @@ import { agora, callTiming, economy, type CallKind } from './config';
 import { applyEarningEventBonus } from './events';
 import { fileReport } from './moderation/reports';
 import { hasConsent, requireConsent } from './privacy/consents';
-import { HttpError, isBlockedEitherWay, prisma } from './db';
+import { HttpError, isBlockedEitherWay, orderedPair, prisma } from './db';
 import { notify } from './notify';
 import { emitToUser, isOnline, onUserOffline, onUserOnline } from './realtime';
 import { publicProfile } from './routes/profile';
@@ -108,6 +108,14 @@ export async function startCall(callerId: string, calleeId: string, kind: CallKi
   const callee = await prisma.user.findUnique({ where: { id: calleeId }, include: { profile: true } });
   if (!callee?.profile || callee.bannedAt || callee.deletionRequestedAt || (await isBlockedEitherWay(callerId, calleeId))) {
     throw new HttpError(404, 'not_found');
+  }
+  // Faz 20: alıcı bu türde arama almayı kapattıysa arama başlamaz (toplum içinde rahatsız edilmesin)
+  if (!(kind === 'VIDEO' ? callee.acceptVideoCalls : callee.acceptVoiceCalls)) throw new HttpError(409, 'calls_disabled');
+  // Faz 20: "sadece eşleştiklerim" açıksa arayan, alıcıyla bir sohbeti (eşleşme veya kabul edilmiş istek) olmalı
+  if (callee.callsMatchesOnly) {
+    const [userAId, userBId] = orderedPair(callerId, calleeId);
+    const conv = await prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } }, select: { id: true } });
+    if (!conv) throw new HttpError(409, 'calls_matches_only');
   }
   // Ses/görüntü yurt dışındaki sunuculardan (Agora) geçer: iki tarafın da rızası gerekir
   await requireConsent(callerId, 'overseas_transfer');

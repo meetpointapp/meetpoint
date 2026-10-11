@@ -3046,4 +3046,188 @@ class AppLocalizationsEn extends AppLocalizations {
   String requestEarnRule(int coins, int replies, int minWords) {
     return '$coins coins: accept, then write $replies replies of $minWords+ words';
   }
+
+  @override
+  String likeInfoTitle(int remaining, int limit) {
+    return 'Likes left: $remaining/$limit';
+  }
+
+  @override
+  String get closeAction => 'Close';
+
+  @override
+  String get dailyTitle => 'Daily reward';
+
+  @override
+  String dailyStreak(int days) {
+    return '$days-day streak';
+  }
+
+  @override
+  String dailyClaim(int coins) {
+    return 'Claim reward · +$coins coins';
+  }
+
+  @override
+  String get dailyClaimedToday => 'You claimed today\'s reward';
+
+  @override
+  String get dailyComeBack => 'Come back tomorrow to grow your streak';
+
+  @override
+  String dailyDay(int n) {
+    return 'Day $n';
+  }
+
+  @override
+  String dailyNextBonus(int streak, int coins) {
+    return '+$coins coins bonus on day $streak';
+  }
+
+  @override
+  String dailyMonthTotal(int coins) {
+    return 'You earned $coins coins this month';
+  }
+
+  @override
+  String dailyClaimedSnack(int coins) {
+    return '+$coins coins added to your account';
+  }
+
+  @override
+  String dailyBonusLine(int coins) {
+    return '+$coins including streak bonus';
+  }
+
+  @override
+  String get dailyInfo =>
+      'Log in every day to build a streak: rewards grow with it. Coins can be spent but not cashed out.';
+
+  @override
+  String get dailyOpenTooltip => 'Daily reward and streak calendar';
+
+  @override
+  String get errSuperLikeLimit =>
+      'You\'re out of super likes. You can buy a pack.';
+
+  @override
+  String get storeCategorySuperLike => 'Super likes';
+
+  @override
+  String get superLikeLimitTitle => 'You\'re out of super likes';
+
+  @override
+  String superLikeLimitBody(int n) {
+    return 'You get $n free super likes a day. Get more with a pack: the more you buy, the cheaper each one gets.';
+  }
+
+  @override
+  String superLikePackCount(int n) {
+    return '$n super likes';
+  }
+
+  @override
+  String superLikeUnit(String price) {
+    return '$price coins each';
+  }
+
+  @override
+  String get superLikeBestValue => 'Best value';
+
+  @override
+  String superLikeBought(int n) {
+    return '$n super likes added';
+  }
+
+  @override
+  String superLikeBalance(int free, int daily, int credits) {
+    return 'Free today: $free/$daily · Purchased: $credits';
+  }
+
+  @override
+  String superLikeFreeIn(int hours, int minutes) {
+    return 'One free super like returns in ${hours}h ${minutes}m';
+  }
+
+  @override
+  String premiumPerkSuperLikes(int n, int free) {
+    return '$n super likes a day ($free for free members)';
+  }
+
+  @override
+  String premiumPerkLikeLimit(int n, int free) {
+    return '$n likes a day ($free for free members)';
+  }
+
+  @override
+  String get premiumPerkBadge =>
+      'Gold VibeUpMe+ badge and gold frame on your profile, card and chats';
+
+  @override
+  String get premiumMonthlyNote =>
+      'Monthly membership: renews automatically every month, cancel anytime. Perks end when the period ends.';
+
+  @override
+  String get premiumBadgeShort => 'VibeUpMe+';
+
+  @override
+  String premiumUntilShort(String date) {
+    return 'until $date';
+  }
+
+  @override
+  String get premiumPerkLikeLimitTitle => 'More likes';
+
+  @override
+  String get boostRunningTitle => 'You\'re boosted';
+
+  @override
+  String boostRemaining(int minutes) {
+    return '$minutes min left';
+  }
+
+  @override
+  String boostExtendBody(int minutes) {
+    return 'Extend it and $minutes more minutes are added to the time left.';
+  }
+
+  @override
+  String boostExtend(int minutes) {
+    return 'Add $minutes min';
+  }
+
+  @override
+  String get errBoostMax =>
+      'Your boost can\'t be extended further. You can extend it again as time runs down.';
+
+  @override
+  String get errCallsDisabled =>
+      'This person isn\'t taking this type of call right now.';
+
+  @override
+  String get callSettingVoice => 'Accept voice calls';
+
+  @override
+  String get callSettingVideo => 'Accept video calls';
+
+  @override
+  String get callSettingHint =>
+      'When off, nobody can call you this way, so you won\'t be disturbed in public.';
+
+  @override
+  String get callsOffLabel => 'Off';
+
+  @override
+  String get callSettingMatchesOnly => 'Only matches can call me';
+
+  @override
+  String get callSettingMatchesOnlyHint =>
+      'Nobody except people you matched or chatted with can call you.';
+
+  @override
+  String get errCallsMatchesOnly =>
+      'This person only takes calls from their matches. You need to match or chat first.';
+
+  @override
+  String get callsMatchesOnlyLabel => 'Matches';
 }

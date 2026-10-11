@@ -26,6 +26,8 @@ const internalCodes = {
   'idempotency_key_reused': 'her yeni eylem yeni anahtar alır; aynı anahtar sadece aynı isteğin tekrarında kullanılır',
   'token_expired': 'Api jetonu yenileyip isteği kendiliğinden tekrarlar',
   'invalid_refresh': 'oturum kapanmış: giriş ekranına dönülür',
+  'daily_not_active': 'ödül düğmesi sadece alınabilirken görünür (uygulama açılışta /me çeker)',
+  'daily_already_claimed': 'ödül düğmesi alındıktan sonra kapanır',
   'mfa_setup_required': 'sadece yönetim paneli',
   'mfa_required': 'sadece yönetim paneli',
   'mfa_already_enabled': 'sadece yönetim paneli',

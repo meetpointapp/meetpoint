@@ -939,5 +939,211 @@
         "type": "int"
       }
     }
-  }
+  },
+  "likeInfoTitle": "Likes left: {remaining}/{limit}",
+  "@likeInfoTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "closeAction": "Close",
+  "dailyTitle": "Daily reward",
+  "dailyStreak": "{days}-day streak",
+  "@dailyStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyClaim": "Claim reward · +{coins} coins",
+  "@dailyClaim": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyClaimedToday": "You claimed today's reward",
+  "dailyComeBack": "Come back tomorrow to grow your streak",
+  "dailyDay": "Day {n}",
+  "@dailyDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyNextBonus": "+{coins} coins bonus on day {streak}",
+  "@dailyNextBonus": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      },
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyMonthTotal": "You earned {coins} coins this month",
+  "@dailyMonthTotal": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyClaimedSnack": "+{coins} coins added to your account",
+  "@dailyClaimedSnack": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyBonusLine": "+{coins} including streak bonus",
+  "@dailyBonusLine": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyInfo": "Log in every day to build a streak: rewards grow with it. Coins can be spent but not cashed out.",
+  "dailyOpenTooltip": "Daily reward and streak calendar",
+  "errSuperLikeLimit": "You're out of super likes. You can buy a pack.",
+  "storeCategorySuperLike": "Super likes",
+  "superLikeLimitTitle": "You're out of super likes",
+  "superLikeLimitBody": "You get {n} free super likes a day. Get more with a pack: the more you buy, the cheaper each one gets.",
+  "@superLikeLimitBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "superLikePackCount": "{n} super likes",
+  "@superLikePackCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "superLikeUnit": "{price} coins each",
+  "@superLikeUnit": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "superLikeBestValue": "Best value",
+  "superLikeBought": "{n} super likes added",
+  "@superLikeBought": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "superLikeBalance": "Free today: {free}/{daily} · Purchased: {credits}",
+  "@superLikeBalance": {
+    "placeholders": {
+      "free": {
+        "type": "int"
+      },
+      "daily": {
+        "type": "int"
+      },
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "superLikeFreeIn": "One free super like returns in {hours}h {minutes}m",
+  "@superLikeFreeIn": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPerkSuperLikes": "{n} super likes a day ({free} for free members)",
+  "@premiumPerkSuperLikes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "free": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPerkLikeLimit": "{n} likes a day ({free} for free members)",
+  "@premiumPerkLikeLimit": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "free": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPerkBadge": "Gold VibeUpMe+ badge and gold frame on your profile, card and chats",
+  "premiumMonthlyNote": "Monthly membership: renews automatically every month, cancel anytime. Perks end when the period ends.",
+  "premiumBadgeShort": "VibeUpMe+",
+  "premiumUntilShort": "until {date}",
+  "@premiumUntilShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumPerkLikeLimitTitle": "More likes",
+  "boostRunningTitle": "You're boosted",
+  "boostRemaining": "{minutes} min left",
+  "@boostRemaining": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "boostExtendBody": "Extend it and {minutes} more minutes are added to the time left.",
+  "@boostExtendBody": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "boostExtend": "Add {minutes} min",
+  "@boostExtend": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "errBoostMax": "Your boost can't be extended further. You can extend it again as time runs down.",
+  "errCallsDisabled": "This person isn't taking this type of call right now.",
+  "callSettingVoice": "Accept voice calls",
+  "callSettingVideo": "Accept video calls",
+  "callSettingHint": "When off, nobody can call you this way, so you won't be disturbed in public.",
+  "callsOffLabel": "Off",
+  "callSettingMatchesOnly": "Only matches can call me",
+  "callSettingMatchesOnlyHint": "Nobody except people you matched or chatted with can call you.",
+  "errCallsMatchesOnly": "This person only takes calls from their matches. You need to match or chat first.",
+  "callsMatchesOnlyLabel": "Matches"
 }

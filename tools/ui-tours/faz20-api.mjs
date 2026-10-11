@@ -116,4 +116,44 @@ const mid = await call(caller.t, 'GET', `/calls/${c2.id}`);
 check('30 sn sonra ilk dakika (15 jeton) alındı', (await bal(caller)) === cb0 - 15 && mid.billedMinutes === 1, `bal ${cb0}→${await bal(caller)} billed=${mid.billedMinutes}`);
 await call(callee.t, 'POST', `/calls/${c2.id}/hangup`);
 
+// ---------- günlük giriş ödülü
+const d = await makeUser('Dayl', 'male', 'female');
+await call(d.t, 'GET', '/me'); // seri bugün işlenir
+const dr0 = await call(d.t, 'GET', '/me/daily-reward');
+check('ödül alınabilir ve ilk gün 3 jeton', dr0.claimable === true && dr0.streak === 1 && dr0.todayCoins === 3 && dr0.cycle.length === 7, JSON.stringify({ c: dr0.claimable, s: dr0.streak, t: dr0.todayCoins }));
+const bd0 = await bal(d);
+const cl = await call(d.t, 'POST', '/me/daily-reward/claim');
+check('ödül alındı (+3 jeton, promo kovası)', cl.status === 200 && cl.coins === 3 && (await bal(d)) === bd0 + 3, JSON.stringify({ s: cl.status, coins: cl.coins }));
+const cl2 = await call(d.t, 'POST', '/me/daily-reward/claim');
+check('aynı gün ikinci alım reddedilir', cl2.status === 409 && cl2.error === 'daily_already_claimed', JSON.stringify({ s: cl2.status, e: cl2.error }));
+const dr1 = await call(d.t, 'GET', '/me/daily-reward');
+check('takvimde bugün işaretli, alınamaz', dr1.claimedToday === true && dr1.claimable === false && dr1.claimedDays.length === 1 && dr1.monthCoins === 3);
+check('sıradaki seri bonusu 7. günde +10', dr1.nextBonus?.streak === 7 && dr1.nextBonus?.coins === 10, JSON.stringify(dr1.nextBonus));
+
+// ---------- süper beğeni: günlük 3 ücretsiz + paketler
+const sm = await makeUser('Sprm', 'male', 'female');
+const tg = [];
+for (let i = 0; i < 5; i++) tg.push(await makeUser(`Spt${i}x`, 'female', 'male'));
+const ss0 = await call(sm.t, 'GET', '/superlikes/status');
+check('süper beğeni: günde 3 ücretsiz, 4 paket', ss0.daily === 3 && ss0.freeRemaining === 3 && ss0.packs.length === 4, JSON.stringify({ d: ss0.daily, f: ss0.freeRemaining }));
+check('paket büyüdükçe adet fiyatı düşer', ss0.packs[0].unitPrice > ss0.packs[1].unitPrice && ss0.packs[2].unitPrice > ss0.packs[3].unitPrice);
+const wb0 = await bal(sm);
+for (let i = 0; i < 3; i++) {
+  const r = await call(sm.t, 'POST', '/swipes', { toId: tg[i].id, direction: 'superlike' });
+  check(`süper beğeni ${i + 1}/3 ücretsiz`, r.status === 200 && r.superLikes?.freeRemaining === 2 - i, JSON.stringify(r.superLikes));
+}
+check('ücretsiz süper beğeniler jeton harcamadı', (await bal(sm)) === wb0);
+const blockedSl = await call(sm.t, 'POST', '/swipes', { toId: tg[3].id, direction: 'superlike' });
+check('4. süper beğeni 403 + paketler', blockedSl.status === 403 && blockedSl.error === 'superlike_limit_reached' && blockedSl.superLikes?.packs?.length === 4, JSON.stringify({ s: blockedSl.status, e: blockedSl.error }));
+await call(sm.t, 'POST', '/wallet/dev-topup', { packId: 'coins_500' });
+const bb = await bal(sm);
+const buy = await call(sm.t, 'POST', '/superlikes/buy', { packId: 'sl_10' });
+check('10 adetlik paket 200 jeton, +10 hak', buy.status === 200 && buy.credits === 10 && bb - (await bal(sm)) === 200, JSON.stringify({ s: buy.status, c: buy.credits }));
+const viaPack = await call(sm.t, 'POST', '/swipes', { toId: tg[3].id, direction: 'superlike' });
+check('satın alınan hak kullanıldı ve ücretsiz sayımı etkilemedi', viaPack.status === 200 && viaPack.superLikes?.credits === 9 && viaPack.superLikes?.used === 3, JSON.stringify(viaPack.superLikes));
+const dupe = await call(sm.t, 'POST', '/swipes', { toId: tg[3].id, direction: 'superlike' });
+check('aynı kişiye tekrar süper beğeni hak harcamaz', dupe.status === 200 && dupe.superLikes?.credits === 9);
+const badPack = await call(sm.t, 'POST', '/superlikes/buy', { packId: 'sl_999' });
+check('geçersiz paket reddedilir', badPack.status === 400);
+
 summary();

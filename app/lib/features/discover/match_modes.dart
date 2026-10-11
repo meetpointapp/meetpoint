@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/catalog.dart';
 import '../../core/models.dart';
-import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -34,15 +33,16 @@ class ModeBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // Tinder tarzı: sade metin sekmeleri, seçili olan ince çerçeveli hap içinde
     return SizedBox(
-      height: 48,
+      height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         itemCount: _modes.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 2),
         itemBuilder: (_, i) {
-          final (id, emoji) = _modes[i];
+          final (id, _) = _modes[i];
           final on = id == mode;
           return Semantics(
             button: true,
@@ -51,29 +51,24 @@ class ModeBar extends StatelessWidget {
             excludeSemantics: true,
             onTap: () => onSelected(id),
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => onSelected(id),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22),
-                  gradient: on ? Brand.gradient : null,
-                  color: on ? null : theme.cardTheme.color,
-                  border: on ? null : Border.all(color: theme.colorScheme.outlineVariant),
-                  boxShadow: on ? [BoxShadow(color: Brand.coral.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 3))] : null,
+                  borderRadius: BorderRadius.circular(20),
+                  color: on ? theme.colorScheme.onSurface.withValues(alpha: 0.07) : null,
+                  border: on ? Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.18)) : null,
                 ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(emoji, style: const TextStyle(fontSize: 15)),
-                  const SizedBox(width: 6),
-                  Text(
-                    _modeLabel(l, id),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: on ? Colors.white : theme.colorScheme.onSurface,
-                      fontWeight: on ? FontWeight.w800 : FontWeight.w600,
-                    ),
+                child: Text(
+                  _modeLabel(l, id),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: on ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.62),
+                    fontWeight: on ? FontWeight.w800 : FontWeight.w600,
                   ),
-                ]),
+                ),
               ),
             ),
           );

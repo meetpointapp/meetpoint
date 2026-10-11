@@ -84,6 +84,7 @@ async function collect(userId: string) {
       banReason: u.banReason,
       salesTermsVersion: u.salesTermsVersion,
       notificationPreferences: { disabled: u.notifyPrefs, quietStart: u.quietStart, quietEnd: u.quietEnd },
+      callPreferences: { acceptVoiceCalls: u.acceptVoiceCalls, acceptVideoCalls: u.acceptVideoCalls, callsMatchesOnly: u.callsMatchesOnly },
       referralCode: u.referralCode,
       referredById: u.referredById,
     },

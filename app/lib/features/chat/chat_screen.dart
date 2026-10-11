@@ -480,7 +480,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             const SizedBox(width: 10),
             Flexible(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                NameWithBadge(other?.displayName ?? '', verified: other?.verified ?? false),
+                NameWithBadge(other?.displayName ?? '', verified: other?.verified ?? false, premium: other?.premium ?? false),
                 AnimatedSize(
                   duration: const Duration(milliseconds: 150),
                   child: _otherTyping

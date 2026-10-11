@@ -75,17 +75,40 @@ export const economy = {
   referralBonus: 50,
 
   // Jetonla alınan özellikler (jeton kimseye geçmez: tamamı gelir)
-  superLikePrice: 30,
+  // Faz 20: süper beğeni. Günlük ücretsiz hak (kayan 24 saat) + jetonla alınan paketler. Paket büyüdükçe
+  // birim fiyat düşer (toplu alım daha uygun). VibeUpMe+ abonelerinin günlük hakkı daha yüksek.
+  superLike: {
+    daily: 3,
+    dailyPremium: 10,
+    windowHours: 24,
+    packs: [
+      { id: 'sl_3', count: 3, price: 75 }, // 25/adet
+      { id: 'sl_10', count: 10, price: 200 }, // 20/adet
+      { id: 'sl_25', count: 25, price: 425 }, // 17/adet
+      { id: 'sl_60', count: 60, price: 900 }, // 15/adet
+    ],
+  },
   boostPrice: 150,
   boostMinutes: 30,
+  // Faz 20: süren öne çıkarma uzatılabilir; kalan süre bu değeri aşamaz
+  boostMaxMinutes: 120,
   likesUnlockPrice: 200,
   likesUnlockHours: 24,
 
   // Faz 20: keşfette beğeni hakkı. Kayan pencerede (likeWindowHours) en fazla likeLimit beğeni;
   // hak bitince likeResetPrice jetonla anında sıfırlanır (süper beğeni zaten ücretli, sayılmaz).
   likeLimit: Number(process.env.LIKE_LIMIT ?? 25),
+  likeLimitPremium: Number(process.env.LIKE_LIMIT_PREMIUM ?? 50), // VibeUpMe+ aboneleri
   likeWindowHours: 24,
   likeResetPrice: 50,
+
+  // Faz 20: günlük giriş ödülü (promo jeton: harcanabilir, bozdurulamaz). 7 günlük döngü + serinin
+  // tam bu gününe ulaşınca bir kerelik bonus. Bilerek küçük: asıl gelir jeton satışı.
+  // Haftalık ≈ 32 jeton, 30 günlük seri ≈ 140 + bonuslar (65) jeton.
+  dailyReward: {
+    cycle: [3, 3, 4, 4, 5, 5, 8],
+    streakBonuses: { '7': 10, '14': 15, '30': 40, '60': 60, '100': 100 } as Record<string, number>,
+  },
 
   // Faz 20: mesaj isteği emaneti. Kabulde jeton alıcıya hemen geçmez; alıcı en az minWords kelimelik
   // `replies` cevap yazınca geçer, `days` gün içinde yazmazsa gönderene iade edilir.
