@@ -429,25 +429,25 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 4. 🛠 **Maliyet görünürlüğü.** Arama dakikaları ve tahmini Agora maliyeti yönetim panelinde görünür (jeton geliri ile karşılaştırma); beklenmedik kullanımda uyarı.
 5. 🛠 **Kalite ve güvenilirlik.** Zayıf ağda çözünürlük/bit hızı uyarlaması, jeton yenilemenin 1 saatten uzun gerçek aramada doğrulanması, ortam doğrulaması (iki taraf da katılmadıysa ücret yok) gerçek akışla sınanması.
 
-## Faz 22 · Sosyal akış (yazı tabanlı)
+## Faz 22 · Sosyal akış (yazı tabanlı) ✅
 
-**Amaç:** Uygulamaya ilk dönem Twitter gibi sadece yazı paylaşılan, altına yorum yapılan hafif bir akış eklemek. Akış ayrı bir ürün değil, tanışmanın yeni kapısı: yazarın profil kartından beğeni, süper beğeni ve mesaj isteğine geçilir.
+**Amaç:** Hiçbir tanışma uygulamasında olmayan bir katman: ilk dönem Twitter gibi sadece yazı paylaşılan, altına yorum yapılan bir akış, takip sistemi ve 24 saatlik hikayeler. Akış ayrı bir ürün değil, tanışmanın yeni kapısı: yazarın profil kartından beğeni, süper beğeni ve mesaj isteğine geçilir. Uzun vadede gerçek bir sosyal ağa dönüşebilir; `Post.kind` alanı dış reklam için ayrılmıştır.
 
 **Kararlar (2026-10-12):**
-- **Kapsam:** herkese açık tek akış; üstte "Herkes / İlgi alanlarım / Eşleşmelerim" sekmeleri. Takip sistemi ilk sürümde yok (boş akış sorununu azaltır).
-- **Kim yazar:** sadece mavi tikli (doğrulanmış) hesaplar paylaşır; herkes okur ve yorum yapar. Spam, taciz ve sahte hesap yükü azalır.
-- **Alt menü:** Keşfet · Eşleşmeler · **Akış (ortada, öne çıkan)** · Sohbetler · Cüzdan · Profil. Mağaza Profil içine taşınır; bakiye hapı üst çubukta kalır ve mağazaya götürür (jeton satışı gözden uzaklaşmasın).
-- **İlk sürüm sınırları:** 280 karakter, düz yorum listesi (iç içe yok), beğeni var; takip, hashtag, alıntılama ve görsel paylaşım yok.
+- **Kapsam:** herkese açık tek akış; sekmeler "Herkes / Takip / İlgi alanlarım / Eşleşmelerim". Tek yönlü takip (karşılıklı takip = "takipleşme").
+- **Kim yazar:** gönderi, yorum ve hikaye sadece **mavi tikli** hesaplara açık; okuma, beğeni ve takip herkese açık. Spam, taciz ve sahte hesap yükü azalır.
+- **Alt menü:** Keşfet · Eşleşmeler · **Akış (ortada, gradyanlı yuvarlak)** · Sohbetler · Cüzdan · Profil. Mağaza Profil içine taşındı (büyük kart).
+- **İlk sürüm sınırları:** 280 karakter, düz yorum listesi (iç içe yok), görsel paylaşım sadece hikayede.
 
-1. 🛠 **Veri modeli ve akış.** `Post`, `PostLike`, `PostComment` tabloları; gönderi ≤280 karakter, ilgi alanı etiketi, gizleme alanı. Sayfalamalı akış sorgusu (herkes / ortak ilgi alanı / eşleşmeler); engellenen, silinen, yasaklı ve kısıtlı hesaplar hariç. Kotalar: günde 5 gönderi, 60 yorum; rate limit ve Idempotency-Key.
-2. 🛠 **Güvenlik ve moderasyon.** İletişim bilgisi ve spam tespiti (`detect.ts` yeniden kullanılır), gönderi/yorum şikâyeti ve yaptırımla paylaşım kısıtı (`requireNotRestricted`), panelde "Gönderiler" sekmesi (gizle, sil, kullanıcıya yaptırım), trafik kaydı, KVKK envanteri + dışa aktarma + hesap silinince silme, topluluk kuralları metni.
-3. 🛠 **Akış ekranı ve paylaşım.** Sonsuz kaydırmalı akış, gönderi kartı (yazarın rozetleri, avatar çerçevesi, ilgi etiketi), beğeni, yorum sayısı; paylaşım kutusu (karakter sayacı, ilgi alanı seçimi); gönderi detayı ve yorumlar; kendi gönderisini silme; şikâyet/engelle menüsü.
-4. 🛠 **Alt menü ve gezinti.** Ortada Akış sekmesi, Mağaza'nın Profil içine alınması (kart + hızlı erişim), bakiye hapından mağazaya geçiş, eski bağlantıların (`/store`) yönlendirilmesi.
-5. 🛠 **Bildirimler ve bağlantı.** Gönderine yorum/beğeni bildirimi (tür bazlı tercih ve sessiz saatlere uyar), yazardan profile geçiş (beğen, süper beğeni, mesaj isteği), profilde "Gönderilerim", yeni gönderi sayacı rozeti.
-6. 🛠 **Gelir ve büyüme.** Gönderiyi jetonla öne çıkarma (süreli) ve profile sabitleme; paylaşılabilir gönderi kartı (kendi şablonumuzla, harici API yok).
-7. 🛠 **Test ve belgeler.** Sunucu testleri (kota, yetki, engelleme, silme), UI turu, yol haritası/README güncellemesi.
+1. ✅ **Veri modeli ve akış.** `Post`, `PostLike`, `PostComment`, `Follow`, `Story`, `StoryView` (migration `20261012120000_faz22_social`); sayfalamalı akış (`GET /feed?tab=`), engellenen/silinen/yasaklı hesaplar hariç. Kotalar: günde 5 gönderi, 60 yorum, 10 hikaye; aynı metin 24 saatte tekrar atılamaz; Idempotency-Key ve rate limit.
+2. ✅ **Güvenlik ve moderasyon.** Telefon/e-posta/bağlantı/sosyal hesap içeren metin reddedilir (`contact_info_not_allowed`); gönderi, yorum ve hikaye şikayeti (`Report.subjectType/subjectId/subjectText`, içerik silinse de panelde görünür); yaptırımla kısıt; fotoğraf hikayesinde ten oranı şüphesi gizler ve kuyruğa düşürür; panelde kuyruktaki şikayetlerde "İçeriği kaldır"; engelleme takipleri düşürür; KVKK envanteri, dışa aktarma ve hesap silme.
+3. ✅ **Akış ekranı ve paylaşım.** Hikaye halkaları, sekmeli sonsuz akış, "Aklından ne geçiyor?" kutusu, paylaşım sayfası (karakter sayacı, ilgi alanı etiketi), gönderi detayı ve yorumlar, kendi gönderisini silme, şikayet/engelle menüsü, mavi tik kapısı (doğrulanmamışa açıklama + doğrulama yönlendirmesi).
+4. ✅ **Alt menü ve gezinti.** Ortada Akış düğmesi; mağaza `/store` olarak Profil'den açılır; cüzdan alt menüde kaldı.
+5. ✅ **Bildirimler ve bağlantı.** Beğeni/yorum/yeni takipçi bildirimi (yeni "Sosyal akış" tercihi, sessiz saatlere uyar); profilde takipçi/takip/gönderi sayıları, takip düğmesi, son gönderiler ve hikaye halkası; takipçi/takip listeleri; kendi profilimde sayaçlar.
+6. ⏳ **Gelir ve büyüme (sonraya).** Gönderiyi jetonla öne çıkarma ve profile sabitleme (`Post.boostedUntil/pinnedAt` alanları hazır), paylaşılabilir gönderi kartı, dış reklam alanı (`Post.kind = 'ad'`).
+7. ✅ **Test ve belgeler.** Sunucu API testi (`test/api/social.test.ts`), canlı kontrol betiği (`tools/ui-tours/social-api.mjs`), demo veri (`social-seed.mjs`), UI turu (`feed-tour.mjs`).
 
-**Süre tahmini:** 7–10 gün. **Açık riskler:** içerik moderasyonu iş yükü (5651 sorumluluğu avukat aşamasında netleşir), akışın başlangıçta boş görünmesi (ilgi alanı filtresi ve ruh hali gibi hafif içeriklerle canlı tutulur).
+**Açık riskler:** içerik moderasyonu iş yükü (5651 sorumluluğu avukat aşamasında netleşir); akışın başlangıçta boş görünmesi (ilgi alanı filtresi, hikayeler ve demo içerikle canlı tutulur).
 
 ## Faz 23 · Dış süreçler ve yayın
 

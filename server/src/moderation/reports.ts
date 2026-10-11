@@ -11,7 +11,17 @@ const PRIORITY: Record<string, number> = { underage: 1, inappropriate_content: 1
 export const BURST_REPORTERS = 3;
 const BURST_DAYS = 7;
 
-export async function fileReport(input: { fromId: string; toId: string; reason: string; details?: string; priority?: number }) {
+export async function fileReport(input: {
+  fromId: string;
+  toId: string;
+  reason: string;
+  details?: string;
+  priority?: number;
+  // Faz 22: şikayet bir içeriğe aitse (gönderi/yorum/hikaye) türü, kimliği ve metin kopyası
+  subjectType?: 'user' | 'post' | 'comment' | 'story';
+  subjectId?: string;
+  subjectText?: string;
+}) {
   const report = await prisma.report.create({
     data: {
       fromId: input.fromId,
@@ -19,6 +29,9 @@ export async function fileReport(input: { fromId: string; toId: string; reason: 
       reason: input.reason,
       details: input.details ?? '',
       priority: input.priority ?? PRIORITY[input.reason] ?? 3,
+      subjectType: input.subjectType ?? 'user',
+      subjectId: input.subjectId ?? '',
+      subjectText: (input.subjectText ?? '').slice(0, 500),
     },
   });
   await checkReportBurst(input.toId).catch((e) => console.error('[moderasyon] şikayet kontrolü', e));

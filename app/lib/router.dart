@@ -21,6 +21,9 @@ import 'features/chat/conversations_screen.dart';
 import 'features/discover/discover_screen.dart';
 import 'features/discover/interest_group_screen.dart';
 import 'features/store/store_screen.dart';
+import 'features/feed/feed_screen.dart';
+import 'features/feed/post_screens.dart';
+import 'features/feed/stories.dart';
 import 'features/home/home_shell.dart';
 import 'features/daily/daily_reward_screen.dart';
 import 'features/likes/likes_screen.dart';
@@ -82,6 +85,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/support/new', builder: (_, s) => NewTicketScreen(args: s.extra is NewTicketArgs ? s.extra as NewTicketArgs : null)),
       GoRoute(path: '/support/:id', builder: (_, s) => TicketScreen(ticketId: s.pathParameters['id']!)),
       GoRoute(path: '/user/:id', builder: (_, s) => UserProfileScreen(userId: s.pathParameters['id']!)),
+      // Faz 22: sosyal akış
+      GoRoute(path: '/user/:id/posts', builder: (_, s) => UserPostsScreen(userId: s.pathParameters['id']!)),
+      GoRoute(path: '/user/:id/followers', builder: (_, s) => FollowListScreen(userId: s.pathParameters['id']!, followers: true)),
+      GoRoute(path: '/user/:id/following', builder: (_, s) => FollowListScreen(userId: s.pathParameters['id']!, followers: false)),
+      GoRoute(path: '/post/:id', builder: (_, s) => PostDetailScreen(postId: s.pathParameters['id']!)),
+      GoRoute(
+        path: '/stories',
+        redirect: (_, state) => state.extra is StoryViewerArgs ? null : '/feed',
+        builder: (_, s) => StoryViewerScreen(args: s.extra as StoryViewerArgs),
+      ),
+      GoRoute(path: '/stories/user/:id', builder: (_, s) => StoryByUserScreen(userId: s.pathParameters['id']!)),
+      GoRoute(path: '/story/new', builder: (_, _) => const StoryComposerScreen()),
+      GoRoute(path: '/store', builder: (_, _) => const StoreScreen()),
       GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
       GoRoute(path: '/discover/groups/:interestId', builder: (_, s) => InterestGroupScreen(interestId: s.pathParameters['interestId']!)),
       GoRoute(
@@ -100,9 +116,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(routes: [GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/matches', builder: (_, _) => const MatchesScreen())]),
+          StatefulShellBranch(routes: [GoRoute(path: '/feed', builder: (_, _) => const FeedScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/chats', builder: (_, _) => const ConversationsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/store', builder: (_, _) => const StoreScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/me', builder: (_, _) => const MeScreen())]),
         ],
       ),

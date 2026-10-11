@@ -1145,5 +1145,111 @@
   "callSettingMatchesOnly": "Only matches can call me",
   "callSettingMatchesOnlyHint": "Nobody except people you matched or chatted with can call you.",
   "errCallsMatchesOnly": "This person only takes calls from their matches. You need to match or chat first.",
-  "callsMatchesOnlyLabel": "Matches"
+  "callsMatchesOnlyLabel": "Matches",
+  "navFeed": "Feed",
+  "feedTabAll": "Everyone",
+  "feedTabFollowing": "Following",
+  "feedTabInterests": "My interests",
+  "feedTabMatches": "My matches",
+  "feedComposerHint": "What's on your mind?",
+  "feedEmptyAll": "No posts yet. Be the first to share!",
+  "feedEmptyFollowing": "The people you follow haven't posted yet. Follow a few more people to fill your feed.",
+  "feedEmptyInterests": "No posts match your interests yet. You can add interests in your profile.",
+  "feedEmptyMatches": "Posts from the people you matched with show up here.",
+  "feedSeeAll": "See everyone's posts",
+  "postTitle": "Post",
+  "postsTitle": "Posts",
+  "postsEmpty": "No posts yet.",
+  "postsLabel": "Posts",
+  "seeAllPosts": "See all ({n})",
+  "@seeAllPosts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "postNew": "New post",
+  "postShare": "Share",
+  "postShared": "Your post is live",
+  "postHint": "What's happening?",
+  "postInterestLabel": "Interest tag (optional)",
+  "postContactRule": "Phone numbers, emails, links and social handles can't be shared.",
+  "postDelete": "Delete post",
+  "postDeleteConfirm": "Delete this post? This can't be undone.",
+  "postDeleted": "Post deleted",
+  "postReport": "Report",
+  "postLike": "Like",
+  "commentsTitle": "Comments",
+  "commentsEmpty": "No comments yet.",
+  "commentsMore": "More comments",
+  "commentHint": "Write a comment…",
+  "commentDelete": "Delete comment",
+  "commentVerifiedOnly": "You need to verify your profile (blue tick) to comment.",
+  "verifyToPostTitle": "Blue tick required",
+  "verifyToPostBody": "You need to verify your profile to share posts, comments and stories. Everyone can read, like and follow.",
+  "follow": "Follow",
+  "followBack": "Follow back",
+  "followingState": "Following",
+  "unfollow": "Unfollow",
+  "mutualFollow": "You follow each other",
+  "followersLabel": "Followers",
+  "followingLabel": "Following",
+  "followersTitle": "Followers",
+  "followingTitle": "Following",
+  "noFollowers": "No followers yet.",
+  "noFollowing": "Not following anyone yet.",
+  "timeNow": "now",
+  "timeMinutes": "{n}m",
+  "@timeMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHours": "{n}h",
+  "@timeHours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeDays": "{n}d",
+  "@timeDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "storyYours": "Your story",
+  "storyText": "Text",
+  "storyPhoto": "Photo",
+  "storyHint": "Write something…",
+  "storyCaption": "Caption (optional)",
+  "storyPickPhoto": "Choose a photo",
+  "storyShare": "Share",
+  "storyShared": "Your story is live for 24 hours",
+  "storyUnderReview": "Your photo is under review and will go live once approved.",
+  "storyViews": "{n} views",
+  "@storyViews": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "storyViewers": "Viewers",
+  "storyNoViewers": "Nobody has seen it yet.",
+  "storyDelete": "Delete story",
+  "storyDeleted": "Story deleted",
+  "storeEntrySubtitle": "Bubbles, frames, themes and super like packs",
+  "notifySocial": "Social feed",
+  "errPostLimit": "You've reached today's post limit. You can post again tomorrow.",
+  "errCommentLimit": "You've reached today's comment limit. Try again tomorrow.",
+  "errStoryLimit": "You've reached today's story limit.",
+  "errDuplicatePost": "You already shared this post.",
+  "errContactInfo": "Phone numbers, emails, links and social handles can't be shared in public."
 }

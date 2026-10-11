@@ -156,7 +156,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     leading: const Icon(Icons.storefront_outlined),
                     title: Text(l.storeTitle),
                     trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.go('/store'),
+                    onTap: () => context.push('/store'),
                   ),
                 ),
               ]),

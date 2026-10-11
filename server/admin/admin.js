@@ -368,7 +368,9 @@ const FLAG_KINDS = {
   contact_repeat: 'Tekrarlayan iletişim bilgisi paylaşımı',
   spam: 'Toplu mesaj',
   report_burst: 'Kısa sürede çok şikayet (otomatik 24 saat kısıt verildi)',
+  story_suspicious: 'Şüpheli hikaye fotoğrafı (yayınlanmadan gizlendi)',
 };
+const SUBJECT_TYPES = { post: 'Gönderi', comment: 'Yorum', story: 'Hikaye' };
 const PRIO = { 1: '🔴 Acil', 2: '🟠 Yüksek', 3: '⚪ Normal' };
 const age = (h) => (h < 1 ? `${Math.round(h * 60)} dk` : h < 48 ? `${Math.round(h)} sa` : `${Math.round(h / 24)} gün`);
 
@@ -399,9 +401,10 @@ function queueItem(i) {
     return `<div class="card item" data-item="${esc(i.id)}">${head}
       <div><span class="pill red">Şikayet: ${esc(REASONS[i.reason] || i.reason)}</span> <span class="muted small">şikayet eden: ${esc(i.reporter?.displayName || i.reporter?.email || '?')}</span></div>
       ${briefLine(i.user)}
+      ${i.subject ? `<div class="detail"><b>${esc(SUBJECT_TYPES[i.subject.type] || i.subject.type)}:</b> “${esc(i.subject.text)}”</div>` : ''}
       ${i.details ? `<div class="detail">${esc(i.details)}</div>` : ''}
       ${thumbs(i.user, i.id)}
-      <div class="actions"><button class="btn soft" data-dismiss="${esc(i.id)}">Yoksay</button>${sanctionButtons(i.user?.id, `data-report-id="${esc(i.id)}"`)}</div>
+      <div class="actions"><button class="btn soft" data-dismiss="${esc(i.id)}">Yoksay</button>${i.subject ? `<button class="btn red" data-hide-content="${esc(i.subject.type)}:${esc(i.subject.id)}">İçeriği kaldır</button>` : ''}${sanctionButtons(i.user?.id, `data-report-id="${esc(i.id)}"`)}</div>
       <div class="history hidden" data-history-for="${esc(i.user?.id)}"></div></div>`;
   }
   if (i.type === 'flag') {
@@ -410,7 +413,11 @@ function queueItem(i) {
       : i.message
         ? `<div class="detail">“${esc(i.message.body)}”</div>`
         : '';
-    const actions = i.photo
+    const actions = i.kind === 'story_suspicious'
+      ? `<button class="btn green" data-story-restore="${esc(i.photo?.id || '')}">Yayınla</button>
+         <button class="btn red" data-hide-content="story:${esc(i.photo?.id || '')}">Kaldır</button>
+         <button class="btn soft" data-flag="${esc(i.id)}" data-action="sanction">Kaldır + yaptırım</button>`
+      : i.photo
       ? `<button class="btn green" data-flag="${esc(i.id)}" data-action="approve_photo">Fotoğrafı onayla</button>
          <button class="btn soft" data-flag="${esc(i.id)}" data-action="remove_photo">Fotoğrafı kaldır</button>
          <button class="btn red" data-flag="${esc(i.id)}" data-action="sanction">Kaldır + yaptırım</button>`
@@ -475,6 +482,14 @@ $('#queue').addEventListener('click', async (e) => {
     } else if (t.dataset.dismiss) {
       await api('POST', `/admin/api/reports/${t.dataset.dismiss}/resolve`, { action: 'dismiss' });
       toast('Şikayet yoksayıldı');
+    } else if (t.dataset.hideContent) {
+      if (!confirm('Bu içerik kullanıcılara gösterilmesin mi?')) return;
+      const [type, id] = t.dataset.hideContent.split(':');
+      await api('POST', `/admin/api/moderation/content/${type}/${id}/hide`, {});
+      toast('İçerik kaldırıldı');
+    } else if (t.dataset.storyRestore) {
+      await api('POST', `/admin/api/moderation/content/story/${t.dataset.storyRestore}/hide`, { restore: true });
+      toast('Hikaye yayınlandı');
     } else if (t.dataset.sanction) {
       const ban = t.dataset.level === 'ban';
       const note = prompt(ban ? 'Kalıcı yasak gerekçesi (kullanıcıya gösterilir):' : 'Kullanıcıya gösterilecek açıklama:', '');

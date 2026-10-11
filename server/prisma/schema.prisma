@@ -102,6 +102,14 @@ model User {
   // bkz. src/referral.ts). Eski hesaplarda kod yok (null) — sorun değil, sadece yeni özellik.
   referralCode String? @unique
   dailyClaims  DailyClaim[]
+  // Faz 22: sosyal akış
+  posts        Post[]        @relation("PostAuthor")
+  postLikes    PostLike[]
+  postComments PostComment[]
+  stories      Story[]       @relation("StoryAuthor")
+  storyViews   StoryView[]
+  following    Follow[]      @relation("FollowFollower")
+  followers    Follow[]      @relation("FollowFollowing")
   referredById String?
   referredBy   User?   @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
   referrals    User[]  @relation("Referrals")
@@ -721,6 +729,11 @@ model Report {
   status     String    @default("OPEN") // OPEN | RESOLVED
   resolution String    @default("") // dismissed | photo_removed | banned | sanctioned
   priority   Int       @default(3) // 1 = acil (reşit olmayan, müstehcenlik), 2 = yüksek, 3 = normal
+  // Faz 22: şikayet bir kullanıcıya mı yoksa bir içeriğe mi (gönderi/yorum/hikaye). Metin, içerik silinse de
+  // incelemede görülebilsin diye şikayet anında kopyalanır.
+  subjectType String   @default("user") // user | post | comment | story
+  subjectId   String   @default("")
+  subjectText String   @default("")
   resolvedAt DateTime?
   createdAt  DateTime  @default(now())
 
@@ -1094,5 +1107,94 @@ model DailyClaim {
   createdAt  DateTime @default(now())
 
   @@unique([userId, day])
+  @@index([userId, createdAt])
+}
+
+// ---------- Faz 22: sosyal akış (yazı tabanlı gönderiler, yorumlar, takip, 24 saatlik hikayeler)
+
+// Tek yönlü takip (Twitter gibi); karşılıklı takip = "takipleşme"
+model Follow {
+  followerId  String
+  followingId String
+  follower    User     @relation("FollowFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("FollowFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId, createdAt])
+}
+
+model Post {
+  id           String        @id @default(cuid())
+  authorId     String
+  author       User          @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  body         String
+  interest     String        @default("") // isteğe bağlı ilgi alanı etiketi (catalog kimliği)
+  kind         String        @default("post") // post | (ileride) ad — dış reklam için ayrılmış
+  likeCount    Int           @default(0)
+  commentCount Int           @default(0)
+  hiddenAt     DateTime? // moderatör gizledi
+  pinnedAt     DateTime? // profile sabitlendi (ileride)
+  boostedUntil DateTime? // jetonla öne çıkarıldı (ileride)
+  createdAt    DateTime      @default(now())
+  likes        PostLike[]
+  comments     PostComment[]
+
+  @@index([createdAt, id])
+  @@index([authorId, createdAt])
+  @@index([interest, createdAt])
+}
+
+model PostLike {
+  postId    String
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+}
+
+model PostComment {
+  id        String    @id @default(cuid())
+  postId    String
+  authorId  String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  hiddenAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([postId, createdAt])
+  @@index([authorId, createdAt])
+}
+
+// 24 saat görünen hikaye: yazı (renkli zemin) veya fotoğraf
+model Story {
+  id        String      @id @default(cuid())
+  authorId  String
+  author    User        @relation("StoryAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  kind      String // text | photo
+  text      String      @default("")
+  bg        String      @default("") // metin hikayesinin zemin kimliği (uygulamadaki gradyan listesi)
+  photoPath String      @default("") // fotoğraf hikayesi: depolama anahtarı (profil fotoğraflarıyla aynı boyutlar)
+  hiddenAt  DateTime?
+  createdAt DateTime    @default(now())
+  expiresAt DateTime
+  views     StoryView[]
+
+  @@index([authorId, createdAt])
+  @@index([expiresAt])
+}
+
+model StoryView {
+  storyId   String
+  userId    String
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([storyId, userId])
   @@index([userId, createdAt])
 }

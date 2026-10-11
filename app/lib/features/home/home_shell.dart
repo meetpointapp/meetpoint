@@ -222,19 +222,20 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               for (final (i, d) in [
                 (Icons.style_outlined, Icons.style_rounded, l.navDiscover, 0, false),
                 (Icons.favorite_border_rounded, Icons.favorite_rounded, l.matchesTitle, newMatches, false),
+                (Icons.dynamic_feed_outlined, Icons.dynamic_feed_rounded, l.navFeed, 0, false),
                 (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, l.navChats, unread + pending, false),
                 (Icons.account_balance_wallet_outlined, Icons.account_balance_wallet_rounded, l.navWallet, 0, false),
-                (Icons.storefront_outlined, Icons.storefront_rounded, l.navStore, 0, false),
                 (Icons.person_outline_rounded, Icons.person_rounded, l.navProfile, 0, dailyDot),
               ].indexed)
                 Expanded(
-                  flex: widget.shell.currentIndex == i ? 6 : 2,
+                  flex: i == 2 ? 3 : (widget.shell.currentIndex == i ? 6 : 2),
                   child: _NavItem(
                     icon: d.$1,
                     selectedIcon: d.$2,
                     label: d.$3,
                     badge: d.$4,
                     dot: d.$5,
+                    center: i == 2,
                     selected: widget.shell.currentIndex == i,
                     onTap: () => widget.shell.goBranch(i, initialLocation: i == widget.shell.currentIndex),
                   ),
@@ -248,7 +249,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({required this.icon, required this.selectedIcon, required this.label, required this.badge, required this.dot, required this.selected, required this.onTap});
+  const _NavItem({required this.icon, required this.selectedIcon, required this.label, required this.badge, required this.dot, required this.selected, required this.onTap, this.center = false});
   final IconData icon;
   final IconData selectedIcon;
   final String label;
@@ -256,12 +257,41 @@ class _NavItem extends StatelessWidget {
   // Sayı yerine sadece kırmızı nokta (ör. günlük ödül hazır)
   final bool dot;
   final bool selected;
+  // Ortadaki Akış düğmesi: her zaman gradyanlı yuvarlak, etiketsiz
+  final bool center;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final color = selected ? Brand.coral : scheme.onSurfaceVariant;
+    if (center) {
+      return Semantics(
+        button: true,
+        selected: selected,
+        label: label,
+        excludeSemantics: true,
+        onTap: onTap,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              width: selected ? 54 : 50,
+              height: selected ? 54 : 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: Brand.gradient,
+                boxShadow: [BoxShadow(color: Brand.coral.withValues(alpha: selected ? 0.5 : 0.32), blurRadius: selected ? 18 : 12, offset: const Offset(0, 5))],
+              ),
+              child: Icon(selected ? selectedIcon : icon, color: Brand.onAccent, size: 26),
+            ),
+          ),
+        ),
+      );
+    }
     return Semantics(
       button: true,
       selected: selected,

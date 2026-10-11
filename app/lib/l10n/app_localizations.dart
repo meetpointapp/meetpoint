@@ -4904,6 +4904,432 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Eşleşme'**
   String get callsMatchesOnlyLabel;
+
+  /// No description provided for @navFeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Akış'**
+  String get navFeed;
+
+  /// No description provided for @feedTabAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Herkes'**
+  String get feedTabAll;
+
+  /// No description provided for @feedTabFollowing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takip'**
+  String get feedTabFollowing;
+
+  /// No description provided for @feedTabInterests.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgi alanlarım'**
+  String get feedTabInterests;
+
+  /// No description provided for @feedTabMatches.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşmelerim'**
+  String get feedTabMatches;
+
+  /// No description provided for @feedComposerHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aklından ne geçiyor?'**
+  String get feedComposerHint;
+
+  /// No description provided for @feedEmptyAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz gönderi yok. İlk paylaşımı sen yap!'**
+  String get feedEmptyAll;
+
+  /// No description provided for @feedEmptyFollowing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takip ettiklerin henüz bir şey paylaşmadı. Birkaç kişiyi takip ederek akışını doldur.'**
+  String get feedEmptyFollowing;
+
+  /// No description provided for @feedEmptyInterests.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgi alanlarına uyan gönderi yok. Profilinden ilgi alanı ekleyebilirsin.'**
+  String get feedEmptyInterests;
+
+  /// No description provided for @feedEmptyMatches.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleştiğin kişilerin gönderileri burada görünür.'**
+  String get feedEmptyMatches;
+
+  /// No description provided for @feedSeeAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Herkesin gönderilerini gör'**
+  String get feedSeeAll;
+
+  /// No description provided for @postTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi'**
+  String get postTitle;
+
+  /// No description provided for @postsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderiler'**
+  String get postsTitle;
+
+  /// No description provided for @postsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz gönderi yok.'**
+  String get postsEmpty;
+
+  /// No description provided for @postsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi'**
+  String get postsLabel;
+
+  /// No description provided for @seeAllPosts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümünü gör ({n})'**
+  String seeAllPosts(int n);
+
+  /// No description provided for @postNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni gönderi'**
+  String get postNew;
+
+  /// No description provided for @postShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get postShare;
+
+  /// No description provided for @postShared.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderin paylaşıldı'**
+  String get postShared;
+
+  /// No description provided for @postHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Neler oluyor?'**
+  String get postHint;
+
+  /// No description provided for @postInterestLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgi alanı etiketi (isteğe bağlı)'**
+  String get postInterestLabel;
+
+  /// No description provided for @postContactRule.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefon, e-posta, bağlantı ve sosyal hesap adı paylaşılamaz.'**
+  String get postContactRule;
+
+  /// No description provided for @postDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderiyi sil'**
+  String get postDelete;
+
+  /// No description provided for @postDeleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gönderi silinsin mi? Geri alınamaz.'**
+  String get postDeleteConfirm;
+
+  /// No description provided for @postDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi silindi'**
+  String get postDeleted;
+
+  /// No description provided for @postReport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şikayet et'**
+  String get postReport;
+
+  /// No description provided for @postLike.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beğen'**
+  String get postLike;
+
+  /// No description provided for @commentsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorumlar'**
+  String get commentsTitle;
+
+  /// No description provided for @commentsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz yorum yok.'**
+  String get commentsEmpty;
+
+  /// No description provided for @commentsMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha fazla yorum'**
+  String get commentsMore;
+
+  /// No description provided for @commentHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorum yaz…'**
+  String get commentHint;
+
+  /// No description provided for @commentDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorumu sil'**
+  String get commentDelete;
+
+  /// No description provided for @commentVerifiedOnly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorum yapabilmek için profilini doğrulaman (mavi tik) gerekir.'**
+  String get commentVerifiedOnly;
+
+  /// No description provided for @verifyToPostTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mavi tik gerekli'**
+  String get verifyToPostTitle;
+
+  /// No description provided for @verifyToPostBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi, yorum ve hikaye paylaşabilmek için profilini doğrulaman gerekir. Herkes okuyabilir, beğenebilir ve takip edebilir.'**
+  String get verifyToPostBody;
+
+  /// No description provided for @follow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takip et'**
+  String get follow;
+
+  /// No description provided for @followBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sen de takip et'**
+  String get followBack;
+
+  /// No description provided for @followingState.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takiptesin'**
+  String get followingState;
+
+  /// No description provided for @unfollow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takibi bırak'**
+  String get unfollow;
+
+  /// No description provided for @mutualFollow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takipleşiyorsunuz'**
+  String get mutualFollow;
+
+  /// No description provided for @followersLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takipçi'**
+  String get followersLabel;
+
+  /// No description provided for @followingLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takip'**
+  String get followingLabel;
+
+  /// No description provided for @followersTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takipçiler'**
+  String get followersTitle;
+
+  /// No description provided for @followingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Takip edilenler'**
+  String get followingTitle;
+
+  /// No description provided for @noFollowers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz takipçi yok.'**
+  String get noFollowers;
+
+  /// No description provided for @noFollowing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz kimseyi takip etmiyor.'**
+  String get noFollowing;
+
+  /// No description provided for @timeNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'şimdi'**
+  String get timeNow;
+
+  /// No description provided for @timeMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} dk'**
+  String timeMinutes(int n);
+
+  /// No description provided for @timeHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} sa'**
+  String timeHours(int n);
+
+  /// No description provided for @timeDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} g'**
+  String timeDays(int n);
+
+  /// No description provided for @storyYours.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hikayen'**
+  String get storyYours;
+
+  /// No description provided for @storyText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazı'**
+  String get storyText;
+
+  /// No description provided for @storyPhoto.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf'**
+  String get storyPhoto;
+
+  /// No description provided for @storyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şeyler yaz…'**
+  String get storyHint;
+
+  /// No description provided for @storyCaption.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıklama (isteğe bağlı)'**
+  String get storyCaption;
+
+  /// No description provided for @storyPickPhoto.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf seç'**
+  String get storyPickPhoto;
+
+  /// No description provided for @storyShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get storyShare;
+
+  /// No description provided for @storyShared.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hikayen 24 saat yayında'**
+  String get storyShared;
+
+  /// No description provided for @storyUnderReview.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafın incelemeye alındı, onaylanınca yayınlanır.'**
+  String get storyUnderReview;
+
+  /// No description provided for @storyViews.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} görüntüleme'**
+  String storyViews(int n);
+
+  /// No description provided for @storyViewers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görenler'**
+  String get storyViewers;
+
+  /// No description provided for @storyNoViewers.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz kimse görmedi.'**
+  String get storyNoViewers;
+
+  /// No description provided for @storyDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hikayeyi sil'**
+  String get storyDelete;
+
+  /// No description provided for @storyDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hikaye silindi'**
+  String get storyDeleted;
+
+  /// No description provided for @storeEntrySubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Balon, çerçeve, tema ve süper beğeni paketleri'**
+  String get storeEntrySubtitle;
+
+  /// No description provided for @notifySocial.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal akış'**
+  String get notifySocial;
+
+  /// No description provided for @errPostLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü gönderi hakkın doldu. Yarın tekrar paylaşabilirsin.'**
+  String get errPostLimit;
+
+  /// No description provided for @errCommentLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü yorum hakkın doldu. Yarın tekrar yorum yapabilirsin.'**
+  String get errCommentLimit;
+
+  /// No description provided for @errStoryLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü hikaye hakkın doldu.'**
+  String get errStoryLimit;
+
+  /// No description provided for @errDuplicatePost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gönderiyi zaten paylaştın.'**
+  String get errDuplicatePost;
+
+  /// No description provided for @errContactInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz.'**
+  String get errContactInfo;
 }
 
 class _AppLocalizationsDelegate

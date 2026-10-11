@@ -22,6 +22,7 @@ import { accountWebRouter } from './routes/accountWeb';
 import { personalLinkRouter } from './routes/personalLink';
 import { helpRouter } from './routes/help';
 import { engagementRouter } from './routes/engagement';
+import { socialRouter } from './routes/social';
 import { notificationsRouter } from './routes/notifications';
 import { supportRouter } from './routes/support';
 import { ensureHelpArticles } from './support/help';
@@ -121,6 +122,7 @@ app.use(
   supportRouter,
   notificationsRouter,
   engagementRouter,
+  socialRouter,
 );
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {

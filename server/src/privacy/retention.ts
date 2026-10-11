@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client';
 import { retention } from '../config';
 import { prisma } from '../db';
+import { removeProfilePhoto } from '../images';
 import { sendMail } from '../mailer';
 import { purgeOldTraffic } from '../moderation/traffic';
 import { privateStore } from '../storage';
@@ -113,6 +114,18 @@ async function cleanupClosedTickets() {
   return log('support_tickets', count, { days: retention.supportClosedDays });
 }
 
+// Faz 22: süresi dolan hikayeler (24 saat) ve fotoğrafları. Süresi dolan zaten görünmez; burada kalıcı silinir.
+async function cleanupExpiredStories() {
+  const old = await prisma.story.findMany({
+    where: { expiresAt: { lt: new Date(Date.now() - 3_600_000) } },
+    select: { id: true, photoPath: true },
+    take: 1000,
+  });
+  for (const s of old) if (s.photoPath) await removeProfilePhoto(s.photoPath).catch(() => {});
+  const { count } = await prisma.story.deleteMany({ where: { id: { in: old.map((s) => s.id) } } });
+  return log('expired_stories', count, { hours: 24 });
+}
+
 export async function runRetention() {
   const summary: Record<string, number> = {};
   const jobs: [string, () => Promise<number>][] = [
@@ -124,6 +137,7 @@ export async function runRetention() {
     ['viewOncePhotos', cleanupViewOncePhotos],
     ['resolvedErrors', cleanupResolvedErrors],
     ['supportTickets', cleanupClosedTickets],
+    ['expiredStories', cleanupExpiredStories],
     ['trafficLogs', async () => log('traffic_logs', await purgeOldTraffic(), { days: retention.trafficLogDays })],
   ];
   // Bir iş hata verirse diğerleri yine çalışır

@@ -54,11 +54,14 @@ adminModerationRouter.get('/queue', MOD, async (_req, res) => {
   ]);
   // İşarete konu fotoğraf / mesaj
   const photoIds = flags.filter((f) => f.kind === 'photo_suspicious').map((f) => f.refId);
-  const msgIds = flags.filter((f) => f.kind !== 'photo_suspicious' && f.refId).map((f) => f.refId);
-  const [photos, messages] = await Promise.all([
+  const storyIds = flags.filter((f) => f.kind === 'story_suspicious').map((f) => f.refId);
+  const msgIds = flags.filter((f) => f.kind !== 'photo_suspicious' && f.kind !== 'story_suspicious' && f.refId).map((f) => f.refId);
+  const [photos, messages, storiesFlagged] = await Promise.all([
     prisma.photo.findMany({ where: { id: { in: photoIds } } }),
     prisma.message.findMany({ where: { id: { in: msgIds } }, select: { id: true, body: true, createdAt: true } }),
+    prisma.story.findMany({ where: { id: { in: storyIds } } }),
   ]);
+  const storyById = new Map(storiesFlagged.map((st) => [st.id, st]));
   const photoById = new Map(photos.map((p) => [p.id, p]));
   const msgById = new Map(messages.map((m) => [m.id, m]));
 
@@ -73,9 +76,12 @@ adminModerationRouter.get('/queue', MOD, async (_req, res) => {
       details: r.details,
       user: brief(r.to),
       reporter: brief(r.from),
+      // Faz 22: şikayet bir içeriğe aitse metin kopyası (içerik silinse de görülür)
+      subject: r.subjectType === 'user' ? null : { type: r.subjectType, id: r.subjectId, text: r.subjectText },
     })),
     ...flags.map((f) => {
-      const photo = photoById.get(f.refId);
+      const story = storyById.get(f.refId);
+      const photo = photoById.get(f.refId) ?? (story?.photoPath ? { id: story.id, path: story.photoPath, hiddenAt: story.hiddenAt } : undefined);
       const msg = msgById.get(f.refId);
       return {
         type: 'flag' as const,
@@ -120,6 +126,41 @@ adminModerationRouter.get('/queue', MOD, async (_req, res) => {
       resolved7d: done.length,
     },
   });
+});
+
+// ---------- Faz 22: sosyal içerik (gönderi/yorum/hikaye) gizle / geri aç / sil
+// Şikayet kuyruğundaki "İçeriği kaldır" düğmesi: içerik gizlenir (kullanıcı görmez), ilgili açık şikayetler kapanır.
+adminModerationRouter.post('/content/:type/:id/hide', MOD, async (req, res) => {
+  const type = z.enum(['post', 'comment', 'story']).parse(req.params.type);
+  const id = req.params.id;
+  const { reportId, restore } = z.object({ reportId: z.string().optional(), restore: z.boolean().default(false) }).parse(req.body ?? {});
+  const hiddenAt = restore ? null : new Date();
+  let authorId: string | undefined;
+  if (type === 'post') authorId = (await prisma.post.update({ where: { id }, data: { hiddenAt } }).catch(() => null))?.authorId;
+  else if (type === 'comment') {
+    const c = await prisma.postComment.update({ where: { id }, data: { hiddenAt } }).catch(() => null);
+    authorId = c?.authorId;
+    if (c && !restore) await prisma.post.update({ where: { id: c.postId }, data: { commentCount: { decrement: 1 } } }).catch(() => {});
+  } else authorId = (await prisma.story.update({ where: { id }, data: { hiddenAt } }).catch(() => null))?.authorId;
+  if (!authorId) throw new HttpError(404, 'not_found');
+  if (restore) {
+    await prisma.moderationFlag.updateMany({
+      where: { status: 'OPEN', kind: 'story_suspicious', refId: id },
+      data: { status: 'RESOLVED', resolution: 'story_approved', resolvedBy: await adminEmailOf(req), resolvedAt: new Date() },
+    });
+  }
+  if (!restore) {
+    await prisma.report.updateMany({
+      where: { status: 'OPEN', subjectType: type, subjectId: id },
+      data: { status: 'RESOLVED', resolution: 'content_removed', resolvedAt: new Date() },
+    });
+    await prisma.moderationFlag.updateMany({
+      where: { status: 'OPEN', kind: 'story_suspicious', refId: id },
+      data: { status: 'RESOLVED', resolution: 'content_removed', resolvedBy: await adminEmailOf(req), resolvedAt: new Date() },
+    });
+  }
+  await audit(req, restore ? `${type}.restore` : `${type}.hide`, 'user', authorId, { contentId: id, reportId: reportId ?? '' });
+  res.json({ ok: true });
 });
 
 // ---------- Otomatik işareti kapat

@@ -94,3 +94,6 @@ export const webDeleteLimiter = rateLimit({
   handler: (_req: Request, res: import('express').Response) =>
     res.status(429).type('text/plain; charset=utf-8').send('Çok fazla deneme, 15 dakika sonra tekrar dene. / Too many attempts, try again in 15 minutes.'),
 });
+
+// Faz 22: sosyal akış yazma işlemleri (gönderi, yorum, beğeni, takip, hikaye): kullanıcı başına dakikada 40
+export const socialWriteLimiter = rateLimit({ ...base, ...store('social'), windowMs: 60_000, limit: 40, keyGenerator: byUser });

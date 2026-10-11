@@ -4,6 +4,7 @@ import { uid } from '../auth';
 import { HttpError, prisma } from '../db';
 import { reportLimiter } from '../limits';
 import { fileReport, REPORT_REASONS } from '../moderation/reports';
+import { dropFollowsBetween } from '../social';
 
 export const safetyRouter = Router();
 
@@ -16,6 +17,8 @@ safetyRouter.post('/blocks', async (req, res) => {
     create: { fromId: me, toId },
     update: {},
   });
+  // Faz 22: engellenen kişiyle karşılıklı takip de biter
+  await dropFollowsBetween(me, toId);
   res.json({ ok: true });
 });
 

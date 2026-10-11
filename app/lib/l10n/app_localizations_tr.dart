@@ -3166,4 +3166,238 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get callsMatchesOnlyLabel => 'Eşleşme';
+
+  @override
+  String get navFeed => 'Akış';
+
+  @override
+  String get feedTabAll => 'Herkes';
+
+  @override
+  String get feedTabFollowing => 'Takip';
+
+  @override
+  String get feedTabInterests => 'İlgi alanlarım';
+
+  @override
+  String get feedTabMatches => 'Eşleşmelerim';
+
+  @override
+  String get feedComposerHint => 'Aklından ne geçiyor?';
+
+  @override
+  String get feedEmptyAll => 'Henüz gönderi yok. İlk paylaşımı sen yap!';
+
+  @override
+  String get feedEmptyFollowing =>
+      'Takip ettiklerin henüz bir şey paylaşmadı. Birkaç kişiyi takip ederek akışını doldur.';
+
+  @override
+  String get feedEmptyInterests =>
+      'İlgi alanlarına uyan gönderi yok. Profilinden ilgi alanı ekleyebilirsin.';
+
+  @override
+  String get feedEmptyMatches =>
+      'Eşleştiğin kişilerin gönderileri burada görünür.';
+
+  @override
+  String get feedSeeAll => 'Herkesin gönderilerini gör';
+
+  @override
+  String get postTitle => 'Gönderi';
+
+  @override
+  String get postsTitle => 'Gönderiler';
+
+  @override
+  String get postsEmpty => 'Henüz gönderi yok.';
+
+  @override
+  String get postsLabel => 'Gönderi';
+
+  @override
+  String seeAllPosts(int n) {
+    return 'Tümünü gör ($n)';
+  }
+
+  @override
+  String get postNew => 'Yeni gönderi';
+
+  @override
+  String get postShare => 'Paylaş';
+
+  @override
+  String get postShared => 'Gönderin paylaşıldı';
+
+  @override
+  String get postHint => 'Neler oluyor?';
+
+  @override
+  String get postInterestLabel => 'İlgi alanı etiketi (isteğe bağlı)';
+
+  @override
+  String get postContactRule =>
+      'Telefon, e-posta, bağlantı ve sosyal hesap adı paylaşılamaz.';
+
+  @override
+  String get postDelete => 'Gönderiyi sil';
+
+  @override
+  String get postDeleteConfirm => 'Bu gönderi silinsin mi? Geri alınamaz.';
+
+  @override
+  String get postDeleted => 'Gönderi silindi';
+
+  @override
+  String get postReport => 'Şikayet et';
+
+  @override
+  String get postLike => 'Beğen';
+
+  @override
+  String get commentsTitle => 'Yorumlar';
+
+  @override
+  String get commentsEmpty => 'Henüz yorum yok.';
+
+  @override
+  String get commentsMore => 'Daha fazla yorum';
+
+  @override
+  String get commentHint => 'Yorum yaz…';
+
+  @override
+  String get commentDelete => 'Yorumu sil';
+
+  @override
+  String get commentVerifiedOnly =>
+      'Yorum yapabilmek için profilini doğrulaman (mavi tik) gerekir.';
+
+  @override
+  String get verifyToPostTitle => 'Mavi tik gerekli';
+
+  @override
+  String get verifyToPostBody =>
+      'Gönderi, yorum ve hikaye paylaşabilmek için profilini doğrulaman gerekir. Herkes okuyabilir, beğenebilir ve takip edebilir.';
+
+  @override
+  String get follow => 'Takip et';
+
+  @override
+  String get followBack => 'Sen de takip et';
+
+  @override
+  String get followingState => 'Takiptesin';
+
+  @override
+  String get unfollow => 'Takibi bırak';
+
+  @override
+  String get mutualFollow => 'Takipleşiyorsunuz';
+
+  @override
+  String get followersLabel => 'Takipçi';
+
+  @override
+  String get followingLabel => 'Takip';
+
+  @override
+  String get followersTitle => 'Takipçiler';
+
+  @override
+  String get followingTitle => 'Takip edilenler';
+
+  @override
+  String get noFollowers => 'Henüz takipçi yok.';
+
+  @override
+  String get noFollowing => 'Henüz kimseyi takip etmiyor.';
+
+  @override
+  String get timeNow => 'şimdi';
+
+  @override
+  String timeMinutes(int n) {
+    return '$n dk';
+  }
+
+  @override
+  String timeHours(int n) {
+    return '$n sa';
+  }
+
+  @override
+  String timeDays(int n) {
+    return '$n g';
+  }
+
+  @override
+  String get storyYours => 'Hikayen';
+
+  @override
+  String get storyText => 'Yazı';
+
+  @override
+  String get storyPhoto => 'Fotoğraf';
+
+  @override
+  String get storyHint => 'Bir şeyler yaz…';
+
+  @override
+  String get storyCaption => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get storyPickPhoto => 'Fotoğraf seç';
+
+  @override
+  String get storyShare => 'Paylaş';
+
+  @override
+  String get storyShared => 'Hikayen 24 saat yayında';
+
+  @override
+  String get storyUnderReview =>
+      'Fotoğrafın incelemeye alındı, onaylanınca yayınlanır.';
+
+  @override
+  String storyViews(int n) {
+    return '$n görüntüleme';
+  }
+
+  @override
+  String get storyViewers => 'Görenler';
+
+  @override
+  String get storyNoViewers => 'Henüz kimse görmedi.';
+
+  @override
+  String get storyDelete => 'Hikayeyi sil';
+
+  @override
+  String get storyDeleted => 'Hikaye silindi';
+
+  @override
+  String get storeEntrySubtitle =>
+      'Balon, çerçeve, tema ve süper beğeni paketleri';
+
+  @override
+  String get notifySocial => 'Sosyal akış';
+
+  @override
+  String get errPostLimit =>
+      'Bugünkü gönderi hakkın doldu. Yarın tekrar paylaşabilirsin.';
+
+  @override
+  String get errCommentLimit =>
+      'Bugünkü yorum hakkın doldu. Yarın tekrar yorum yapabilirsin.';
+
+  @override
+  String get errStoryLimit => 'Bugünkü hikaye hakkın doldu.';
+
+  @override
+  String get errDuplicatePost => 'Bu gönderiyi zaten paylaştın.';
+
+  @override
+  String get errContactInfo =>
+      'Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz.';
 }

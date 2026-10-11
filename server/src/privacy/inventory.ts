@@ -79,6 +79,15 @@ export const INVENTORY: InventoryEntry[] = [
     recipients: 'Karşı taraf',
   },
   {
+    category: 'Sosyal akış',
+    tables: ['Post', 'PostLike', 'PostComment', 'Follow', 'Story', 'StoryView'],
+    data: 'Gönderi ve yorum metinleri, ilgi alanı etiketi, beğeniler, takip ilişkileri, hikaye içeriği (metin veya fotoğraf) ve hikayeyi görenler',
+    purpose: 'Sosyal akış hizmetinin sunulması ve kötüye kullanımın önlenmesi',
+    basis: ['sözleşme', 'meşru'],
+    retention: 'Hesap süresince; hikayeler 24 saat sonra silinir. Kullanıcı gönderi ve yorumlarını istediği an silebilir',
+    recipients: 'Diğer kullanıcılar (akış herkese açık); şikayet halinde moderasyon ekibi',
+  },
+  {
     category: 'Sesli ve görüntülü arama',
     tables: ['Call', 'CallGift', 'CallDispute'],
     data: 'Arama zamanı, süresi, ücreti, hediyeler, puanlama, ücret itirazları ve incelemesi (ses/görüntü kaydedilmez)',

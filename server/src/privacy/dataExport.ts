@@ -54,7 +54,7 @@ async function collect(userId: string) {
       supportTickets: { orderBy: { createdAt: 'asc' }, include: { messages: { orderBy: { createdAt: 'asc' } } } },
     },
   });
-  const [wallet, conversations, messages, icebreakers, ticTacToes, calls, gifts, blocks, reports, devices] = await Promise.all([
+  const [wallet, conversations, messages, icebreakers, ticTacToes, calls, gifts, blocks, reports, devices, posts, comments, stories, follows] = await Promise.all([
     prisma.walletEntry.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
     prisma.conversation.findMany({ where: { OR: [{ userAId: userId }, { userBId: userId }] } }),
     prisma.message.findMany({ where: { senderId: userId }, orderBy: { createdAt: 'asc' } }),
@@ -65,6 +65,10 @@ async function collect(userId: string) {
     prisma.block.findMany({ where: { fromId: userId } }),
     prisma.report.findMany({ where: { fromId: userId }, select: { toId: true, reason: true, details: true, status: true, createdAt: true } }),
     prisma.device.findMany({ where: { userId }, select: { platform: true, updatedAt: true } }),
+    prisma.post.findMany({ where: { authorId: userId }, orderBy: { createdAt: 'asc' }, select: { body: true, interest: true, likeCount: true, commentCount: true, createdAt: true } }),
+    prisma.postComment.findMany({ where: { authorId: userId }, orderBy: { createdAt: 'asc' }, select: { postId: true, body: true, createdAt: true } }),
+    prisma.story.findMany({ where: { authorId: userId }, orderBy: { createdAt: 'asc' }, select: { kind: true, text: true, createdAt: true, expiresAt: true } }),
+    prisma.follow.findMany({ where: { OR: [{ followerId: userId }, { followingId: userId }] }, select: { followerId: true, followingId: true, createdAt: true } }),
   ]);
 
   const data = {
@@ -159,6 +163,13 @@ async function collect(userId: string) {
     })),
     gifts: gifts.map((g) => ({ direction: g.fromId === userId ? 'sent' : 'received', giftId: g.giftId, coins: g.coins, createdAt: g.createdAt })),
     blocked: blocks.map((b) => ({ userId: b.toId, createdAt: b.createdAt })),
+    social: {
+      posts,
+      comments,
+      stories,
+      following: follows.filter((f) => f.followerId === userId).map((f) => ({ userId: f.followingId, createdAt: f.createdAt })),
+      followers: follows.filter((f) => f.followingId === userId).map((f) => ({ userId: f.followerId, createdAt: f.createdAt })),
+    },
     reportsMade: reports,
     verification: u.verifications.map(({ pose, status, createdAt, reviewedAt }) => ({ pose, status, createdAt, reviewedAt })),
     sessions: u.sessions,

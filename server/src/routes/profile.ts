@@ -35,6 +35,7 @@ import { roundCoord, roundedDistance } from '../geo';
 import { isOnline } from '../realtime';
 import { getBalance, getCashable } from '../wallet';
 import { reviewNewPhoto } from '../moderation/detect';
+import { socialStats } from '../social';
 import { requireNotRestricted, sanctionDto } from '../moderation/sanctions';
 import { requestDeletion } from '../privacy/accounts';
 import { sendStreakReminders, touchStreak } from '../streak';
@@ -173,6 +174,8 @@ profileRouter.get('/me', async (req, res) => {
     premiumUntil: user.premiumUntil && user.premiumUntil > new Date() ? user.premiumUntil : null,
     // Faz 17: günlük giriş serisi
     streak: { current: streak.current, longest: streak.longest },
+    // Faz 22: takipçi/takip/gönderi sayıları
+    social: await socialStats(user.id, user.id),
     // Faz 20: gelen arama tercihi
     callSettings: { voice: user.acceptVoiceCalls, video: user.acceptVideoCalls, matchesOnly: user.callsMatchesOnly },
     // Faz 17 madde 8: davet programı — kendi kodu (eski hesaplarda null olabilir)
@@ -458,6 +461,8 @@ profileRouter.get('/users/:id', async (req, res) => {
   ]);
   const profile = user && !user.bannedAt && !user.deletionRequestedAt && publicProfile(user, target === me ? null : viewer, { owner: target === me });
   if (!profile) throw new HttpError(404, 'not_found');
-  res.json(target === me ? profile : await withOnline(profile));
+  const stats = await socialStats(target, me);
+  const withSocial = { ...profile, social: stats };
+  res.json(target === me ? withSocial : await withOnline(withSocial));
 });
 

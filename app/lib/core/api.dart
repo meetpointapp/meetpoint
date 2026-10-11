@@ -457,6 +457,96 @@ class Api {
   Future<void> rateCall(String id, int rating, {String? reportReason}) =>
       _post('/calls/$id/rate', {'rating': rating, 'reportReason': ?reportReason});
 
+  // Faz 22: sosyal akış (gönderi, yorum, beğeni, takip, hikaye)
+  Future<FeedPage> feed(String tab, {String? before}) async =>
+      FeedPage.fromJson(await _get('/feed', {'tab': tab, 'before': ?before}));
+
+  Future<FeedPage> userPosts(String userId, {String? before}) async =>
+      FeedPage.fromJson(await _get('/users/$userId/posts', {'before': ?before}));
+
+  Future<Post> createPost(String body, {String interest = ''}) async =>
+      Post.fromJson(await _post('/posts', {'body': body, 'interest': ?(interest.isEmpty ? null : interest)}));
+
+  Future<Post> post(String id) async => Post.fromJson(await _get('/posts/$id'));
+
+  Future<void> deletePost(String id) => _delete('/posts/$id');
+
+  Future<({bool liked, int likeCount})> likePost(String id) async {
+    final r = await _put('/posts/$id/like');
+    return (liked: true, likeCount: (r['likeCount'] ?? 0) as int);
+  }
+
+  Future<({bool liked, int likeCount})> unlikePost(String id) async {
+    final r = await _delete('/posts/$id/like');
+    return (liked: false, likeCount: (r['likeCount'] ?? 0) as int);
+  }
+
+  Future<({List<PostComment> comments, String? next})> postComments(String id, {String? after}) async {
+    final r = await _get('/posts/$id/comments', {'after': ?after});
+    return (
+      comments: [for (final c in (r['comments'] as List)) PostComment.fromJson(Map<String, dynamic>.from(c))],
+      next: r['next'] as String?,
+    );
+  }
+
+  Future<PostComment> addComment(String postId, String body) async =>
+      PostComment.fromJson(await _post('/posts/$postId/comments', {'body': body}));
+
+  Future<void> deleteComment(String id) => _delete('/comments/$id');
+
+  Future<SocialStats> follow(String userId) async => SocialStats.fromJson(await _put('/users/$userId/follow'));
+
+  Future<SocialStats> unfollow(String userId) async => SocialStats.fromJson(await _delete('/users/$userId/follow'));
+
+  Future<({List<FollowUser> users, String? next})> followList(String userId, {required bool followers, String? after}) async {
+    final r = await _get('/users/$userId/${followers ? 'followers' : 'following'}', {'after': ?after});
+    return (
+      users: [for (final u in (r['users'] as List)) FollowUser.fromJson(Map<String, dynamic>.from(u))],
+      next: r['next'] as String?,
+    );
+  }
+
+  Future<List<StoryTrayItem>> storyTray() async =>
+      [for (final i in ((await _get('/stories/tray'))['items'] as List)) StoryTrayItem.fromJson(Map<String, dynamic>.from(i))];
+
+  Future<StoryTrayItem?> userStories(String userId) async {
+    final r = await _get('/users/$userId/stories');
+    final stories = [for (final s in (r['stories'] as List)) Story.fromJson(Map<String, dynamic>.from(s))];
+    if (stories.isEmpty || r['user'] == null) return null;
+    return StoryTrayItem(
+      user: PublicProfile.fromJson(Map<String, dynamic>.from(r['user'])),
+      mine: stories.first.mine,
+      hasUnseen: stories.any((s) => !s.seen),
+      stories: stories,
+    );
+  }
+
+  Future<Story> createTextStory(String text, String bg) async =>
+      Story.fromJson(await _post('/stories', FormData.fromMap({'kind': 'text', 'text': text, 'bg': bg})));
+
+  Future<Story> createPhotoStory(XFile file, {String text = ''}) async {
+    final name = file.name.isEmpty ? 'story.jpg' : file.name;
+    final ext = name.split('.').last.toLowerCase();
+    final subtype = switch (ext) { 'png' => 'png', 'webp' => 'webp', 'heic' => 'heic', _ => 'jpeg' };
+    final form = FormData.fromMap({
+      'kind': 'photo',
+      'text': text,
+      'photo': MultipartFile.fromBytes(await file.readAsBytes(), filename: name, contentType: DioMediaType('image', subtype)),
+    });
+    return Story.fromJson(await _post('/stories', form));
+  }
+
+  Future<void> viewStory(String id) => _post('/stories/$id/view');
+
+  Future<List<StoryViewer>> storyViewers(String id) async => [
+        for (final v in ((await _get('/stories/$id/viewers'))['viewers'] as List))
+          StoryViewer(PublicProfile.fromJson(Map<String, dynamic>.from(v['user'])), DateTime.parse(v['at'] as String).toLocal()),
+      ];
+
+  Future<void> deleteStory(String id) => _delete('/stories/$id');
+
+  Future<void> reportContent(String type, String id, String reason) => _post('/$type/$id/report', {'reason': reason});
+
   // Sohbet
   Future<List<Conversation>> conversations() async =>
       [for (final c in (await _get('/conversations') as List)) Conversation.fromJson(c)];

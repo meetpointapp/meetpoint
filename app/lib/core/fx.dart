@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 
@@ -6,7 +8,9 @@ import 'package:flutter/services.dart';
 // yoksa ses yorucu olur). Her çağrı best-effort: platform desteklemiyorsa (web ses politikası,
 // izin yok, test ortamı) sessizce yutulur — bu bir cila katmanı, hiçbir akışı bloklamamalı.
 abstract final class Fx {
-  static final _player = AudioPlayer()..setPlayerMode(PlayerMode.lowLatency);
+  // Oynatıcı ilk kullanımda (tembel) ve korumalı bölgede oluşturulur: eklenti yoksa (test, bazı platformlar)
+  // yapıcının asenkron başlatma hatası uygulamayı/testi düşürmez.
+  static AudioPlayer? _player;
 
   // Sık tekrarlanan dokunuşlar: buton, kaydırma, geç/beğen — sadece haptik
   static void tap() {
@@ -32,11 +36,14 @@ abstract final class Fx {
   }
 
   static Future<void> _play(String asset) async {
-    try {
-      await _player.stop();
-      await _player.play(AssetSource('sfx/$asset'));
-    } catch (_) {
-      // Ses çalınamadı (izin/politika/test ortamı) — sessizce yut
-    }
+    await runZonedGuarded(() async {
+      try {
+        final player = _player ??= AudioPlayer()..setPlayerMode(PlayerMode.lowLatency);
+        await player.stop();
+        await player.play(AssetSource('sfx/$asset'));
+      } catch (_) {
+        // Ses çalınamadı (izin/politika/test ortamı) — sessizce yut
+      }
+    }, (_, _) {});
   }
 }

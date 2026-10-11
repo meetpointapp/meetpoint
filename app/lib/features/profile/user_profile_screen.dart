@@ -12,6 +12,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../call/start_call.dart';
+import '../feed/social_widgets.dart';
 import 'photo_viewer.dart';
 import 'profile_widgets.dart';
 import 'request_actions.dart';
@@ -56,6 +57,9 @@ class _ProfileBody extends ConsumerWidget {
     // Faz 20: kompakt profil — küçük avatar başlığı + yatay fotoğraf şeridi (dokununca tam ekran büyür)
     final blocks = <Widget>[];
     Widget gap(Widget w) => Padding(padding: const EdgeInsets.only(bottom: 12), child: w);
+
+    // Faz 22: takipçi/takip/gönderi sayıları ve takip düğmesi
+    blocks.add(gap(SocialCounts(userId: p.id, stats: p.social, isMe: isMe)));
 
     if (photos.length > 1) {
       blocks.add(Padding(
@@ -131,6 +135,7 @@ class _ProfileBody extends ConsumerWidget {
     for (var i = 1; i < prompts.length; i++) {
       blocks.add(gap(PromptCard(prompt: prompts[i])));
     }
+    if (p.social.posts > 0) blocks.add(PostsPreview(userId: p.id, total: p.social.posts));
 
     // VibeUpMe+ aboneleri altın başlık bandı alır
     final banner = p.premium ? const [Color(0xFFFFD86B), Color(0xFFC88A0A)] : cardGradientOf(p.cardBackgroundId.isEmpty ? 'default' : p.cardBackgroundId);
@@ -180,7 +185,16 @@ class _ProfileBody extends ConsumerWidget {
               left: 16,
               top: bannerHeight - 40,
               child: GestureDetector(
-                onTap: () => showPhotoViewer(context, photos),
+                onTap: () async {
+                  // Aktif hikayesi varsa önce hikaye; yoksa fotoğraflar
+                  final hasStory = (await ref.read(apiProvider).userStories(p.id).catchError((_) => null)) != null;
+                  if (!context.mounted) return;
+                  if (hasStory) {
+                    context.push('/stories/user/${p.id}');
+                  } else {
+                    showPhotoViewer(context, photos);
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(

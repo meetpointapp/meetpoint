@@ -3230,4 +3230,238 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get callsMatchesOnlyLabel => 'Matches';
+
+  @override
+  String get navFeed => 'Feed';
+
+  @override
+  String get feedTabAll => 'Everyone';
+
+  @override
+  String get feedTabFollowing => 'Following';
+
+  @override
+  String get feedTabInterests => 'My interests';
+
+  @override
+  String get feedTabMatches => 'My matches';
+
+  @override
+  String get feedComposerHint => 'What\'s on your mind?';
+
+  @override
+  String get feedEmptyAll => 'No posts yet. Be the first to share!';
+
+  @override
+  String get feedEmptyFollowing =>
+      'The people you follow haven\'t posted yet. Follow a few more people to fill your feed.';
+
+  @override
+  String get feedEmptyInterests =>
+      'No posts match your interests yet. You can add interests in your profile.';
+
+  @override
+  String get feedEmptyMatches =>
+      'Posts from the people you matched with show up here.';
+
+  @override
+  String get feedSeeAll => 'See everyone\'s posts';
+
+  @override
+  String get postTitle => 'Post';
+
+  @override
+  String get postsTitle => 'Posts';
+
+  @override
+  String get postsEmpty => 'No posts yet.';
+
+  @override
+  String get postsLabel => 'Posts';
+
+  @override
+  String seeAllPosts(int n) {
+    return 'See all ($n)';
+  }
+
+  @override
+  String get postNew => 'New post';
+
+  @override
+  String get postShare => 'Share';
+
+  @override
+  String get postShared => 'Your post is live';
+
+  @override
+  String get postHint => 'What\'s happening?';
+
+  @override
+  String get postInterestLabel => 'Interest tag (optional)';
+
+  @override
+  String get postContactRule =>
+      'Phone numbers, emails, links and social handles can\'t be shared.';
+
+  @override
+  String get postDelete => 'Delete post';
+
+  @override
+  String get postDeleteConfirm => 'Delete this post? This can\'t be undone.';
+
+  @override
+  String get postDeleted => 'Post deleted';
+
+  @override
+  String get postReport => 'Report';
+
+  @override
+  String get postLike => 'Like';
+
+  @override
+  String get commentsTitle => 'Comments';
+
+  @override
+  String get commentsEmpty => 'No comments yet.';
+
+  @override
+  String get commentsMore => 'More comments';
+
+  @override
+  String get commentHint => 'Write a comment…';
+
+  @override
+  String get commentDelete => 'Delete comment';
+
+  @override
+  String get commentVerifiedOnly =>
+      'You need to verify your profile (blue tick) to comment.';
+
+  @override
+  String get verifyToPostTitle => 'Blue tick required';
+
+  @override
+  String get verifyToPostBody =>
+      'You need to verify your profile to share posts, comments and stories. Everyone can read, like and follow.';
+
+  @override
+  String get follow => 'Follow';
+
+  @override
+  String get followBack => 'Follow back';
+
+  @override
+  String get followingState => 'Following';
+
+  @override
+  String get unfollow => 'Unfollow';
+
+  @override
+  String get mutualFollow => 'You follow each other';
+
+  @override
+  String get followersLabel => 'Followers';
+
+  @override
+  String get followingLabel => 'Following';
+
+  @override
+  String get followersTitle => 'Followers';
+
+  @override
+  String get followingTitle => 'Following';
+
+  @override
+  String get noFollowers => 'No followers yet.';
+
+  @override
+  String get noFollowing => 'Not following anyone yet.';
+
+  @override
+  String get timeNow => 'now';
+
+  @override
+  String timeMinutes(int n) {
+    return '${n}m';
+  }
+
+  @override
+  String timeHours(int n) {
+    return '${n}h';
+  }
+
+  @override
+  String timeDays(int n) {
+    return '${n}d';
+  }
+
+  @override
+  String get storyYours => 'Your story';
+
+  @override
+  String get storyText => 'Text';
+
+  @override
+  String get storyPhoto => 'Photo';
+
+  @override
+  String get storyHint => 'Write something…';
+
+  @override
+  String get storyCaption => 'Caption (optional)';
+
+  @override
+  String get storyPickPhoto => 'Choose a photo';
+
+  @override
+  String get storyShare => 'Share';
+
+  @override
+  String get storyShared => 'Your story is live for 24 hours';
+
+  @override
+  String get storyUnderReview =>
+      'Your photo is under review and will go live once approved.';
+
+  @override
+  String storyViews(int n) {
+    return '$n views';
+  }
+
+  @override
+  String get storyViewers => 'Viewers';
+
+  @override
+  String get storyNoViewers => 'Nobody has seen it yet.';
+
+  @override
+  String get storyDelete => 'Delete story';
+
+  @override
+  String get storyDeleted => 'Story deleted';
+
+  @override
+  String get storeEntrySubtitle =>
+      'Bubbles, frames, themes and super like packs';
+
+  @override
+  String get notifySocial => 'Social feed';
+
+  @override
+  String get errPostLimit =>
+      'You\'ve reached today\'s post limit. You can post again tomorrow.';
+
+  @override
+  String get errCommentLimit =>
+      'You\'ve reached today\'s comment limit. Try again tomorrow.';
+
+  @override
+  String get errStoryLimit => 'You\'ve reached today\'s story limit.';
+
+  @override
+  String get errDuplicatePost => 'You already shared this post.';
+
+  @override
+  String get errContactInfo =>
+      'Phone numbers, emails, links and social handles can\'t be shared in public.';
 }

@@ -10,6 +10,7 @@ import '../../core/store.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
+import '../feed/social_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../onboarding/intro_screen.dart';
 import '../profile/photo_viewer.dart';
@@ -93,6 +94,17 @@ class MeScreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 // Faz 20: dört büyük kart yerine tek satırda üç kompakt kutu (seri, yolculuk, doğrulama)
                 _QuickStats(me: m),
+                const SizedBox(height: 10),
+                // Faz 22: takipçi/takip/gönderi sayıları ve mağaza girişi (mağaza alt menüden buraya taşındı)
+                Card(
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: SocialCounts(userId: m.id, stats: m.social, isMe: true),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _StoreEntryCard(onTap: () => context.push('/store')),
                 const SizedBox(height: 14),
                 const _WeeklyDigestCard(),
                 const SizedBox(height: 14),
@@ -522,6 +534,47 @@ class _MeHeader extends StatelessWidget {
           ),
         ]),
       ]),
+    );
+  }
+}
+
+// Faz 22: mağaza girişi — alt menüde yer değiştirdi, profil sayfasında öne çıkarılır
+class _StoreEntryCard extends StatelessWidget {
+  const _StoreEntryCard({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Material(
+      borderRadius: BorderRadius.circular(Brand.radius),
+      clipBehavior: Clip.antiAlias,
+      color: Colors.transparent,
+      child: Ink(
+        decoration: BoxDecoration(gradient: Brand.gradient, borderRadius: BorderRadius.circular(Brand.radius)),
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: Brand.onAccent.withValues(alpha: 0.18)),
+                child: Icon(Icons.storefront_rounded, color: Brand.onAccent),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(l.navStore, style: TextStyle(color: Brand.onAccent, fontWeight: FontWeight.w900, fontSize: 16)),
+                  Text(l.storeEntrySubtitle, style: TextStyle(color: Brand.onAccent.withValues(alpha: 0.85), fontSize: 12.5)),
+                ]),
+              ),
+              Icon(Icons.chevron_right_rounded, color: Brand.onAccent),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }

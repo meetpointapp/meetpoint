@@ -322,7 +322,7 @@ Yayın öncesi seri: önce uygulama (Faz 8–22), dış işler en sonda (Faz 23)
 - [x] **Faz 19 · Kazanç heyecanı:** kazananlar sıralaması, canlı aktivite göstergesi, arama içi gerçek zamanlı kazanç sayacı, kazanç kilometre taşları, zaman sınırlı etkinlikler
 - [x] **Faz 20 · Eşleştirme modları, mağaza ve görsel yenileme:** astroloji/müzik/ilgi/vibe modları ve "neden bu kişi" açıklaması, oda kaldırıldı, mağaza sekmesi (10 balon, 10 arka plan, canlı önizleme, doğrudan kullan), kompakt profil + fotoğraf görüntüleyici, görsel yenileme
 - [ ] **Faz 21 · Agora altyapısı:** gerçek sesli/görüntülü arama için Agora hesabı ve anahtarları, gerçek cihaz testi, maliyet görünürlüğü, kalite
-- [ ] **Faz 22 · Sosyal akış:** yazı tabanlı akış (mavi tikliler paylaşır, herkes yorumlar), ortada Akış sekmesi, mağaza Profil içinde, moderasyon ve bildirimler
+- [x] **Faz 22 · Sosyal akış:** yazı tabanlı akış, takip sistemi ve 24 saatlik hikayeler (gönderi/yorum/hikaye mavi tikli hesaplara açık), ortada Akış sekmesi, mağaza Profil içinde, moderasyon ve bildirimler
 - [ ] **Faz 23 · Dış süreçler ve yayın:** avukat, mali müşavir, şirket ve marka, sunucu, mağaza hesapları, sızma testi, kapalı beta, yayın
 
 ## Notlar

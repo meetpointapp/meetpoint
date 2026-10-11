@@ -40,6 +40,9 @@ final storeItemsProvider = FutureProvider.autoDispose<List<StoreItem>>((ref) => 
 // geçersiz kılınınca ikisi de güncel hakkı görür
 final superLikeStatusProvider = FutureProvider<SuperLikeStatus>((ref) => ref.watch(apiProvider).superLikeStatus());
 
+// Faz 22: akış üstündeki hikaye halkaları (kendi hikayem + takip ettiklerim)
+final storyTrayProvider = FutureProvider.autoDispose<List<StoryTrayItem>>((ref) => ref.watch(apiProvider).storyTray());
+
 // Faz 20: bugünkü giriş ödülü alınabilir mi (profil sekmesindeki kırmızı nokta). Seri /me çağrısında
 // işlendiği için önce /me beklenir.
 final dailyClaimableProvider = FutureProvider<bool>((ref) async {

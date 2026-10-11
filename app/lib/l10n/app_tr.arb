@@ -1816,5 +1816,111 @@
   "callSettingMatchesOnly": "Sadece eşleştiklerim arayabilsin",
   "callSettingMatchesOnlyHint": "Eşleştiğin veya sohbet ettiğin kişiler dışında kimse seni arayamaz.",
   "errCallsMatchesOnly": "Bu kişi sadece eşleştiği kişilerden arama alıyor. Önce eşleşmen veya sohbet etmen gerekir.",
-  "callsMatchesOnlyLabel": "Eşleşme"
+  "callsMatchesOnlyLabel": "Eşleşme",
+  "navFeed": "Akış",
+  "feedTabAll": "Herkes",
+  "feedTabFollowing": "Takip",
+  "feedTabInterests": "İlgi alanlarım",
+  "feedTabMatches": "Eşleşmelerim",
+  "feedComposerHint": "Aklından ne geçiyor?",
+  "feedEmptyAll": "Henüz gönderi yok. İlk paylaşımı sen yap!",
+  "feedEmptyFollowing": "Takip ettiklerin henüz bir şey paylaşmadı. Birkaç kişiyi takip ederek akışını doldur.",
+  "feedEmptyInterests": "İlgi alanlarına uyan gönderi yok. Profilinden ilgi alanı ekleyebilirsin.",
+  "feedEmptyMatches": "Eşleştiğin kişilerin gönderileri burada görünür.",
+  "feedSeeAll": "Herkesin gönderilerini gör",
+  "postTitle": "Gönderi",
+  "postsTitle": "Gönderiler",
+  "postsEmpty": "Henüz gönderi yok.",
+  "postsLabel": "Gönderi",
+  "seeAllPosts": "Tümünü gör ({n})",
+  "@seeAllPosts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "postNew": "Yeni gönderi",
+  "postShare": "Paylaş",
+  "postShared": "Gönderin paylaşıldı",
+  "postHint": "Neler oluyor?",
+  "postInterestLabel": "İlgi alanı etiketi (isteğe bağlı)",
+  "postContactRule": "Telefon, e-posta, bağlantı ve sosyal hesap adı paylaşılamaz.",
+  "postDelete": "Gönderiyi sil",
+  "postDeleteConfirm": "Bu gönderi silinsin mi? Geri alınamaz.",
+  "postDeleted": "Gönderi silindi",
+  "postReport": "Şikayet et",
+  "postLike": "Beğen",
+  "commentsTitle": "Yorumlar",
+  "commentsEmpty": "Henüz yorum yok.",
+  "commentsMore": "Daha fazla yorum",
+  "commentHint": "Yorum yaz…",
+  "commentDelete": "Yorumu sil",
+  "commentVerifiedOnly": "Yorum yapabilmek için profilini doğrulaman (mavi tik) gerekir.",
+  "verifyToPostTitle": "Mavi tik gerekli",
+  "verifyToPostBody": "Gönderi, yorum ve hikaye paylaşabilmek için profilini doğrulaman gerekir. Herkes okuyabilir, beğenebilir ve takip edebilir.",
+  "follow": "Takip et",
+  "followBack": "Sen de takip et",
+  "followingState": "Takiptesin",
+  "unfollow": "Takibi bırak",
+  "mutualFollow": "Takipleşiyorsunuz",
+  "followersLabel": "Takipçi",
+  "followingLabel": "Takip",
+  "followersTitle": "Takipçiler",
+  "followingTitle": "Takip edilenler",
+  "noFollowers": "Henüz takipçi yok.",
+  "noFollowing": "Henüz kimseyi takip etmiyor.",
+  "timeNow": "şimdi",
+  "timeMinutes": "{n} dk",
+  "@timeMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHours": "{n} sa",
+  "@timeHours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeDays": "{n} g",
+  "@timeDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "storyYours": "Hikayen",
+  "storyText": "Yazı",
+  "storyPhoto": "Fotoğraf",
+  "storyHint": "Bir şeyler yaz…",
+  "storyCaption": "Açıklama (isteğe bağlı)",
+  "storyPickPhoto": "Fotoğraf seç",
+  "storyShare": "Paylaş",
+  "storyShared": "Hikayen 24 saat yayında",
+  "storyUnderReview": "Fotoğrafın incelemeye alındı, onaylanınca yayınlanır.",
+  "storyViews": "{n} görüntüleme",
+  "@storyViews": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "storyViewers": "Görenler",
+  "storyNoViewers": "Henüz kimse görmedi.",
+  "storyDelete": "Hikayeyi sil",
+  "storyDeleted": "Hikaye silindi",
+  "storeEntrySubtitle": "Balon, çerçeve, tema ve süper beğeni paketleri",
+  "notifySocial": "Sosyal akış",
+  "errPostLimit": "Bugünkü gönderi hakkın doldu. Yarın tekrar paylaşabilirsin.",
+  "errCommentLimit": "Bugünkü yorum hakkın doldu. Yarın tekrar yorum yapabilirsin.",
+  "errStoryLimit": "Bugünkü hikaye hakkın doldu.",
+  "errDuplicatePost": "Bu gönderiyi zaten paylaştın.",
+  "errContactInfo": "Herkese açık alanda telefon, e-posta, bağlantı veya sosyal hesap adı paylaşılamaz."
 }

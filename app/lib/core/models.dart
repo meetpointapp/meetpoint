@@ -49,6 +49,8 @@ class PublicProfile {
   final bool acceptsVideo;
   // Sadece eşleştiği / sohbet ettiği kişilerden arama alır
   final bool callsMatchesOnly;
+  // Faz 22: takipçi/takip/gönderi sayıları ve izleyicinin ilişkisi (sadece /users/:id yanıtında dolu)
+  final SocialStats social;
   final int? distanceKm; // yaklaşık mesafe; konum bilinmiyorsa null
   final bool superLikedMe;
   final String displayName;
@@ -92,6 +94,7 @@ class PublicProfile {
     this.acceptsVoice = true,
     this.acceptsVideo = true,
     this.callsMatchesOnly = false,
+    this.social = const SocialStats(),
     this.distanceKm,
     this.superLikedMe = false,
     required this.displayName,
@@ -133,6 +136,7 @@ class PublicProfile {
         acceptsVoice: j['acceptsVoice'] ?? true,
         acceptsVideo: j['acceptsVideo'] ?? true,
         callsMatchesOnly: j['callsMatchesOnly'] ?? false,
+        social: j['social'] == null ? const SocialStats() : SocialStats.fromJson(Map<String, dynamic>.from(j['social'])),
         distanceKm: j['distanceKm'],
         superLikedMe: j['superLikedMe'] ?? false,
         displayName: j['displayName'],
@@ -426,6 +430,8 @@ class Me {
   final bool acceptVoiceCalls;
   final bool acceptVideoCalls;
   final bool callsMatchesOnly;
+  // Faz 22: kendi takipçi/takip/gönderi sayılarım
+  final SocialStats social;
 
   const Me({
     required this.id,
@@ -451,6 +457,7 @@ class Me {
     this.acceptVoiceCalls = true,
     this.acceptVideoCalls = true,
     this.callsMatchesOnly = false,
+    this.social = const SocialStats(),
   });
 
   factory Me.fromJson(Map<String, dynamic> j) => Me(
@@ -477,6 +484,7 @@ class Me {
         acceptVoiceCalls: (j['callSettings'] as Map?)?['voice'] ?? true,
         acceptVideoCalls: (j['callSettings'] as Map?)?['video'] ?? true,
         callsMatchesOnly: (j['callSettings'] as Map?)?['matchesOnly'] ?? false,
+        social: j['social'] == null ? const SocialStats() : SocialStats.fromJson(Map<String, dynamic>.from(j['social'])),
       );
 }
 
@@ -1626,7 +1634,7 @@ class HelpCategory {
 
 // ---------- Bildirim tercihleri ----------
 
-enum NotifyType { message, match, request, call, like, streak }
+enum NotifyType { message, match, request, call, like, streak, social }
 
 class NotificationPrefs {
   final Map<NotifyType, bool> prefs;
@@ -1719,4 +1727,179 @@ class EarningEvent {
         endAt: _date(j['endAt']),
       );
   Duration get remaining => endAt.difference(DateTime.now());
+}
+
+// ---------- Faz 22: sosyal akış
+
+class SocialStats {
+  final int followers;
+  final int following;
+  final int posts;
+  final bool isFollowing; // ben onu takip ediyorum
+  final bool followsMe; // o beni takip ediyor
+  const SocialStats({this.followers = 0, this.following = 0, this.posts = 0, this.isFollowing = false, this.followsMe = false});
+  factory SocialStats.fromJson(Map<String, dynamic> j) => SocialStats(
+        followers: j['followers'] ?? 0,
+        following: j['following'] ?? 0,
+        posts: j['posts'] ?? 0,
+        isFollowing: j['isFollowing'] ?? false,
+        followsMe: j['followsMe'] ?? false,
+      );
+  // Karşılıklı takip: "takipleşme"
+  bool get mutual => isFollowing && followsMe;
+}
+
+class Post {
+  final String id;
+  final String body;
+  final String interest;
+  final DateTime createdAt;
+  final int likeCount;
+  final int commentCount;
+  final bool likedByMe;
+  final bool mine;
+  final PublicProfile author;
+  final bool following; // yazarı takip ediyorum
+  const Post({
+    required this.id,
+    required this.body,
+    required this.interest,
+    required this.createdAt,
+    required this.likeCount,
+    required this.commentCount,
+    required this.likedByMe,
+    required this.mine,
+    required this.author,
+    required this.following,
+  });
+  factory Post.fromJson(Map<String, dynamic> j) => Post(
+        id: j['id'],
+        body: j['body'],
+        interest: j['interest'] ?? '',
+        createdAt: _date(j['createdAt']),
+        likeCount: j['likeCount'] ?? 0,
+        commentCount: j['commentCount'] ?? 0,
+        likedByMe: j['likedByMe'] ?? false,
+        mine: j['mine'] ?? false,
+        author: PublicProfile.fromJson(Map<String, dynamic>.from(j['author'])),
+        following: j['following'] ?? false,
+      );
+  Post copyWith({int? likeCount, int? commentCount, bool? likedByMe, bool? following}) => Post(
+        id: id,
+        body: body,
+        interest: interest,
+        createdAt: createdAt,
+        likeCount: likeCount ?? this.likeCount,
+        commentCount: commentCount ?? this.commentCount,
+        likedByMe: likedByMe ?? this.likedByMe,
+        mine: mine,
+        author: author,
+        following: following ?? this.following,
+      );
+}
+
+class PostComment {
+  final String id;
+  final String body;
+  final DateTime createdAt;
+  final PublicProfile author;
+  final bool mine;
+  final bool canDelete;
+  const PostComment({required this.id, required this.body, required this.createdAt, required this.author, required this.mine, required this.canDelete});
+  factory PostComment.fromJson(Map<String, dynamic> j) => PostComment(
+        id: j['id'],
+        body: j['body'],
+        createdAt: _date(j['createdAt']),
+        author: PublicProfile.fromJson(Map<String, dynamic>.from(j['author'])),
+        mine: j['mine'] ?? false,
+        canDelete: j['canDelete'] ?? false,
+      );
+}
+
+class FeedPage {
+  final List<Post> posts;
+  final String? next;
+  const FeedPage(this.posts, this.next);
+  factory FeedPage.fromJson(Map<String, dynamic> j) => FeedPage(
+        [for (final p in (j['posts'] as List? ?? const [])) Post.fromJson(Map<String, dynamic>.from(p))],
+        j['next'] as String?,
+      );
+}
+
+class Story {
+  final String id;
+  final String kind; // text | photo
+  final String text;
+  final String bg; // text hikayesinin zemin kimliği
+  final Photo? photo;
+  final DateTime createdAt;
+  final DateTime expiresAt;
+  final bool seen;
+  final bool mine;
+  final int viewCount;
+  final bool underReview; // fotoğraf incelemeye alındı, onaylanınca yayınlanır
+  const Story({
+    required this.id,
+    required this.kind,
+    required this.text,
+    required this.bg,
+    this.photo,
+    required this.createdAt,
+    required this.expiresAt,
+    required this.seen,
+    required this.mine,
+    this.viewCount = 0,
+    this.underReview = false,
+  });
+  factory Story.fromJson(Map<String, dynamic> j) => Story(
+        id: j['id'],
+        kind: j['kind'],
+        text: j['text'] ?? '',
+        bg: j['bg'] ?? '',
+        photo: j['photo'] == null ? null : Photo(id: j['id'], url: j['photo']['url'], thumbUrl: j['photo']['thumbUrl'], fullUrl: j['photo']['fullUrl']),
+        createdAt: _date(j['createdAt']),
+        expiresAt: _date(j['expiresAt']),
+        seen: j['seen'] ?? false,
+        mine: j['mine'] ?? false,
+        viewCount: j['viewCount'] ?? 0,
+        underReview: j['underReview'] == true,
+      );
+  Story markSeen() => Story(
+        id: id, kind: kind, text: text, bg: bg, photo: photo, createdAt: createdAt, expiresAt: expiresAt,
+        seen: true, mine: mine, viewCount: viewCount,
+      );
+}
+
+// Akıştaki hikaye halkası: bir kullanıcının aktif hikayeleri
+class StoryTrayItem {
+  final PublicProfile user;
+  final bool mine;
+  final bool hasUnseen;
+  final List<Story> stories;
+  const StoryTrayItem({required this.user, required this.mine, required this.hasUnseen, required this.stories});
+  factory StoryTrayItem.fromJson(Map<String, dynamic> j) => StoryTrayItem(
+        user: PublicProfile.fromJson(Map<String, dynamic>.from(j['user'])),
+        mine: j['mine'] ?? false,
+        hasUnseen: j['hasUnseen'] ?? false,
+        stories: [for (final s in (j['stories'] as List? ?? const [])) Story.fromJson(Map<String, dynamic>.from(s))],
+      );
+}
+
+// Takipçi / takip listesi satırı
+class FollowUser {
+  final PublicProfile user;
+  final bool isFollowing;
+  final bool followsMe;
+  const FollowUser({required this.user, required this.isFollowing, required this.followsMe});
+  factory FollowUser.fromJson(Map<String, dynamic> j) => FollowUser(
+        user: PublicProfile.fromJson(Map<String, dynamic>.from(j)),
+        isFollowing: j['isFollowing'] ?? false,
+        followsMe: j['followsMe'] ?? false,
+      );
+}
+
+class StoryViewer {
+  final PublicProfile user;
+  final DateTime at;
+  const StoryViewer(this.user, this.at);
 }

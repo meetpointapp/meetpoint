@@ -11,11 +11,11 @@ if (firebaseServiceAccount && fs.existsSync(firebaseServiceAccount)) {
   messaging = getMessaging();
 }
 
-type Kind = 'match' | 'message' | 'request' | 'superlike' | 'call' | 'payout' | 'support' | 'streak_risk';
+type Kind = 'match' | 'message' | 'request' | 'superlike' | 'call' | 'payout' | 'support' | 'streak_risk' | 'post_like' | 'post_comment' | 'follow';
 
 // Kullanıcının türe göre kapatabildiği bildirimler (Profil › Bildirimler). Ödeme ve destek yanıtı
 // hesapla ilgili zorunlu bildirimlerdir, kapatılamaz.
-export const NOTIFY_PREFS = ['message', 'match', 'request', 'call', 'like', 'streak'] as const;
+export const NOTIFY_PREFS = ['message', 'match', 'request', 'call', 'like', 'streak', 'social'] as const;
 export type NotifyPref = (typeof NOTIFY_PREFS)[number];
 const PREF_OF: Partial<Record<Kind, NotifyPref>> = {
   message: 'message',
@@ -24,6 +24,9 @@ const PREF_OF: Partial<Record<Kind, NotifyPref>> = {
   call: 'call',
   superlike: 'like',
   streak_risk: 'streak',
+  post_like: 'social',
+  post_comment: 'social',
+  follow: 'social',
 };
 
 type PrefUser = { notifyPrefs: unknown; quietStart: number | null; quietEnd: number | null; tzOffsetMin: number };
@@ -67,6 +70,9 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
     support: (_n, subject) => ({ title: 'Destek yanıtı 💬', body: subject ? `Talebine yanıt geldi: ${subject}` : 'Destek talebine yanıt geldi.' }),
     // Faz 17: günlük giriş serisi. "extra" = mevcut seri sayısı (src/streak.ts)
     streak_risk: (_n, days) => ({ title: 'Serin tehlikede! 🔥', body: `${days} günlük serini bugün kaybetme, VibeUpMe'yi aç.` }),
+    post_like: (n, t) => ({ title: `${n} gönderini beğendi ❤️`, body: t || 'Gönderin beğenildi.' }),
+    post_comment: (n, t) => ({ title: `${n} yorum yaptı 💬`, body: t || 'Gönderine yeni bir yorum geldi.' }),
+    follow: (n) => ({ title: 'Yeni takipçi', body: `${n} seni takip etmeye başladı.` }),
   },
   en: {
     match: (n) => ({ title: "It's a match! 💞", body: `You and ${n} liked each other. Say hi!` }),
@@ -80,6 +86,9 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
         : { title: 'Cash-out request', body: 'Your request was declined and the coins are back in your balance.' },
     support: (_n, subject) => ({ title: 'Support reply 💬', body: subject ? `New reply to: ${subject}` : 'Your support request has a new reply.' }),
     streak_risk: (_n, days) => ({ title: 'Your streak is at risk! 🔥', body: `Don't lose your ${days}-day streak — open VibeUpMe today.` }),
+    post_like: (n, t) => ({ title: `${n} liked your post ❤️`, body: t || 'Your post got a like.' }),
+    post_comment: (n, t) => ({ title: `${n} commented 💬`, body: t || 'Your post has a new comment.' }),
+    follow: (n) => ({ title: 'New follower', body: `${n} started following you.` }),
   },
 };
 
@@ -103,6 +112,11 @@ function routeFor(kind: Kind, data: Record<string, string>): string | undefined 
       return '/wallet';
     case 'streak_risk':
       return '/discover';
+    case 'post_like':
+    case 'post_comment':
+      return data.postId ? `/post/${data.postId}` : '/feed';
+    case 'follow':
+      return data.userId ? `/user/${data.userId}` : '/feed';
   }
 }
 
