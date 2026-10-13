@@ -19,7 +19,7 @@ Sadece Python 3 ve SQLite kullanır (kurulum yok, `pip install` yok). Veriler te
 ## Web arayüzü
 
 ```bash
-python3 web.py              # http://127.0.0.1:8080
+python3 web.py              # http://127.0.0.1:8765
 ```
 Sayfalar: **Panel** (özet kartlar, satış hattı kanban'ı, bugünkü takipler), **Firmalar** (arama/filtre), **Firma detayı** (kişiler, geçmiş, takip kaydı, durum, e-posta taslağı + "Mail uygulamasında aç"), **Firma ekle**, **İçe aktar** (CSV yükle/yapıştır), **Pazarlar** (ülke sıralaması), **Araçlar** (Comtrade, OSM, e-posta toplama, puanlama – arka planda çalışır).
 

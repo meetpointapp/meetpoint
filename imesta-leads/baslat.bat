@@ -7,6 +7,5 @@ where py >nul 2>nul && (set PY=py) || (where python >nul 2>nul && (set PY=python
   echo ve kurulumda "Add python.exe to PATH" kutusunu isaretleyin.
   pause
   exit /b 1))
-start "" http://127.0.0.1:8080
-%PY% web.py
+%PY% web.py --open
 pause

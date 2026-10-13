@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Imesta Food lead sistemi – web arayüzü (sadece standart kütüphane).
 
-Çalıştır:  python3 web.py            → http://127.0.0.1:8080
+Çalıştır:  python3 web.py            → http://127.0.0.1:8765
 İnternete açacaksanız WEB_PASSWORD ortam değişkeni belirleyin (HTTP Basic şifre, kullanıcı adı: imesta).
 Renkler/logo: config.json içindeki "theme" bölümü.
 """
@@ -424,13 +424,27 @@ class H(BaseHTTPRequestHandler):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--host", default="127.0.0.1", help="Başka cihazlardan erişim için 0.0.0.0 (WEB_PASSWORD ayarlayın!)")
-    p.add_argument("--port", type=int, default=8080)
+    p.add_argument("--port", type=int, default=8765)
+    p.add_argument("--open", action="store_true", help="tarayıcıyı otomatik aç")
     a = p.parse_args()
     if a.host != "127.0.0.1" and not os.environ.get("WEB_PASSWORD"):
         raise SystemExit("Güvenlik: localhost dışına açmak için WEB_PASSWORD ortam değişkenini ayarlayın.")
     leads.db().close()
-    print(f"Imesta Lead paneli: http://{a.host}:{a.port}")
-    ThreadingHTTPServer((a.host, a.port), H).serve_forever()
+    srv = None
+    for port in range(a.port, a.port + 20):  # port doluysa sıradakini dene
+        try:
+            srv = ThreadingHTTPServer((a.host, port), H)
+            break
+        except OSError:
+            print(f"Port {port} dolu, sıradaki deneniyor...")
+    if not srv:
+        raise SystemExit("Boş port bulunamadı. --port ile başka bir port verin.")
+    url = f"http://{a.host}:{srv.server_address[1]}"
+    print(f"Imesta Lead paneli: {url}  (kapatmak için Ctrl+C)")
+    if a.open:
+        import webbrowser
+        threading.Timer(1.0, webbrowser.open, [url]).start()
+    srv.serve_forever()
 
 
 if __name__ == "__main__":
