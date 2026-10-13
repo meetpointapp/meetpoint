@@ -1284,5 +1284,113 @@
   "adOpenFailed": "Couldn't open the link",
   "premiumPerkNoAdsTitle": "Ad-free feed",
   "premiumPerkNoAds": "You won't see sponsored content in the feed",
-  "errPostBoostMax": "The boost can't be extended further. You can extend it again as time runs down."
+  "errPostBoostMax": "The boost can't be extended further. You can extend it again as time runs down.",
+  "truthDareTitle": "Truth or Dare?",
+  "tdRoundOf": "Round {n} / {total}",
+  "@tdRoundOf": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tdChoose": "Make your pick",
+  "tdTruth": "Truth",
+  "tdDare": "Dare",
+  "tdTruthHint": "You get an honest question",
+  "tdDareHint": "You get a small challenge",
+  "tdToneRomantic": "Romantic",
+  "tdToneFun": "Fun",
+  "tdToneDeep": "Deep",
+  "tdAnswerHint": "Write your answer…",
+  "tdSend": "Send answer",
+  "tdWaiting": "Answer sent",
+  "tdWaitingBody": "Once {name} answers, you both see the replies.",
+  "@tdWaitingBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tdOtherAnswered": "{name} answered, it's your turn!",
+  "@tdOtherAnswered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tdOtherChose": "{name} made a pick.",
+  "@tdOtherChose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tdRevealed": "Answers revealed! The next round has started.",
+  "tdYou": "You",
+  "tdHistory": "Previous rounds",
+  "tdFinishedTitle": "Game over!",
+  "tdFinishedBody": "You finished {total} rounds with {name}. If you liked it, visit their profile and keep the conversation going.",
+  "@tdFinishedBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tdDeclined": "Game declined",
+  "tdEnded": "Game ended",
+  "tdClosedBody": "This game with {name} is no longer open.",
+  "@tdClosedBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tdPlayAgain": "Play again",
+  "tdEndGame": "Leave game",
+  "tdEndConfirm": "End the game? The other player will see that it ended.",
+  "tdInviteBanner": "{name} wants to play Truth or Dare with you",
+  "@tdInviteBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tdTurnBanner": "{name} answered, it's your turn",
+  "@tdTurnBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tdRevealBanner": "Answers with {name} are revealed",
+  "@tdRevealBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gamesTitle": "My games",
+  "gamesEmpty": "No games yet. Tap the dice button on a profile in Discover to start one.",
+  "tdYourTurn": "Your turn",
+  "tdWaitingShort": "Waiting",
+  "tdFinishedShort": "Finished",
+  "notifyGames": "Games",
+  "errGameLimit": "You've used today's game invites. Try again tomorrow.",
+  "errGameNotActive": "This game is no longer open.",
+  "errGameState": "This step is already done, refreshing."
 }

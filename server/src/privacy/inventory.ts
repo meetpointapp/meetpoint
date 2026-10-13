@@ -88,6 +88,15 @@ export const INVENTORY: InventoryEntry[] = [
     recipients: 'Diğer kullanıcılar (akış herkese açık); şikayet halinde moderasyon ekibi',
   },
   {
+    category: 'Oyunlar',
+    tables: ['TruthDareGame', 'TruthDareRound'],
+    data: 'Doğruluk mu Cesaret mi oyunu: oyuncular, tur ilerlemesi, seçilen tür, verilen soru ve yazılan cevaplar',
+    purpose: 'Kullanıcılar arası oyun hizmeti ve kötüye kullanımın önlenmesi',
+    basis: ['sözleşme'],
+    retention: 'Hesap süresince; hesap silinince oyunlar da silinir',
+    recipients: 'Oyunun diğer oyuncusu (açılan cevaplar); şikayet halinde moderasyon ekibi',
+  },
+  {
     category: 'Reklam kayıtları',
     tables: ['Ad'],
     data: 'Reklam içeriği, bağlantı ve toplu gösterim/tıklama sayaçları (kişisel veri içermez; hangi kullanıcının gördüğü tutulmaz)',

@@ -142,6 +142,25 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       case 'sanction':
         ref.invalidate(meProvider);
         await _checkSanction();
+      case 'game:update':
+        // Faz 23: Doğruluk mu Cesaret mi — davet, sıra ya da cevaplar açıldı
+        ref.invalidate(truthDareGamesProvider);
+        final data = Map<String, dynamic>.from(event.data as Map);
+        final gameId = data['gameId'] as String?;
+        final kind = data['kind'] as String?;
+        if (gameId != null && (kind == 'invite' || kind == 'turn' || kind == 'reveal') && _currentPath != '/game/$gameId') {
+          String name = '';
+          try {
+            name = (await ref.read(apiProvider).user(data['fromId'] as String)).displayName;
+          } catch (_) {}
+          if (!mounted) return;
+          final text = switch (kind) {
+            'invite' => l.tdInviteBanner(name),
+            'turn' => l.tdTurnBanner(name),
+            _ => l.tdRevealBanner(name),
+          };
+          _banner(text, '/game/$gameId');
+        }
       case 'superlike':
         ref.invalidate(likesProvider);
         final fromId = Map<String, dynamic>.from(event.data as Map)['fromId'];
@@ -173,6 +192,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final pending = ref.watch(requestsProvider(true)).value?.where((r) => r.isPending).length ?? 0;
     final newMatches = newMatchCount(ref.watch(conversationsProvider).value ?? const []);
     final unread = ref.watch(unreadCountProvider);
+    final gameTurns = ref.watch(truthDareGamesProvider).value?.myTurnCount ?? 0;
     // Günlük giriş ödülü alınmadıysa profil simgesinde kırmızı nokta
     final dailyDot = ref.watch(dailyClaimableProvider).value ?? false;
 
@@ -229,7 +249,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   child: Row(children: [
                     for (final (i, d) in [
                       (Icons.style_outlined, Icons.style_rounded, l.navDiscover, 0, false),
-                      (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, l.navChats, unread + pending + newMatches, false),
+                      (Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, l.navChats, unread + pending + newMatches + gameTurns, false),
                       null, // Akış için boş yuva
                       (Icons.account_balance_wallet_outlined, Icons.account_balance_wallet_rounded, l.navWallet, 0, false),
                       (Icons.person_outline_rounded, Icons.person_rounded, l.navProfile, 0, dailyDot),

@@ -109,6 +109,8 @@ model User {
   stories      Story[]       @relation("StoryAuthor")
   storyViews   StoryView[]
   following    Follow[]      @relation("FollowFollower")
+  tdGamesA     TruthDareGame[] @relation("TdUserA")
+  tdGamesB     TruthDareGame[] @relation("TdUserB")
   followers    Follow[]      @relation("FollowFollowing")
   referredById String?
   referredBy   User?   @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
@@ -1219,4 +1221,44 @@ model Ad {
   updatedAt   DateTime  @updatedAt
 
   @@index([active, startsAt])
+}
+
+// Faz 23: "Doğruluk mu Cesaret mi" — iki kullanıcı arasında (eşleşme şartı yok, keşfetten başlar) 10 turluk,
+// sunucunun rastgele soru sorduğu oyun. İki taraf da cevaplayınca cevaplar açılır ve sonraki tura geçilir.
+model TruthDareGame {
+  id          String   @id @default(cuid())
+  userAId     String // sıralı çift (orderedPair): Conversation gibi
+  userBId     String
+  userA       User     @relation("TdUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB       User     @relation("TdUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  initiatorId String
+  status      String   @default("ACTIVE") // ACTIVE | FINISHED | DECLINED | ENDED | EXPIRED
+  round       Int      @default(1) // şu anki tur (1..totalRounds)
+  totalRounds Int      @default(10)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  finishedAt  DateTime?
+  rounds      TruthDareRound[]
+
+  @@index([userAId, status])
+  @@index([userBId, status])
+  @@index([initiatorId, createdAt])
+}
+
+model TruthDareRound {
+  id          String        @id @default(cuid())
+  gameId      String
+  game        TruthDareGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  index       Int
+  aChoice     String        @default("") // truth | dare
+  aPrompt     String        @default("") // soru kimliği (src/truthDare.ts)
+  aAnswer     String        @default("")
+  aAnsweredAt DateTime?
+  bChoice     String        @default("")
+  bPrompt     String        @default("")
+  bAnswer     String        @default("")
+  bAnsweredAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@unique([gameId, index])
 }

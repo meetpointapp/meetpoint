@@ -5444,6 +5444,240 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin.'**
   String get errPostBoostMax;
+
+  /// No description provided for @truthDareTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğruluk mu Cesaret mi?'**
+  String get truthDareTitle;
+
+  /// No description provided for @tdRoundOf.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tur {n} / {total}'**
+  String tdRoundOf(int n, int total);
+
+  /// No description provided for @tdChoose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçimini yap'**
+  String get tdChoose;
+
+  /// No description provided for @tdTruth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğruluk'**
+  String get tdTruth;
+
+  /// No description provided for @tdDare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cesaret'**
+  String get tdDare;
+
+  /// No description provided for @tdTruthHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dürüst bir soru gelir'**
+  String get tdTruthHint;
+
+  /// No description provided for @tdDareHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Küçük bir görev gelir'**
+  String get tdDareHint;
+
+  /// No description provided for @tdToneRomantic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Romantik'**
+  String get tdToneRomantic;
+
+  /// No description provided for @tdToneFun.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğlenceli'**
+  String get tdToneFun;
+
+  /// No description provided for @tdToneDeep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derin'**
+  String get tdToneDeep;
+
+  /// No description provided for @tdAnswerHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevabını yaz…'**
+  String get tdAnswerHint;
+
+  /// No description provided for @tdSend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevabı gönder'**
+  String get tdSend;
+
+  /// No description provided for @tdWaiting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevabın gönderildi'**
+  String get tdWaiting;
+
+  /// No description provided for @tdWaitingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} cevaplayınca ikiniz de cevapları görürsünüz.'**
+  String tdWaitingBody(String name);
+
+  /// No description provided for @tdOtherAnswered.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} cevapladı, sıra sende!'**
+  String tdOtherAnswered(String name);
+
+  /// No description provided for @tdOtherChose.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} seçimini yaptı.'**
+  String tdOtherChose(String name);
+
+  /// No description provided for @tdRevealed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cevaplar açıldı! Sıradaki tur başladı.'**
+  String get tdRevealed;
+
+  /// No description provided for @tdYou.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sen'**
+  String get tdYou;
+
+  /// No description provided for @tdHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki turlar'**
+  String get tdHistory;
+
+  /// No description provided for @tdFinishedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyun bitti!'**
+  String get tdFinishedTitle;
+
+  /// No description provided for @tdFinishedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile {total} turu tamamladınız. Beğendiysen profilini ziyaret edip sohbeti sürdürebilirsin.'**
+  String tdFinishedBody(String name, int total);
+
+  /// No description provided for @tdDeclined.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyun reddedildi'**
+  String get tdDeclined;
+
+  /// No description provided for @tdEnded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyun sona erdi'**
+  String get tdEnded;
+
+  /// No description provided for @tdClosedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile bu oyun artık açık değil.'**
+  String tdClosedBody(String name);
+
+  /// No description provided for @tdPlayAgain.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeniden oyna'**
+  String get tdPlayAgain;
+
+  /// No description provided for @tdEndGame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyundan çık'**
+  String get tdEndGame;
+
+  /// No description provided for @tdEndConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyun sonlandırılsın mı? Karşı taraf da oyunun bittiğini görür.'**
+  String get tdEndConfirm;
+
+  /// No description provided for @tdInviteBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} seninle Doğruluk mu Cesaret mi oynamak istiyor'**
+  String tdInviteBanner(String name);
+
+  /// No description provided for @tdTurnBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} cevapladı, sıra sende'**
+  String tdTurnBanner(String name);
+
+  /// No description provided for @tdRevealBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile cevaplar açıldı'**
+  String tdRevealBanner(String name);
+
+  /// No description provided for @gamesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyunlarım'**
+  String get gamesTitle;
+
+  /// No description provided for @gamesEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz oyun yok. Keşfet\'te bir profildeki zar düğmesine dokunarak başlat.'**
+  String get gamesEmpty;
+
+  /// No description provided for @tdYourTurn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıra sende'**
+  String get tdYourTurn;
+
+  /// No description provided for @tdWaitingShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bekleniyor'**
+  String get tdWaitingShort;
+
+  /// No description provided for @tdFinishedShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitti'**
+  String get tdFinishedShort;
+
+  /// No description provided for @notifyGames.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oyunlar'**
+  String get notifyGames;
+
+  /// No description provided for @errGameLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünlük oyun daveti hakkın doldu. Yarın tekrar deneyebilirsin.'**
+  String get errGameLimit;
+
+  /// No description provided for @errGameNotActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu oyun artık açık değil.'**
+  String get errGameNotActive;
+
+  /// No description provided for @errGameState.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu adım zaten tamamlanmış, ekran yenileniyor.'**
+  String get errGameState;
 }
 
 class _AppLocalizationsDelegate

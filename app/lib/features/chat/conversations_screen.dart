@@ -22,6 +22,7 @@ class ConversationsScreen extends ConsumerWidget {
     final convs = ref.watch(conversationsProvider);
     final pending = ref.watch(requestsProvider(true)).value?.where((r) => r.isPending).length ?? 0;
     final newMatches = newMatchCount(convs.value ?? const []);
+    final gameTurns = ref.watch(truthDareGamesProvider).value?.myTurnCount ?? 0;
 
     return DefaultTabController(
       length: 3,
@@ -29,6 +30,11 @@ class ConversationsScreen extends ConsumerWidget {
         appBar: AppBar(
           title: Text(l.navChats),
           actions: [
+            IconButton(
+              tooltip: l.gamesTitle,
+              icon: Badge(isLabelVisible: gameTurns > 0, label: Text('$gameTurns'), backgroundColor: Brand.coral, child: const Icon(Icons.casino_outlined)),
+              onPressed: () => context.push('/games'),
+            ),
             IconButton(
               tooltip: l.callHistory,
               icon: const Icon(Icons.history_rounded),

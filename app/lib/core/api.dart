@@ -457,6 +457,29 @@ class Api {
   Future<void> rateCall(String id, int rating, {String? reportReason}) =>
       _post('/calls/$id/rate', {'rating': rating, 'reportReason': ?reportReason});
 
+  // Faz 23: Doğruluk mu Cesaret mi
+  Future<TruthDareGame> startTruthDare(String toId) async => TruthDareGame.fromJson(await _post('/games/truth-dare', {'toId': toId}));
+
+  Future<({List<TruthDareGame> games, int myTurnCount})> truthDareGames() async {
+    final r = await _get('/games/truth-dare');
+    return (
+      games: [for (final g in (r['games'] as List)) TruthDareGame.fromJson(Map<String, dynamic>.from(g))],
+      myTurnCount: (r['myTurnCount'] ?? 0) as int,
+    );
+  }
+
+  Future<TruthDareGame> truthDareGame(String id) async => TruthDareGame.fromJson(await _get('/games/truth-dare/$id'));
+
+  Future<TruthDareGame> tdChoose(String id, String choice) async =>
+      TruthDareGame.fromJson(await _post('/games/truth-dare/$id/choose', {'choice': choice}));
+
+  Future<TruthDareGame> tdAnswer(String id, String answer) async =>
+      TruthDareGame.fromJson(await _post('/games/truth-dare/$id/answer', {'answer': answer}));
+
+  Future<TruthDareGame> tdEnd(String id) async => TruthDareGame.fromJson(await _post('/games/truth-dare/$id/end'));
+
+  Future<void> tdReport(String id, String reason) => _post('/games/truth-dare/$id/report', {'reason': reason});
+
   // Faz 22: sosyal akış (gönderi, yorum, beğeni, takip, hikaye)
   Future<FeedPage> feed(String tab, {String? before}) async =>
       FeedPage.fromJson(await _get('/feed', {'tab': tab, 'before': ?before}));

@@ -24,6 +24,8 @@ import 'features/store/store_screen.dart';
 import 'features/feed/feed_screen.dart';
 import 'features/feed/post_screens.dart';
 import 'features/feed/stories.dart';
+import 'features/games/games_screen.dart';
+import 'features/games/truth_dare_screen.dart';
 import 'features/home/home_shell.dart';
 import 'features/daily/daily_reward_screen.dart';
 import 'features/likes/likes_screen.dart';
@@ -98,6 +100,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/stories/user/:id', builder: (_, s) => StoryByUserScreen(userId: s.pathParameters['id']!)),
       GoRoute(path: '/story/new', builder: (_, _) => const StoryComposerScreen()),
       GoRoute(path: '/store', builder: (_, _) => const StoreScreen()),
+      GoRoute(path: '/games', builder: (_, _) => const GamesScreen()),
+      GoRoute(path: '/game/:id', builder: (_, s) => TruthDareScreen(gameId: s.pathParameters['id']!)),
       GoRoute(path: '/matches', builder: (_, _) => const MatchesScreen()),
       GoRoute(path: '/vibe', builder: (_, _) => const VibeQuizScreen()),
       GoRoute(path: '/discover/groups/:interestId', builder: (_, s) => InterestGroupScreen(interestId: s.pathParameters['interestId']!)),

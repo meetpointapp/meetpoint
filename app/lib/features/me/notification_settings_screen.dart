@@ -83,6 +83,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       NotifyType.like: (Icons.star_border_rounded, l.notifyLikes),
       NotifyType.streak: (Icons.local_fire_department_outlined, l.notifyStreak),
       NotifyType.social: (Icons.dynamic_feed_outlined, l.notifySocial),
+      NotifyType.game: (Icons.casino_outlined, l.notifyGames),
     };
 
     return Scaffold(

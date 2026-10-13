@@ -23,6 +23,7 @@ import { personalLinkRouter } from './routes/personalLink';
 import { helpRouter } from './routes/help';
 import { engagementRouter } from './routes/engagement';
 import { socialRouter } from './routes/social';
+import { truthDareRouter } from './routes/truthDare';
 import { adminAdsRouter } from './routes/adminAds';
 import { notificationsRouter } from './routes/notifications';
 import { supportRouter } from './routes/support';
@@ -125,6 +126,7 @@ app.use(
   notificationsRouter,
   engagementRouter,
   socialRouter,
+  truthDareRouter,
 );
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {

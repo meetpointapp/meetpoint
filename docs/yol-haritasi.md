@@ -447,6 +447,8 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 6. ✅ **Gelir ve büyüme.** Gönderiyi jetonla öne çıkarma (60 jeton, 6 saat, en fazla 24 saat birikir; "Herkes" akışının en üstünde "Öne çıkarıldı" etiketiyle durur); profile sabitleme (tek gönderi, profilde ilk sırada "Sabitlenmiş"); görsel olarak paylaşılabilir gönderi kartı (kendi şablonumuz); dış reklam alanı: `Ad` modeli, yönetim panelinde "Reklamlar" sekmesi (oluştur/durdur/sil, gösterim-tıklama-TO), akışta ağırlıklı dönüşümle "Sponsorlu" kart, VibeUpMe+ üyelere gösterilmez (yeni paket avantajı: reklamsız akış).
 7. ✅ **Test ve belgeler.** Sunucu API testi (`test/api/social.test.ts`), canlı kontrol betikleri (`tools/ui-tours/social-api.mjs`, `social-extras-api.mjs`), demo veri (`social-seed.mjs`), UI turu (`feed-tour.mjs`).
 
+8. ✅ **Doğruluk mu Cesaret mi (oyun).** Keşfet kartındaki alt çubukta zar düğmesi; karşıdaki kişiyle (eşleşme gerekmeden) 10 turluk oyun. Her turda iki taraf da **Doğruluk** ya da **Cesaret** seçer, sunucu havuzdan rastgele soru verir (aynı oyunda tekrar etmez; 52 doğruluk + 46 cesaret, TR/EN, romantik/eğlenceli/derin); ikisi de cevaplayınca cevaplar ve sorular açılır, sonraki tura geçilir; 10. turdan sonra oyun biter. `TruthDareGame/TruthDareRound` modelleri (migration `20261013100000_faz23_truth_dare`), günde 10 davet sınırı, cevapta iletişim bilgisi reddi, reddet/çık/şikayet/engelle, bildirim ve canlı güncelleme ("Oyunlar" tercihi), Sohbetler ekranında "Oyunlarım" listesi ve sıra bende rozeti.
+
 **Açık riskler:** içerik moderasyonu iş yükü (5651 sorumluluğu avukat aşamasında netleşir); akışın başlangıçta boş görünmesi (ilgi alanı filtresi, hikayeler ve demo içerikle canlı tutulur).
 
 ## Faz 23 · Dış süreçler ve yayın

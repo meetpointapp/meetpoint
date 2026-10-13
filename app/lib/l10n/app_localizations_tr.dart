@@ -3462,4 +3462,142 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errPostBoostMax =>
       'Öne çıkarma süresi daha fazla uzatılamaz. Süre azalınca tekrar uzatabilirsin.';
+
+  @override
+  String get truthDareTitle => 'Doğruluk mu Cesaret mi?';
+
+  @override
+  String tdRoundOf(int n, int total) {
+    return 'Tur $n / $total';
+  }
+
+  @override
+  String get tdChoose => 'Seçimini yap';
+
+  @override
+  String get tdTruth => 'Doğruluk';
+
+  @override
+  String get tdDare => 'Cesaret';
+
+  @override
+  String get tdTruthHint => 'Dürüst bir soru gelir';
+
+  @override
+  String get tdDareHint => 'Küçük bir görev gelir';
+
+  @override
+  String get tdToneRomantic => 'Romantik';
+
+  @override
+  String get tdToneFun => 'Eğlenceli';
+
+  @override
+  String get tdToneDeep => 'Derin';
+
+  @override
+  String get tdAnswerHint => 'Cevabını yaz…';
+
+  @override
+  String get tdSend => 'Cevabı gönder';
+
+  @override
+  String get tdWaiting => 'Cevabın gönderildi';
+
+  @override
+  String tdWaitingBody(String name) {
+    return '$name cevaplayınca ikiniz de cevapları görürsünüz.';
+  }
+
+  @override
+  String tdOtherAnswered(String name) {
+    return '$name cevapladı, sıra sende!';
+  }
+
+  @override
+  String tdOtherChose(String name) {
+    return '$name seçimini yaptı.';
+  }
+
+  @override
+  String get tdRevealed => 'Cevaplar açıldı! Sıradaki tur başladı.';
+
+  @override
+  String get tdYou => 'Sen';
+
+  @override
+  String get tdHistory => 'Önceki turlar';
+
+  @override
+  String get tdFinishedTitle => 'Oyun bitti!';
+
+  @override
+  String tdFinishedBody(String name, int total) {
+    return '$name ile $total turu tamamladınız. Beğendiysen profilini ziyaret edip sohbeti sürdürebilirsin.';
+  }
+
+  @override
+  String get tdDeclined => 'Oyun reddedildi';
+
+  @override
+  String get tdEnded => 'Oyun sona erdi';
+
+  @override
+  String tdClosedBody(String name) {
+    return '$name ile bu oyun artık açık değil.';
+  }
+
+  @override
+  String get tdPlayAgain => 'Yeniden oyna';
+
+  @override
+  String get tdEndGame => 'Oyundan çık';
+
+  @override
+  String get tdEndConfirm =>
+      'Oyun sonlandırılsın mı? Karşı taraf da oyunun bittiğini görür.';
+
+  @override
+  String tdInviteBanner(String name) {
+    return '$name seninle Doğruluk mu Cesaret mi oynamak istiyor';
+  }
+
+  @override
+  String tdTurnBanner(String name) {
+    return '$name cevapladı, sıra sende';
+  }
+
+  @override
+  String tdRevealBanner(String name) {
+    return '$name ile cevaplar açıldı';
+  }
+
+  @override
+  String get gamesTitle => 'Oyunlarım';
+
+  @override
+  String get gamesEmpty =>
+      'Henüz oyun yok. Keşfet\'te bir profildeki zar düğmesine dokunarak başlat.';
+
+  @override
+  String get tdYourTurn => 'Sıra sende';
+
+  @override
+  String get tdWaitingShort => 'Bekleniyor';
+
+  @override
+  String get tdFinishedShort => 'Bitti';
+
+  @override
+  String get notifyGames => 'Oyunlar';
+
+  @override
+  String get errGameLimit =>
+      'Bugünlük oyun daveti hakkın doldu. Yarın tekrar deneyebilirsin.';
+
+  @override
+  String get errGameNotActive => 'Bu oyun artık açık değil.';
+
+  @override
+  String get errGameState => 'Bu adım zaten tamamlanmış, ekran yenileniyor.';
 }

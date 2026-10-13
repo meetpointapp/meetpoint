@@ -3526,4 +3526,142 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errPostBoostMax =>
       'The boost can\'t be extended further. You can extend it again as time runs down.';
+
+  @override
+  String get truthDareTitle => 'Truth or Dare?';
+
+  @override
+  String tdRoundOf(int n, int total) {
+    return 'Round $n / $total';
+  }
+
+  @override
+  String get tdChoose => 'Make your pick';
+
+  @override
+  String get tdTruth => 'Truth';
+
+  @override
+  String get tdDare => 'Dare';
+
+  @override
+  String get tdTruthHint => 'You get an honest question';
+
+  @override
+  String get tdDareHint => 'You get a small challenge';
+
+  @override
+  String get tdToneRomantic => 'Romantic';
+
+  @override
+  String get tdToneFun => 'Fun';
+
+  @override
+  String get tdToneDeep => 'Deep';
+
+  @override
+  String get tdAnswerHint => 'Write your answer…';
+
+  @override
+  String get tdSend => 'Send answer';
+
+  @override
+  String get tdWaiting => 'Answer sent';
+
+  @override
+  String tdWaitingBody(String name) {
+    return 'Once $name answers, you both see the replies.';
+  }
+
+  @override
+  String tdOtherAnswered(String name) {
+    return '$name answered, it\'s your turn!';
+  }
+
+  @override
+  String tdOtherChose(String name) {
+    return '$name made a pick.';
+  }
+
+  @override
+  String get tdRevealed => 'Answers revealed! The next round has started.';
+
+  @override
+  String get tdYou => 'You';
+
+  @override
+  String get tdHistory => 'Previous rounds';
+
+  @override
+  String get tdFinishedTitle => 'Game over!';
+
+  @override
+  String tdFinishedBody(String name, int total) {
+    return 'You finished $total rounds with $name. If you liked it, visit their profile and keep the conversation going.';
+  }
+
+  @override
+  String get tdDeclined => 'Game declined';
+
+  @override
+  String get tdEnded => 'Game ended';
+
+  @override
+  String tdClosedBody(String name) {
+    return 'This game with $name is no longer open.';
+  }
+
+  @override
+  String get tdPlayAgain => 'Play again';
+
+  @override
+  String get tdEndGame => 'Leave game';
+
+  @override
+  String get tdEndConfirm =>
+      'End the game? The other player will see that it ended.';
+
+  @override
+  String tdInviteBanner(String name) {
+    return '$name wants to play Truth or Dare with you';
+  }
+
+  @override
+  String tdTurnBanner(String name) {
+    return '$name answered, it\'s your turn';
+  }
+
+  @override
+  String tdRevealBanner(String name) {
+    return 'Answers with $name are revealed';
+  }
+
+  @override
+  String get gamesTitle => 'My games';
+
+  @override
+  String get gamesEmpty =>
+      'No games yet. Tap the dice button on a profile in Discover to start one.';
+
+  @override
+  String get tdYourTurn => 'Your turn';
+
+  @override
+  String get tdWaitingShort => 'Waiting';
+
+  @override
+  String get tdFinishedShort => 'Finished';
+
+  @override
+  String get notifyGames => 'Games';
+
+  @override
+  String get errGameLimit =>
+      'You\'ve used today\'s game invites. Try again tomorrow.';
+
+  @override
+  String get errGameNotActive => 'This game is no longer open.';
+
+  @override
+  String get errGameState => 'This step is already done, refreshing.';
 }

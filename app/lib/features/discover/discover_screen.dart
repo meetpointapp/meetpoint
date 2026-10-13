@@ -298,6 +298,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     }
   }
 
+  // Faz 23: karttaki kişiyle Doğruluk mu Cesaret mi oyunu başlat (açık oyun varsa ona gider)
+  Future<void> _startTruthDare(PublicProfile profile) async {
+    final l = AppLocalizations.of(context);
+    try {
+      final game = await ref.read(apiProvider).startTruthDare(profile.id);
+      ref.invalidate(truthDareGamesProvider);
+      if (mounted) context.push('/game/${game.id}');
+    } catch (e) {
+      if (mounted) showSnack(context, errorText(l, e));
+    }
+  }
+
   Future<void> _askLocation() async {
     if (await syncLocation(ref.read(apiProvider), ask: true)) {
       ref.invalidate(meProvider);
@@ -458,6 +470,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       onTap: () => _controller.swipe(CardSwiperDirection.top)),
                   _GlassButton(icon: Icons.favorite_rounded, size: 66, iconColor: Brand.coral, ring: true, tooltip: l.accept,
                       onTap: () => _controller.swipe(CardSwiperDirection.right)),
+                  _GlassButton(icon: Icons.casino_rounded, size: 46, iconColor: const Color(0xFFB9A4FF), tooltip: l.truthDareTitle,
+                      onTap: () => _startTruthDare(cards[_current.clamp(0, cards.length - 1)])),
                   _GlassButton(icon: Icons.send_rounded, size: 46, iconColor: Colors.white, tooltip: l.messageRequest,
                       onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message)),
                 ]),

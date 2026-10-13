@@ -1641,7 +1641,7 @@ class HelpCategory {
 
 // ---------- Bildirim tercihleri ----------
 
-enum NotifyType { message, match, request, call, like, streak, social }
+enum NotifyType { message, match, request, call, like, streak, social, game }
 
 class NotificationPrefs {
   final Map<NotifyType, bool> prefs;
@@ -1944,4 +1944,82 @@ class StoryViewer {
   final PublicProfile user;
   final DateTime at;
   const StoryViewer(this.user, this.at);
+}
+
+// ---------- Faz 23: Doğruluk mu Cesaret mi
+class TdPrompt {
+  final String id;
+  final String kind; // truth | dare
+  final String tone; // romantic | fun | deep
+  final String text;
+  const TdPrompt({required this.id, required this.kind, required this.tone, required this.text});
+  factory TdPrompt.fromJson(Map<String, dynamic> j) => TdPrompt(id: j['id'], kind: j['kind'], tone: j['tone'], text: j['text']);
+  bool get isTruth => kind == 'truth';
+}
+
+class TdSide {
+  final String choice; // '' | truth | dare | hidden (karşı taraf, tur açılana kadar)
+  final TdPrompt? prompt;
+  final String answer;
+  final bool answered;
+  const TdSide({this.choice = '', this.prompt, this.answer = '', this.answered = false});
+  factory TdSide.fromJson(Map<String, dynamic> j) => TdSide(
+        choice: j['choice'] ?? '',
+        prompt: j['prompt'] == null ? null : TdPrompt.fromJson(Map<String, dynamic>.from(j['prompt'])),
+        answer: j['answer'] ?? '',
+        answered: j['answered'] ?? false,
+      );
+}
+
+class TdRound {
+  final int index;
+  final bool revealed;
+  final TdSide mine;
+  final TdSide theirs;
+  const TdRound({required this.index, required this.revealed, required this.mine, required this.theirs});
+  factory TdRound.fromJson(Map<String, dynamic> j) => TdRound(
+        index: j['index'],
+        revealed: j['revealed'] ?? false,
+        mine: TdSide.fromJson(Map<String, dynamic>.from(j['mine'])),
+        theirs: TdSide.fromJson(Map<String, dynamic>.from(j['theirs'])),
+      );
+}
+
+class TruthDareGame {
+  final String id;
+  final String state; // ACTIVE | FINISHED | DECLINED | ENDED | EXPIRED
+  final int round;
+  final int totalRounds;
+  final bool initiatedByMe;
+  final bool myTurn;
+  final PublicProfile other;
+  final TdRound current;
+  final List<TdRound> history;
+  final DateTime updatedAt;
+  const TruthDareGame({
+    required this.id,
+    required this.state,
+    required this.round,
+    required this.totalRounds,
+    required this.initiatedByMe,
+    required this.myTurn,
+    required this.other,
+    required this.current,
+    required this.history,
+    required this.updatedAt,
+  });
+  factory TruthDareGame.fromJson(Map<String, dynamic> j) => TruthDareGame(
+        id: j['id'],
+        state: j['state'],
+        round: j['round'],
+        totalRounds: j['totalRounds'],
+        initiatedByMe: j['initiatedByMe'] ?? false,
+        myTurn: j['myTurn'] ?? false,
+        other: PublicProfile.fromJson(Map<String, dynamic>.from(j['other'])),
+        current: TdRound.fromJson(Map<String, dynamic>.from(j['current'])),
+        history: [for (final r in (j['history'] as List? ?? const [])) TdRound.fromJson(Map<String, dynamic>.from(r))],
+        updatedAt: _date(j['updatedAt']),
+      );
+  bool get active => state == 'ACTIVE';
+  bool get finished => state == 'FINISHED';
 }

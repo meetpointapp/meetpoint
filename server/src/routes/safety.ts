@@ -5,6 +5,7 @@ import { HttpError, prisma } from '../db';
 import { reportLimiter } from '../limits';
 import { fileReport, REPORT_REASONS } from '../moderation/reports';
 import { dropFollowsBetween } from '../social';
+import { endGamesBetween } from '../truthDare';
 
 export const safetyRouter = Router();
 
@@ -19,6 +20,7 @@ safetyRouter.post('/blocks', async (req, res) => {
   });
   // Faz 22: engellenen kişiyle karşılıklı takip de biter
   await dropFollowsBetween(me, toId);
+  await endGamesBetween(me, toId);
   res.json({ ok: true });
 });
 

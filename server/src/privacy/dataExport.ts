@@ -54,7 +54,7 @@ async function collect(userId: string) {
       supportTickets: { orderBy: { createdAt: 'asc' }, include: { messages: { orderBy: { createdAt: 'asc' } } } },
     },
   });
-  const [wallet, conversations, messages, icebreakers, ticTacToes, calls, gifts, blocks, reports, devices, posts, comments, stories, follows] = await Promise.all([
+  const [wallet, conversations, messages, icebreakers, ticTacToes, calls, gifts, blocks, reports, devices, posts, comments, stories, follows, tdGames] = await Promise.all([
     prisma.walletEntry.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
     prisma.conversation.findMany({ where: { OR: [{ userAId: userId }, { userBId: userId }] } }),
     prisma.message.findMany({ where: { senderId: userId }, orderBy: { createdAt: 'asc' } }),
@@ -69,6 +69,7 @@ async function collect(userId: string) {
     prisma.postComment.findMany({ where: { authorId: userId }, orderBy: { createdAt: 'asc' }, select: { postId: true, body: true, createdAt: true } }),
     prisma.story.findMany({ where: { authorId: userId }, orderBy: { createdAt: 'asc' }, select: { kind: true, text: true, createdAt: true, expiresAt: true } }),
     prisma.follow.findMany({ where: { OR: [{ followerId: userId }, { followingId: userId }] }, select: { followerId: true, followingId: true, createdAt: true } }),
+    prisma.truthDareGame.findMany({ where: { OR: [{ userAId: userId }, { userBId: userId }] }, include: { rounds: { orderBy: { index: 'asc' } } } }),
   ]);
 
   const data = {
@@ -163,6 +164,15 @@ async function collect(userId: string) {
     })),
     gifts: gifts.map((g) => ({ direction: g.fromId === userId ? 'sent' : 'received', giftId: g.giftId, coins: g.coins, createdAt: g.createdAt })),
     blocked: blocks.map((b) => ({ userId: b.toId, createdAt: b.createdAt })),
+    truthOrDareGames: tdGames.map((g) => ({
+      withUserId: g.userAId === userId ? g.userBId : g.userAId,
+      status: g.status,
+      createdAt: g.createdAt,
+      rounds: g.rounds.map((r) => {
+        const mine = g.userAId === userId;
+        return { index: r.index, choice: mine ? r.aChoice : r.bChoice, prompt: mine ? r.aPrompt : r.bPrompt, answer: mine ? r.aAnswer : r.bAnswer };
+      }),
+    })),
     social: {
       posts,
       comments,

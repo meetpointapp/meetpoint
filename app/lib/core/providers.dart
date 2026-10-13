@@ -40,6 +40,9 @@ final storeItemsProvider = FutureProvider.autoDispose<List<StoreItem>>((ref) => 
 // geçersiz kılınınca ikisi de güncel hakkı görür
 final superLikeStatusProvider = FutureProvider<SuperLikeStatus>((ref) => ref.watch(apiProvider).superLikeStatus());
 
+// Faz 23: oyunlarım (liste ekranı + alt menü rozeti için sıra bende olan oyun sayısı)
+final truthDareGamesProvider = FutureProvider<({List<TruthDareGame> games, int myTurnCount})>((ref) => ref.watch(apiProvider).truthDareGames());
+
 // Faz 22: akış üstündeki hikaye halkaları (kendi hikayem + takip ettiklerim)
 final storyTrayProvider = FutureProvider.autoDispose<List<StoryTrayItem>>((ref) => ref.watch(apiProvider).storyTray());
 

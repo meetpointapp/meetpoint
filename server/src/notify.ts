@@ -11,11 +11,11 @@ if (firebaseServiceAccount && fs.existsSync(firebaseServiceAccount)) {
   messaging = getMessaging();
 }
 
-type Kind = 'match' | 'message' | 'request' | 'superlike' | 'call' | 'payout' | 'support' | 'streak_risk' | 'post_like' | 'post_comment' | 'follow';
+type Kind = 'match' | 'message' | 'request' | 'superlike' | 'call' | 'payout' | 'support' | 'streak_risk' | 'post_like' | 'post_comment' | 'follow' | 'game_invite' | 'game_turn' | 'game_reveal';
 
 // Kullanıcının türe göre kapatabildiği bildirimler (Profil › Bildirimler). Ödeme ve destek yanıtı
 // hesapla ilgili zorunlu bildirimlerdir, kapatılamaz.
-export const NOTIFY_PREFS = ['message', 'match', 'request', 'call', 'like', 'streak', 'social'] as const;
+export const NOTIFY_PREFS = ['message', 'match', 'request', 'call', 'like', 'streak', 'social', 'game'] as const;
 export type NotifyPref = (typeof NOTIFY_PREFS)[number];
 const PREF_OF: Partial<Record<Kind, NotifyPref>> = {
   message: 'message',
@@ -27,6 +27,9 @@ const PREF_OF: Partial<Record<Kind, NotifyPref>> = {
   post_like: 'social',
   post_comment: 'social',
   follow: 'social',
+  game_invite: 'game',
+  game_turn: 'game',
+  game_reveal: 'game',
 };
 
 type PrefUser = { notifyPrefs: unknown; quietStart: number | null; quietEnd: number | null; tzOffsetMin: number };
@@ -73,6 +76,9 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
     post_like: (n, t) => ({ title: `${n} gönderini beğendi ❤️`, body: t || 'Gönderin beğenildi.' }),
     post_comment: (n, t) => ({ title: `${n} yorum yaptı 💬`, body: t || 'Gönderine yeni bir yorum geldi.' }),
     follow: (n) => ({ title: 'Yeni takipçi', body: `${n} seni takip etmeye başladı.` }),
+    game_invite: (n) => ({ title: 'Doğruluk mu Cesaret mi? 🎲', body: `${n} seninle oynamak istiyor. 10 soruluk oyuna katıl!` }),
+    game_turn: (n) => ({ title: 'Sıra sende 🎲', body: `${n} cevapladı. Sen de cevapla, cevaplar açılsın.` }),
+    game_reveal: (n) => ({ title: 'Cevaplar açıldı 👀', body: `${n} ile oynadığın turun cevapları açıldı.` }),
   },
   en: {
     match: (n) => ({ title: "It's a match! 💞", body: `You and ${n} liked each other. Say hi!` }),
@@ -89,6 +95,9 @@ const TEXTS: Record<string, Record<Kind, (name: string, extra?: string) => { tit
     post_like: (n, t) => ({ title: `${n} liked your post ❤️`, body: t || 'Your post got a like.' }),
     post_comment: (n, t) => ({ title: `${n} commented 💬`, body: t || 'Your post has a new comment.' }),
     follow: (n) => ({ title: 'New follower', body: `${n} started following you.` }),
+    game_invite: (n) => ({ title: 'Truth or Dare? 🎲', body: `${n} wants to play with you. Join the 10-question game!` }),
+    game_turn: (n) => ({ title: 'Your turn 🎲', body: `${n} answered. Answer too and the replies are revealed.` }),
+    game_reveal: (n) => ({ title: 'Answers revealed 👀', body: `The answers of your round with ${n} are revealed.` }),
   },
 };
 
@@ -117,6 +126,10 @@ function routeFor(kind: Kind, data: Record<string, string>): string | undefined 
       return data.postId ? `/post/${data.postId}` : '/feed';
     case 'follow':
       return data.userId ? `/user/${data.userId}` : '/feed';
+    case 'game_invite':
+    case 'game_turn':
+    case 'game_reveal':
+      return data.gameId ? `/game/${data.gameId}` : '/games';
   }
 }
 
