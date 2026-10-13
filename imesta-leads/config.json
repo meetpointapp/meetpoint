@@ -8,7 +8,20 @@
   "products": "cocoa powder (natural & alkalized), cocoa butter, cocoa liquor/mass, compound & couverture chocolate",
   "certifications": "ISO 22000 / HACCP, Halal (düzenleyin)",
   "postal_address": "Imesta Food, Şirket adresiniz, Türkiye",
-  "hs_codes": ["1801", "1803", "1804", "1805", "1806"],
+  "hs_codes": [
+    "1801",
+    "1803",
+    "1804",
+    "1805",
+    "1806"
+  ],
   "home_country_code": "792",
-  "comtrade_year": 2023
+  "comtrade_year": 2023,
+  "theme": {
+    "brand": "#3B2418",
+    "accent": "#C8963E",
+    "cream": "#F6EFE6",
+    "cocoa": "#6F4E37",
+    "logo_url": ""
+  }
 }

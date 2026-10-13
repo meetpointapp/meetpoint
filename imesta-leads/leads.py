@@ -7,6 +7,7 @@ Kullanım: python3 leads.py --help
 import argparse
 import csv
 import datetime as dt
+import io
 import json
 import os
 import re
@@ -191,25 +192,28 @@ def cmd_add(a):
     print(("Eklendi" if new else "Zaten vardı") + f": #{cid}")
 
 
-def cmd_import_csv(a):
-    con = db()
+def import_csv_text(con, text, source, segment=None):
+    """CSV metnini içe aktarır; (yeni, tekrar) döner."""
     new = dup = 0
-    with open(a.file, newline="", encoding="utf-8-sig") as f:
-        sample = f.read(2048)
-        f.seek(0)
-        try:
-            dialect = csv.Sniffer().sniff(sample, delimiters=",;\t")
-        except csv.Error:
-            dialect = csv.excel
-        for r in csv.DictReader(f, dialect=dialect):
-            r = {(k or "").strip().lower(): (v or "").strip() for k, v in r.items()}
-            cid, is_new = upsert_company(
-                con, r.get("name") or r.get("company"), r.get("country"), r.get("city"),
-                r.get("website") or r.get("url"), r.get("segment") or a.segment or "other",
-                a.source or os.path.basename(a.file), r.get("notes"), r.get("email"), r.get("phone"))
-            new += is_new
-            dup += (cid is not None and not is_new)
+    try:
+        dialect = csv.Sniffer().sniff(text[:2048], delimiters=",;\t")
+    except csv.Error:
+        dialect = csv.excel
+    for r in csv.DictReader(io.StringIO(text), dialect=dialect):
+        r = {(k or "").strip().lower(): (v or "").strip() for k, v in r.items()}
+        cid, is_new = upsert_company(
+            con, r.get("name") or r.get("company"), r.get("country"), r.get("city"),
+            r.get("website") or r.get("url"), r.get("segment") or segment or "other",
+            source, r.get("notes"), r.get("email"), r.get("phone"))
+        new += is_new
+        dup += (cid is not None and not is_new)
     con.commit()
+    return new, dup
+
+
+def cmd_import_csv(a):
+    with open(a.file, newline="", encoding="utf-8-sig") as f:
+        new, dup = import_csv_text(db(), f.read(), a.source or os.path.basename(a.file), a.segment)
     print(f"{new} yeni firma, {dup} tekrar (atlandı).")
 
 
@@ -283,16 +287,18 @@ def cmd_harvest_comtrade(a):
     con.commit()
 
 
-def cmd_markets(a):
-    con = db()
-    rows = con.execute("""
+def market_rows(con, hs=None, year=None, top=30):
+    return con.execute("""
       SELECT w.importer, w.importer_iso3 iso, SUM(w.value_usd) total,
              IFNULL(SUM(t.value_usd),0) from_tr
       FROM trade_flows w LEFT JOIN trade_flows t
         ON t.year=w.year AND t.hs=w.hs AND t.importer_iso3=w.importer_iso3 AND t.partner='TUR'
       WHERE w.partner='WORLD' AND (? IS NULL OR w.year=?) AND (? IS NULL OR w.hs=?)
-      GROUP BY w.importer_iso3 ORDER BY total DESC LIMIT ?""",
-                       (a.year, a.year, a.hs, a.hs, a.top)).fetchall()
+      GROUP BY w.importer_iso3 ORDER BY total DESC LIMIT ?""", (year, year, hs, hs, top)).fetchall()
+
+
+def cmd_markets(a):
+    rows = market_rows(db(), a.hs, a.year, a.top)
     if not rows:
         print("Veri yok. Önce: python3 leads.py harvest-comtrade")
         return
@@ -403,29 +409,38 @@ def cmd_show(a):
         print(f"  {x['ts'][:16]} [{x['kind']}] {x['summary']}")
 
 
-def cmd_log(a):
-    con = db()
-    if not con.execute("SELECT 1 FROM companies WHERE id=?", (a.id,)).fetchone():
-        sys.exit("Bulunamadı")
-    con.execute("INSERT INTO activities(company_id,kind,summary) VALUES(?,?,?)", (a.id, a.kind, a.summary))
-    days = a.followup if a.followup is not None else FOLLOWUP_DAYS.get(a.kind)
+def do_log(con, cid, kind, summary, status=None, followup=None):
+    """Aktivite kaydeder, takip tarihini ve durumu günceller. Sonraki takip tarihini döner."""
+    cur = con.execute("SELECT status FROM companies WHERE id=?", (cid,)).fetchone()
+    if not cur:
+        raise ValueError("Bulunamadı")
+    if status and status not in STATUSES:
+        raise ValueError("Durumlar: " + ", ".join(STATUSES))
+    con.execute("INSERT INTO activities(company_id,kind,summary) VALUES(?,?,?)", (cid, kind, summary))
+    days = followup if followup is not None else FOLLOWUP_DAYS.get(kind)
     nxt = (dt.date.today() + dt.timedelta(days=days)).isoformat() if days else None
     sets, p = ["next_followup=?"], [nxt]
-    if a.kind in ("email", "call", "sample", "meeting"):
+    if kind in ("email", "call", "sample", "meeting"):
         sets.append("last_contacted=?")
         p.append(today())
-    status = a.status or ("contacted" if a.kind in ("email", "call") and con.execute(
-        "SELECT status FROM companies WHERE id=?", (a.id,)).fetchone()[0] == "new" else None)
+    status = status or ("contacted" if kind in ("email", "call") and cur[0] == "new" else None)
     if status:
-        if status not in STATUSES:
-            sys.exit("Durumlar: " + ", ".join(STATUSES))
         sets.append("status=?")
         p.append(status)
         if status in ("won", "lost"):
             p[0] = None  # takip gerekmez
-    con.execute(f"UPDATE companies SET {','.join(sets)} WHERE id=?", p + [a.id])
+    con.execute(f"UPDATE companies SET {','.join(sets)} WHERE id=?", p + [cid])
     con.commit()
-    print(f"Kaydedildi. Sonraki takip: {p[0] or '-'}")
+    return p[0]
+
+
+def cmd_log(a):
+    con = db()
+    try:
+        nxt = do_log(con, a.id, a.kind, a.summary, a.status, a.followup)
+    except ValueError as e:
+        sys.exit(str(e))
+    print(f"Kaydedildi. Sonraki takip: {nxt or '-'}")
 
 
 def cmd_due(a):
@@ -451,23 +466,29 @@ class _Safe(dict):
         return "{" + k + "}"
 
 
-def cmd_compose(a):
-    con = db()
-    c = con.execute("SELECT * FROM companies WHERE id=?", (a.id,)).fetchone()
+def render_email(con, cid, lang="en", template="cold"):
+    """(alıcı_e-posta | None, metin) döner; hata durumunda ValueError."""
+    c = con.execute("SELECT * FROM companies WHERE id=?", (cid,)).fetchone()
     if not c:
-        sys.exit("Bulunamadı")
-    if is_suppressed(con, company_id=a.id):
-        sys.exit("Bu firma engelleme listesinde; yazılmaz.")
-    path = os.path.join(HERE, "templates", f"{a.lang}_{a.template}.txt")
+        raise ValueError("Bulunamadı")
+    if is_suppressed(con, company_id=cid):
+        raise ValueError("Bu firma engelleme listesinde; yazılmaz.")
+    path = os.path.join(HERE, "templates", f"{lang}_{template}.txt")
     if not os.path.exists(path):
-        sys.exit(f"Şablon yok: {path}")
-    k = con.execute("SELECT * FROM contacts WHERE company_id=? AND email_ok=1 ORDER BY (name IS NULL), id", (a.id,)).fetchone()
-    cfg = config()
-    ctx = _Safe(cfg, company=c["name"], contact=(k["name"] if k and k["name"] else "Sir or Madam" if a.lang == "en" else "Damen und Herren"),
+        raise ValueError(f"Şablon yok: {lang}_{template}")
+    k = con.execute("SELECT * FROM contacts WHERE company_id=? AND email_ok=1 ORDER BY (name IS NULL), id", (cid,)).fetchone()
+    ctx = _Safe(config(), company=c["name"], contact=(k["name"] if k and k["name"] else "Sir or Madam" if lang == "en" else "Damen und Herren"),
                 segment_label=SEGMENTS.get(c["segment"], SEGMENTS["other"])[1])
     with open(path, encoding="utf-8") as f:
-        text = f.read().format_map(ctx)
-    print(f"To: {k['email'] if k else '(geçerli e-posta yok — önce enrich çalıştırın)'}\n")
+        return (k["email"] if k else None), f.read().format_map(ctx)
+
+
+def cmd_compose(a):
+    try:
+        to, text = render_email(db(), a.id, a.lang, a.template)
+    except ValueError as e:
+        sys.exit(str(e))
+    print(f"To: {to or '(geçerli e-posta yok — önce enrich çalıştırın)'}\n")
     print(text)
 
 

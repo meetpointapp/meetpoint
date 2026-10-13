@@ -10,7 +10,17 @@ Sadece Python 3 ve SQLite kullanır (kurulum yok, `pip install` yok). Veriler te
 3. **Nasıl ulaşırım?** → Site tarama ile e-posta/telefon, puanlama
 4. **Takip** → Kayıt, hatırlatma, e-posta şablonları, rapor
 
-## Hızlı başlangıç
+## Web arayüzü
+
+```bash
+python3 web.py              # http://127.0.0.1:8080
+```
+Sayfalar: **Panel** (özet kartlar, satış hattı kanban'ı, bugünkü takipler), **Firmalar** (arama/filtre), **Firma detayı** (kişiler, geçmiş, takip kaydı, durum, e-posta taslağı + "Mail uygulamasında aç"), **Firma ekle**, **İçe aktar** (CSV yükle/yapıştır), **Pazarlar** (ülke sıralaması), **Araçlar** (Comtrade, OSM, e-posta toplama, puanlama – arka planda çalışır).
+
+- Renkler ve logo: `config.json` → `theme` (`brand`, `accent`, `cream`, `cocoa`, `logo_url`). imestafood.com'a erişemediğim için kakao kahvesi + krem + altın paleti kullandım; kurumsal renk kodlarınızı buraya yazın.
+- Ekip içinde paylaşmak için: `WEB_PASSWORD=sifreniz python3 web.py --host 0.0.0.0` (kullanıcı adı: `imesta`). Şifresiz sadece kendi bilgisayarınızda (127.0.0.1) açılır. İnternete açacaksanız HTTPS arkasına (ör. Caddy/nginx) koyun.
+
+## Hızlı başlangıç (komut satırı)
 
 ```bash
 cd imesta-leads
