@@ -255,8 +255,10 @@ def page_markets(con, q):
 
 
 def page_tools(con, q):
-    run = '<p class="muted">Çalışan iş yok.</p>' if not JOB["running"] else f'<p class="flash">Çalışıyor: {esc(JOB["name"])} … (sayfayı yenileyin)</p>'
+    refresh = '<script>setTimeout(()=>location.reload(),5000)</script>' if JOB["running"] else ""
+    run = '<p class="muted">Çalışan iş yok.</p>' if not JOB["running"] else f'<p class="flash">Çalışıyor: {esc(JOB["name"])} … (sayfa 5 saniyede bir yenilenir)</p>'
     log = f'<pre class="mail">{esc(JOB["log"])}</pre>' if JOB["log"] else ""
+    log += refresh
     return "Araçlar", f"""<h1>Araçlar</h1>{run}{log}<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
 <form class="card" method="post" action="/job/comtrade"><h3>Pazar verisi çek</h3><p class="muted">UN Comtrade'den kakao ithalatı (ücretsiz).</p>
 <label>Yıl</label><input name="year" value="{leads.config().get('comtrade_year', 2023)}" size="5"> <button>Çek</button></form>
@@ -274,14 +276,22 @@ def run_job(name, fn):
             return False
         JOB.update(running=True, name=name, log="")
 
+    class Live:  # çıktıyı iş sürerken sayfada gösterebilmek için anında JOB["log"]'a yazar
+        def write(self, t):
+            JOB["log"] += t
+            return len(t)
+
+        def flush(self):
+            pass
+
     def work():
-        buf = io.StringIO()
         try:
-            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            with contextlib.redirect_stdout(Live()), contextlib.redirect_stderr(Live()):
                 fn()
         except BaseException as e:  # SystemExit dahil
-            buf.write(f"\nHata: {e}")
-        JOB.update(running=False, log=buf.getvalue() or "Bitti.")
+            JOB["log"] += f"\nHata: {e}"
+        JOB["log"] += "\n[Bitti]"
+        JOB["running"] = False
 
     threading.Thread(target=work, daemon=True).start()
     return True

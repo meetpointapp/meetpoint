@@ -15,6 +15,7 @@ import socket
 import sqlite3
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import urllib.robotparser
@@ -289,21 +290,47 @@ def cmd_harvest_osm(a):
     log(f"Toplam yeni: {total}")
 
 
+def comtrade_get(url, key, log):
+    """429 (hız sınırı) durumunda bekleyip yeniden dener. Başarısızsa None döner."""
+    for attempt in range(5):
+        try:
+            return json.loads(http_get(url, headers={"Ocp-Apim-Subscription-Key": key} if key else None, timeout=60))
+        except urllib.error.HTTPError as e:
+            if e.code != 429:
+                log(f"    hata: {e}")
+                return None
+            wait = int(e.headers.get("Retry-After") or 0) or 30 * (attempt + 1)
+            log(f"    hız sınırı (429), {wait} sn bekleniyor... ({attempt + 1}/5)")
+            time.sleep(min(wait, 120))
+        except Exception as e:
+            log(f"    hata: {e}")
+            return None
+    log("    vazgeçildi; birkaç dakika sonra aynı komutu tekrar çalıştırın (çekilenler atlanır).")
+    return None
+
+
 def cmd_harvest_comtrade(a):
-    """UN Comtrade (ücretsiz önizleme API'si) ile kakao ithalatçı ülkeleri ve Türkiye'den alım yapanları çeker."""
+    """UN Comtrade (ücretsiz önizleme API'si) ile kakao ithalatçı ülkeleri ve Türkiye'den alım yapanları çeker.
+    Zaten çekilmiş (yıl, ürün kodu, kaynak) kombinasyonlarını atlar; eksikleri tamamlamak için tekrar çalıştırın."""
     con = db()
     cfg = config()
+    log = lambda m: print(m, flush=True)  # noqa: E731
     year = a.year or cfg["comtrade_year"]
-    key = os.environ.get("COMTRADE_KEY")  # isteğe bağlı: ücretsiz anahtar daha fazla satır verir
+    key = os.environ.get("COMTRADE_KEY")  # isteğe bağlı: ücretsiz anahtar daha yüksek limit verir
     base = ("https://comtradeapi.un.org/data/v1/get/C/A/HS" if key else "https://comtradeapi.un.org/public/v1/preview/C/A/HS")
+    pause = 3 if key else 12  # anahtarsız önizleme API'si çok düşük limitli
+    done = failed = 0
     for hs in (a.hs.split(",") if a.hs else cfg["hs_codes"]):
         for tag, partner in (("WORLD", "0"), ("TUR", cfg["home_country_code"])):
+            if con.execute("SELECT 1 FROM trade_flows WHERE year=? AND hs=? AND partner=? LIMIT 1", (year, hs, tag)).fetchone() and not getattr(a, "force", False):
+                log(f"HS {hs} {tag}: zaten var, atlandı")
+                continue
             qs = urllib.parse.urlencode({"period": year, "cmdCode": hs, "flowCode": "M", "partnerCode": partner,
                                          "includeDesc": "true", "maxRecords": 500})
-            try:
-                data = json.loads(http_get(f"{base}?{qs}", headers={"Ocp-Apim-Subscription-Key": key} if key else None, timeout=60))
-            except Exception as e:
-                print(f"HS {hs}/{tag}: hata: {e}", file=sys.stderr)
+            data = comtrade_get(f"{base}?{qs}", key, log)
+            if data is None:
+                failed += 1
+                log(f"HS {hs} {tag}: ÇEKİLEMEDİ")
                 continue
             n = 0
             for r in data.get("data", []):
@@ -313,9 +340,11 @@ def cmd_harvest_comtrade(a):
                 con.execute("INSERT OR REPLACE INTO trade_flows VALUES(?,?,?,?,?,?,?)",
                             (year, hs, iso, r.get("reporterDesc"), tag, val, r.get("netWgt")))
                 n += 1
-            print(f"HS {hs} {tag}: {n} ülke")
-            time.sleep(1.5)  # ücretsiz API'ye nazik davran
-    con.commit()
+            con.commit()
+            done += 1
+            log(f"HS {hs} {tag}: {n} ülke")
+            time.sleep(pause)
+    log(f"Bitti: {done} çekildi, {failed} başarısız." + (" Başarısızlar için birkaç dakika sonra tekrar çalıştırın." if failed else ""))
 
 
 def market_rows(con, hs=None, year=None, top=30):
@@ -576,7 +605,7 @@ def main():
     s = add("harvest-osm", cmd_harvest_osm, "OpenStreetMap'ten çikolata/şekerleme firmaları çek")
     s.add_argument("--country", required=True, help="ISO2, virgülle: DE,NL,GB"); s.add_argument("--segments")
     s = add("harvest-comtrade", cmd_harvest_comtrade, "UN Comtrade'den ithalatçı ülke verisi çek")
-    s.add_argument("--hs"); s.add_argument("--year", type=int)
+    s.add_argument("--hs"); s.add_argument("--year", type=int); s.add_argument("--force", action="store_true", help="çekilmiş olanları da yeniden çek")
     s = add("markets", cmd_markets, "hedef pazar sıralaması")
     s.add_argument("--hs"); s.add_argument("--year", type=int); s.add_argument("--top", type=int, default=30)
     s = add("enrich", cmd_enrich, "sitelerden e-posta topla")
