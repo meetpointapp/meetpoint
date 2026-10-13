@@ -217,45 +217,76 @@ def cmd_import_csv(a):
     print(f"{new} yeni firma, {dup} tekrar (atlandı).")
 
 
-OSM_FILTERS = {  # segment -> Overpass filtreleri
+OSM_FILTERS = {  # segment -> Overpass filtreleri (hafif tutuldu: ülke çapında ağır regex sorgusu zaman aşımına düşer)
     "retail_craft": ['["shop"="chocolate"]', '["craft"="confectionery"]', '["shop"="confectionery"]'],
-    "chocolate_maker": ['["craft"="chocolatier"]', '["product"~"chocolate|cocoa",i]', '["industrial"="confectionery"]'],
-    "bakery_ingredient": ['["shop"="wholesale"]["wholesale"~"food|bakery",i]', '["craft"="bakery"]["industrial"]'],
-    "ice_cream": ['["craft"="ice_cream"]', '["product"~"ice.?cream",i]'],
+    "chocolate_maker": ['["craft"="chocolatier"]', '["industrial"="confectionery"]', '["product"="chocolate"]', '["product"="cocoa"]'],
+    "bakery_ingredient": ['["shop"="wholesale"]["wholesale"="food"]', '["shop"="pastry"]'],
+    "ice_cream": ['["craft"="ice_cream"]', '["shop"="ice_cream"]', '["product"="ice_cream"]'],
 }
+OVERPASS_URLS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
+                 "https://overpass.private.coffee/api/interpreter"]
+
+
+def overpass(query, log):
+    """Yedek sunucuları sırayla dener; hata veya zaman aşımı (remark) durumunda sıradakine geçer."""
+    body = urllib.parse.urlencode({"data": query}).encode()
+    last = "bilinmeyen hata"
+    for url in OVERPASS_URLS:
+        for attempt in range(2):
+            try:
+                req = urllib.request.Request(url, data=body, headers={"User-Agent": UA})
+                with urllib.request.urlopen(req, timeout=240) as r:
+                    data = json.loads(r.read().decode("utf-8", "replace"))
+            except Exception as e:
+                last = f"{url.split('/')[2]}: {e}"
+                log(f"    ! {last}")
+                time.sleep(5 * (attempt + 1))  # 429/504 (sunucu meşgul) için bekle
+                continue
+            remark = data.get("remark", "")
+            if remark and not data.get("elements"):
+                last = f"{url.split('/')[2]}: {remark}"
+                log(f"    ! {last}")
+                break  # bu sunucuda zaman aşımı/bellek sınırı: yedeğe geç
+            return data
+    raise RuntimeError(last)
 
 
 def cmd_harvest_osm(a):
-    """OpenStreetMap'ten (ücretsiz) çikolata/şekerleme üreticilerini çeker."""
+    """OpenStreetMap'ten (ücretsiz) çikolata/şekerleme/dondurma firmalarını çeker. Her filtre ayrı sorgudur."""
     con = db()
     segs = a.segments.split(",") if a.segments else ["chocolate_maker", "retail_craft", "ice_cream"]
     segs = [s for s in segs if s in OSM_FILTERS] or ["chocolate_maker"]
+    log = lambda m: print(m, flush=True)  # noqa: E731
     total = 0
-    for cc in a.country.upper().split(","):
-        parts = "".join(f"nwr{flt}(area.a);" for s in segs for flt in OSM_FILTERS[s])
-        q = f'[out:json][timeout:90];area["ISO3166-1"="{cc}"][admin_level=2]->.a;({parts});out center tags 2000;'
-        try:
-            data = json.loads(http_get("https://overpass-api.de/api/interpreter?data=" + urllib.parse.quote(q), timeout=120))
-        except Exception as e:  # ağ/sunucu hatası
-            print(f"{cc}: Overpass hatası: {e}", file=sys.stderr)
-            continue
-        n = 0
-        for el in data.get("elements", []):
-            t = el.get("tags", {})
-            if not t.get("name"):
-                continue
-            seg = "retail_craft" if t.get("shop") or t.get("craft") else "chocolate_maker"
-            if "ice" in (t.get("craft", "") + t.get("product", "")):
-                seg = "ice_cream"
-            _, is_new = upsert_company(
-                con, t["name"], cc, t.get("addr:city"), t.get("website") or t.get("contact:website"), seg, "osm",
-                None, t.get("email") or t.get("contact:email"), t.get("phone") or t.get("contact:phone"))
-            n += is_new
-        total += n
-        print(f"{cc}: {n} yeni firma ({len(data.get('elements', []))} kayıttan)")
-        time.sleep(2)
-    con.commit()
-    print(f"Toplam yeni: {total}")
+    for cc in [c.strip() for c in a.country.upper().split(",") if c.strip()]:
+        log(f"{cc}:")
+        n_cc = 0
+        for seg in segs:
+            for flt in OSM_FILTERS[seg]:
+                q = (f'[out:json][timeout:180][maxsize:536870912];area["ISO3166-1"="{cc}"][admin_level=2]->.a;'
+                     f'nwr{flt}(area.a);out tags center 3000;')
+                try:
+                    data = overpass(q, log)
+                except Exception as e:
+                    log(f"  {flt}: BAŞARISIZ ({e})")
+                    continue
+                els = data.get("elements", [])
+                named = [e for e in els if e.get("tags", {}).get("name")]
+                n = 0
+                for el in named:
+                    t = el["tags"]
+                    _, is_new = upsert_company(
+                        con, t["name"], cc, t.get("addr:city"), t.get("website") or t.get("contact:website") or t.get("url"),
+                        seg, "osm", None, t.get("email") or t.get("contact:email"), t.get("phone") or t.get("contact:phone"))
+                    n += is_new
+                con.commit()
+                n_cc += n
+                warn = " (3000 sınırına ulaştı, eksik olabilir)" if len(els) >= 3000 else ""
+                log(f"  {flt}: {len(els)} kayıt, {len(named)} isimli, {n} yeni{warn}")
+                time.sleep(2)
+        total += n_cc
+        log(f"{cc}: toplam {n_cc} yeni firma")
+    log(f"Toplam yeni: {total}")
 
 
 def cmd_harvest_comtrade(a):
