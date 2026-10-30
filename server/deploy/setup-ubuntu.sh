@@ -56,8 +56,10 @@ systemctl enable redis-server
 echo "==> nginx"
 cp "$DEPLOY/nginx-vibeupme.conf" /etc/nginx/sites-available/vibeupme
 ln -sf /etc/nginx/sites-available/vibeupme /etc/nginx/sites-enabled/vibeupme
+cp "$DEPLOY/nginx-vibeupme-site.conf" /etc/nginx/sites-available/vibeupme-site
+ln -sf /etc/nginx/sites-available/vibeupme-site /etc/nginx/sites-enabled/vibeupme-site
 rm -f /etc/nginx/sites-enabled/default
-echo "   (TLS sertifikası henüz yok: önce alan adını sunucuya yönlendirin, sonra  certbot --nginx -d api.vibeupme.com )"
+echo "   (HTTPS için: alan adlarını sunucuya yönlendirin, sonra certbot --nginx; ayrıntı aşağıdaki adımlarda)"
 
 echo "==> Güvenlik duvarı (SSH, HTTP, HTTPS)"
 ufw allow OpenSSH
@@ -77,5 +79,5 @@ Kurulum tamam. Sıradaki adımlar (ayrıntı: docs/yayin-sunucu-kurulumu.md):
   3) vibeupme kullanıcısıyla:  cd $APP_DIR/server && npm ci && npx prisma migrate deploy && npm run build
   4) REDIS_URL=... npm run redis:check     (hepsi OK olmalı)
   5) pm2 start deploy/ecosystem.config.cjs --env production && pm2 save
-  6) nginx -t && systemctl reload nginx && certbot --nginx -d api.vibeupme.com
+  6) nginx -t && systemctl reload nginx && certbot --nginx -d api.vibeupme.com -d vibeupme.com -d www.vibeupme.com
 MSG

@@ -41,7 +41,7 @@ Redis ve S3 **isteğe bağlıdır**: ortam değişkeni yoksa sistem eski davran�
    pm2 start deploy/ecosystem.config.cjs --env production
    pm2 save
    ```
-7. **TLS:** `certbot --nginx -d api.vibeupme.com`, sonra `nginx -t && systemctl reload nginx`.
+7. **TLS:** önce `nginx -t && systemctl reload nginx` (yapılandırmalar sadece 80'de dinler), sonra tek komutla üç ad için sertifika: `certbot --nginx -d api.vibeupme.com -d vibeupme.com -d www.vibeupme.com`. Certbot 443 bloklarını ve http→https yönlendirmesini kendisi ekler.
 8. **Kontrol:** `curl https://api.vibeupme.com/health` → `{"ok":true,"scheduler":"leader"|"follower"}`. Üç süreçten yalnızca biri `leader` olur.
 
 ## 2b. Tanıtım sitesi (vibeupme.com)
@@ -50,7 +50,8 @@ Redis ve S3 **isteğe bağlıdır**: ortam değişkeni yoksa sistem eski davran�
 
 - **Yeniden üretme:** metinler `site/build.py` içindeki `TEXT` sözlüğünde; değiştirince `python site/build.py`.
 - **Yerel önizleme:** `cd site && python -m http.server 8090`.
-- **Yayınlama (önerim):** Cloudflare Pages'e depoyu bağla, "build command": `python site/build.py` (ya da hiç yok, `site/` zaten üretilmiş dosyaları içerir), "output directory": `site`. Alan adı olarak `vibeupme.com` ve `www` eklenir. Alternatif: `site/` klasörünü OWEB hosting'e ya da sunucudaki nginx'e (`root /opt/vibeupme/site;`) kopyalamak.
+- **Aynı sunucuda yayınlamak (kurulum betiği bunu hazırlar):** `deploy/nginx-vibeupme-site.conf` siteyi `/opt/vibeupme/site` klasöründen sunar; `vibeupme.com` ve `www` için A kaydı sunucu IP'sine yönlendirilir, TLS: `certbot --nginx -d vibeupme.com -d www.vibeupme.com`. Artısı tek yerde olması; eksisi sunucu kapanınca site de kapanır.
+- **Yayınlama (alternatif, sunucu hazır değilken):** Cloudflare Pages'e depoyu bağla, "build command": `python site/build.py` (ya da hiç yok, `site/` zaten üretilmiş dosyaları içerir), "output directory": `site`. Alan adı olarak `vibeupme.com` ve `www` eklenir. Alternatif: `site/` klasörünü OWEB hosting'e ya da sunucudaki nginx'e (`root /opt/vibeupme/site;`) kopyalamak.
 - **DNS:** `vibeupme.com` (ve `www`) → Cloudflare Pages; `api.vibeupme.com` → API sunucusunun IP'si (A kaydı).
 - **Bağlantılar:** gizlilik, koşullar, topluluk kuralları ve hesap silme bağlantıları `https://api.vibeupme.com/legal/...` ve `/account/delete` adreslerine gider; yani **bu bağlantılar API sunucusu yayına girince çalışır**. Mağaza ve Meta formlarında gizlilik adresi olarak `https://api.vibeupme.com/legal/privacy` verilir.
 - **E-posta:** sitede iletişim adresi `destek@vibeupme.com`; bu posta kutusu açılmalı (alan adı sağlayıcısında ya da Cloudflare Email Routing ile mevcut bir adrese yönlendirme).
