@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { config } from './config';
 
 // Dosya depolama katmanı. Şimdilik yerel disk; yayında S3 uyumlu nesne depolama aynı arayüzle takılır
@@ -38,8 +39,58 @@ class LocalStore implements Store {
   }
 }
 
-export const publicStore: Store = new LocalStore(config.uploadDir);
-export const privateStore: Store = new LocalStore(config.privateUploadDir);
+// S3 uyumlu nesne depolama (Cloudflare R2, AWS S3, MinIO, Backblaze B2...). Çoklu sunucuda ortak depolama
+// gerektiğinde açılır: S3_PUBLIC_BUCKET / S3_PRIVATE_BUCKET tanımlıysa o depo yerel disk yerine kullanılır.
+// Genel (profil fotoğrafları) ve özel (doğrulama, sohbet fotoğrafı, veri dışa aktarma) depolar ayrı kovalardır.
+const CONTENT_TYPES: Record<string, string> = { webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', zip: 'application/zip' };
+
+export class S3Store implements Store {
+  constructor(
+    private client: S3Client,
+    private bucket: string,
+  ) {}
+  private check(key: string) {
+    if (!isValidKey(key)) throw new Error(`geçersiz dosya anahtarı: ${key}`);
+    return key;
+  }
+  async put(key: string, data: Buffer) {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: this.check(key),
+        Body: data,
+        ContentType: CONTENT_TYPES[key.split('.').pop() ?? ''] ?? 'application/octet-stream',
+      }),
+    );
+  }
+  async read(key: string) {
+    try {
+      const r = await this.client.send(new GetObjectCommand({ Bucket: this.bucket, Key: this.check(key) }));
+      return r.Body ? Buffer.from(await r.Body.transformToByteArray()) : null;
+    } catch (e) {
+      const err = e as { name?: string; $metadata?: { httpStatusCode?: number } };
+      if (err.name === 'NoSuchKey' || err.$metadata?.httpStatusCode === 404) return null;
+      throw e;
+    }
+  }
+  async remove(key: string) {
+    await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: this.check(key) }));
+  }
+}
+
+let s3: S3Client | null = null;
+const s3Client = () =>
+  (s3 ??= new S3Client({
+    region: process.env.S3_REGION ?? 'auto',
+    endpoint: process.env.S3_ENDPOINT || undefined,
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+    credentials: process.env.S3_ACCESS_KEY_ID
+      ? { accessKeyId: process.env.S3_ACCESS_KEY_ID, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '' }
+      : undefined,
+  }));
+
+export const publicStore: Store = process.env.S3_PUBLIC_BUCKET ? new S3Store(s3Client(), process.env.S3_PUBLIC_BUCKET) : new LocalStore(config.uploadDir);
+export const privateStore: Store = process.env.S3_PRIVATE_BUCKET ? new S3Store(s3Client(), process.env.S3_PRIVATE_BUCKET) : new LocalStore(config.privateUploadDir);
 
 // --- İmzalı, süreli medya adresleri ---
 // Adres haftalık pencerelere yuvarlanır: aynı fotoğrafın adresi bir hafta boyunca değişmez

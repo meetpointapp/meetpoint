@@ -7,7 +7,7 @@ Bu rehber, yayına çok yakın uygulanacak adımları toplar. Şu an sistem loka
 | Gereken | Neden | Nereden |
 |---|---|---|
 | Şirket | Mağaza hesapları, para çekme ödemeleri, yasal metinler | Muhasebeci / avukat |
-| Alan adı (ör. `vibeupme.app`) | HTTPS, e-posta, mağaza gizlilik linki | Herhangi bir alan adı firması |
+| Alan adı (ör. `vibeupme.com`) | HTTPS, e-posta, mağaza gizlilik linki | Herhangi bir alan adı firması |
 | Google Play geliştirici hesabı ($25, tek sefer) | Android yayını | play.google.com/console |
 | Apple Developer hesabı ($99/yıl) | iOS yayını | developer.apple.com |
 | RevenueCat projesi | Jeton satışı | app.revenuecat.com |
@@ -90,11 +90,11 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload && sudo systemctl enable --now vibeupme.service
 ```
 
-nginx (`/etc/nginx/sites-available/vibeupme`, alan adı `api.vibeupme.app` varsayımıyla). WebSocket (Socket.IO) için `Upgrade` başlıkları şart:
+nginx (`/etc/nginx/sites-available/vibeupme`, alan adı `api.vibeupme.com` varsayımıyla). WebSocket (Socket.IO) için `Upgrade` başlıkları şart:
 
 ```
 server {
-  server_name api.vibeupme.app;
+  server_name api.vibeupme.com;
   client_max_body_size 12m;
   location / {
     proxy_pass http://127.0.0.1:4000;
@@ -111,10 +111,10 @@ server {
 ```
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/vibeupme /etc/nginx/sites-enabled/ && sudo nginx -t && sudo systemctl reload nginx && sudo certbot --nginx -d api.vibeupme.app
+sudo ln -s /etc/nginx/sites-available/vibeupme /etc/nginx/sites-enabled/ && sudo nginx -t && sudo systemctl reload nginx && sudo certbot --nginx -d api.vibeupme.com
 ```
 
-Yönetim paneli: `https://api.vibeupme.app/admin`. İlk yönetici hesabını veritabanında `isAdmin = true` yaparak aç; seed yayında **çalıştırılmaz**.
+Yönetim paneli: `https://api.vibeupme.com/admin`. İlk yönetici hesabını veritabanında `isAdmin = true` yaparak aç; seed yayında **çalıştırılmaz**.
 
 ## 3. Yedekleme
 
@@ -129,11 +129,11 @@ Her gece veritabanı ve kullanıcı dosyaları:
 Sunucu adresi ve mağaza anahtarları derleme sırasında verilir:
 
 ```bash
-flutter build appbundle --dart-define=API_URL=https://api.vibeupme.app --dart-define=REVENUECAT_ANDROID_KEY=goog_xxx --dart-define=APP_VERSION=1.0.0
+flutter build appbundle --dart-define=API_URL=https://api.vibeupme.com --dart-define=REVENUECAT_ANDROID_KEY=goog_xxx --dart-define=APP_VERSION=1.0.0
 ```
 
 ```bash
-flutter build ipa --dart-define=API_URL=https://api.vibeupme.app --dart-define=REVENUECAT_IOS_KEY=appl_xxx --dart-define=APP_VERSION=1.0.0
+flutter build ipa --dart-define=API_URL=https://api.vibeupme.com --dart-define=REVENUECAT_IOS_KEY=appl_xxx --dart-define=APP_VERSION=1.0.0
 ```
 
 Firebase için bir kez `flutterfire configure` çalıştırılır (`lib/firebase_options.dart` şu an yer tutucu). iOS için `ios/Podfile` içine kamera ve mikrofon izin makroları eklenir (README → Agora kurulumu).
@@ -141,7 +141,7 @@ Firebase için bir kez `flutterfire configure` çalıştırılır (`lib/firebase
 ## 5. Yayın günü kontrol listesi
 
 - [ ] Yasal metinler avukat onaylı, şirket bilgileri eklendi
-- [ ] `https://api.vibeupme.app/health` → `{"ok":true}`
+- [ ] `https://api.vibeupme.com/health` → `{"ok":true}`
 - [ ] Gerçek telefonda: kayıt → e-posta kodu geldi
 - [ ] Sandbox satın alma → jeton geldi, yönetimde "Sandbox" etiketiyle görünüyor
 - [ ] İki telefonla sesli ve görüntülü arama: ses/görüntü var, dakika ücreti düşüyor

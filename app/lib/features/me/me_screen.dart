@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/models.dart';
+import '../../core/profile_completion.dart';
 import '../../core/providers.dart';
 import '../../core/push.dart';
 import '../../core/store.dart';
@@ -15,25 +16,6 @@ import '../../l10n/app_localizations.dart';
 import '../onboarding/intro_screen.dart';
 import '../profile/photo_viewer.dart';
 import '../support/support_screens.dart';
-
-// Profil tamamlama yüzdesi: fotoğraf, soru ve temel bilgiler eşleşmeyi artırır
-int profileCompletion(PublicProfile p) {
-  var score = 0;
-  score += (p.photos.length.clamp(0, 3)) * 10; // 30
-  if (p.interests.length >= 3) score += 10;
-  if (p.lookingFor.isNotEmpty) score += 10;
-  score += p.prompts.length.clamp(0, 3) * 10; // 30
-  if (p.bio.isNotEmpty) score += 10;
-  final basics = [
-    p.heightCm != null,
-    p.job.isNotEmpty,
-    p.education.isNotEmpty,
-    p.zodiac.isNotEmpty,
-    p.city.isNotEmpty,
-  ].where((b) => b).length;
-  if (basics >= 2) score += 10;
-  return score.clamp(0, 100);
-}
 
 // Faz 17 madde 7: haftalık özet — GET /me'nin parçası değil (daha ağır, daha seyrek istenen bir
 // hesaplama), bu yüzden ayrı bir provider ile isteniyor (journeyNextStep ile aynı yaklaşım).

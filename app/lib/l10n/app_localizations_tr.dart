@@ -3600,4 +3600,155 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errGameState => 'Bu adım zaten tamamlanmış, ekran yenileniyor.';
+
+  @override
+  String get undo => 'Geri al';
+
+  @override
+  String get undoDone => 'Son kaydırma geri alındı';
+
+  @override
+  String get undoLimitTitle => 'Geri al hakkın bitti';
+
+  @override
+  String undoLimitBody(int n, int m) {
+    return 'Günde $n kez geri alabilirsin. VibeUpMe+ üyeler günde $m kez geri alır.';
+  }
+
+  @override
+  String get errUndoUnavailable =>
+      'Geri alınacak bir kaydırma yok ya da süresi geçti.';
+
+  @override
+  String get errUndoMatched => 'Eşleşmeye dönüşen kaydırma geri alınamaz.';
+
+  @override
+  String get errUndoLimit => 'Bugünkü geri al hakkın bitti.';
+
+  @override
+  String profileNudgeTitle(int percent) {
+    return 'Profilin %$percent tamamlandı';
+  }
+
+  @override
+  String get profileNudgeBody =>
+      'Tamamlanan profiller keşfette öne çıkar ve daha çok kişiyle eşleşir.';
+
+  @override
+  String get profileNudgeCta => 'Tamamla';
+
+  @override
+  String get profileChecklistTitle => 'Profilini güçlendir';
+
+  @override
+  String get profileChecklistCta => 'Profili düzenle';
+
+  @override
+  String profileMissPhotos(int n) {
+    return '$n fotoğraf daha ekle';
+  }
+
+  @override
+  String get profileMissInterests => 'En az 3 ilgi alanı seç';
+
+  @override
+  String get profileMissLookingFor => 'Ne aradığını belirt';
+
+  @override
+  String profileMissPrompts(int n) {
+    return '$n soruyu daha cevapla';
+  }
+
+  @override
+  String get profileMissBio => 'Kısa bir biyografi yaz';
+
+  @override
+  String get profileMissBasics =>
+      'Boy, meslek, eğitim, burç ya da şehirden en az ikisini ekle';
+
+  @override
+  String frequencyLabel(int score) {
+    return 'Uyum frekansı yüzde $score';
+  }
+
+  @override
+  String frequencySheetTitle(int score) {
+    return '%$score frekans';
+  }
+
+  @override
+  String frequencySheetBody(String name) {
+    return '$name ile aranızdaki uyumun nereden geldiği';
+  }
+
+  @override
+  String get frequencyPartInterests => 'Ortak ilgiler';
+
+  @override
+  String get frequencyPartAstro => 'Burç uyumu';
+
+  @override
+  String get frequencyPartMusic => 'Müzik zevki';
+
+  @override
+  String get frequencyPartVibe => 'Vibe';
+
+  @override
+  String get frequencyPartIntent => 'Aradığınız';
+
+  @override
+  String get frequencyFootnote =>
+      'Frekans, ikinizin profilindeki ortak noktalardan hesaplanır. Profilini ne kadar doldurursan o kadar doğru çıkar.';
+
+  @override
+  String get swipeLike => 'Frekans gönder';
+
+  @override
+  String get swipePass => 'Sonra';
+
+  @override
+  String get matchFrequencyTitle => 'Frekanslarınız tuttu!';
+
+  @override
+  String matchFrequencyLine(int score) {
+    return '%$score uyum frekansı';
+  }
+
+  @override
+  String get captureMerak => 'Merak';
+
+  @override
+  String get captureInterest => 'İlgi';
+
+  @override
+  String get capturePassion => 'Tutku';
+
+  @override
+  String get captureHint =>
+      'Beğenmek için karta basılı tut: Merak, İlgi, Tutku. Geçmek için ✕ düğmesine dokun.';
+
+  @override
+  String get captureConfirmTitle => 'Süper beğeni gönderilsin mi?';
+
+  @override
+  String get captureConfirmBody => 'Tutku, bir süper beğeni hakkı harcar.';
+
+  @override
+  String captureConfirmFree(int n) {
+    return 'Bugünkü ücretsiz süper beğeni hakkından 1 harcanır. Kalan: $n';
+  }
+
+  @override
+  String captureConfirmPaid(int n) {
+    return 'Satın aldığın süper beğeni haklarından 1 harcanır. Kalan: $n';
+  }
+
+  @override
+  String get captureConfirmSend => 'Gönder';
+
+  @override
+  String get captureHintLine => 'Basılı tut: Merak, İlgi, Tutku';
+
+  @override
+  String get capturePassionNote => 'Bırakınca onay sorulur';
 }

@@ -11,6 +11,7 @@ import { idempotency } from './idempotency';
 import { flushTraffic, trafficMiddleware } from './moderation/traffic';
 import { pool } from './pgPool';
 import { closeRealtime, initRealtime } from './realtime';
+import { closeRedis } from './redis';
 import { isLeader, startScheduler, stopScheduler } from './scheduler';
 import { adminRouter } from './routes/admin';
 import { adminAuthRouter } from './routes/adminAuth';
@@ -167,6 +168,7 @@ async function shutdown(signal: string) {
   await flushTraffic();
   await prisma.$disconnect();
   await pool.end().catch(() => {});
+  await closeRedis();
   process.exit(0);
 }
 process.on('SIGINT', () => void shutdown('SIGINT'));

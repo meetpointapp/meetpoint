@@ -3664,4 +3664,156 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errGameState => 'This step is already done, refreshing.';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get undoDone => 'Last swipe undone';
+
+  @override
+  String get undoLimitTitle => 'You\'re out of undos';
+
+  @override
+  String undoLimitBody(int n, int m) {
+    return 'You can undo $n times a day. VibeUpMe+ members get $m a day.';
+  }
+
+  @override
+  String get errUndoUnavailable =>
+      'There\'s no swipe to undo, or the time has passed.';
+
+  @override
+  String get errUndoMatched =>
+      'A swipe that turned into a match can\'t be undone.';
+
+  @override
+  String get errUndoLimit => 'You\'ve used today\'s undos.';
+
+  @override
+  String profileNudgeTitle(int percent) {
+    return 'Your profile is $percent% complete';
+  }
+
+  @override
+  String get profileNudgeBody =>
+      'Complete profiles are shown first in Discover and match with more people.';
+
+  @override
+  String get profileNudgeCta => 'Complete';
+
+  @override
+  String get profileChecklistTitle => 'Strengthen your profile';
+
+  @override
+  String get profileChecklistCta => 'Edit profile';
+
+  @override
+  String profileMissPhotos(int n) {
+    return 'Add $n more photo(s)';
+  }
+
+  @override
+  String get profileMissInterests => 'Pick at least 3 interests';
+
+  @override
+  String get profileMissLookingFor => 'Say what you\'re looking for';
+
+  @override
+  String profileMissPrompts(int n) {
+    return 'Answer $n more prompt(s)';
+  }
+
+  @override
+  String get profileMissBio => 'Write a short bio';
+
+  @override
+  String get profileMissBasics =>
+      'Add at least two of height, job, education, zodiac or city';
+
+  @override
+  String frequencyLabel(int score) {
+    return 'Compatibility frequency $score percent';
+  }
+
+  @override
+  String frequencySheetTitle(int score) {
+    return '$score% frequency';
+  }
+
+  @override
+  String frequencySheetBody(String name) {
+    return 'Where your match with $name comes from';
+  }
+
+  @override
+  String get frequencyPartInterests => 'Shared interests';
+
+  @override
+  String get frequencyPartAstro => 'Zodiac match';
+
+  @override
+  String get frequencyPartMusic => 'Music taste';
+
+  @override
+  String get frequencyPartVibe => 'Vibe';
+
+  @override
+  String get frequencyPartIntent => 'Looking for';
+
+  @override
+  String get frequencyFootnote =>
+      'Frequency is calculated from what your two profiles have in common. The more you fill in, the more accurate it gets.';
+
+  @override
+  String get swipeLike => 'Send frequency';
+
+  @override
+  String get swipePass => 'Later';
+
+  @override
+  String get matchFrequencyTitle => 'Your frequencies synced!';
+
+  @override
+  String matchFrequencyLine(int score) {
+    return '$score% compatibility frequency';
+  }
+
+  @override
+  String get captureMerak => 'Curious';
+
+  @override
+  String get captureInterest => 'Interested';
+
+  @override
+  String get capturePassion => 'Passion';
+
+  @override
+  String get captureHint =>
+      'Press and hold a card to like it: Curious, Interested, Passion. Tap ✕ to pass.';
+
+  @override
+  String get captureConfirmTitle => 'Send a super like?';
+
+  @override
+  String get captureConfirmBody => 'Passion uses one super like.';
+
+  @override
+  String captureConfirmFree(int n) {
+    return 'Uses 1 of today\'s free super likes. Left: $n';
+  }
+
+  @override
+  String captureConfirmPaid(int n) {
+    return 'Uses 1 of your purchased super likes. Left: $n';
+  }
+
+  @override
+  String get captureConfirmSend => 'Send';
+
+  @override
+  String get captureHintLine => 'Press and hold: Curious, Interested, Passion';
+
+  @override
+  String get capturePassionNote => 'You\'ll be asked to confirm';
 }

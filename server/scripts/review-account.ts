@@ -1,6 +1,6 @@
 // Mağaza incelemesi (Apple App Review / Google Play) için demo hesap. Yayın sunucusunda bir kez çalıştırılır;
 // tekrar çalıştırılırsa hesabı sıfırlar (şifre, bakiye, rızalar). İki hesap açar:
-//   REVIEW_ACCOUNT_EMAIL (varsayılan review@vibeupme.app): incelemecinin gireceği hesap
+//   REVIEW_ACCOUNT_EMAIL (varsayılan review@vibeupme.com): incelemecinin gireceği hesap
 //   review-partner+<aynı alan>: onunla eşleşmiş, sohbet geçmişi olan demo profil
 // Kullanım:
 //   REVIEW_ACCOUNT_PASSWORD='en-az-12-karakter' npm run review:account

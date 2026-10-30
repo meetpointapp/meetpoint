@@ -3,3 +3,6 @@
 Thumbs.db
 .idea/
 *.log
+
+# Yük testi jetonları (erişim jetonu içerir, asla depoya girmez)
+tools/loadtest/tokens.json

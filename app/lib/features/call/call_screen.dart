@@ -273,12 +273,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         ]),
       ),
 
-      // Kendi kameran (görüntülü aramada sağ üst köşe)
+      // Kendi kameran: parmakla sürüklenir, bırakılınca en yakın köşeye oturur (başlangıç sağ üst)
       if (showVideo)
-        Positioned(
-          top: MediaQuery.paddingOf(context).top + 72,
-          right: 16,
-          child: _LocalPreview(view: _cameraOn ? media?.localView() : null, cameraOn: _cameraOn),
+        Positioned.fill(
+          child: _DraggablePreview(
+            topInset: MediaQuery.paddingOf(context).top + 72,
+            bottomInset: 230,
+            child: _LocalPreview(view: _cameraOn ? media?.localView() : null, cameraOn: _cameraOn),
+          ),
         ),
 
       for (final g in _floating) _GiftBurst(key: g.key, emoji: g.emoji),
@@ -718,6 +720,60 @@ class _RemoteVideo extends StatelessWidget {
         ),
     ]);
   }
+}
+
+// Faz 24: kendi küçük kamera penceresi sürüklenebilir; bırakılınca en yakın köşeye yumuşakça oturur.
+class _DraggablePreview extends StatefulWidget {
+  const _DraggablePreview({required this.child, required this.topInset, required this.bottomInset});
+  final Widget child;
+  final double topInset;
+  final double bottomInset;
+
+  @override
+  State<_DraggablePreview> createState() => _DraggablePreviewState();
+}
+
+class _DraggablePreviewState extends State<_DraggablePreview> {
+  static const _w = 96.0;
+  static const _h = 136.0;
+  static const _m = 16.0;
+  Offset? _drag; // sürüklerken anlık sol-üst konum
+  bool _right = true;
+  bool _bottom = false;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        final minX = _m;
+        final maxX = box.maxWidth - _w - _m;
+        final minY = widget.topInset;
+        final maxY = (box.maxHeight - _h - widget.bottomInset).clamp(minY, double.infinity);
+        final rest = Offset(_right ? maxX : minX, _bottom ? maxY : minY);
+        final pos = _drag ?? rest;
+        return Stack(children: [
+          AnimatedPositioned(
+            duration: _drag == null ? const Duration(milliseconds: 240) : Duration.zero,
+            curve: Curves.easeOutCubic,
+            left: pos.dx,
+            top: pos.dy,
+            child: GestureDetector(
+              onPanStart: (_) => setState(() => _drag = rest),
+              onPanUpdate: (d) => setState(() {
+                final cur = _drag ?? rest;
+                _drag = Offset((cur.dx + d.delta.dx).clamp(minX, maxX), (cur.dy + d.delta.dy).clamp(minY, maxY));
+              }),
+              onPanEnd: (_) {
+                final p = _drag ?? rest;
+                setState(() {
+                  _right = p.dx + _w / 2 > box.maxWidth / 2;
+                  _bottom = p.dy + _h / 2 > (minY + maxY + _h) / 2;
+                  _drag = null;
+                });
+              },
+              child: widget.child,
+            ),
+          ),
+        ]);
+      });
 }
 
 class _LocalPreview extends StatelessWidget {

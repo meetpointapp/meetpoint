@@ -5678,6 +5678,258 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu adım zaten tamamlanmış, ekran yenileniyor.'**
   String get errGameState;
+
+  /// No description provided for @undo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri al'**
+  String get undo;
+
+  /// No description provided for @undoDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son kaydırma geri alındı'**
+  String get undoDone;
+
+  /// No description provided for @undoLimitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri al hakkın bitti'**
+  String get undoLimitTitle;
+
+  /// No description provided for @undoLimitBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde {n} kez geri alabilirsin. VibeUpMe+ üyeler günde {m} kez geri alır.'**
+  String undoLimitBody(int n, int m);
+
+  /// No description provided for @errUndoUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri alınacak bir kaydırma yok ya da süresi geçti.'**
+  String get errUndoUnavailable;
+
+  /// No description provided for @errUndoMatched.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşmeye dönüşen kaydırma geri alınamaz.'**
+  String get errUndoMatched;
+
+  /// No description provided for @errUndoLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü geri al hakkın bitti.'**
+  String get errUndoLimit;
+
+  /// No description provided for @profileNudgeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilin %{percent} tamamlandı'**
+  String profileNudgeTitle(int percent);
+
+  /// No description provided for @profileNudgeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlanan profiller keşfette öne çıkar ve daha çok kişiyle eşleşir.'**
+  String get profileNudgeBody;
+
+  /// No description provided for @profileNudgeCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamla'**
+  String get profileNudgeCta;
+
+  /// No description provided for @profileChecklistTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilini güçlendir'**
+  String get profileChecklistTitle;
+
+  /// No description provided for @profileChecklistCta.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profili düzenle'**
+  String get profileChecklistCta;
+
+  /// No description provided for @profileMissPhotos.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} fotoğraf daha ekle'**
+  String profileMissPhotos(int n);
+
+  /// No description provided for @profileMissInterests.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az 3 ilgi alanı seç'**
+  String get profileMissInterests;
+
+  /// No description provided for @profileMissLookingFor.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne aradığını belirt'**
+  String get profileMissLookingFor;
+
+  /// No description provided for @profileMissPrompts.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} soruyu daha cevapla'**
+  String profileMissPrompts(int n);
+
+  /// No description provided for @profileMissBio.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa bir biyografi yaz'**
+  String get profileMissBio;
+
+  /// No description provided for @profileMissBasics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy, meslek, eğitim, burç ya da şehirden en az ikisini ekle'**
+  String get profileMissBasics;
+
+  /// No description provided for @frequencyLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyum frekansı yüzde {score}'**
+  String frequencyLabel(int score);
+
+  /// No description provided for @frequencySheetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'%{score} frekans'**
+  String frequencySheetTitle(int score);
+
+  /// No description provided for @frequencySheetBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile aranızdaki uyumun nereden geldiği'**
+  String frequencySheetBody(String name);
+
+  /// No description provided for @frequencyPartInterests.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortak ilgiler'**
+  String get frequencyPartInterests;
+
+  /// No description provided for @frequencyPartAstro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burç uyumu'**
+  String get frequencyPartAstro;
+
+  /// No description provided for @frequencyPartMusic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Müzik zevki'**
+  String get frequencyPartMusic;
+
+  /// No description provided for @frequencyPartVibe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vibe'**
+  String get frequencyPartVibe;
+
+  /// No description provided for @frequencyPartIntent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aradığınız'**
+  String get frequencyPartIntent;
+
+  /// No description provided for @frequencyFootnote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Frekans, ikinizin profilindeki ortak noktalardan hesaplanır. Profilini ne kadar doldurursan o kadar doğru çıkar.'**
+  String get frequencyFootnote;
+
+  /// No description provided for @swipeLike.
+  ///
+  /// In tr, this message translates to:
+  /// **'Frekans gönder'**
+  String get swipeLike;
+
+  /// No description provided for @swipePass.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonra'**
+  String get swipePass;
+
+  /// No description provided for @matchFrequencyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Frekanslarınız tuttu!'**
+  String get matchFrequencyTitle;
+
+  /// No description provided for @matchFrequencyLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'%{score} uyum frekansı'**
+  String matchFrequencyLine(int score);
+
+  /// No description provided for @captureMerak.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merak'**
+  String get captureMerak;
+
+  /// No description provided for @captureInterest.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlgi'**
+  String get captureInterest;
+
+  /// No description provided for @capturePassion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tutku'**
+  String get capturePassion;
+
+  /// No description provided for @captureHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beğenmek için karta basılı tut: Merak, İlgi, Tutku. Geçmek için ✕ düğmesine dokun.'**
+  String get captureHint;
+
+  /// No description provided for @captureConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süper beğeni gönderilsin mi?'**
+  String get captureConfirmTitle;
+
+  /// No description provided for @captureConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tutku, bir süper beğeni hakkı harcar.'**
+  String get captureConfirmBody;
+
+  /// No description provided for @captureConfirmFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü ücretsiz süper beğeni hakkından 1 harcanır. Kalan: {n}'**
+  String captureConfirmFree(int n);
+
+  /// No description provided for @captureConfirmPaid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın aldığın süper beğeni haklarından 1 harcanır. Kalan: {n}'**
+  String captureConfirmPaid(int n);
+
+  /// No description provided for @captureConfirmSend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönder'**
+  String get captureConfirmSend;
+
+  /// No description provided for @captureHintLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'Basılı tut: Merak, İlgi, Tutku'**
+  String get captureHintLine;
+
+  /// No description provided for @capturePassionNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bırakınca onay sorulur'**
+  String get capturePassionNote;
 }
 
 class _AppLocalizationsDelegate

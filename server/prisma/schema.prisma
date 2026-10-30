@@ -280,6 +280,8 @@ model Swipe {
   direction String // "like" | "pass" | "superlike" (jetonla; eşleşme açısından beğeni sayılır)
   // Faz 20: süper beğeni satın alınmış haktan mı gitti (günlük ücretsiz hak sayımına katılmaz)
   superPaid Boolean @default(false)
+  // Faz 24 "frekans yakalama": beğeninin gücü — 1 merak, 2 ilgi (basılı tutma süresi). Karşı taraf görür.
+  strength  Int      @default(1)
   createdAt DateTime @default(now())
 
   @@unique([fromId, toId])
@@ -1261,4 +1263,15 @@ model TruthDareRound {
   createdAt   DateTime      @default(now())
 
   @@unique([gameId, index])
+}
+
+// Faz 24: keşfette "geri al" kullanımı. Günlük hak bu kayıtların son 24 saatteki sayısından hesaplanır.
+model SwipeUndo {
+  id        String   @id @default(cuid())
+  userId    String
+  toId      String
+  direction String // geri alınan kaydırma yönü
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }

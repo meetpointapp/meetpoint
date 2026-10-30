@@ -39,6 +39,19 @@ class MatchInfo {
       );
 }
 
+// Faz 24: uyum frekansı — sunucu her keşfet kartı için 40-98 arası tek sayı ve parçalarını (0-100) gönderir.
+class Frequency {
+  final int score;
+  final Map<String, int> parts; // interests | astro | music | vibe | intent
+  const Frequency({required this.score, this.parts = const {}});
+  factory Frequency.fromJson(Map<String, dynamic> j) => Frequency(
+        score: (j['score'] as num?)?.toInt() ?? 0,
+        parts: {
+          for (final e in Map<String, dynamic>.from(j['parts'] ?? const {}).entries) e.key: (e.value as num).toInt(),
+        },
+      );
+}
+
 class PublicProfile {
   final String id;
   final bool verified;
@@ -53,6 +66,8 @@ class PublicProfile {
   final SocialStats social;
   final int? distanceKm; // yaklaşık mesafe; konum bilinmiyorsa null
   final bool superLikedMe;
+  // Faz 24: seni beğenenler listesinde beğeninin gücü (1 merak, 2 ilgi)
+  final int likeStrength;
   final String displayName;
   final int age;
   final String gender;
@@ -63,6 +78,7 @@ class PublicProfile {
   final List<String> interests;
   final List<String> musicGenres;
   final MatchInfo? match; // sadece mod seçili keşfet destesinde dolu
+  final Frequency? frequency; // Faz 24: keşfet kartlarında dolu
   final List<ProfilePrompt> prompts;
   final String lookingFor;
   final int? heightCm;
@@ -97,6 +113,7 @@ class PublicProfile {
     this.social = const SocialStats(),
     this.distanceKm,
     this.superLikedMe = false,
+    this.likeStrength = 1,
     required this.displayName,
     required this.age,
     required this.gender,
@@ -107,6 +124,7 @@ class PublicProfile {
     this.interests = const [],
     this.musicGenres = const [],
     this.match,
+    this.frequency,
     this.prompts = const [],
     this.lookingFor = '',
     this.heightCm,
@@ -139,6 +157,7 @@ class PublicProfile {
         social: j['social'] == null ? const SocialStats() : SocialStats.fromJson(Map<String, dynamic>.from(j['social'])),
         distanceKm: j['distanceKm'],
         superLikedMe: j['superLikedMe'] ?? false,
+        likeStrength: j['likeStrength'] ?? 1,
         displayName: j['displayName'],
         age: j['age'],
         gender: j['gender'],
@@ -149,6 +168,7 @@ class PublicProfile {
         interests: [for (final i in (j['interests'] as List? ?? const [])) i as String],
         musicGenres: [for (final i in (j['musicGenres'] as List? ?? const [])) i as String],
         match: j['match'] == null ? null : MatchInfo.fromJson(Map<String, dynamic>.from(j['match'])),
+        frequency: j['frequency'] == null ? null : Frequency.fromJson(Map<String, dynamic>.from(j['frequency'])),
         prompts: [for (final p in (j['prompts'] as List? ?? const [])) ProfilePrompt.fromJson(p)],
         lookingFor: j['lookingFor'] ?? '',
         heightCm: j['heightCm'],
@@ -2022,4 +2042,15 @@ class TruthDareGame {
       );
   bool get active => state == 'ACTIVE';
   bool get finished => state == 'FINISHED';
+}
+
+// Faz 24: keşfette "geri al" hakkı
+class UndoStatus {
+  final int limit;
+  final int used;
+  final int remaining;
+  final bool premium;
+  const UndoStatus({required this.limit, required this.used, required this.remaining, required this.premium});
+  factory UndoStatus.fromJson(Map<String, dynamic> j) =>
+      UndoStatus(limit: j['limit'], used: j['used'], remaining: j['remaining'], premium: j['premium'] ?? false);
 }

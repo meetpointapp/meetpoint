@@ -3,8 +3,10 @@ import { type ClientRateLimitInfo, type Options, type Store, ipKeyGenerator, rat
 import type { AuthedRequest } from './auth';
 import { config } from './config';
 import { prisma } from './db';
+import { redis } from './redis';
+import { RedisStore } from 'rate-limit-redis';
 
-// Sayaçlar PostgreSQL'de: birden fazla sunucu çalışırken aynı kullanıcı/IP için tek sayaç tutulur.
+// Sayaçlar (Redis yoksa) PostgreSQL'de: birden fazla sunucu çalışırken aynı kullanıcı/IP için tek sayaç tutulur.
 // Tek sorguda artır-veya-sıfırla (süresi dolan pencere yeniden başlar). Saatler UTC.
 class PostgresStore implements Store {
   prefix: string;
@@ -34,7 +36,20 @@ class PostgresStore implements Store {
   }
 }
 
-const store = (name: string) => ({ store: new PostgresStore(name) });
+// REDIS_URL varsa sayaçlar Redis'te (PostgreSQL'e her istekte yazmaz: yüksek trafikte darboğaz olurdu).
+// Redis kapanırsa sınırlayıcı açık geçer (passOnStoreError): kesinti sırasında tüm API 500 vermesin.
+const store = (name: string) => {
+  const r = redis;
+  return r
+    ? {
+        store: new RedisStore({
+          prefix: `vibeupme:rl:${name}:`,
+          sendCommand: (...args: string[]) => r.call(args[0], ...args.slice(1)) as Promise<never>,
+        }),
+        passOnStoreError: true,
+      }
+    : { store: new PostgresStore(name) };
+};
 
 // Kötüye kullanım koruması. Sınır aşılınca { error: 'rate_limited' } döner.
 const base = {

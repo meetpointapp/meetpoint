@@ -2063,5 +2063,120 @@
   "notifyGames": "Oyunlar",
   "errGameLimit": "Bugünlük oyun daveti hakkın doldu. Yarın tekrar deneyebilirsin.",
   "errGameNotActive": "Bu oyun artık açık değil.",
-  "errGameState": "Bu adım zaten tamamlanmış, ekran yenileniyor."
+  "errGameState": "Bu adım zaten tamamlanmış, ekran yenileniyor.",
+  "undo": "Geri al",
+  "undoDone": "Son kaydırma geri alındı",
+  "undoLimitTitle": "Geri al hakkın bitti",
+  "undoLimitBody": "Günde {n} kez geri alabilirsin. VibeUpMe+ üyeler günde {m} kez geri alır.",
+  "@undoLimitBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "errUndoUnavailable": "Geri alınacak bir kaydırma yok ya da süresi geçti.",
+  "errUndoMatched": "Eşleşmeye dönüşen kaydırma geri alınamaz.",
+  "errUndoLimit": "Bugünkü geri al hakkın bitti.",
+  "profileNudgeTitle": "Profilin %{percent} tamamlandı",
+  "@profileNudgeTitle": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "profileNudgeBody": "Tamamlanan profiller keşfette öne çıkar ve daha çok kişiyle eşleşir.",
+  "profileNudgeCta": "Tamamla",
+  "profileChecklistTitle": "Profilini güçlendir",
+  "profileChecklistCta": "Profili düzenle",
+  "profileMissPhotos": "{n} fotoğraf daha ekle",
+  "@profileMissPhotos": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMissInterests": "En az 3 ilgi alanı seç",
+  "profileMissLookingFor": "Ne aradığını belirt",
+  "profileMissPrompts": "{n} soruyu daha cevapla",
+  "@profileMissPrompts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMissBio": "Kısa bir biyografi yaz",
+  "profileMissBasics": "Boy, meslek, eğitim, burç ya da şehirden en az ikisini ekle",
+  "frequencyLabel": "Uyum frekansı yüzde {score}",
+  "@frequencyLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "frequencySheetTitle": "%{score} frekans",
+  "@frequencySheetTitle": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "frequencySheetBody": "{name} ile aranızdaki uyumun nereden geldiği",
+  "@frequencySheetBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "frequencyPartInterests": "Ortak ilgiler",
+  "frequencyPartAstro": "Burç uyumu",
+  "frequencyPartMusic": "Müzik zevki",
+  "frequencyPartVibe": "Vibe",
+  "frequencyPartIntent": "Aradığınız",
+  "frequencyFootnote": "Frekans, ikinizin profilindeki ortak noktalardan hesaplanır. Profilini ne kadar doldurursan o kadar doğru çıkar.",
+  "swipeLike": "Frekans gönder",
+  "swipePass": "Sonra",
+  "matchFrequencyTitle": "Frekanslarınız tuttu!",
+  "matchFrequencyLine": "%{score} uyum frekansı",
+  "@matchFrequencyLine": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "captureMerak": "Merak",
+  "captureInterest": "İlgi",
+  "capturePassion": "Tutku",
+  "captureHint": "Beğenmek için karta basılı tut: Merak, İlgi, Tutku. Geçmek için ✕ düğmesine dokun.",
+  "captureConfirmTitle": "Süper beğeni gönderilsin mi?",
+  "captureConfirmBody": "Tutku, bir süper beğeni hakkı harcar.",
+  "captureConfirmFree": "Bugünkü ücretsiz süper beğeni hakkından 1 harcanır. Kalan: {n}",
+  "@captureConfirmFree": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "captureConfirmPaid": "Satın aldığın süper beğeni haklarından 1 harcanır. Kalan: {n}",
+  "@captureConfirmPaid": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "captureConfirmSend": "Gönder",
+  "captureHintLine": "Basılı tut: Merak, İlgi, Tutku",
+  "capturePassionNote": "Bırakınca onay sorulur"
 }

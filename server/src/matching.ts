@@ -21,6 +21,7 @@ interface MatchProfile {
   interests: unknown;
   musicGenres: unknown;
   vibeArchetypeId: string;
+  lookingFor?: string;
 }
 
 // ---------- Burç
@@ -108,4 +109,54 @@ export function matchReason(mode: Exclude<MatchMode, 'all'>, my: MatchProfile, t
     case 'vibe':
       return vibeCompat(my, their);
   }
+}
+
+// ---------- Faz 24: uyum "frekansı" — her aday için 0-100 arası tek bir sayı ve parçaları.
+// Mevcut kural tabanlı sinyallerin (ilgi alanı, burç, müzik, vibe, ne aradığı) ağırlıklı ortalaması;
+// verisi olmayan parça hesaba katılmaz (ağırlık kalanlara dağılır). Yapay zekâ yok, deterministik.
+export interface Frequency {
+  score: number; // 40-98
+  parts: Partial<Record<'interests' | 'astro' | 'music' | 'vibe' | 'intent', number>>;
+}
+
+const WEIGHTS = { interests: 0.3, astro: 0.15, music: 0.15, vibe: 0.2, intent: 0.2 } as const;
+
+export function frequency(my: MatchProfile, their: MatchProfile): Frequency {
+  const parts: Frequency['parts'] = {};
+
+  const mineI = strings(my.interests);
+  const theirI = strings(their.interests);
+  if (mineI.length && theirI.length) {
+    const shared = theirI.filter((g) => mineI.includes(g)).length;
+    parts.interests = Math.min(100, 20 + shared * 27);
+  }
+
+  const diff = Math.abs(ZODIAC.indexOf(zodiacOf(my)) - ZODIAC.indexOf(zodiacOf(their)));
+  parts.astro = ASPECTS[Math.min(diff, 12 - diff)].score;
+
+  const mineM = strings(my.musicGenres);
+  const theirM = strings(their.musicGenres);
+  if (mineM.length && theirM.length) {
+    const shared = theirM.filter((g) => mineM.includes(g)).length;
+    parts.music = shared > 0 ? Math.min(100, 40 + shared * 30) : 20;
+  }
+
+  if (my.vibeArchetypeId && their.vibeArchetypeId) {
+    const tier = compatibilityTier(my.vibeArchetypeId, their.vibeArchetypeId);
+    parts.vibe = tier === 'similar' ? 90 : tier === 'complementary' ? 75 : 45;
+  }
+
+  if (my.lookingFor && their.lookingFor) {
+    parts.intent = my.lookingFor === their.lookingFor ? 100 : my.lookingFor === 'unsure' || their.lookingFor === 'unsure' ? 70 : 35;
+  }
+
+  let sum = 0;
+  let weight = 0;
+  for (const [k, v] of Object.entries(parts) as [keyof typeof WEIGHTS, number][]) {
+    sum += v * WEIGHTS[k];
+    weight += WEIGHTS[k];
+  }
+  const weighted = weight > 0 ? sum / weight : 50;
+  const score = Math.max(40, Math.min(98, Math.round(40 + weighted * 0.58)));
+  return { score, parts };
 }

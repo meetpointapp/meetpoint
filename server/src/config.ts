@@ -37,7 +37,7 @@ export const config = {
     port: Number(process.env.SMTP_PORT ?? 587),
     user: process.env.SMTP_USER ?? '',
     pass: process.env.SMTP_PASS ?? '',
-    from: process.env.MAIL_FROM ?? 'VibeUpMe <no-reply@vibeupme.app>',
+    from: process.env.MAIL_FROM ?? 'VibeUpMe <no-reply@vibeupme.com>',
   },
 };
 
@@ -92,6 +92,10 @@ export const economy = {
   boostMinutes: 30,
   // Faz 20: süren öne çıkarma uzatılabilir; kalan süre bu değeri aşamaz
   boostMaxMinutes: 120,
+  // Faz 24: keşfette geri al — günlük hak (VibeUpMe+ için daha fazla) ve geri alınabilecek süre
+  undoDaily: 3,
+  undoDailyPremium: 15,
+  undoWindowMinutes: 15,
   // Faz 22: gönderiyi akışta öne çıkarma (jeton). Süren öne çıkarma uzatılabilir; kalan süre sınırlıdır.
   postBoostPrice: 60,
   postBoostHours: 6,
@@ -221,7 +225,7 @@ export const consumer = {
   supportFirstResponseHours: Number(process.env.SUPPORT_SLA_HOURS ?? 48), // ilk yanıt hedefi
   supportMaxOpenTickets: 5, // aynı anda açık talep sınırı (kötüye kullanıma karşı)
   // Mağaza incelemesi için demo hesabın e-postası (scripts/review-account.ts)
-  reviewAccountEmail: process.env.REVIEW_ACCOUNT_EMAIL ?? 'review@vibeupme.app',
+  reviewAccountEmail: process.env.REVIEW_ACCOUNT_EMAIL ?? 'review@vibeupme.com',
 };
 
 // Zamanlayıcı (scheduler.ts): tur aralığı, liderlik deneme aralığı, bağlantı taraması aralığı
@@ -255,6 +259,9 @@ export function assertProductionConfig() {
   if (problems.length) {
     throw new Error(`Yayın ayarları eksik:\n- ${problems.join('\n- ')}`);
   }
+  // Faz 25 (ölçek): çoklu süreç/sunucuda sayaçların ve anlık olayların hızlı olması için Redis, fotoğraflar için ortak depolama gerekir
+  if (!process.env.REDIS_URL) console.warn('UYARI: REDIS_URL yok, hız sınırı ve anlık olaylar PostgreSQL üzerinden gidiyor (yoğun trafikte yavaşlar)');
+  if (!process.env.S3_PUBLIC_BUCKET) console.warn('UYARI: S3_PUBLIC_BUCKET yok, fotoğraflar yerel diskte (tek sunucuya bağlı, disk dolabilir)');
   if (!agora.appId) console.warn('UYARI: AGORA_APP_ID yok, aramalar test modunda (ses/görüntü yok)');
   if (!firebaseServiceAccount) console.warn('UYARI: FIREBASE_SERVICE_ACCOUNT yok, push bildirimleri kapalı');
   if (!turnstile.secret) console.warn('UYARI: TURNSTILE_SECRET yok, kayıtta bot koruması kapalı');

@@ -65,7 +65,7 @@ boostsRouter.get('/likes', async (req, res) => {
     unlockedUntil: premium ? null : me.likesUnlockedUntil, // null + premium: süresiz (abonelik boyunca)
     premium,
     count,
-    users: likes.map((s) => ({ ...publicProfile(s.from, me.profile), superLikedMe: s.direction === 'superlike' })),
+    users: likes.map((s) => ({ ...publicProfile(s.from, me.profile), superLikedMe: s.direction === 'superlike', likeStrength: s.strength })),
   });
 });
 

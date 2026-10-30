@@ -103,11 +103,11 @@ Yayın sunucusunda bir kez:
 REVIEW_ACCOUNT_PASSWORD='buraya-en-az-12-karakterlik-sifre' npm run review:account
 ```
 
-`review@vibeupme.app` (e-posta `REVIEW_ACCOUNT_EMAIL` ile değişir) ve onunla eşleşmiş `review-partner@vibeupme.app` açılır. İnceleme hesabına 1000 promosyon jetonu yüklenir (mağazadan satın almadan ücretli özellikler denenebilsin), satış koşulları ve rızalar onaylı gelir. Tekrar çalıştırmak hesabı sıfırlar.
+`review@vibeupme.com` (e-posta `REVIEW_ACCOUNT_EMAIL` ile değişir) ve onunla eşleşmiş `review-partner@vibeupme.com` açılır. İnceleme hesabına 1000 promosyon jetonu yüklenir (mağazadan satın almadan ücretli özellikler denenebilsin), satış koşulları ve rızalar onaylı gelir. Tekrar çalıştırmak hesabı sıfırlar.
 
 **App Review Notes (İngilizce, forma yapıştır):**
 
-> Demo account: review@vibeupme.app / (password)
+> Demo account: review@vibeupme.com / (password)
 > The account already has a match ("Mia") with a chat, and 1,000 coins so paid features can be tested without purchasing.
 >
 > VibeUpMe is an 18+ dating app. Chatting after a mutual match is free. Coins (sold only via In-App Purchase, never expire) are used to message people you haven't matched with, for per-minute voice/video calls and virtual gifts. The coins a user spends go to the receiving user; receivers may request a payout of coins earned from others after identity verification (payout happens outside the app by bank transfer). Purchased coins cannot be cashed out.

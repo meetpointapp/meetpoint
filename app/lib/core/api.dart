@@ -310,11 +310,23 @@ class Api {
 
   // direction: like | pass | superlike (süper beğeni jetonla)
   // Beğenide kalan hak (likes) da döner; hak bittiyse sunucu 403 like_limit_reached verir.
-  Future<({bool match, String? conversationId, LikeStatus? likes, SuperLikeStatus? superLikes})> swipe(String toId, String direction) async {
-    final r = await _post('/swipes', {'toId': toId, 'direction': direction});
+  Future<({bool match, String? conversationId, LikeStatus? likes, SuperLikeStatus? superLikes})> swipe(String toId, String direction, {int strength = 1}) async {
+    final r = await _post('/swipes', {'toId': toId, 'direction': direction, if (strength > 1) 'strength': strength});
     return (
       match: r['match'] as bool,
       conversationId: r['conversationId'] as String?,
+      likes: r['likes'] == null ? null : LikeStatus.fromJson(Map<String, dynamic>.from(r['likes'])),
+      superLikes: r['superLikes'] == null ? null : SuperLikeStatus.fromJson(Map<String, dynamic>.from(r['superLikes'])),
+    );
+  }
+
+  // Faz 24: son kaydırmayı geri al
+  Future<UndoStatus> undoStatus() async => UndoStatus.fromJson(await _get('/discover/undo-status'));
+
+  Future<({UndoStatus undo, LikeStatus? likes, SuperLikeStatus? superLikes})> undoSwipe(String toId) async {
+    final r = await _post('/swipes/undo', {'toId': toId});
+    return (
+      undo: UndoStatus.fromJson(Map<String, dynamic>.from(r['undo'])),
       likes: r['likes'] == null ? null : LikeStatus.fromJson(Map<String, dynamic>.from(r['likes'])),
       superLikes: r['superLikes'] == null ? null : SuperLikeStatus.fromJson(Map<String, dynamic>.from(r['superLikes'])),
     );

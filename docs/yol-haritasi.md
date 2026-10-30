@@ -451,6 +451,32 @@ Faz 19, tek bir oturumda (yerel) tamamlandı; cloud oturumunun Faz 15-18 işinin
 
 **Açık riskler:** içerik moderasyonu iş yükü (5651 sorumluluğu avukat aşamasında netleşir); akışın başlangıçta boş görünmesi (ilgi alanı filtresi, hikayeler ve demo içerikle canlı tutulur).
 
+## Faz 24 · Keşfet'te özgünlük ve kullanım iyileştirmeleri ✅
+
+Test geri bildirimleri üzerine: yanlışlıkla kaydırmayı geri alma, profil tamamlamaya yönlendirme, sürüklenebilir kamera ve uygulamayı "başka bir kaydırmalı uygulama" olmaktan çıkaran kimlik.
+
+- **Geri al:** son kaydırma 15 dakika içinde, günde 3 kez (VibeUpMe+ için 15) geri alınır; eşleşmeye dönüşmüş kaydırma geri alınamaz, harcanan beğeni/süper beğeni hakkı iade edilir. `POST /swipes/undo`, `GET /discover/undo-status`, `SwipeUndo` tablosu.
+- **Profil tamamlama:** keşfette yüzde halkalı banner ve eksik adım listesi (+%10 her biri); tamamlanan profiller destede öne çıkar (bio + 3 ilgi + 3 fotoğraf). Banner 24 saat susturulabilir.
+- **Sürüklenebilir kamera:** görüntülü görüşmede kendi küçük önizleme köşeler arasında taşınır, bırakınca en yakın köşeye oturur.
+- **Uyum frekansı:** her kartta ilgi alanı, burç, müzik, vibe ve ne aradığı birleşerek 40–98 arası tek sayı üretir; halkaya dokununca parça parça nedeni görünür. Kural tabanlı, yapay zekâ yok (`frequency()` in `matching.ts`).
+- **Moda özel kartlar:** Astroloji yıldız alanı, Müzik ekolayzır, İlgi yüzen baloncuklar, Vibe arketipine göre nefes alan aura.
+- **Frekans yakalama:** karta basılı tutunca halka dolar; bırakma anına göre Merak (normal beğeni), İlgi (karşı tarafa "ilgi gösterdi" rozeti, `Swipe.strength`) ya da Tutku (süper beğeni). Her kademede artan haptik. Sürükleyerek kaydırma kapatıldı; geçmek için ✕ düğmesi var, ♥/★ düğmeleri kalktı. Tutku bırakınca onay sorar (yanlışlıkla süper beğeni harcanmasın); ekran okuyucu için karta özel eylemler tanımlı.
+- **Kendi dilimiz:** "Frekans gönder" / "Sonra"; eşleşmede iki aura renginin buluştuğu dalga animasyonu ve imza haptik ("Frekanslarınız tuttu!").
+
+---
+
+## Faz 25 · Ölçek hazırlığı ✅ (yazılım tarafı)
+
+Hedef: tek sunucuyla başlayıp makine ekleyerek onbinlerce eşzamanlı kullanıcıya çıkabilmek. Ayrıntı ve kurulum: `docs/yayin-sunucu-kurulumu.md`.
+
+- **Redis (isteğe bağlı, `REDIS_URL`):** hız sınırı sayaçları, Socket.IO yayını (Redis adaptörü) ve çevrimiçi durum. Yoksa eski PostgreSQL davranışı. Keşfet destesindeki "şu an" rozeti tek `ZMSCORE` ile okunur (kart başına küme genelinde soru yok).
+- **S3 uyumlu depolama (isteğe bağlı, `S3_PUBLIC_BUCKET` / `S3_PRIVATE_BUCKET`):** fotoğraflar yerel disk yerine R2/S3; `/media` imzalı adresi aynı, Cloudflare önbelleğiyle API'ye ilk istek düşer.
+- **Dağıtım dosyaları:** `server/deploy/` (pm2 cluster, nginx, PostgreSQL ve Redis ayarı, Ubuntu kurulum betiği, yayın `.env` örneği).
+- **Yük testi araçları:** `npm run load:users` (toplu sahte hesap + jeton), `tools/loadtest/` (k6 HTTP senaryosu, Socket.IO bağlantı testi), `npm run redis:check` (sunucuda Redis duman testi).
+- **Bilinen açıklar:** gerçek Redis ile yerelde denenemedi (sunucuda `redis:check` şart); auth sorgusu önbelleği, keşfet havuzu önbelleği ve fotoğraf dönüştürme kuyruğu ölçüm gerektirirse sonraki adım.
+
+---
+
 ## Faz 23 · Dış süreçler ve yayın
 
 **Amaç:** Uygulama bittikten sonra, hepsi bir arada.

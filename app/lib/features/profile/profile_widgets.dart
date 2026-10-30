@@ -136,6 +136,7 @@ class LikeActionCard extends StatelessWidget {
             ),
           ),
           if (p.superLikedMe) const Positioned(top: 8, left: 8, child: _SuperBadge()),
+          if (!p.superLikedMe && p.likeStrength >= 2) const Positioned(top: 8, left: 8, child: _InterestBadge()),
           Positioned(
             left: 10,
             right: 10,
@@ -162,6 +163,21 @@ class LikeActionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// Faz 24: seni "ilgi" gücüyle (basılı tutarak) beğenen kişi
+class _InterestBadge extends StatelessWidget {
+  const _InterestBadge();
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        label: AppLocalizations.of(context).captureInterest,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: ShapeDecoration(shape: const StadiumBorder(), color: Brand.orange),
+          child: const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 14),
+        ),
+      );
 }
 
 class _SuperBadge extends StatelessWidget {

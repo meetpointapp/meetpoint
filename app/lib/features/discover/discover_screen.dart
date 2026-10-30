@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:flutter/semantics.dart' show CustomSemanticsAction;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/api.dart';
 import '../../core/catalog.dart';
@@ -17,7 +19,10 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../../l10n/app_localizations.dart';
 import '../profile/mood_widgets.dart';
+import '../profile/profile_nudge.dart';
 import '../store/superlike_packs.dart';
+import 'capture_ring.dart';
+import 'frequency_widgets.dart';
 import 'match_modes.dart';
 import '../profile/profile_widgets.dart';
 import '../profile/request_actions.dart';
@@ -44,6 +49,15 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   // Faz 20: süper beğeni hakları (günlük ücretsiz + satın alınmış)
   SuperLikeStatus? _superLikes;
   String? _buyingPack;
+  // Faz 24: geri al — son kaydırılan kart ve kalan günlük hak
+  PublicProfile? _lastSwiped;
+  UndoStatus? _undo;
+  bool _undoBusy = false;
+  // Deste bittiğinde geri alınca kaldığı karttan devam etmek için başlangıç sırası
+  int _startIndex = 0;
+  // Faz 24: basılı tutarak yakalanan beğeni gücü (1 merak, 2 ilgi); bir sonraki sağa kaydırmada gönderilir
+  int _nextStrength = 1;
+  int _captureCount = 3; // prefs yüklenene dek ipucu gizli
 
   @override
   void initState() {
@@ -51,6 +65,79 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     _load();
     _loadLikes();
     _loadSuperLikes();
+    _loadUndo();
+    _maybeShowCaptureHint();
+    _loadCaptureCount();
+  }
+
+  // İlk açılışta bir kez: karta basılı tutma özelliğini anlat
+  Future<void> _maybeShowCaptureHint() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool('capture_hint_seen') ?? false) return;
+      await Future<void>.delayed(const Duration(milliseconds: 2500));
+      if (!mounted || (_cards?.isEmpty ?? true)) return;
+      await prefs.setBool('capture_hint_seen', true);
+      if (mounted) showSnack(context, AppLocalizations.of(context).captureHint);
+    } catch (_) {}
+  }
+
+  // Basılı tutma bırakıldı: 1-2 → sağa (güçlü beğeni), 3 → yukarı (süper beğeni)
+  Future<void> _capture(int tier) async {
+    if (_cards == null || _finished) return;
+    _noteCapture();
+    if (tier >= 3) {
+      // Süper beğeni bir hak harcar: yanlışlıkla uzun basmaya karşı onay sorulur
+      if (!await _confirmPassion()) return;
+      if (!mounted) return;
+      _controller.swipe(CardSwiperDirection.top);
+    } else {
+      _nextStrength = tier;
+      _controller.swipe(CardSwiperDirection.right);
+    }
+  }
+
+  Future<bool> _confirmPassion() async {
+    final l = AppLocalizations.of(context);
+    final st = _superLikes;
+    final body = st == null
+        ? l.captureConfirmBody
+        : st.freeRemaining > 0
+            ? l.captureConfirmFree(st.freeRemaining)
+            : l.captureConfirmPaid(st.total);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.star_rounded, color: Brand.gold, size: 36),
+        title: Text(l.captureConfirmTitle),
+        content: Text(body),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l.captureConfirmSend)),
+        ],
+      ),
+    );
+    return ok ?? false;
+  }
+
+  // İpucu satırı ilk üç yakalamaya kadar kartta görünür
+  Future<void> _loadCaptureCount() async {
+    try {
+      final n = (await SharedPreferences.getInstance()).getInt('capture_count') ?? 0;
+      if (mounted) setState(() => _captureCount = n);
+    } catch (_) {}
+  }
+
+  void _noteCapture() {
+    setState(() => _captureCount++);
+    SharedPreferences.getInstance().then((p) => p.setInt('capture_count', _captureCount)).catchError((_) => false);
+  }
+
+  Future<void> _loadUndo() async {
+    try {
+      final u = await ref.read(apiProvider).undoStatus();
+      if (mounted) setState(() => _undo = u);
+    } catch (_) {}
   }
 
   Future<void> _loadLikes() async {
@@ -214,6 +301,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           _cards = cards;
           _finished = cards.isEmpty;
           _current = 0;
+          _startIndex = 0;
+          _lastSwiped = null;
           _deckVersion++;
         });
       }
@@ -240,6 +329,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       CardSwiperDirection.top => 'superlike',
       _ => 'pass',
     };
+    final strength = action == 'like' ? _nextStrength : 1;
+    _nextStrength = 1;
     // Beğeni hakkı bittiyse kart geri döner ve sıfırlama seçeneği sunulur
     if (action == 'like' && (_likes?.remaining ?? 1) <= 0) {
       unawaited(_showLikeLimitSheet());
@@ -261,9 +352,10 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final before = _current;
     setState(() => _current = next ?? index);
     try {
-      final r = await ref.read(apiProvider).swipe(profile.id, action);
+      final r = await ref.read(apiProvider).swipe(profile.id, action, strength: strength);
       if (!mounted) return true;
       setState(() {
+        _lastSwiped = profile;
         if (r.likes != null) _likes = r.likes;
         if (r.superLikes != null) _superLikes = r.superLikes;
       });
@@ -308,6 +400,78 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     } catch (e) {
       if (mounted) showSnack(context, errorText(l, e));
     }
+  }
+
+  // Faz 24: son kaydırmayı geri al (günlük hak sınırlı; eşleşmeye dönüşen geri alınamaz)
+  Future<void> _undoLast() async {
+    final last = _lastSwiped;
+    final cards = _cards;
+    if (last == null || cards == null || _undoBusy) return;
+    final l = AppLocalizations.of(context);
+    setState(() => _undoBusy = true);
+    try {
+      final r = await ref.read(apiProvider).undoSwipe(last.id);
+      if (!mounted) return;
+      final idx = cards.indexWhere((c) => c.id == last.id);
+      setState(() {
+        _undo = r.undo;
+        _lastSwiped = null;
+        if (r.likes != null) _likes = r.likes;
+        if (r.superLikes != null) _superLikes = r.superLikes;
+        if (_finished && idx >= 0) {
+          // Deste bitmişti: son karttan yeniden başlat
+          _finished = false;
+          _startIndex = idx;
+          _current = idx;
+          _deckVersion++;
+        } else {
+          _current = (_current - 1).clamp(0, cards.length - 1);
+        }
+      });
+      if (!_finished) _controller.undo();
+      ref.invalidate(superLikeStatusProvider);
+      Fx.tap();
+      showSnack(context, l.undoDone);
+    } catch (e) {
+      if (!mounted) return;
+      if (e is ApiException && e.code == 'undo_limit_reached') {
+        _loadUndo();
+        await _showUndoLimit();
+      } else {
+        showSnack(context, errorText(l, e));
+      }
+    } finally {
+      if (mounted) setState(() => _undoBusy = false);
+    }
+  }
+
+  Future<void> _showUndoLimit() async {
+    final l = AppLocalizations.of(context);
+    final u = _undo;
+    final go = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFC857)),
+              child: const Icon(Icons.replay_rounded, color: Color(0xFF3A2A00), size: 34),
+            ),
+            const SizedBox(height: 14),
+            Text(l.undoLimitTitle, style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 6),
+            Text(l.undoLimitBody(u?.limit ?? 3, 15), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            if (!(u?.premium ?? false)) GradientButton(label: l.premiumBadgeShort, icon: Icons.workspace_premium_rounded, onPressed: () => Navigator.pop(ctx, true)),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.closeAction)),
+          ]),
+        ),
+      ),
+    );
+    if (go == true && mounted) context.push('/premium');
   }
 
   Future<void> _askLocation() async {
@@ -416,22 +580,27 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     } else {
       body = Column(children: [
         if (me != null && !me.hasLocation) _LocationBar(onEnable: _askLocation),
+        const ProfileNudgeBanner(),
         Expanded(
           child: Stack(children: [
             CardSwiper(
               key: ValueKey(_deckVersion),
               controller: _controller,
+              initialIndex: _startIndex.clamp(0, cards.length - 1),
               cardsCount: cards.length,
               numberOfCardsDisplayed: cards.length.clamp(1, 2),
               isLoop: false,
               padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
               backCardOffset: const Offset(0, 0),
               scale: 0.95,
+              // Faz 24: sürükleyerek kaydırma yok; karar basılı tutma (frekans yakalama) ya da "Geç" düğmesiyle.
+              // isDisabled sadece sürüklemeyi kapatır, controller.swipe çalışmaya devam eder.
+              isDisabled: true,
               allowedSwipeDirection: const AllowedSwipeDirection.only(left: true, right: true, up: true),
               onSwipe: _onSwipe,
               onEnd: () => setState(() => _finished = true),
               cardBuilder: (context, index, dx, dy) =>
-                  _ProfileCard(profile: cards[index], dx: dx, dy: dy, myInterests: myInterests, showInfo: index <= _current),
+                  _ProfileCard(profile: cards[index], dx: dx, dy: dy, myInterests: myInterests, mode: _mode, showInfo: index <= _current, onCapture: index == _current ? _capture : null, showHint: _captureCount < 3),
             ),
             // Kartın üstünde cam rozetler: kalan beğeni hakkı (solda), seri ve ruh hali (sağda)
             Positioned(
@@ -462,17 +631,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   borderRadius: BorderRadius.circular(44),
                   border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
                 ),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  _GlassButton(icon: Icons.close_rounded, size: 60, iconColor: Colors.white, tooltip: l.reject,
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                  Opacity(
+                    opacity: _lastSwiped == null ? 0.4 : 1,
+                    child: _GlassButton(icon: Icons.replay_rounded, size: 42, iconColor: const Color(0xFFFFC857), tooltip: l.undo,
+                        badge: _undo == null || _lastSwiped == null ? null : '${_undo!.remaining}', badgeLow: (_undo?.remaining ?? 1) <= 0,
+                        onTap: _undoLast),
+                  ),
+                  _GlassButton(icon: Icons.close_rounded, size: 60, iconColor: Colors.white, ring: true, tooltip: l.swipePass,
                       onTap: () => _controller.swipe(CardSwiperDirection.left)),
-                  _GlassButton(icon: Icons.star_rounded, size: 46, iconColor: const Color(0xFF7FB2FF), tooltip: l.superLike,
-                      badge: _superLikes == null ? null : '${_superLikes!.total}', badgeLow: (_superLikes?.total ?? 1) <= 0,
-                      onTap: () => _controller.swipe(CardSwiperDirection.top)),
-                  _GlassButton(icon: Icons.favorite_rounded, size: 66, iconColor: Brand.coral, ring: true, tooltip: l.accept,
-                      onTap: () => _controller.swipe(CardSwiperDirection.right)),
-                  _GlassButton(icon: Icons.casino_rounded, size: 46, iconColor: const Color(0xFFB9A4FF), tooltip: l.truthDareTitle,
+                  _GlassButton(icon: Icons.casino_rounded, size: 44, iconColor: const Color(0xFFB9A4FF), tooltip: l.truthDareTitle,
                       onTap: () => _startTruthDare(cards[_current.clamp(0, cards.length - 1)])),
-                  _GlassButton(icon: Icons.send_rounded, size: 46, iconColor: Colors.white, tooltip: l.messageRequest,
+                  _GlassButton(icon: Icons.send_rounded, size: 44, iconColor: Colors.white, tooltip: l.messageRequest,
                       onTap: () => sendContactRequest(context, ref, cards[_current.clamp(0, cards.length - 1)], RequestKind.message)),
                 ]),
               ),
@@ -576,13 +746,17 @@ class _GroupsStrip extends ConsumerWidget {
 }
 
 class _ProfileCard extends StatefulWidget {
-  const _ProfileCard({required this.profile, required this.dx, required this.dy, required this.myInterests, this.showInfo = true});
+  const _ProfileCard({required this.profile, required this.dx, required this.dy, required this.myInterests, this.mode = 'all', this.showInfo = true, this.onCapture, this.showHint = false});
   final PublicProfile profile;
+  final String mode; // Faz 24: keşfet modu → karta o moda özel hareketli katman biner
   final int dx; // kaydırma yönü/yüzdesi: +sağ (beğen), -sol (geç)
   final int dy; // -yukarı (süper beğeni)
   final Set<String> myInterests;
   // Arkadaki (sıradaki) kartta bilgiler gizlenir: sürüklerken iki kartın yazısı üst üste binmesin
   final bool showInfo;
+  // Faz 24: basılı tutma bırakılınca kademe (1-3) ile çağrılır; sadece öndeki kartta dolu
+  final ValueChanged<int>? onCapture;
+  final bool showHint; // "basılı tut" ipucu satırı
 
   @override
   State<_ProfileCard> createState() => _ProfileCardState();
@@ -591,8 +765,68 @@ class _ProfileCard extends StatefulWidget {
 class _ProfileCardState extends State<_ProfileCard> {
   int _photo = 0;
 
+  // Faz 24: basılı tutma ("frekans yakalama")
+  Timer? _holdTimer;
+  Stopwatch? _holdWatch;
+  int _holdMs = 0;
+  int _holdTier = 0;
+  int _lastHoldMs = 0;
+  int? _holdPointer;
+  Offset _holdOrigin = Offset.zero;
+
+  @override
+  void dispose() {
+    _holdTimer?.cancel();
+    super.dispose();
+  }
+
+  void _holdDown(PointerDownEvent e) {
+    if (widget.onCapture == null || _holdPointer != null) return;
+    _holdPointer = e.pointer;
+    _holdOrigin = e.position;
+    _lastHoldMs = 0;
+    _holdWatch = Stopwatch()..start();
+    _holdTimer?.cancel();
+    _holdTimer = Timer.periodic(const Duration(milliseconds: 40), (_) {
+      if (!mounted || _holdWatch == null) return;
+      final ms = _holdWatch!.elapsedMilliseconds;
+      final tier = captureTier(ms);
+      if (tier > _holdTier && tier > 0) Fx.captureTier(tier);
+      // Görsel güncelleme sadece yakalama başladıktan sonra
+      if (ms >= captureStartMs || _holdMs != 0) setState(() => _holdMs = ms);
+      _holdTier = tier;
+    });
+  }
+
+  void _holdMove(PointerMoveEvent e) {
+    if (e.pointer != _holdPointer) return;
+    // Sürükleme başladıysa bu bir kaydırmadır, yakalama iptal
+    if ((e.position - _holdOrigin).distance > 14) _holdCancel();
+  }
+
+  void _holdUp(PointerEvent e) {
+    if (e.pointer != _holdPointer) return;
+    final ms = _holdWatch?.elapsedMilliseconds ?? 0;
+    final tier = captureTier(ms);
+    final fire = e is PointerUpEvent && tier > 0;
+    _lastHoldMs = ms;
+    _holdCancel();
+    if (fire) widget.onCapture?.call(tier);
+  }
+
+  void _holdCancel() {
+    _holdTimer?.cancel();
+    _holdTimer = null;
+    _holdWatch?.stop();
+    _holdWatch = null;
+    _holdPointer = null;
+    _holdTier = 0;
+    if (_holdMs != 0 && mounted) setState(() => _holdMs = 0);
+  }
+
   // Karta her dokunuşta bir sonraki fotoğraf; sonuncudan sonra ilk fotoğrafa dönülür
   void _tap() {
+    if (_lastHoldMs >= captureStartMs) return; // basılı tutma bırakıldı, dokunuş sayılmaz
     final count = widget.profile.photos.length;
     if (count < 2) return;
     setState(() => _photo = (_photo + 1) % count);
@@ -600,6 +834,28 @@ class _ProfileCardState extends State<_ProfileCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final onCapture = widget.onCapture;
+    return Semantics(
+      // Ekran okuyucu ve anahtar erişimi için: basılı tutma yerine üç eylem
+      customSemanticsActions: onCapture == null
+          ? null
+          : {
+              CustomSemanticsAction(label: l.captureMerak): () => onCapture(1),
+              CustomSemanticsAction(label: l.captureInterest): () => onCapture(2),
+              CustomSemanticsAction(label: l.capturePassion): () => onCapture(3),
+            },
+      child: Listener(
+        onPointerDown: _holdDown,
+        onPointerMove: _holdMove,
+        onPointerUp: _holdUp,
+        onPointerCancel: _holdUp,
+        child: _buildCard(context),
+      ),
+    );
+  }
+
+  Widget _buildCard(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final p = widget.profile;
@@ -647,6 +903,7 @@ class _ProfileCardState extends State<_ProfileCard> {
                   ),
                 ),
               ),
+              if (widget.showInfo && widget.mode != 'all') Positioned.fill(child: ModeSkin(mode: widget.mode, profile: p)),
               if (photos.length > 1)
                 Positioned(
                   top: 8,
@@ -666,6 +923,13 @@ class _ProfileCardState extends State<_ProfileCard> {
                       ),
                   ]),
                 ),
+              // Faz 24: uyum frekansı halkası — dokununca "neden bu sayı?" açılır
+              if (widget.showInfo && p.frequency != null && widget.dx.abs() < 10 && widget.dy > -10)
+                Positioned(
+                  top: 64, // üst satırdaki beğeni sayacı / ruh hali rozetinin altında
+                  right: 14,
+                  child: FrequencyRing(frequency: p.frequency!, onTap: () => showFrequencySheet(context, p)),
+                ),
               // Kaydırma etiketi: yukarı = süper beğeni, sağ = beğen, sol = geç
               if (widget.dy < -10 && widget.dy.abs() > widget.dx.abs())
                 Positioned(
@@ -684,6 +948,7 @@ class _ProfileCardState extends State<_ProfileCard> {
                     opacity: (widget.dx.abs() / 100).clamp(0.0, 1.0),
                   ),
                 ),
+              if (_holdMs >= captureStartMs) Positioned.fill(child: CaptureOverlay(ms: _holdMs)),
               if (widget.showInfo)
                 Positioned(
                 left: 22,
@@ -743,6 +1008,14 @@ class _ProfileCardState extends State<_ProfileCard> {
                     Wrap(spacing: 6, runSpacing: 6, children: [
                       for (final id in interests.take(3))
                         InterestChip(id, onPhoto: true, highlighted: widget.myInterests.contains(id)),
+                    ]),
+                  ],
+                  if (widget.showHint && widget.onCapture != null) ...[
+                    const SizedBox(height: 12),
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.touch_app_rounded, color: Colors.white70, size: 18),
+                      const SizedBox(width: 6),
+                      Flexible(child: Text(l.captureHintLine, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700, fontSize: 13))),
                     ]),
                   ],
                 ]),

@@ -62,7 +62,7 @@ export const INVENTORY: InventoryEntry[] = [
   },
   {
     category: 'Etkileşim',
-    tables: ['Swipe', 'Block', 'Conversation', 'ContactRequest'],
+    tables: ['Swipe', 'SwipeUndo', 'Block', 'Conversation', 'ContactRequest'],
     data: 'Beğeni/geçme, engellemeler, eşleşmeler, mesaj istekleri',
     purpose: 'Eşleşme ve iletişim hizmeti, güvenlik',
     basis: ['sözleşme', 'meşru'],

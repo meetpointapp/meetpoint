@@ -30,3 +30,14 @@ export async function likeStatus(userId: string) {
     nextFreeAt: oldest ? new Date(oldest.createdAt.getTime() + windowMs) : null,
   };
 }
+
+// Faz 24: "geri al" hakkı. Günlük (kayan 24 saat) sınır; VibeUpMe+ üyelerde daha yüksek.
+export async function undoStatus(userId: string) {
+  const [user, used] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { premiumUntil: true } }),
+    prisma.swipeUndo.count({ where: { userId, createdAt: { gt: new Date(Date.now() - 24 * 3_600_000) } } }),
+  ]);
+  const premium = !!user?.premiumUntil && user.premiumUntil > new Date();
+  const limit = premium ? economy.undoDailyPremium : economy.undoDaily;
+  return { limit, used, remaining: Math.max(0, limit - used), premium };
+}

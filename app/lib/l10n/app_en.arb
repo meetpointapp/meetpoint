@@ -1392,5 +1392,120 @@
   "notifyGames": "Games",
   "errGameLimit": "You've used today's game invites. Try again tomorrow.",
   "errGameNotActive": "This game is no longer open.",
-  "errGameState": "This step is already done, refreshing."
+  "errGameState": "This step is already done, refreshing.",
+  "undo": "Undo",
+  "undoDone": "Last swipe undone",
+  "undoLimitTitle": "You're out of undos",
+  "undoLimitBody": "You can undo {n} times a day. VibeUpMe+ members get {m} a day.",
+  "@undoLimitBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "errUndoUnavailable": "There's no swipe to undo, or the time has passed.",
+  "errUndoMatched": "A swipe that turned into a match can't be undone.",
+  "errUndoLimit": "You've used today's undos.",
+  "profileNudgeTitle": "Your profile is {percent}% complete",
+  "@profileNudgeTitle": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "profileNudgeBody": "Complete profiles are shown first in Discover and match with more people.",
+  "profileNudgeCta": "Complete",
+  "profileChecklistTitle": "Strengthen your profile",
+  "profileChecklistCta": "Edit profile",
+  "profileMissPhotos": "Add {n} more photo(s)",
+  "@profileMissPhotos": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMissInterests": "Pick at least 3 interests",
+  "profileMissLookingFor": "Say what you're looking for",
+  "profileMissPrompts": "Answer {n} more prompt(s)",
+  "@profileMissPrompts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMissBio": "Write a short bio",
+  "profileMissBasics": "Add at least two of height, job, education, zodiac or city",
+  "frequencyLabel": "Compatibility frequency {score} percent",
+  "@frequencyLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "frequencySheetTitle": "{score}% frequency",
+  "@frequencySheetTitle": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "frequencySheetBody": "Where your match with {name} comes from",
+  "@frequencySheetBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "frequencyPartInterests": "Shared interests",
+  "frequencyPartAstro": "Zodiac match",
+  "frequencyPartMusic": "Music taste",
+  "frequencyPartVibe": "Vibe",
+  "frequencyPartIntent": "Looking for",
+  "frequencyFootnote": "Frequency is calculated from what your two profiles have in common. The more you fill in, the more accurate it gets.",
+  "swipeLike": "Send frequency",
+  "swipePass": "Later",
+  "matchFrequencyTitle": "Your frequencies synced!",
+  "matchFrequencyLine": "{score}% compatibility frequency",
+  "@matchFrequencyLine": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "captureMerak": "Curious",
+  "captureInterest": "Interested",
+  "capturePassion": "Passion",
+  "captureHint": "Press and hold a card to like it: Curious, Interested, Passion. Tap ✕ to pass.",
+  "captureConfirmTitle": "Send a super like?",
+  "captureConfirmBody": "Passion uses one super like.",
+  "captureConfirmFree": "Uses 1 of today's free super likes. Left: {n}",
+  "@captureConfirmFree": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "captureConfirmPaid": "Uses 1 of your purchased super likes. Left: {n}",
+  "@captureConfirmPaid": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "captureConfirmSend": "Send",
+  "captureHintLine": "Press and hold: Curious, Interested, Passion",
+  "capturePassionNote": "You'll be asked to confirm"
 }

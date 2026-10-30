@@ -14,9 +14,9 @@ import { swipeLimiter } from '../limits';
 import { notify } from '../notify';
 import { emitToUser } from '../realtime';
 import { debit, lockWallet } from '../wallet';
-import { likeStatus } from '../likeLimit';
+import { likeStatus, undoStatus } from '../likeLimit';
 import { superLikeStatus } from '../superLikes';
-import { MATCH_MODES, matchReason } from '../matching';
+import { MATCH_MODES, frequency, matchReason } from '../matching';
 import { publicProfile, withOnlineMany } from './profile';
 
 export const discoverRouter = Router();
@@ -83,6 +83,8 @@ discoverRouter.get('/discover', async (req, res) => {
     SELECT u."id",
       EXISTS (SELECT 1 FROM "Swipe" s WHERE s."fromId" = u."id" AND s."toId" = ${me.id} AND s."direction" = 'superlike') AS "superLikedMe",
       (u."boostedUntil" IS NOT NULL AND u."boostedUntil" > NOW() AT TIME ZONE 'UTC') AS "boosted",
+      (p."bio" <> '' AND jsonb_array_length(p."interests") >= 3
+        AND (SELECT COUNT(*) FROM "Photo" ph2 WHERE ph2."userId" = u."id" AND ph2."hiddenAt" IS NULL) >= 3) AS "complete",
       ${km} AS "km"
     FROM "User" u
     JOIN "Profile" p ON p."userId" = u."id"
@@ -98,7 +100,7 @@ discoverRouter.get('/discover', async (req, res) => {
       AND NOT EXISTS (SELECT 1 FROM "Swipe" s WHERE s."fromId" = ${me.id} AND s."toId" = u."id")
       AND NOT EXISTS (SELECT 1 FROM "Block" b WHERE (b."fromId" = u."id" AND b."toId" = ${me.id}) OR (b."fromId" = ${me.id} AND b."toId" = u."id"))
       ${distanceFilter}
-    ORDER BY "superLikedMe" DESC, "boosted" DESC, "km" ASC NULLS LAST, u."createdAt" DESC
+    ORDER BY "superLikedMe" DESC, "boosted" DESC, "complete" DESC, "km" ASC NULLS LAST, u."createdAt" DESC
     LIMIT ${mode === 'all' ? DECK_SIZE : MODE_POOL_SIZE}`;
 
   const users = await prisma.user.findMany({ where: { id: { in: rows.map((r) => r.id) } }, include: { profile: true, photos: true } });
@@ -122,7 +124,12 @@ discoverRouter.get('/discover', async (req, res) => {
       match: { mode: reason.mode, score: reason.score, key: reason.key, args: reason.args },
     }));
   }
-  res.json(await withOnlineMany(deck));
+  // Faz 24: her kartta uyum frekansı (tüm modlarda)
+  const withFrequency = deck.map((d) => {
+    const their = byId.get(d.id)?.profile;
+    return their ? { ...d, frequency: frequency(my, their) } : d;
+  });
+  res.json(await withOnlineMany(withFrequency));
 });
 
 // Faz 16: salt kaydırma yerine ortak ilgiye göre vitrinler ("kahve tutkunları", "gezginler").
@@ -207,9 +214,11 @@ discoverRouter.get('/discover/groups/:interestId', async (req, res) => {
 });
 
 discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, res) => {
-  const { toId, direction } = z
-    .object({ toId: z.string(), direction: z.enum(['like', 'pass', 'superlike']) })
+  const { toId, direction, strength: rawStrength } = z
+    .object({ toId: z.string(), direction: z.enum(['like', 'pass', 'superlike']), strength: z.number().int().min(1).max(2).optional() })
     .parse(req.body);
+  // Faz 24: basılı tutma süresine göre beğeni gücü (1 merak, 2 ilgi); sadece normal beğenide anlamlı
+  const strength = direction === 'like' ? (rawStrength ?? 1) : 1;
   const me = uid(req);
   if (toId === me) throw new HttpError(400, 'invalid_target');
   await requireConsent(me, 'special_category');
@@ -245,9 +254,9 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
     }
     await tx.swipe.upsert({
       where: { fromId_toId: { fromId: me, toId } },
-      create: { fromId: me, toId, direction, superPaid: superLikeUsesCredit },
+      create: { fromId: me, toId, direction, superPaid: superLikeUsesCredit, strength },
       // Beğeniden süper beğeniye yükseltmede zaman damgası yenilenir (günlük hak sayımı doğru kalsın)
-      update: { direction, ...(direction === 'superlike' ? { createdAt: new Date(), superPaid: superLikeUsesCredit } : {}) },
+      update: { direction, strength, ...(direction === 'superlike' ? { createdAt: new Date(), superPaid: superLikeUsesCredit } : {}) },
     });
   });
 
@@ -281,6 +290,43 @@ discoverRouter.post('/swipes', requireNotRestricted, swipeLimiter, async (req, r
   await unlockMilestone(me, 'first_match');
   await unlockMilestone(toId, 'first_match');
   res.json({ match: true, conversationId: conversation.id, likes, superLikes });
+});
+
+// Faz 24: son kaydırmayı geri al. Sadece en son kaydırma ve belirli süre içinde; eşleşmeye dönüşmüş
+// kaydırma geri alınamaz. Günlük hak sınırlıdır (VibeUpMe+ için daha fazla).
+discoverRouter.get('/discover/undo-status', async (req, res) => {
+  res.json(await undoStatus(uid(req)));
+});
+
+discoverRouter.post('/swipes/undo', requireNotRestricted, swipeLimiter, async (req, res) => {
+  const { toId } = z.object({ toId: z.string() }).parse(req.body);
+  const me = uid(req);
+  const last = await prisma.swipe.findFirst({ where: { fromId: me }, orderBy: { createdAt: 'desc' } });
+  if (!last || last.toId !== toId) throw new HttpError(409, 'undo_unavailable');
+  if (Date.now() - last.createdAt.getTime() > economy.undoWindowMinutes * 60_000) throw new HttpError(409, 'undo_unavailable');
+  const status = await undoStatus(me);
+  if (status.remaining <= 0) throw new HttpError(403, 'undo_limit_reached', { undo: status });
+
+  // Karşı taraf da beğenmişse sohbet açılmıştır: eşleşme geri alınmaz
+  const [userAId, userBId] = orderedPair(me, toId);
+  const conv = await prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } }, select: { id: true } });
+  if (conv) throw new HttpError(409, 'undo_matched');
+
+  await prisma.$transaction(async (tx) => {
+    const { count } = await tx.swipe.deleteMany({ where: { id: last.id } });
+    if (count !== 1) throw new HttpError(409, 'undo_unavailable');
+    // Satın alınmış süper beğeni hakkı iade edilir
+    if (last.direction === 'superlike' && last.superPaid) {
+      await tx.profile.update({ where: { userId: me }, data: { superLikeCredits: { increment: 1 } } });
+    }
+    await tx.swipeUndo.create({ data: { userId: me, toId, direction: last.direction } });
+  });
+  res.json({
+    undone: { toId, direction: last.direction },
+    undo: await undoStatus(me),
+    likes: await likeStatus(me),
+    superLikes: await superLikeStatus(me),
+  });
 });
 
 // Faz 20: süper beğeni hakları ve paket satın alma

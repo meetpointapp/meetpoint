@@ -32,7 +32,7 @@ import { photoUrls, removeProfilePhoto, storeProfilePhoto } from '../images';
 import { config } from '../config';
 import { HttpError, isBlockedEitherWay, prisma } from '../db';
 import { roundCoord, roundedDistance } from '../geo';
-import { isOnline } from '../realtime';
+import { isOnline, onlineMany } from '../realtime';
 import { getBalance, getCashable } from '../wallet';
 import { reviewNewPhoto } from '../moderation/detect';
 import { socialStats } from '../social';
@@ -135,7 +135,8 @@ export async function withOnline<T extends { id: string }>(profile: T): Promise<
   return { ...profile, online: await isOnline(profile.id) };
 }
 export async function withOnlineMany<T extends { id: string }>(profiles: T[]): Promise<(T & { online: boolean })[]> {
-  return Promise.all(profiles.map(withOnline));
+  const online = await onlineMany(profiles.map((p) => p.id));
+  return profiles.map((p) => ({ ...p, online: online.has(p.id) }));
 }
 
 // Faz 20: gelen sesli/görüntülü aramayı aç/kapat. Kapalıyken o türde arama ve arama isteği alınmaz.

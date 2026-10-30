@@ -27,10 +27,36 @@ abstract final class Fx {
     _play('success.wav');
   }
 
+  // Faz 24: frekans yakalama kademeleri (1 merak, 2 ilgi, 3 tutku) — her kademede daha güçlü titreşim
+  static void captureTier(int tier) {
+    try {
+      switch (tier) {
+        case 1:
+          HapticFeedback.selectionClick();
+        case 2:
+          HapticFeedback.mediumImpact();
+        default:
+          HapticFeedback.heavyImpact();
+      }
+    } catch (_) {}
+  }
+
   // En yüksek değerli an: eşleşme, kademe atlama — güçlü haptik + kutlama sesi
   static void celebrate() {
     try {
       HapticFeedback.heavyImpact();
+    } catch (_) {}
+    _play('celebrate.wav');
+  }
+
+  // Faz 24: eşleşmenin imza haptiği — iki frekans yaklaşırken hafif, birleşince sert vuruş
+  static Future<void> frequencySync() async {
+    try {
+      await HapticFeedback.mediumImpact();
+      await Future<void>.delayed(const Duration(milliseconds: 380));
+      await HapticFeedback.lightImpact();
+      await Future<void>.delayed(const Duration(milliseconds: 140));
+      await HapticFeedback.heavyImpact();
     } catch (_) {}
     _play('celebrate.wav');
   }
