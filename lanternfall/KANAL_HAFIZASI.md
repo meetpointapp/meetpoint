@@ -192,7 +192,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
   - İki hesap: kota ilk kullanımdan 24 saat sonra yenileniyor, toplam günde ~12 klip.
   - Tokenlar bulut ortamına kayıtlı.
 - **Ses (13 Kasım'dan itibaren):** YEREL Chatterbox (cbenv/bin/python3 scripts/tts_local.py; CPU'da, kota yok; 11 sn ses ≈ 50 sn üretim). HF Space sürümünün kotası çok küçük. Zor özel adlar (Zeugma, mozaiğin) bozuk okunuyor: bunları cümleden çıkar, ekranda yaz. **Kullanıcının seçtiği ayar (13 Kasım): "1 güzel" → Ahmet referansı, exaggeration 1.1, cfg_weight 0.3, atempo 1.1.** Cümle içinde dramatik duraklama için "..." kullan. Chatterbox Multilingual Türkçe, "B: duygulu" ayarı (Ahmet referansı, exaggeration 0.8). Script: scripts/tts_chatterbox.py, girdi lines.json = [[metin, duygu], ...]. Whisper kontrolü ve kelime zamanları otomatik. Kullanıcı yorumu: "B fena değil gibi"; ilk videoların ses geri bildirimine göre ayar yapılacak.
-- **Eski ses:** Edge TTS Brian. Yedek olarak duruyor.
+- **Eski ses:** Edge TTS Brian. **16 Kasım'dan beri bu ortamda ÇALIŞMIYOR (proxy WebSocket'e izin vermiyor).**
+- **Yeni İngilizce ses (16 Kasım, kullanıcı seçimi):** Yerel Chatterbox İngilizce, varsayılan ses, exaggeration 0.5, cfg 0.5 ("A güzel ama çok hızlı") → **atempo 0.9 ile yavaşlatılıyor**, satır arası 0,6 sn. Script: scripts/tts_en_local.py (Whisper kontrolü dahil).
 - **Gerçek görsel:** scripts/commons_get.py (Wikimedia; hız sınırı var, 1920 px küçük resim kullan, istekler arasında 6–8 sn bekle; orijinal video dosyaları 429 hatası veriyor).
 - **Yeni ses akışı:** tts_local.py → audio_raw → scripts/prep_audio.sh (atempo 1.1) → audio.
 - **Kurgu:** v31/v32/v33_build.py (v30 tabanlı, ALT_IMG ve klip desteği). Eski şablon: scripts/v26_build.py (klip desteğiyle), scripts/make_builds_27_29.py ile yeni video üretimi.
