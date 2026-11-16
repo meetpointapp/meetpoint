@@ -64,7 +64,10 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
     - Hedef: izlemeye devam eden %70+, ortalama izleme %65+.
   - **2. uzun video (onaylandı): Derinkuyu**, **21 Kasım 16:00** (1. uzun video 14 Kasım 16:00; düzen haftada bir, cuma 16:00). Çalışma başlığı: "Derinkuyu: The Underground City That Hid 20,000 People".
     - Doğrulanan bilgiler: 1963'te bir ev tadilatında duvar yıkılınca bulundu. Yaklaşık 20.000 kişi kapasitesi. ~76–85 m derinlik (kaynaklara göre 8 kat veya daha fazla). İçeriden kapatılan yuvarlak taş kapılar, her kat ayrı kapatılabiliyor. 1923 nüfus mübadelesiyle terk edildi. 1969'da ziyarete açıldı. 1985'ten beri UNESCO (Göreme alanı kapsamında). Kökeni tartışmalı: Frigler (MÖ 8–7. yy) ile Bizans dönemi arası.
-    - Yatay 16:9, 8–10 dk, bölümlü. lflong_build.py şablonu kullanılacak.
+    - Yatay 16:9, 8–10 dk, bölümlü.
+    - **Üretim notları (16 Kasım):** Yeni builder `scripts/long_build.py` (piksel altı afin kamera, döndürme yok, 0,6 sn çapraz geçiş, CRF 15, tekrar kontrolü) + `dk/cards.py` (harita, kat kesiti, derinlik, taş kapı, zaman çizelgesi, yıl kartı, bitiş ekranı) + `scripts/long_mix.py` (ducking, -14 LUFS) + `scripts/music_dk.py` (videoya özel tema).
+    - **Süre dersi:** 59 cümlelik ilk senaryo seslendirilince sadece 4,5 dk tuttu. Bu ses temposunda (atempo 0.9) **8 dk için ~100 cümle** gerekiyor. Senaryo yazarken süreyi baştan hesapla (ortalama ~4,3 sn/cümle + 0,6 sn boşluk).
+    - Görsel kaynakları: Derinkuyu (Nevit Dilmen ve diğerleri), Kaymaklı, Özkonak, Tatlarin, Uçhisar, Zelve, Skylitzes el yazması (kamu malı). Özel kişilerin portre fotoğrafları kullanılmıyor.
   - **Göbekli Tepe uzun video, 44. saat:** 4 izlenme, 9 küçük resim gösterimi, **ortalama izleme 4:40 (8:18'in %56'sı, çok iyi)**. Kaynaklar: YouTube arama 2, kanal sayfası 1, ilgili Shorts 1.
     - Sonuç: İçerik izleyiciyi tutuyor, sorun keşfedilme. YouTube yeni kanalın uzun videosunu henüz önermiyor (9 gösterim). Shorts'taki "İlgili video" bağlantısı ~2.500 Short izlenmesinden sadece 1 izlenme getirdi.
     - Derinkuyu için: başlık ve açıklama arama odaklı olacak (insanların aradığı ifadeler). Kanal fragmanı ayarlanacak. Abone sayısı arttıkça uzun video gösterimleri de artacak.

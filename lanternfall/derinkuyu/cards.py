@@ -295,6 +295,19 @@ def timeline_card(spec, t, dur):
     return done(im)
 
 
+def end_card(spec, t, dur):
+    im = canvas(); d = ImageDraw.Draw(im)
+    text(d, (W / 2, 250), "LANTERNFALL", F("Cinzel.ttf", 84, 700), AMBER, ease(t / 1), "mm")
+    text(d, (W / 2, 330), "Lost places of Türkiye, one story at a time", F("Inter.ttf", 32, 500), CREAM, ease((t - .4) / 1), "mm")
+    # placeholders for YouTube end-screen elements
+    for x in (560, 1360):
+        a = ease((t - .8) / 1)
+        d.rounded_rectangle([S(x - 330), S(470), S(x + 330), S(850)], radius=S(18), outline=mix(AMBER, .5 * a), width=S(3))
+    text(d, (560, 900), "Watch next", F("Inter.ttf", 30, 600), CREAM, ease((t - 1) / 1), "mm")
+    text(d, (1360, 900), "Subscribe for the next lost place", F("Inter.ttf", 30, 600), CREAM, ease((t - 1) / 1), "mm")
+    return done(im)
+
+
 def make(name, spec, t, dur, P):
     return {"map": map_card, "section": section_card, "depth": depth_card, "year": year_card,
-            "door": door_card, "timeline": timeline_card}[name](spec, t, dur)
+            "door": door_card, "timeline": timeline_card, "end": end_card}[name](spec, t, dur)

@@ -44,7 +44,10 @@ def main(out, total, secs):
         a, b = int(s * SR), int(e * SR)
         env[:, a:b] = np.array(lvl[k])[:, None]
     k = int(3 * SR)  # smooth transitions (3 s)
-    env = np.array([np.convolve(e, np.ones(k) / k, "same") for e in env])
+    def smooth(e):
+        c = np.cumsum(np.concatenate([np.full(k // 2, e[0]), e, np.full(k - k // 2, e[-1])]))
+        return (c[k:] - c[:-k])[:len(e)] / k
+    env = np.array([smooth(e) for e in env])
 
     wind = bp(rng.standard_normal(n), 120, 900)
     wind *= 0.5 + 0.5 * np.sin(2 * np.pi * t / 11 + 1) ** 2

@@ -178,11 +178,12 @@ def build_timeline():
     cur = 0.6
     voice = []
     for s in SHOTS:
-        a = os.path.join(P, os.environ.get("AUDIO", "audio"), f"line_{s['line']:02d}")
-        a = a + ".wav" if os.path.exists(a + ".wav") else a + ".mp3"
+        ad = os.path.join(P, os.environ.get("AUDIO", "audio"))
+        a = next(os.path.join(ad, f"line_{s['line']:{w}}.{e}") for w in ("03d", "02d") for e in ("wav", "mp3")
+                 if os.path.exists(os.path.join(ad, f"line_{s['line']:{w}}.{e}")))
         d = dur_of(a)
         if s.get("chapter"):
-            cur += 0.7
+            cur += float(os.environ.get("CHPAUSE", 0.7))
             chapters.append((cur, s["chapter"]))
         gap = s.get("gap", 0.6)
         start, end = cur, cur + d + gap
