@@ -12,6 +12,9 @@ SPACES = [
     ("r3gm/wan2-2-fp8da-aoti-preview", "b"),
     ("r3gm/wan2-2-fp8da-aoti-preview2", "c"),
 ]
+import os as _os
+if _os.environ.get("SKIP"):
+    SPACES = [s for s in SPACES if s[1] not in _os.environ["SKIP"]]
 
 
 def small(src):
@@ -35,7 +38,7 @@ def run(src, out, prompt, dur=3.5):
                       randomize_seed=True, api_name="/generate_video")
             if kind != "a":
                 kw.update(last_image=None, quality=6, scheduler="UniPCMultistep", flow_shift=3.0,
-                          frame_multiplier="16", video_component=True, safe_mode=True,
+                          frame_multiplier=16, video_component=True, safe_mode=True,
                           enable_safety_checker=False)
             if kind == "c":
                 kw.update(upscale_model="2xNomosUni_compact_otf_medium", upscale_factor=1.0)

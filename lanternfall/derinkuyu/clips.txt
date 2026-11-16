@@ -1,0 +1,9 @@
+c02|p25|slow steady camera tilt down into a deep vertical rock shaft, cold blue light, dust drifting, realistic
+c03|p40|slow steady camera moving down a narrow carved stone staircase, handrail, dim lamps, realistic
+c04|p27|slow steady push in toward a huge round millstone door beside a dark passage, flickering warm lamp light, realistic
+c05|p44|slow steady camera descending into a circular carved ventilation shaft, light from above, realistic
+c06|p49|clouds drifting slowly over a quiet town square, slow push in, natural daylight, realistic
+c07|p14|slow steady push through a carved round opening into an underground chamber, lamps glowing, realistic
+c08|p20|slow steady dolly forward through a low carved corridor toward a lit room, realistic
+c09|p45|slow steady dolly forward through a long golden-lit stone tunnel, dust in the air, realistic
+c10|p01|slow steady pan across a large carved underground hall with warm light, realistic
