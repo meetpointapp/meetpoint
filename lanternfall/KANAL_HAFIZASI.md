@@ -186,7 +186,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
   - **Doğruluk kontrolü:** Gerçek eseri değiştiren yapay zekâ klipleri atıldı (Karun açılışı yeniden yapıldı). Örnek fotoğraflar "ÖRNEK" diye etiketlendi.
 
 ## Üretim sistemi (teknik)
-- **⚠️ 16 Kasım: Bulut ortamı sıfırlandı; scratchpad'deki tüm scriptler, görseller ve cbenv silindi.** Hafıza dosyası kullanıcıdaki kopyadan geri yüklendi. Araçlar yeniden kuruluyor. Ders: hafıza dosyası her güncellemede kullanıcıya gönderilmeye devam edecek (yedek kullanıcıda).
+- **⚠️ 16 Kasım: Bulut ortamı sıfırlandı; scratchpad'deki tüm scriptler, görseller ve cbenv silindi.** Hafıza dosyası kullanıcıdaki kopyadan geri yüklendi. Araçlar yeniden kuruluyor. Ders: hafıza dosyası her güncellemede kullanıcıya gönderilmeye devam edecek. **Kalıcı yedek (kullanıcı onayı, 16 Kasım): GitHub meetpoint deposu, `claude/brave-hypatia-07udpo` dalı, `lanternfall/` klasörü. Her script/hafıza değişikliğinden sonra oraya commit + push. Ortam sıfırlanırsa önce oradan geri yükle.**
 - **Görsel:** Cloudflare FLUX klein (scripts/cf_klein.py dikey, cf_klein_h.py yatay). İki hesap var, kota 03:00 TR'de sıfırlanıyor.
 - **Hareketli klip:** Hugging Face Wan 2.2 (scripts/wan_i2v.py).
   - İki hesap: kota ilk kullanımdan 24 saat sonra yenileniyor, toplam günde ~12 klip.
