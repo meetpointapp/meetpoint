@@ -1,0 +1,22 @@
+DERINKUYU UZUN VIDEO - YUKLEME BILGILERI (21 Kasim Cuma 16:00)
+
+BASLIK:
+Derinkuyu: The Underground City That Hid 20,000 People
+
+ACIKLAMA:
+(aciklama.txt dosyasinin tamamini yapistir)
+
+ETIKETLER:
+derinkuyu, derinkuyu underground city, underground city, underground city turkey, cappadocia, cappadocia underground city, kaymakli, ancient underground city, turkey history, ancient mysteries, archaeology documentary, lost city, byzantine, hidden city, nevsehir, ozkonak, history documentary
+
+KAPAK: kapak_A / kapak_B / kapak_C (birini sec)
+
+SABIT YORUM:
+If you had to hide down here for weeks, what would you miss most from the world above? I think I'd miss the sunlight more than anything.
+
+AYARLAR:
+- Kategori: Education
+- Cocuklara ozel: Hayir
+- Bitis ekrani (son 9 saniye): sol kutu = "En iyi eslesen video" veya Gobekli Tepe uzun videosu, sag kutu = Abone ol
+- Bolumler aciklamadaki zaman damgalariyla otomatik olusur
+- 21 Kasim 16:00'dan itibaren Shortlardaki "Ilgili video" = bu video

@@ -1,3 +1,4 @@
+c01|p32|slow steady camera dolly forward through a narrow carved stone tunnel
 c02|p25|slow steady camera tilt down into a deep vertical rock shaft, cold blue light, dust drifting, realistic
 c03|p40|slow steady camera moving down a narrow carved stone staircase, handrail, dim lamps, realistic
 c04|p27|slow steady push in toward a huge round millstone door beside a dark passage, flickering warm lamp light, realistic
