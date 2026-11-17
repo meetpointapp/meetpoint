@@ -103,6 +103,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **TikTok takvimi (teslim edildi):** 17 Kasım Derinkuyu duvar (paylaşıldı 20:35), 18 Kasım taş kapılar, 19 Kasım hava bacaları, 20 Kasım Kekova, 21 Kasım Truva/Ajax, 22 Kasım Mardin Çemka Höyük (hepsi 23:00, kapaklı). Sonraki: 23 Kasım'dan itibaren yeni Shorts'ların Türkçe versiyonları.
 
+- **TikTok Derinkuyu #1, 4. saat:** 373 izlenme, 5 beğeni, 3 yorum, 1 paylaşım, 0 takipçi, ort. 9,8 sn (50 sn'nin %20'si), tamamı izleme %4,65. Eski TikTok ortalamalarıyla aynı bant (Nemrut 688/12,3 sn). Kullanıcı: "TikTok'tan iyice soğudum". Ders: TikTok'ta 50 sn çok uzun; izleyici ~10. saniyede gidiyor. Karar önerisi: TikTok sıfır ekstra emekle (YouTube Shorts'un Türkçesi, 25–35 sn) 15 Aralık'a kadar sürsün, orada karar verilsin; kullanıcı isterse hemen durdurulur.
+
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
 
