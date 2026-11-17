@@ -18,7 +18,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 ## 🗓️ 2. HAFTA ÜRETİM PLANI (15 Kasım'da kuruldu)
 - Zamanlanmış içerik 17 Kasım'da bitiyor (10:00 ve 16:00).
 - **18–20 Kasım:** Her gün 10:00'da yeni keşif Short'u (kontrol listesine göre), 16:00'da Derinkuyu tanıtım Short'u. İlgili video 21 Kasım'a kadar Göbekli, sonra Derinkuyu.
-- **21 Kasım Cuma 16:00:** Derinkuyu uzun videosu.
+- **21 Kasım CUMARTESİ 16:00:** Derinkuyu uzun videosu (planlandı). Not: 21 Kasım cumartesi; eski notlardaki 'cuma' yanlıştı.
 - **21–23 Kasım:** 10:00 yeni keşif + 16:00 Derinkuyu kesitleri.
 - **Üretim takvimi:** 16 Kasım → 18–20 Kasım Shorts'ları (6 adet) sende. 17–20 Kasım → Derinkuyu uzun video. 20 Kasım → 21–23 Kasım Shorts'ları.
 - **TikTok:** Her Lanternfall Short'unun Türkçe versiyonu, kotasız, aynı gün 23:00'te.
@@ -84,6 +84,11 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
       - Sıkıştırma yüzünden oluşan takılmayı önlemek için daha yüksek bit hızı kullanılacak.
       - Videoya özgü yeni bir müzik teması yazılacak.
   - **Uzun video:** Haftalık. Arama hacmi yüksek konu, güçlü küçük resim, ilk 30 saniyede kanca, bölümler. Shorts uzun videoya trafik taşıyan kapı olacak.
+
+## 3. HAFTA PLANI (17 Kasım)
+- YouTube: 20 Kasım 16:00'ya kadar Shorts planlı, 21 Kasım cumartesi 16:00 Derinkuyu planlı.
+- Üretilecek: 21–23 Kasım Shorts (10:00 yeni keşif ×3, 16:00 Derinkuyu ×3, kesit + yeni öğe), yeni açılış kuralıyla. 18 Kasım sonuna kadar teslim.
+- TikTok: 15 Kasım'dan beri boş. Türkçe ses: Chatterbox Multilingual varsayılan ses (Ahmet referansı ortam sıfırlanınca kayboldu; Edge çalışmıyor). Yıllar yazıyla yazılmalı ("1963" → "bin dokuz yüz altmış üç"; rakamla 1936 okudu). 18–20 Kasım 23:00 için Derinkuyu malzemesinden 3 Türkçe TikTok; 21 Kasım'dan itibaren her yeni Short iki dilde birden üretilir.
 
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
