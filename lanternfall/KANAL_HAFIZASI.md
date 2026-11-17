@@ -87,7 +87,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 ## 3. HAFTA PLANI (17 Kasım)
 - YouTube: 20 Kasım 16:00'ya kadar Shorts planlı, 21 Kasım cumartesi 16:00 Derinkuyu planlı.
-- Üretilecek: 21–23 Kasım Shorts (10:00 yeni keşif ×3, 16:00 Derinkuyu ×3, kesit + yeni öğe), yeni açılış kuralıyla. 18 Kasım sonuna kadar teslim.
+- Üretilecek: 21–23 Kasım Shorts: 10:00 yeni keşif ×3 (21, 22, 23); 16:00 Derinkuyu ×2 (22, 23; kesit + yeni öğe). **Kural (kullanıcı onayı): uzun video günü 16:00'da Short YOK.** Yeni açılış kuralıyla, 18 Kasım sonuna kadar teslim.
 - TikTok: 15 Kasım'dan beri boş. Türkçe ses: Chatterbox Multilingual varsayılan ses (Ahmet referansı ortam sıfırlanınca kayboldu; Edge çalışmıyor). Yıllar yazıyla yazılmalı ("1963" → "bin dokuz yüz altmış üç"; rakamla 1936 okudu). 18–20 Kasım 23:00 için Derinkuyu malzemesinden 3 Türkçe TikTok; 21 Kasım'dan itibaren her yeni Short iki dilde birden üretilir.
 
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
