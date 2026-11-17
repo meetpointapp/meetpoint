@@ -1,0 +1,85 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "img": "dkreal/p44.jpg",
+    "move": "in",
+    "credit": "Photo: Joe Wallace · CC BY-SA 2.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "clip": "dkclips/c05.mp4"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "card": "section",
+    "shaft": true,
+    "upto": 8,
+    "animate": false,
+    "title": "Air from the surface",
+    "crop": [
+     250,
+     1800
+    ]
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "dkreal/p35.jpg",
+    "move": "in",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "img": "dkreal/p12.jpg",
+    "move": "in",
+    "label": "SHAFTS & WELLS",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "dkreal/p23.jpg",
+    "move": "in",
+    "label": "13–15 °C",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 6,
+  "vis": [
+   {
+    "img": "dkreal/p14.jpg",
+    "move": "out",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ }
+]

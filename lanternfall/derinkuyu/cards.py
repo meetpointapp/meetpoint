@@ -7,7 +7,7 @@ W, H, SS = 1920, 1080, 2
 AMBER = (255, 178, 72)
 CREAM = (244, 234, 214)
 BG = (20, 17, 13)
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.realpath(__file__))
 FONTS = os.path.join(HERE, "..", "fonts")
 
 
@@ -308,6 +308,43 @@ def end_card(spec, t, dur):
     return done(im)
 
 
+def bars_card(spec, t, dur):
+    im = canvas(); d = ImageDraw.Draw(im)
+    text(d, (W / 2, 130), spec.get("title", ""), F("Cinzel.ttf", 64, 700), CREAM, ease(t / .8), "mm")
+    items = spec["items"]; mx = max(v for _, v, _ in items)
+    y0 = 300
+    for i, (lab, v, sub) in enumerate(items):
+        a = ease((t - 0.4 - i * 0.5) / 1.0)
+        y = y0 + i * 220
+        col = AMBER if i == 0 else (170, 160, 140)
+        text(d, (160, y), lab, F("Inter.ttf", 46, 800), col, min(1, a * 2))
+        text(d, (160, y + 58), sub, F("Inter.ttf", 30, 500), (200, 190, 170), min(1, a * 2))
+        bw = (1600 - 160) * v / mx * a
+        d.rounded_rectangle([S(160), S(y + 110), S(160 + max(bw, 4)), S(y + 160)], radius=S(12), fill=col)
+        text(d, (170 + bw + 20, y + 135), f"{int(v * a):,} yrs", F("Inter.ttf", 40, 800), col, a, "lm")
+    return done(im)
+
+
+def vbars_card(spec, t, dur):
+    VW, VH = 1080, 1920
+    bg = stone_bg().resize((VW * SS * 2, VH * SS * 2 * 1080 // 1920 * 2 // 2)).crop((0, 0, VW * SS, VH * SS)) if False else Image.new("RGB", (VW * SS, VH * SS), BG)
+    d = ImageDraw.Draw(bg)
+    def tx(xy, s_, f, c, a, anc="la"):
+        if a <= 0: return
+        col = tuple(int(x * a + b * (1 - a)) for x, b in zip(c, BG)); d.text((S(xy[0]), S(xy[1])), s_, font=f, fill=col, anchor=anc)
+    tx((VW / 2, 560), spec.get("title", ""), F("Cinzel.ttf", 58, 700), CREAM, ease(t / .8), "mm")
+    items = spec["items"]; mx = max(v for _, v, _ in items)
+    for i, (lab, v, sub) in enumerate(items):
+        a = ease((t - 0.3 - i * 0.45) / 0.9); y = 700 + i * 230
+        col = AMBER if i == 0 else (170, 160, 140)
+        tx((80, y), lab, F("Inter.ttf", 50, 800), col, min(1, a * 2))
+        tx((80, y + 62), sub, F("Inter.ttf", 32, 500), (200, 190, 170), min(1, a * 2))
+        bw = (700) * v / mx * a
+        d.rounded_rectangle([S(80), S(y + 118), S(80 + max(bw, 4)), S(y + 170)], radius=S(12), fill=col)
+        tx((100 + bw, y + 144), f"{int(v * a):,}", F("Inter.ttf", 44, 800), col, a, "lm")
+    return bg.resize((VW, VH), Image.LANCZOS)
+
+
 def make(name, spec, t, dur, P):
     return {"map": map_card, "section": section_card, "depth": depth_card, "year": year_card,
-            "door": door_card, "timeline": timeline_card, "end": end_card}[name](spec, t, dur)
+            "door": door_card, "timeline": timeline_card, "end": end_card, "bars": bars_card, "vbars": vbars_card}[name](spec, t, dur)

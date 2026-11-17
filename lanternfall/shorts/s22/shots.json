@@ -1,0 +1,89 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "img": "real/tr06.jpg",
+    "move": "in",
+    "tag": "1804 engraving: burial mound near Rhoiteion",
+    "label": "NEAR TROY",
+    "credit": "Photo: William Gell · Public domain"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "img": "real/tr07.jpg",
+    "move": "in",
+    "tag": "1824 map of the Troad",
+    "credit": "Photo: William Martin Leake · Public domain"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "clip": "shclips/v2.mp4",
+    "vert": true,
+    "max": 1.5
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "real/tr01.jpg",
+    "move": "left",
+    "credit": "Photo: CherryX · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "img": "real/tr03.jpg",
+    "move": "in",
+    "label": "DATE: UNKNOWN",
+    "credit": "Photo: Dosseman · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "real/tr04.jpg",
+    "move": "in",
+    "tag": "Ajax & Achilles, Exekias amphora, c. 530 BC",
+    "credit": "Photo: Daderot · Public domain"
+   },
+   {
+    "img": "real/tr05.jpg",
+    "move": "out",
+    "credit": "Photo: Daderot · Public domain"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 6,
+  "vis": [
+   {
+    "img": "real/tr02.jpg",
+    "move": "in",
+    "credit": "Photo: Radosław Botev · CC BY 3.0 pl"
+   }
+  ],
+  "gap": 0.2
+ }
+]

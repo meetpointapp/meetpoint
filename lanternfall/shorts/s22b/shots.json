@@ -1,0 +1,76 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "img": "dkreal/p58.jpg",
+    "move": "in",
+    "credit": "Photo: Elena Pleskevich from Moscow, Russia · CC BY-SA 2.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "img": "dkreal/p49.jpg",
+    "move": "in",
+    "label": "DERINKUYU, TÜRKİYE",
+    "credit": "Photo: Codas · CC BY-SA 4.0"
+   },
+   {
+    "img": "dkreal/p40.jpg",
+    "move": "down",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "card": "door",
+    "crop": [
+     300,
+     1800
+    ]
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "dkreal/p47.jpg",
+    "move": "up",
+    "credit": "Photo: TobyJ · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "img": "dkreal/p33.jpg",
+    "move": "in",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "dkreal/p26.jpg",
+    "move": "out",
+    "credit": "Photo: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.2
+ }
+]

@@ -99,6 +99,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **Kararlar (17 Kasım akşam, kullanıcı: "senin önerilerinle devam"):** 28 Kasım cumartesi 16:00 uzun video = **TRUVA: Savaş gerçek miydi?** (yüksek arama hacmi + Ajax mezarı haberi). Göbekli uzun videosu için 2 yeni kapak (YouTube Test ve Karşılaştır). Shorts İngilizce ses = Chatterbox EN (Derinkuyu sesi, atempo 0.9), Brian artık yok.
 
+- **21–23 Kasım Shorts TESLİM EDİLDİ (17 Kasım gece):** 21 10:00 Kekova batığı, 22 10:00 Truva/Ajax, 23 10:00 Mardin çömlek, 22 16:00 Derinkuyu taş kapı, 23 16:00 Derinkuyu hava bacaları. 25–31 sn. Yeni açılış kuralı: ilk kare aydınlık ve gerçek (kararma efekti kaldırıldı: NOFADEIN=1), manşet üstte, büyük sarı altyazı, döngülü son cümle, etiketli örnek/replika görseller. Wan kliplerinde sonradan beliren nesneler (sürat teknesi, beyaz nesne) kesildi (max 1,5 sn). Builder: scripts/short_build.py (dikey; kartlar letterbox+crop, vbars dikey grafik). İlgili video: 21 Kasım Short = Göbekli; 22–23 = Derinkuyu.
+
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
 

@@ -39,6 +39,8 @@ _orig_render_vis = LB.render_vis
 def render_vis(v, u, need):
     if "img" in v:
         fr = LB.render_img(v, u)
+    elif "clip" in v and v.get("vert"):
+        fr = LB.render_clip(v, u, need)
     elif "clip" in v:
         LB.W, LB.H = 1920, 1080
         try:
@@ -52,13 +54,17 @@ def render_vis(v, u, need):
             fr = LB.CARDS.make(v["card"], v, u * need, need, LB.P)
         finally:
             LB.W, LB.H = W, H
+        if fr.size == (W, H):
+            return overlay_v(fr, v, u * need, need)
+        if v.get("crop"):
+            fr = fr.crop((v["crop"][0], 0, v["crop"][1], fr.size[1]))
         fr = letterbox(fr, os.path.join(LB.P, "bg.jpg"))
     return overlay_v(fr, v, u * need, need)
 
 
 def overlay_v(fr, v, t, need):
     if v.get("tag"):
-        LB.shadow_text(fr, (W - 40, 330), v["tag"], LB.font("Inter.ttf", 30, 700), (255, 205, 130), 0.95, "ra", 3)
+        LB.shadow_text(fr, (W - 40, 440), v["tag"], LB.font("Inter.ttf", 30, 700), (255, 205, 130), 0.95, "ra", 3)
     if v.get("credit"):
         LB.shadow_text(fr, (W - 30, H - 40), v["credit"], LB.font("Inter.ttf", 20, 400), (230, 230, 230), 0.7, "rs", 2)
     if v.get("label"):
@@ -175,7 +181,7 @@ def main(p):
     total -= 1.5
     for s in segs:
         if "clip" in s["v"]:
-            LB.W, LB.H = 1920, 1080
+            if not s["v"].get("vert"): LB.W, LB.H = 1920, 1080
             s["v"]["_dir"] = LB.clip_frames_dir(s["v"], s["t1x"] - s["t0"])
             LB.W, LB.H = W, H
     disp = meta.get("display")
