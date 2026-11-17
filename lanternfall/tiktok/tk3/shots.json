@@ -1,0 +1,127 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "img": "real/p44.jpg",
+    "move": "in",
+    "credit": "Foto: Joe Wallace · CC BY-SA 2.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "img": "real/p25.jpg",
+    "move": "in",
+    "label": "HAVA BACALARI",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "img": "real/p14.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "real/p12.jpg",
+    "move": "in",
+    "label": "50'DEN FAZLA",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "img": "real/p35.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "real/p05.jpg",
+    "move": "right",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 6,
+  "vis": [
+   {
+    "img": "real/p09.jpg",
+    "move": "out",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 7,
+  "vis": [
+   {
+    "img": "real/p23.jpg",
+    "move": "in",
+    "label": "13-15 °C",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 8,
+  "vis": [
+   {
+    "img": "real/o03.jpg",
+    "move": "in",
+    "tag": "Özkonak yeraltı şehri: alet izleri",
+    "credit": "Foto: Wolfgang Sauber · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 9,
+  "vis": [
+   {
+    "img": "real/p34.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 10,
+  "vis": [
+   {
+    "img": "real/p43.jpg",
+    "move": "out",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ }
+]

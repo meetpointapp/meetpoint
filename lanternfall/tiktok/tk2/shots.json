@@ -1,0 +1,127 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "img": "real/p29.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "img": "real/p58.jpg",
+    "move": "in",
+    "label": "YÜZLERCE KİLO",
+    "credit": "Foto: Elena Pleskevich from Moscow, Russia · CC BY-SA 2.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "img": "real/p46.jpg",
+    "move": "out",
+    "label": "DERİNKUYU",
+    "credit": "Foto: TobyJ · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "real/p27.jpg",
+    "move": "left",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "img": "real/p47.jpg",
+    "move": "up",
+    "label": "İÇERİDEN",
+    "credit": "Foto: TobyJ · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "real/p26.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 6,
+  "vis": [
+   {
+    "img": "real/p30.jpg",
+    "move": "down",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 7,
+  "vis": [
+   {
+    "img": "real/p38.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 8,
+  "vis": [
+   {
+    "img": "real/s01.jpg",
+    "move": "in",
+    "tag": "Bizans el yazması, 12.-13. yy",
+    "credit": "Foto: Unknown, 13th-century author · Public domain"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 9,
+  "vis": [
+   {
+    "img": "real/p10.jpg",
+    "move": "in",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ },
+ {
+  "line": 10,
+  "vis": [
+   {
+    "img": "real/p28.jpg",
+    "move": "out",
+    "credit": "Foto: Nevit Dilmen · CC BY-SA 3.0"
+   }
+  ],
+  "gap": 0.25
+ }
+]
