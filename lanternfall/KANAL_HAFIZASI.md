@@ -44,6 +44,13 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - **Zamanlanmış videolara dokunulmayacak.** Her YENİ video, önceki videoların verisinden çıkan derslerle üretilecek. Her video bir öncekinden biraz daha iyi olacak; kanal bu birikimle kendini kanıtlayacak.
 - Hasankeyf 15 Kasım'da 3 saat 50 dakikada 419 izlenmeye ulaştı ve 8 beğeni aldı; grafik hâlâ yükseliyordu. Mağara 486'da platoya girmişti.
 
+## 🧱 1.000–1.500 TAVANI (17 Kasım analizi)
+- En iyi Shortlar hep 1.000–1.500'de duruyor: Hasankeyf 1,3K, Stonehenge 1K, 10.000 yıllık yüzler 1.378, Taş Baş 1.420.
+- Ortak zayıflık: izlemeye devam %58–62 (ilk saniyede %40 kaydırma) ve ort. izleme süresinin büyük kısmı tek izleme (tekrar yok).
+- Bir sonraki havuz için hedef: **izlemeye devam %70+**, **ort. izleme %100+** (döngü/tekrar), **beğeni oranı %4+**, yorum/paylaşım.
+- Uygulanan: aydınlık ilk kare, ilk cümlede sonuç, 25–30 sn, döngülü son cümle, büyük sarı altyazı (21–23 Kasım). Test: bu 5 Short'un devam %'si 70'i geçiyor mu? Geçip yine tavanda kalırsa sıradaki kol: konu genişliği (dünya çapında bilinen yer/olay: Truva, piramit karşılaştırması) ve 20–22 sn'lik daha da kısa Shortlar.
+- Kanal 1 haftalık; tavan kanal büyüdükçe kendiliğinden de yükselir.
+
 ## ✅ YENİ SHORTS KONTROL LİSTESİ (her yeni Lanternfall Short'u bunu geçmeli)
 1. Konu: Türkiye'den gerçek bir keşif haberi. Başlık kalıbı: "…Was Just Found in Turkey".
 2. İlk karede hareketli keşif ANI (bir şey bulunuyor/çıkıyor). Manşet ana objenin üstüne binmeyecek.
