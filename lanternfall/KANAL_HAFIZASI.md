@@ -85,6 +85,9 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
       - Videoya özgü yeni bir müzik teması yazılacak.
   - **Uzun video:** Haftalık. Arama hacmi yüksek konu, güçlü küçük resim, ilk 30 saniyede kanca, bölümler. Shorts uzun videoya trafik taşıyan kapı olacak.
 
+## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
+- Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
+
 ## Kanallar
 - **Gece Gelen | Anadolu Sırları** (TikTok @gecegelenai)
   - ~7.000 takipçi, Türkçe.
