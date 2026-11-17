@@ -97,6 +97,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **TikTok Derinkuyu #1 ("Bodrumdaki duvarı yıktı") 17 Kasım 20:35'te paylaşıldı** (plan 18 Kasım 23:00'tü). Yeni Türkçe ses + dikey builder ile ilk video. 3. saat verisi beklenecek.
 
+- **Kararlar (17 Kasım akşam, kullanıcı: "senin önerilerinle devam"):** 28 Kasım cumartesi 16:00 uzun video = **TRUVA: Savaş gerçek miydi?** (yüksek arama hacmi + Ajax mezarı haberi). Göbekli uzun videosu için 2 yeni kapak (YouTube Test ve Karşılaştır). Shorts İngilizce ses = Chatterbox EN (Derinkuyu sesi, atempo 0.9), Brian artık yok.
+
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
 
