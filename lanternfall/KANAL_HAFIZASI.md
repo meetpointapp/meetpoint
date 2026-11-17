@@ -90,6 +90,9 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Üretilecek: 21–23 Kasım Shorts: 10:00 yeni keşif ×3 (21, 22, 23); 16:00 Derinkuyu ×2 (22, 23; kesit + yeni öğe). **Kural (kullanıcı onayı): uzun video günü 16:00'da Short YOK.** Yeni açılış kuralıyla, 18 Kasım sonuna kadar teslim.
 - TikTok: 15 Kasım'dan beri boş. Türkçe ses: Chatterbox Multilingual varsayılan ses (Ahmet referansı ortam sıfırlanınca kayboldu; Edge çalışmıyor). Yıllar yazıyla yazılmalı ("1963" → "bin dokuz yüz altmış üç"; rakamla 1936 okudu). 18–20 Kasım 23:00 için Derinkuyu malzemesinden 3 Türkçe TikTok; 21 Kasım'dan itibaren her yeni Short iki dilde birden üretilir.
 
+- **Türkçe ses (17 Kasım):** Chatterbox varsayılan sesi kullanıcıya göre "çok kötü". Edge (Ahmet) HF Space'leri de çalışmıyor (hepsi hata/askıda). Yeni deneme: Piper tr_TR-dfki-medium (yerel, net) ve bunu referans alan Chatterbox "1" ayarı (ex 1.1, cfg 0.3, atempo 1.1). İkisi de Whisper'da kelimesi kelimesine doğru. Kullanıcı seçimi bekleniyor.
+- **21–23 Kasım 10:00 konuları (araştırıldı):** 21: Kekova açıklarında dünyanın en eski batığı (4.400–4.700 yıl, ~30 m derinlik, 30+ amfora, 3 taş çapa; 'en eski' iddiası kazı ekibinin). 22: Truva yakınında Ajax'ın mezarı olabilecek tümülüs (Işıldaktepe Altı, Rhoiteion yakını; tarih henüz belirsiz, 'olabilir' diye anlatılacak). 23: Mardin Çemka Höyük, ~11.000 yıllık ilk çömlek denemeleri (46 parça, en az 9 kap; Antiquity 2026).
+
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
 
