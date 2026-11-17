@@ -95,6 +95,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **TikTok teslim paketi (her video):** video + dikey kapak (1080x1920, büyük 2 satır beyaz + 2 satır turuncu manşet, alt etiket) + açıklama/etiketler + sabit yorum + oynatma listesi. Kapağı unutma (17 Kasım kullanıcı sordu). Türkçe ses = "1" (Piper dfki referanslı Chatterbox), kullanıcı onayladı.
 
+- **TikTok Derinkuyu #1 ("Bodrumdaki duvarı yıktı") 17 Kasım 20:35'te paylaşıldı** (plan 18 Kasım 23:00'tü). Yeni Türkçe ses + dikey builder ile ilk video. 3. saat verisi beklenecek.
+
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
 
