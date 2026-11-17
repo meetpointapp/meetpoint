@@ -1,0 +1,110 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "clip": "shclips/v1.mp4",
+    "vert": true,
+    "label": "4.700 YIL",
+    "max": 1.6
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "img": "real/kk09.jpg",
+    "move": "in",
+    "credit": "Foto: Tanya Dedyukhina · CC BY 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "img": "real/kk03.jpg",
+    "move": "right",
+    "label": "KEKOVA, ANTALYA",
+    "credit": "Foto: Alexkom000 · CC BY 4.0"
+   },
+   {
+    "img": "real/kk02.jpg",
+    "move": "in",
+    "credit": "Foto: Tanya Dedyukhina · CC BY 3.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "real/kk08.jpg",
+    "move": "in",
+    "tag": "ÖRNEK: Tunç Çağı küpü (müze)",
+    "credit": "Foto: Gary Todd from Xinzheng, China · CC0"
+   },
+   {
+    "img": "real/kk06.jpg",
+    "move": "right",
+    "tag": "Uluburun batığı replikası, Bodrum Müzesi",
+    "credit": "Foto: Dosseman · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "card": "vbars",
+    "title": "Bilinen en eski batıklar (yıl)",
+    "items": [
+     [
+      "Kekova, Türkiye",
+      4700,
+      "MÖ 2700–2400 · yeni duyuruldu"
+     ],
+     [
+      "Dokos, Yunanistan",
+      4200,
+      "MÖ 2200 · önceki rekor"
+     ],
+     [
+      "Uluburun, Türkiye",
+      3300,
+      "MÖ 1300 · ünlü Tunç Çağı batığı"
+     ]
+    ]
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "real/kk07.jpg",
+    "move": "left",
+    "tag": "Uluburun batığı replikası, Bodrum Müzesi",
+    "credit": "Foto: Dosseman · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 6,
+  "vis": [
+   {
+    "img": "real/kk04.jpg",
+    "move": "in",
+    "credit": "Foto: Alexkom000 · CC BY 4.0"
+   }
+  ],
+  "gap": 0.2
+ }
+]

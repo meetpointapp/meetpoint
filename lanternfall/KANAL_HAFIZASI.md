@@ -101,6 +101,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **21–23 Kasım Shorts TESLİM EDİLDİ (17 Kasım gece):** 21 10:00 Kekova batığı, 22 10:00 Truva/Ajax, 23 10:00 Mardin çömlek, 22 16:00 Derinkuyu taş kapı, 23 16:00 Derinkuyu hava bacaları. 25–31 sn. Yeni açılış kuralı: ilk kare aydınlık ve gerçek (kararma efekti kaldırıldı: NOFADEIN=1), manşet üstte, büyük sarı altyazı, döngülü son cümle, etiketli örnek/replika görseller. Wan kliplerinde sonradan beliren nesneler (sürat teknesi, beyaz nesne) kesildi (max 1,5 sn). Builder: scripts/short_build.py (dikey; kartlar letterbox+crop, vbars dikey grafik). İlgili video: 21 Kasım Short = Göbekli; 22–23 = Derinkuyu.
 
+- **TikTok takvimi (teslim edildi):** 17 Kasım Derinkuyu duvar (paylaşıldı 20:35), 18 Kasım taş kapılar, 19 Kasım hava bacaları, 20 Kasım Kekova, 21 Kasım Truva/Ajax, 22 Kasım Mardin Çemka Höyük (hepsi 23:00, kapaklı). Sonraki: 23 Kasım'dan itibaren yeni Shorts'ların Türkçe versiyonları.
+
 ## TikTok oynatma listeleri (17 Kasım, özellik açıldı)
 - Önerilen listeler: "Topraktan Çıkanlar" (keşif haberleri: Siverek tapınağı, Urfa heykeli, Karahantepe), "Saklanan Yerler" (Batman, Cehennem Kapısı, Zerzevan, Yerebatan), "Kayıp Şehirler" (Nemrut, Zeugma, Ani, Hasankeyf, Aizanoi), "Define ve Efsaneler" (Karun, Van Gölü). Her listenin başına en çok izlenen video. Yeni Türkçe Lanternfall versiyonları konusuna göre bu listelere eklenecek. Kota harcamaz.
 

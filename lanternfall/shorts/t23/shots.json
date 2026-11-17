@@ -1,0 +1,83 @@
+[
+ {
+  "line": 0,
+  "vis": [
+   {
+    "clip": "shclips/v3.mp4",
+    "vert": true,
+    "label": "11.000 YIL"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 1,
+  "vis": [
+   {
+    "img": "real/md01.jpg",
+    "move": "in",
+    "label": "MARDİN",
+    "credit": "Foto: Radosław Botev · CC BY 3.0 pl"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 2,
+  "vis": [
+   {
+    "img": "real/md03.jpg",
+    "move": "in",
+    "tag": "ÖRNEK: Neolitik buluntular, Şanlıurfa Müzesi",
+    "credit": "Foto: Radosław Botev · CC BY 3.0 pl"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 3,
+  "vis": [
+   {
+    "img": "real/md04.jpg",
+    "move": "in",
+    "tag": "Müze canlandırması, Şanlıurfa",
+    "credit": "Foto: Radosław Botev · CC BY 3.0 pl"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 4,
+  "vis": [
+   {
+    "img": "real/md05.jpg",
+    "move": "in",
+    "tag": "ÖRNEK: Neolitik buluntular, Şanlıurfa Müzesi",
+    "credit": "Foto: Dosseman · CC BY-SA 4.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 5,
+  "vis": [
+   {
+    "img": "real/md02.jpg",
+    "move": "in",
+    "credit": "Foto: Adam Jones from Kelowna, BC, Canada · CC BY-SA 2.0"
+   }
+  ],
+  "gap": 0.2
+ },
+ {
+  "line": 6,
+  "vis": [
+   {
+    "img": "real/md06.jpg",
+    "move": "out",
+    "credit": "Foto: Senol Demir from Turkey · CC BY 2.0"
+   }
+  ],
+  "gap": 0.2
+ }
+]
