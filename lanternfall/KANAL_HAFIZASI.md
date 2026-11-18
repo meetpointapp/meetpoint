@@ -54,6 +54,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 ## 💬 Kullanıcı soruları (18 Kasım): "İzleyici sıkılmaz mı?" ve "Hep Türkiye, kanal yurt dışı odaklı; bir yerden sonra izleyici getirmeyi bırakmaz mı?" Öneri: format çeşitliliği (haber, karşılaştırma, sıralama, 'ya şöyle olsaydı', seri) + konum 'Anadolu merkezli antik dünya': ~%70 Türkiye, ~%30 Türkiye'yi dünyadaki ünlü yerlerle karşılaştıran içerik (Stonehenge karşılaştırması iyi gitmişti). Kullanıcıyla tartışılıyor.
 
+- **Truva flütü (18 Kasım 10:00, 'The First Musical Instrument…'), 50. dk:** 18 izlenme / 2 aktif, izlemeye devam %12,5 (çok küçük örnek, ~8 kişi), ort. 0:16. İlk test grubu kaydırmış; 3. saat beklenecek.
+
 ## 🧱 1.000–1.500 TAVANI (17 Kasım analizi)
 - En iyi Shortlar hep 1.000–1.500'de duruyor: Hasankeyf 1,3K, Stonehenge 1K, 10.000 yıllık yüzler 1.378, Taş Baş 1.420.
 - Ortak zayıflık: izlemeye devam %58–62 (ilk saniyede %40 kaydırma) ve ort. izleme süresinin büyük kısmı tek izleme (tekrar yok).
