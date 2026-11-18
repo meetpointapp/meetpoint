@@ -44,6 +44,11 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - **Zamanlanmış videolara dokunulmayacak.** Her YENİ video, önceki videoların verisinden çıkan derslerle üretilecek. Her video bir öncekinden biraz daha iyi olacak; kanal bu birikimle kendini kanıtlayacak.
 - Hasankeyf 15 Kasım'da 3 saat 50 dakikada 419 izlenmeye ulaştı ve 8 beğeni aldı; grafik hâlâ yükseliyordu. Mağara 486'da platoya girmişti.
 
+## 🌍 KONU KURALI DEĞİŞTİ (18 Kasım, kullanıcı kararı)
+- **Lanternfall artık sadece Türkiye ile sınırlı DEĞİL. Odak: GÜNCEL arkeoloji/tarih keşifleri, hangi ülke olursa olsun.** Türkiye haberleri devam eder ama zorunlu değil.
+- Başlık kalıbı: "…Was Just Found in [Ülke/Yer]". Kurallar aynı: gerçek kaynak, doğrulanmış bilgi, boş tık tuzağı yok, etiketli AI/örnek görsel.
+- Eski "yabancı haber yok" kuralı Lanternfall için kaldırıldı. TikTok'a giden Türkçe versiyonlar da bu konuları içerir.
+
 ## 🔁 LOOP HATASI (18 Kasım, kullanıcı fark etti)
 - 21–23 Kasım Shortlarında son 1,5 sn ekran kararıyordu → döngü bozuluyor. Düzeltme: Shorts'ta NOFADEIN=1 NOFADEOUT=1, sona boşluk bırakma (gap 0), son kare ilk kareye benzer görsel. Planlanmış videolara dokunulmadı (kar topu).
 
@@ -57,7 +62,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Kanal 1 haftalık; tavan kanal büyüdükçe kendiliğinden de yükselir.
 
 ## ✅ YENİ SHORTS KONTROL LİSTESİ (her yeni Lanternfall Short'u bunu geçmeli)
-1. Konu: Türkiye'den gerçek bir keşif haberi. Başlık kalıbı: "…Was Just Found in Turkey".
+1. Konu: Dünyanın herhangi bir yerinden GÜNCEL, gerçek bir keşif haberi (18 Kasım'dan itibaren). Başlık kalıbı: "…Was Just Found in [Yer]".
 2. İlk karede hareketli keşif ANI (bir şey bulunuyor/çıkıyor). Manşet ana objenin üstüne binmeyecek.
 3. 25–30 saniye. 2. cümle merak cümlesi olacak.
 4. Ortada da sonda da büyük CTA butonu YOK. Soru anlatıya yedirilecek.
