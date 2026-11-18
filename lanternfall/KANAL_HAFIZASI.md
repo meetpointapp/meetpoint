@@ -50,6 +50,15 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - YouTube AI önerisi: en iyi temalarda seri (Göbekli/Taş Tepeler, su altı şehirleri, taş oymalar). Not: AI ilk uzun videoyu Derinkuyu sandı; ilk uzun video Göbekli (14 Kasım), Derinkuyu 21 Kasım'da çıkıyor.
 - YPP yolu: 1.000 abone + (4.000 saat uzun video izlenmesi VEYA 90 günde 10M Shorts izlenmesi). Şu an hafta başına ~17 abone; büyüme hızlanmalı.
 
+## 🚀 BÜYÜME PLANI (18 Kasım, kullanıcı onayladı, bu sırayla)
+1. **Haber takibi:** Her konuşmada/gün son 24–48 saatin dünya arkeoloji haberlerini tara; büyük haber çıkarsa aynı gün Short üret, kullanıcı planlı bir Short'un yerine koysun (planlı olan sonraki boş güne kayar). (Otomatik günlük zamanlanmış görev izin sistemi tarafından reddedildi; manuel yapılıyor.)
+2. **Seriler (sabit başlık/renk/açılış):** "Lost Underwater" (su altı), "Underground Cities" (yeraltı), "Older Than the Pyramids" (çok eski yerler).
+3. **Aylık derleme uzun video:** "The Biggest Archaeological Discoveries of November 2026", Truva'dan sonra (~5 Aralık).
+4. **Kullanıcıdan:** haftalık Topluluk anketi (sıradaki uzun video), Studio'da otomatik dublaj seçeneği var mı kontrol.
+
+## 📰 Haber takibi günlüğü
+- 18 Kasım: Larsa (Irak) 3.800 yıllık Babil köprüsü; Sutton Hoo (İngiltere) yeni Anglo-Sakson mezarı (gövde kumda iz olarak korunmuş); Eriha 2.000 yıllık mezarlık. En güçlü aday: Sutton Hoo (dünyaca ünlü) ve Larsa köprüsü.
+
 ## 🌍 KONU KURALI DEĞİŞTİ (18 Kasım, kullanıcı kararı)
 - **Lanternfall artık sadece Türkiye ile sınırlı DEĞİL. Odak: GÜNCEL arkeoloji/tarih keşifleri, hangi ülke olursa olsun.** Türkiye haberleri devam eder ama zorunlu değil.
 - Başlık kalıbı: "…Was Just Found in [Ülke/Yer]". Kurallar aynı: gerçek kaynak, doğrulanmış bilgi, boş tık tuzağı yok, etiketli AI/örnek görsel.
