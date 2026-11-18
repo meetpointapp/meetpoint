@@ -44,6 +44,12 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - **Zamanlanmış videolara dokunulmayacak.** Her YENİ video, önceki videoların verisinden çıkan derslerle üretilecek. Her video bir öncekinden biraz daha iyi olacak; kanal bu birikimle kendini kanıtlayacak.
 - Hasankeyf 15 Kasım'da 3 saat 50 dakikada 419 izlenmeye ulaştı ve 8 beğeni aldı; grafik hâlâ yükseliyordu. Mağara 486'da platoya girmişti.
 
+## 📊 1. HAFTA ÖZETİ (YouTube AI, 11–17 Kasım)
+- 6.208 görüntüleme, ~28,2 saat izlenme, ort. 27 sn, +17 abone, 1.633 tekil izleyici.
+- En iyiler: 10.000 yıllık yüzler 1.422 (33 sn), Hasankeyf 'underwater city' 1.365 (30 sn), Göbekli vs Stonehenge 1.230 (24 sn), Taş Baş 1.187 (19 sn), Mağara 569 (33 sn).
+- YouTube AI önerisi: en iyi temalarda seri (Göbekli/Taş Tepeler, su altı şehirleri, taş oymalar). Not: AI ilk uzun videoyu Derinkuyu sandı; ilk uzun video Göbekli (14 Kasım), Derinkuyu 21 Kasım'da çıkıyor.
+- YPP yolu: 1.000 abone + (4.000 saat uzun video izlenmesi VEYA 90 günde 10M Shorts izlenmesi). Şu an hafta başına ~17 abone; büyüme hızlanmalı.
+
 ## 🌍 KONU KURALI DEĞİŞTİ (18 Kasım, kullanıcı kararı)
 - **Lanternfall artık sadece Türkiye ile sınırlı DEĞİL. Odak: GÜNCEL arkeoloji/tarih keşifleri, hangi ülke olursa olsun.** Türkiye haberleri devam eder ama zorunlu değil.
 - Başlık kalıbı: "…Was Just Found in [Ülke/Yer]". Kurallar aynı: gerçek kaynak, doğrulanmış bilgi, boş tık tuzağı yok, etiketli AI/örnek görsel.
