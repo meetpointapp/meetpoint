@@ -44,6 +44,11 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - **Zamanlanmış videolara dokunulmayacak.** Her YENİ video, önceki videoların verisinden çıkan derslerle üretilecek. Her video bir öncekinden biraz daha iyi olacak; kanal bu birikimle kendini kanıtlayacak.
 - Hasankeyf 15 Kasım'da 3 saat 50 dakikada 419 izlenmeye ulaştı ve 8 beğeni aldı; grafik hâlâ yükseliyordu. Mağara 486'da platoya girmişti.
 
+## 🔁 LOOP HATASI (18 Kasım, kullanıcı fark etti)
+- 21–23 Kasım Shortlarında son 1,5 sn ekran kararıyordu → döngü bozuluyor. Düzeltme: Shorts'ta NOFADEIN=1 NOFADEOUT=1, sona boşluk bırakma (gap 0), son kare ilk kareye benzer görsel. Planlanmış videolara dokunulmadı (kar topu).
+
+## 💬 Kullanıcı soruları (18 Kasım): "İzleyici sıkılmaz mı?" ve "Hep Türkiye, kanal yurt dışı odaklı; bir yerden sonra izleyici getirmeyi bırakmaz mı?" Öneri: format çeşitliliği (haber, karşılaştırma, sıralama, 'ya şöyle olsaydı', seri) + konum 'Anadolu merkezli antik dünya': ~%70 Türkiye, ~%30 Türkiye'yi dünyadaki ünlü yerlerle karşılaştıran içerik (Stonehenge karşılaştırması iyi gitmişti). Kullanıcıyla tartışılıyor.
+
 ## 🧱 1.000–1.500 TAVANI (17 Kasım analizi)
 - En iyi Shortlar hep 1.000–1.500'de duruyor: Hasankeyf 1,3K, Stonehenge 1K, 10.000 yıllık yüzler 1.378, Taş Baş 1.420.
 - Ortak zayıflık: izlemeye devam %58–62 (ilk saniyede %40 kaydırma) ve ort. izleme süresinin büyük kısmı tek izleme (tekrar yok).

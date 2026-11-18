@@ -232,7 +232,7 @@ def frame(args):
         out = np.zeros((H, W, 3), np.float32)
     out = out * vignette()
     # global fade in/out
-    g = min(1.0, 1.0 if os.environ.get("NOFADEIN") else t / 0.8, (total - t) / 1.5)
+    g = min(1.0, 1.0 if os.environ.get("NOFADEIN") else t / 0.8, 1.0 if os.environ.get("NOFADEOUT") else (total - t) / 1.5)
     out *= max(g, 0)
     img = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
     for ct, title in chapters:
