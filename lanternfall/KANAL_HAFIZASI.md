@@ -80,7 +80,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **Truva flütü (18 Kasım 10:00, 'The First Musical Instrument…'), 50. dk:** 18 izlenme / 2 aktif, izlemeye devam %12,5 (çok küçük örnek, ~8 kişi), ort. 0:16. İlk test grubu kaydırmış; 3. saat beklenecek. **3 saat 10 dk: 189 izlenme, 4 beğeni, %42 devam.** **7 saat 10 dk: 525 izlenme, %51 devam (toparladı), 10 beğeni, +2 abone (kanal 19).** Ders: ilk saatlerdeki düşük oran yanıltıcı olabilir; 3. saatte kesin karar verme, 6–7. saati de bekle. **11–12. saat: 788 izlenme / 392 aktif, %54,5 devam, ort. 0:15, +4 abone (bugün en çok abone getiren).** Hâlâ doğrusal yükseliyor. Soyut konu bile, zamanla iyi kitlesini bulup abone getirdi. 10:00 ortalamasının altında (Hasankeyf ~400, Yüzler 1.320). Ders: 'ilk müzik aleti' konusu soyut kaldı; çarpıcı görsel bir buluntu (yüz, tapınak, şehir) + net büyük sayı daha iyi çalışıyor.
 
-- **Derinkuyu duvarı (18 Kasım 16:00), 1 saat 10 dk:** 35 izlenme, 2 beğeni, %24 devam (küçük örnek). **3. saat: 114 izlenme / 40 aktif, %37,4 devam, ort. 0:14.** Grafik doğrusal yükseliyor (16:00 tipik). Kanal 20 abone.
+- **Derinkuyu duvarı (18 Kasım 16:00), 1 saat 10 dk:** 35 izlenme, 2 beğeni, %24 devam (küçük örnek). **3. saat: 114 izlenme / 40 aktif, %37,4 devam, ort. 0:14.** Grafik doğrusal yükseliyor (16:00 tipik). Kanal 20 abone. **6. saat: 157 izlenme / 60 aktif, %42 devam, ort. 0:17, 2 beğeni, 0 abone; grafik yavaşlıyor.** 16:00'ın zayıf Short'u (Taş Baş 6. saatte ~1.000'di). Canlandırmayla açılış + 16:00 yavaşlığı. Truva flütü 12 beğeni. Kanal 21 abone (18 Kasım gece).
 
 ## 🧱 1.000–1.500 TAVANI (17 Kasım analizi)
 - En iyi Shortlar hep 1.000–1.500'de duruyor: Hasankeyf 1,3K, Stonehenge 1K, 10.000 yıllık yüzler 1.378, Taş Baş 1.420.
