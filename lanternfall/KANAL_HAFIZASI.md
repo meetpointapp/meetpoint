@@ -50,6 +50,12 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - YouTube AI önerisi: en iyi temalarda seri (Göbekli/Taş Tepeler, su altı şehirleri, taş oymalar). Not: AI ilk uzun videoyu Derinkuyu sandı; ilk uzun video Göbekli (14 Kasım), Derinkuyu 21 Kasım'da çıkıyor.
 - YPP yolu: 1.000 abone + (4.000 saat uzun video izlenmesi VEYA 90 günde 10M Shorts izlenmesi). Şu an hafta başına ~17 abone; büyüme hızlanmalı.
 
+## 🎙️ AI SUNUCU FİKRİ (18 Kasım, kullanıcı fikri, onaylandı)
+- Kadın AI sunucu, haber bülteni formatı. Kimlik: 'Lyra — Lanternfall'ın AI rehberi' (gizlenmeyecek; YouTube'da 'değiştirilmiş/sentetik içerik' kutusu işaretlenecek).
+- Açılış (0–2,5 sn) bölünmüş ekran: üst %55 gerçek buluntu görseli + büyük manşet + 'NEW DISCOVERY' bandı ve tarih; alt %45 Lyra konuşuyor (ilk cümle = sonuç). Sonra tam ekran görsellere geçiş, ses Lyra'nın sesiyle devam; sonda 1 sn Lyra dönüş (döngü). Sabit marka: 'LANTERNFALL NEWS' bandı, renk amber.
+- Araçlar: FLUX.1-schnell (yüz), Wan2.2-S2V (konuşan video). 3. HF hesabı tokenı gerekiyor; request_credential iki kez 'Denied' döndü → kullanıcı ortam ayarlarından Network secrets'a ekleyecek (hostlar: black-forest-labs-flux-1-schnell.hf.space, wan-ai-wan2-2-s2v.hf.space).
+- Test: ilk birkaç Short sunuculu, izlemeye devam %'si sunucusuzlarla karşılaştırılacak.
+
 ## 🚀 BÜYÜME PLANI (18 Kasım, kullanıcı onayladı, bu sırayla)
 1. **Haber takibi:** Her konuşmada/gün son 24–48 saatin dünya arkeoloji haberlerini tara; büyük haber çıkarsa aynı gün Short üret, kullanıcı planlı bir Short'un yerine koysun (planlı olan sonraki boş güne kayar). (Otomatik günlük zamanlanmış görev izin sistemi tarafından reddedildi; manuel yapılıyor.)
 2. **Seriler (sabit başlık/renk/açılış):** "Lost Underwater" (su altı), "Underground Cities" (yeraltı), "Older Than the Pyramids" (çok eski yerler).
