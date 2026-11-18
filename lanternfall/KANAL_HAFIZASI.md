@@ -54,6 +54,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Kadın AI sunucu, haber bülteni formatı. Kimlik: 'Lyra — Lanternfall'ın AI rehberi' (gizlenmeyecek; YouTube'da 'değiştirilmiş/sentetik içerik' kutusu işaretlenecek).
 - Açılış (0–2,5 sn) bölünmüş ekran: üst %55 gerçek buluntu görseli + büyük manşet + 'NEW DISCOVERY' bandı ve tarih; alt %45 Lyra konuşuyor (ilk cümle = sonuç). Sonra tam ekran görsellere geçiş, ses Lyra'nın sesiyle devam; sonda 1 sn Lyra dönüş (döngü). Sabit marka: 'LANTERNFALL NEWS' bandı, renk amber.
 - Araçlar: FLUX.1-schnell (yüz), Wan2.2-S2V (konuşan video). 3. HF hesabı tokenı gerekiyor; request_credential iki kez 'Denied' döndü → kullanıcı ortam ayarlarından Network secrets'a ekleyecek (hostlar: black-forest-labs-flux-1-schnell.hf.space, wan-ai-wan2-2-s2v.hf.space).
+- **Teknik (18 Kasım çalışan yol):** Yüz: black-forest-labs/FLUX.1-schnell (768x1344, 4 adım). Konuşturma: multimodalart/MoDA-fast-talking-head (zero-a10g; /generate_motion, emotion Neutral, cfg 1.2) ~1 dk'da 5 sn. Wan-AI/Wan2.2-S2V Space CPU'da çalıştığı için kullanılamaz. Kadın sesi: Chatterbox EN, referans Piper en_US-amy-medium (piper/ref_en_f.wav), ex 0.6 cfg 0.45. Token: kullanıcının 3. HF hesabı, gradio_client token= parametresiyle (dosyaya/GitHub'a YAZILMAZ; kullanıcı ortam ayarlarına erişemediğini söyledi, sohbete yapıştırdı).
+- Adaylar: host/host_1.jpg (kazı alanı, güler yüzlü), host/host_2.jpg (fenerli tünel, önerilen).
 - Test: ilk birkaç Short sunuculu, izlemeye devam %'si sunucusuzlarla karşılaştırılacak.
 
 ## 🚀 BÜYÜME PLANI (18 Kasım, kullanıcı onayladı, bu sırayla)
