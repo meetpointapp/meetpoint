@@ -98,7 +98,7 @@ def draw_char(d, x, y, s, look, pose):
     d.polygon(tor, fill=shirt, outline=OUT, width=int(ow))
     back = [(neck[0] - w_sh * face, neck[1] + 3 * s), (neck[0] - 3 * s * face, neck[1] + 3 * s),
             (hip[0] - 3 * s * face, hip[1] + 4 * s), (hip[0] - w_hip * face, hip[1] + 4 * s)]
-    d.polygon(back, fill=_shade(shirt, 0.86))
+    d.polygon(back, fill=_shade(shirt, 0.93))
     if vest:
         vv = [(neck[0] - w_sh + 2 * s, neck[1] + 4 * s), (neck[0] - 2 * s * face, neck[1] + 5 * s),
               (hip[0] - 2 * s * face, hip[1] + 3 * s), (hip[0] - w_hip + 1 * s, hip[1] + 3 * s)]
@@ -216,7 +216,7 @@ def _head(d, hc, head_r, s, face, look, expr, t, skin, neck, ow, kid=False):
     """Detailed 3/4-profile head. Returns (eye, mouth) anchor points."""
     hx, hy = hc
     fem = bool(look.get("headscarf") or look.get("long_hair"))
-    shade = _shade(skin, 0.86)
+    shade = _shade(skin, 0.94)
     blush = (226, 150, 128)
     # neck
     d.polygon([(neck[0] - 3.2 * s, neck[1] - 4 * s), (neck[0] + 3.2 * s, neck[1] - 4 * s), (neck[0] + 3.6 * s, neck[1] + 4 * s), (neck[0] - 3.6 * s, neck[1] + 4 * s)],
