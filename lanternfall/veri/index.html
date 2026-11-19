@@ -2,100 +2,102 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
 <style>
-/* Layout: one narrow column for phone entry; form card on top, video list with 3/6/24h checkpoint chips below */
+/* Layout: phone-first single column. Top: compact entry card (video, checkpoint tabs, 2-col number grid).
+   Below: schedule grouped by day; each video one row with time pill + three checkpoint cells. */
 :root{
-  --bg:#f6f3ee; --surface:#ffffff; --fg:#22201c; --muted:#6f6a61; --line:#e4ddd2;
-  --accent:#b8741e; --accent-ink:#ffffff; --ok:#2f7d4f; --warn:#b25a1a; --chip:#efe7da;
+  --bg:#f5f2ec; --surface:#ffffff; --fg:#1f1d19; --muted:#716b60; --line:#e3dccf;
+  --accent:#b8741e; --accent-ink:#ffffff; --accent-soft:#f4e6d1; --ok:#2f7d4f; --warn:#b4541a; --chip:#eee7db;
   --f-display:"Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --f-body:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#17150f; --surface:#211e17; --fg:#efe9df; --muted:#a59d8f; --line:#38322a;
-  --accent:#e0a14e; --accent-ink:#1b1408; --ok:#6cc08d; --warn:#e8935a; --chip:#2c271f; color-scheme:dark}}
+  --bg:#15130e; --surface:#1f1c16; --fg:#efe9df; --muted:#a39b8d; --line:#36302a;
+  --accent:#e2a24f; --accent-ink:#1a1307; --accent-soft:#3a2d1b; --ok:#6cc08d; --warn:#ea9460; --chip:#2a251e; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#17150f; --surface:#211e17; --fg:#efe9df; --muted:#a59d8f; --line:#38322a;
-  --accent:#e0a14e; --accent-ink:#1b1408; --ok:#6cc08d; --warn:#e8935a; --chip:#2c271f; color-scheme:dark}
+  --bg:#15130e; --surface:#1f1c16; --fg:#efe9df; --muted:#a39b8d; --line:#36302a;
+  --accent:#e2a24f; --accent-ink:#1a1307; --accent-soft:#3a2d1b; --ok:#6cc08d; --warn:#ea9460; --chip:#2a251e; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
-.wrap{max-width:720px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:20px}
-h1{font-family:var(--f-display);font-size:26px;margin:0;letter-spacing:-.01em}
-h2{font-family:var(--f-display);font-size:18px;margin:0}
-.sub{color:var(--muted);margin:4px 0 0}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px}
-label{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
-input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 11px;min-width:0;width:100%;box-sizing:border-box}
+.wrap{max-width:640px;margin:0 auto;padding-block:18px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:grid;gap:2px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-size:24px;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:13px;margin:0;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:14px}
+label{display:grid;gap:5px;font-size:12.5px;font-weight:600;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 11px;width:100%;box-sizing:border-box;min-width:0}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
-.seg{display:flex;gap:8px;flex-wrap:wrap}
-.seg button{flex:1;min-width:70px}
-button{font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--chip);color:var(--fg);padding:10px 14px;cursor:pointer}
-button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);padding:13px}
-button:disabled{opacity:.5;cursor:default}
-.hint{font-size:12px;color:var(--muted);font-weight:500}
-.status{font-size:13px;min-height:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--chip);border-radius:12px;padding:4px;gap:4px}
+.tabs button{font:inherit;font-weight:600;border:0;border-radius:9px;background:transparent;color:var(--muted);padding:9px 0;cursor:pointer}
+.tabs button.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.save{font:inherit;font-weight:700;font-size:16px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);padding:14px;cursor:pointer}
+.save:disabled{opacity:.55;cursor:default}
+.status{font-size:13px;min-height:18px;text-align:center}
 .status.ok{color:var(--ok)} .status.err{color:var(--warn)}
-.list{display:grid;gap:10px}
-.vid{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;background:var(--surface)}
-.vid-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
-.vid-title{font-weight:700;min-width:0;overflow-wrap:anywhere}
-.meta{font-size:12px;color:var(--muted)}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{font-size:12px;padding:4px 9px;border-radius:999px;background:var(--chip);color:var(--muted);font-variant-numeric:tabular-nums}
-.chip.done{background:var(--accent);color:var(--accent-ink)}
-.vals{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;display:grid;gap:2px}
+details{border-top:1px dashed var(--line);padding-top:10px}
+summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)}
+.day{display:grid;gap:8px}
+.day-h{display:flex;align-items:center;gap:8px}
+.today{font-size:11px;font-weight:700;background:var(--accent);color:var(--accent-ink);padding:2px 8px;border-radius:999px}
+.vid{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;cursor:pointer}
+.vid.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.vid.future{opacity:.5}
+.vid-top{display:flex;gap:10px;align-items:center;min-width:0}
+.slot{font-family:var(--f-display);font-weight:700;font-size:13px;background:var(--accent-soft);color:var(--accent);padding:4px 8px;border-radius:8px;font-variant-numeric:tabular-nums;flex:none}
+.vid-title{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.fmt{font-size:11.5px;color:var(--muted);margin-left:auto;flex:none}
+.cps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp{border-radius:10px;background:var(--chip);padding:7px 8px;display:grid;gap:1px;font-variant-numeric:tabular-nums}
+.cp b{font-size:11px;color:var(--muted);font-weight:600}
+.cp span{font-size:13px;font-weight:600}
+.cp.done{background:var(--accent-soft)}
+.cp.done b{color:var(--accent)}
 .empty{color:var(--muted);text-align:center;padding:18px}
-.newvid[hidden]{display:none}
+@media (max-width:360px){.grid2{grid-template-columns:1fr}}
 </style>
 
 <div class="wrap">
   <header>
-    <h1>Lanternfall Veri Defteri</h1>
-    <p class="sub">Her video için 3., 6. ve 24. saat verilerini buraya gir. Claude doğrudan buradan okur.</p>
+    <div class="brand">Lanternfall</div>
+    <h1>Veri Defteri</h1>
   </header>
 
-  <section class="card" aria-labelledby="formh">
-    <h2 id="formh">Veri gir</h2>
+  <section class="card" aria-label="Veri gir">
     <label for="vidSel">Video
       <select id="vidSel"><option value="">Yükleniyor…</option></select>
     </label>
-    <div class="newvid" id="newBox" hidden>
-      <div class="row">
-        <label for="nTitle">Video adı (kısa)<input id="nTitle" placeholder="ör. Kekova batığı"></label>
-        <label for="nDate">Yayın tarihi<input id="nDate" type="date"></label>
-      </div>
-      <div class="row">
-        <label for="nPlat">Platform<select id="nPlat"><option>YouTube</option><option>TikTok</option></select></label>
-        <label for="nSlot">Saat<select id="nSlot"><option>10:00</option><option>16:00</option><option>23:00</option><option>00:00</option><option>Diğer</option></select></label>
-        <label for="nFmt">Format<select id="nFmt"><option>Haber/keşif</option><option>Kesit (uzun videodan)</option><option>Çizim hikâye</option><option>Uzun video</option><option>Diğer</option></select></label>
-      </div>
+    <div class="tabs" role="tablist" aria-label="Kaçıncı saat">
+      <button type="button" data-cp="h3" class="on">3. saat</button>
+      <button type="button" data-cp="h6">6. saat</button>
+      <button type="button" data-cp="h24">24. saat</button>
     </div>
-    <div>
-      <div class="hint" style="margin-bottom:6px">Kaçıncı saat?</div>
-      <div class="seg" id="cpSeg">
-        <button type="button" data-cp="h3" class="on">3. saat</button>
-        <button type="button" data-cp="h6">6. saat</button>
-        <button type="button" data-cp="h24">24. saat</button>
-      </div>
-    </div>
-    <div class="row">
+    <div class="grid2">
       <label for="f_views">Görüntüleme<input id="f_views" inputmode="numeric"></label>
       <label for="f_active">Aktif izlenme<input id="f_active" inputmode="numeric"></label>
-      <label for="f_stayed">İzlemeye devam %<input id="f_stayed" inputmode="decimal" placeholder="ör. 58.9"></label>
-      <label for="f_avg">Ort. izleme (sn)<input id="f_avg" inputmode="numeric" placeholder="ör. 19"></label>
+      <label for="f_stayed">İzlemeye devam %<input id="f_stayed" inputmode="decimal" placeholder="58,9"></label>
+      <label for="f_avg">Ort. izleme (sn)<input id="f_avg" inputmode="numeric" placeholder="19"></label>
       <label for="f_likes">Beğeni<input id="f_likes" inputmode="numeric"></label>
-      <label for="f_comments">Yorum (bizimki hariç)<input id="f_comments" inputmode="numeric"></label>
+      <label for="f_comments">Yorum<input id="f_comments" inputmode="numeric" placeholder="bizimki hariç"></label>
       <label for="f_subs">Gelen abone<input id="f_subs" inputmode="numeric"></label>
       <label for="f_total">Kanal toplam abone<input id="f_total" inputmode="numeric"></label>
     </div>
-    <label for="f_note">Not (isteğe bağlı)<textarea id="f_note" rows="2" placeholder="ör. yaş dağılımı, dikkat çeken yorum"></textarea></label>
-    <button class="primary" id="saveBtn" type="button">Kaydet</button>
+    <label for="f_note">Not<textarea id="f_note" rows="2" placeholder="İsteğe bağlı: yaş dağılımı, ilginç bir yorum…"></textarea></label>
+    <button class="save" id="saveBtn" type="button">Kaydet</button>
     <div class="status" id="status" role="status"></div>
-    <p class="hint">Boş bıraktığın alanlar kaydedilmez. Aynı saati tekrar kaydedersen güncellenir.</p>
+    <details>
+      <summary>Listede olmayan bir video ekle</summary>
+      <div class="grid2" style="margin-top:10px">
+        <label for="nTitle" style="grid-column:1/-1">Video adı<input id="nTitle" placeholder="ör. Kekova batığı"></label>
+        <label for="nDate">Tarih<input id="nDate" type="date"></label>
+        <label for="nSlot">Saat<select id="nSlot"><option>10:00</option><option>16:00</option><option>23:00</option><option>Diğer</option></select></label>
+        <label for="nFmt" style="grid-column:1/-1">Format<select id="nFmt"><option>Haber/keşif</option><option>Kesit (uzun videodan)</option><option>Çizim hikâye</option><option>Uzun video</option><option>Diğer</option></select></label>
+      </div>
+    </details>
   </section>
 
-  <section aria-labelledby="listh" style="display:grid;gap:10px">
-    <h2 id="listh">Videolar</h2>
-    <div class="list" id="list"><div class="empty">Videolar yükleniyor…</div></div>
+  <section aria-labelledby="listh" style="display:grid;gap:14px">
+    <h2 id="listh">Program</h2>
+    <div id="list" style="display:grid;gap:16px"><div class="empty">Videolar yükleniyor…</div></div>
   </section>
 </div>
 
@@ -103,107 +105,118 @@ button:disabled{opacity:.5;cursor:default}
 (function(){
   const $ = s => document.querySelector(s);
   const FIELDS = ["views","active","stayed","avg","likes","comments","subs","total"];
-  const LABEL = {views:"izl",active:"aktif",stayed:"devam %",avg:"ort sn",likes:"beğeni",comments:"yorum",subs:"abone",total:"kanal"};
-  let db = null, videos = [], cp = "h3", writable = true;
+  const DAYS = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+  const MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+  let db = null, videos = [], cp = "h3", selId = null;
+  const today = () => { const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
 
-  document.querySelectorAll("#cpSeg button").forEach(b => b.addEventListener("click", () => {
-    cp = b.dataset.cp;
-    document.querySelectorAll("#cpSeg button").forEach(x => x.classList.toggle("on", x === b));
-    fillFromExisting();
+  document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+    cp = b.dataset.cp; document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x === b)); fill();
   }));
-  $("#vidSel").addEventListener("change", () => { $("#newBox").hidden = $("#vidSel").value !== "__new"; fillFromExisting(); });
+  $("#vidSel").addEventListener("change", () => { selId = $("#vidSel").value || null; fill(); renderList(); });
+  $("#saveBtn").addEventListener("click", save);
 
   function setStatus(t, cls){ const s = $("#status"); s.textContent = t; s.className = "status " + (cls || ""); }
   function num(v){ v = String(v).trim().replace(",", "."); if (v === "") return null; const n = Number(v); return isFinite(n) ? n : null; }
-
-  function fillFromExisting(){
-    const v = videos.find(x => x.id === $("#vidSel").value);
-    const d = (v && v.data.cp && v.data.cp[cp]) || {};
-    FIELDS.forEach(f => $("#f_" + f).value = d[f] ?? "");
-    $("#f_note").value = d.note || "";
+  function dayLabel(iso){ const [y,m,d] = iso.split("-").map(Number); const dt = new Date(y, m-1, d); return `${d} ${MONTHS[m-1]} ${DAYS[dt.getDay()]}`; }
+  function fill(){
+    const v = videos.find(x => x.id === selId); const d = (v && v.data.cp && v.data.cp[cp]) || {};
+    FIELDS.forEach(f => $("#f_" + f).value = d[f] ?? ""); $("#f_note").value = d.note || "";
   }
+  function pickDefault(){
+    const t = today();
+    const past = videos.filter(v => (v.data.date || "") <= t).sort((a,b) => key(b).localeCompare(key(a)));
+    return past[0] ? past[0].id : (videos[0] && videos[0].id) || null;
+  }
+  const key = v => (v.data.date || "") + " " + (v.data.slot || "");
 
   function renderSelect(){
-    const sel = $("#vidSel"), cur = sel.value;
-    sel.innerHTML = "";
-    const o0 = document.createElement("option"); o0.value = "__new"; o0.textContent = "+ Yeni video ekle"; sel.appendChild(o0);
-    videos.forEach(v => {
-      const o = document.createElement("option"); o.value = v.id;
-      o.textContent = `${v.data.date || ""} ${v.data.slot || ""} · ${v.data.title || v.id} (${v.data.platform || ""})`;
-      sel.appendChild(o);
-    });
-    const today = new Date().toISOString().slice(0,10);
-    const live = videos.find(v => (v.data.date || "") <= today);
-    sel.value = cur && [...sel.options].some(o => o.value === cur) ? cur : (live ? live.id : (videos[0] ? videos[0].id : "__new"));
-    $("#newBox").hidden = sel.value !== "__new";
-    fillFromExisting();
+    const sel = $("#vidSel"); sel.innerHTML = "";
+    const sorted = [...videos].sort((a,b) => key(b).localeCompare(key(a)));
+    if (!sorted.length){ const o = document.createElement("option"); o.value = ""; o.textContent = "Henüz video yok"; sel.appendChild(o); }
+    sorted.forEach(v => { const o = document.createElement("option"); o.value = v.id;
+      const [y,m,d] = (v.data.date||"--").split("-"); o.textContent = `${d}.${m} ${v.data.slot||""} · ${v.data.title||v.id}`; sel.appendChild(o); });
+    if (!selId || !videos.some(v => v.id === selId)) selId = pickDefault();
+    if (selId) sel.value = selId;
+    fill();
+  }
+
+  function cell(lab, c){
+    const el = document.createElement("div"); el.className = "cp" + (c ? " done" : "");
+    const b = document.createElement("b"); b.textContent = lab;
+    const s = document.createElement("span");
+    s.textContent = c ? [c.views != null ? c.views.toLocaleString("tr-TR") : null, c.stayed != null ? "%" + String(c.stayed).replace(".", ",") : null].filter(Boolean).join(" · ") || "✓" : "—";
+    el.append(b, s); return el;
   }
 
   function renderList(){
     const box = $("#list"); box.innerHTML = "";
-    if (!videos.length){ box.innerHTML = '<div class="empty">Henüz video yok. Yukarıdan “Yeni video ekle” ile ilkini gir.</div>'; return; }
-    videos.forEach(v => {
-      const d = v.data, el = document.createElement("div"); el.className = "vid";
-      const top = document.createElement("div"); top.className = "vid-top";
-      const t = document.createElement("div"); t.className = "vid-title"; t.textContent = d.title || v.id;
-      if ((d.date || "") > new Date().toISOString().slice(0,10)) el.style.opacity = ".55";
-      const m = document.createElement("div"); m.className = "meta"; m.textContent = `${d.date || ""} ${d.slot || ""} · ${d.platform || ""} · ${d.format || ""}`;
-      top.append(t, m);
-      const chips = document.createElement("div"); chips.className = "chips";
-      const vals = document.createElement("div"); vals.className = "vals";
-      [["h3","3s"],["h6","6s"],["h24","24s"]].forEach(([k, lab]) => {
-        const c = document.createElement("span"); const has = d.cp && d.cp[k];
-        c.className = "chip" + (has ? " done" : ""); c.textContent = lab + (has ? " ✓" : " —"); chips.appendChild(c);
-        if (has){
-          const line = document.createElement("div");
-          line.textContent = lab + ": " + FIELDS.filter(f => has[f] != null).map(f => `${LABEL[f]} ${has[f]}`).join(" · ");
-          vals.appendChild(line);
-        }
+    if (!videos.length){ box.innerHTML = '<div class="empty">Henüz video yok. Claude planlanan videoları buraya ekler.</div>'; return; }
+    const t = today(); const groups = {};
+    [...videos].sort((a,b) => key(b).localeCompare(key(a))).forEach(v => { (groups[v.data.date || "?"] = groups[v.data.date || "?"] || []).push(v); });
+    Object.keys(groups).sort().reverse().forEach(date => {
+      const day = document.createElement("div"); day.className = "day";
+      const h = document.createElement("div"); h.className = "day-h";
+      const hh = document.createElement("h2"); hh.textContent = date === "?" ? "Tarihsiz" : dayLabel(date); h.appendChild(hh);
+      if (date === t){ const p = document.createElement("span"); p.className = "today"; p.textContent = "Bugün"; h.appendChild(p); }
+      day.appendChild(h);
+      groups[date].sort((a,b) => (a.data.slot||"").localeCompare(b.data.slot||"")).forEach(v => {
+        const d = v.data, el = document.createElement("div");
+        el.className = "vid" + (v.id === selId ? " sel" : "") + ((d.date || "") > t ? " future" : "");
+        el.tabIndex = 0; el.setAttribute("role", "button");
+        const top = document.createElement("div"); top.className = "vid-top";
+        const sl = document.createElement("span"); sl.className = "slot"; sl.textContent = d.slot || "–";
+        const ti = document.createElement("span"); ti.className = "vid-title"; ti.textContent = d.title || v.id;
+        const fm = document.createElement("span"); fm.className = "fmt"; fm.textContent = d.format || "";
+        top.append(sl, ti, fm);
+        const cps = document.createElement("div"); cps.className = "cps";
+        const c = d.cp || {}; cps.append(cell("3. saat", c.h3), cell("6. saat", c.h6), cell("24. saat", c.h24));
+        el.append(top, cps);
+        const pick = () => { selId = v.id; $("#vidSel").value = v.id; fill(); renderList(); window.scrollTo({top:0, behavior:"smooth"}); };
+        el.addEventListener("click", pick); el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+        day.appendChild(el);
       });
-      el.append(top, chips, vals); box.appendChild(el);
+      box.appendChild(day);
     });
   }
 
   async function save(){
-    if (!db){ setStatus("Veritabanına bağlanılamadı. Sayfayı claude.ai'de, giriş yapmış olarak aç.", "err"); return; }
+    if (!db){ setStatus("Kayıt şu an kullanılamıyor. Sayfayı claude.ai'de açık tut.", "err"); return; }
     const btn = $("#saveBtn"); btn.disabled = true; setStatus("Kaydediliyor…");
     try {
-      let id = $("#vidSel").value, base;
-      if (id === "__new"){
-        const title = $("#nTitle").value.trim();
-        if (!title){ setStatus("Yeni video için bir ad yaz.", "err"); btn.disabled = false; return; }
-        const date = $("#nDate").value || new Date().toISOString().slice(0,10);
-        id = (date + "-" + $("#nSlot").value.replace(":","") + "-" + title.toLowerCase().replace(/[^a-z0-9ığüşöç]+/gi,"-")).replace(/[^A-Za-z0-9_.~:@+-]/g,"").slice(0,80) || ("v" + Date.now());
-        base = {title, date, platform: $("#nPlat").value, slot: $("#nSlot").value, format: $("#nFmt").value, cp: {}};
+      let id = selId, base;
+      const nt = $("#nTitle").value.trim();
+      if (nt){
+        const date = $("#nDate").value || today();
+        id = (date + "-" + $("#nSlot").value.replace(":","") + "-" + nt.toLowerCase()).replace(/[^a-z0-9-]+/g,"-").slice(0,80);
+        base = {title: nt, date, platform: "YouTube", slot: $("#nSlot").value, format: $("#nFmt").value, cp: {}};
       } else {
-        const v = videos.find(x => x.id === id); base = JSON.parse(JSON.stringify(v ? v.data : {cp:{}}));
-        base.cp = base.cp || {};
+        const v = videos.find(x => x.id === id);
+        if (!v){ setStatus("Önce bir video seç.", "err"); btn.disabled = false; return; }
+        base = JSON.parse(JSON.stringify(v.data)); base.cp = base.cp || {};
       }
       const entry = {};
       FIELDS.forEach(f => { const n = num($("#f_" + f).value); if (n != null) entry[f] = n; });
       const note = $("#f_note").value.trim(); if (note) entry.note = note;
-      if (!Object.keys(entry).length){ setStatus("En az bir değer gir.", "err"); btn.disabled = false; return; }
-      entry.savedAt = new Date().toISOString();
-      base.cp[cp] = entry; base.updatedAt = entry.savedAt;
+      if (!Object.keys(entry).length){ setStatus("En az bir sayı gir.", "err"); btn.disabled = false; return; }
+      entry.savedAt = new Date().toISOString(); base.cp[cp] = entry; base.updatedAt = entry.savedAt;
       await db.doc("videos/" + id).set(base);
-      setStatus("Kaydedildi ✓ (" + ({h3:"3.",h6:"6.",h24:"24."}[cp]) + " saat)", "ok");
-      $("#vidSel").value = id;
+      selId = id; $("#nTitle").value = "";
+      setStatus("Kaydedildi ✓  " + ({h3:"3.",h6:"6.",h24:"24."}[cp]) + " saat", "ok");
     } catch(e){
-      setStatus(e && e.code === "invalid_argument" ? "Kaydetme iznin yok gibi görünüyor." : "Kaydedilemedi, tekrar dene.", "err");
+      setStatus(e && e.code === "invalid_argument" ? "Bu sayfada kayıt iznin yok." : "Kaydedilemedi, tekrar dene.", "err");
     }
     btn.disabled = false;
   }
-  $("#saveBtn").addEventListener("click", save);
 
   renderSelect(); renderList();
   const tmo = setTimeout(() => { if (!videos.length) $("#list").innerHTML = '<div class="empty">Veriye henüz ulaşılamıyor. Bağlantını kontrol et.</div>'; }, 10000);
   (async () => {
-    try { db = window.claude && await window.claude.use("db"); } catch(e){ db = null; }
-    if (!db){ clearTimeout(tmo); $("#list").innerHTML = '<div class="empty">Bu görünümde veri kaydı kullanılamıyor. Sayfayı claude.ai üzerinde aç.</div>'; return; }
-    db.collection("videos").orderBy("date","desc").onSnapshot(snap => {
+    try { db = await window.claude.use("db"); } catch(e){ db = null; }
+    if (!db){ clearTimeout(tmo); $("#list").innerHTML = '<div class="empty">Bu görünümde kayıt kullanılamıyor. Sayfayı claude.ai üzerinde aç.</div>'; return; }
+    db.collection("videos").onSnapshot(snap => {
       if (!snap.metadata.fromCache) clearTimeout(tmo);
-      videos = snap.docs.map(d => ({id: d.id, data: d.data()}))
-        .sort((a,b) => ((b.data.date||"") + (b.data.slot||"")).localeCompare((a.data.date||"") + (a.data.slot||"")));
+      videos = snap.docs.map(d => ({id: d.id, data: d.data()})).filter(v => (v.data.platform || "YouTube") === "YouTube");
       renderSelect(); renderList();
     }, () => { clearTimeout(tmo); $("#list").innerHTML = '<div class="empty">Veri okunamadı. Sayfayı yenile.</div>'; });
   })();

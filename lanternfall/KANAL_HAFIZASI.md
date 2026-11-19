@@ -4,7 +4,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 ## 📒 VERİ DEFTERİ (19 Kasım'dan itibaren)
 - Kullanıcı 3./6./24. saat verilerini **https://claude.ai/artifact/81JvFUJEKvRjit4PtHzvyZ** sayfasına giriyor. Claude okur: ArtifactData action 'list', collection 'videos' (doc: title, date, platform, slot, format, cp.{h3,h6,h24}.{views, active, stayed, avg, likes, comments, subs, total, note}).
-- **Kural: planlanan her yeni videoyu (YouTube + TikTok) Claude deftere kendisi ekler; kullanıcı sadece sayı girer.** 19 Kasım'da 23 Kasım'a kadarki tüm planlı videolar eklendi.
+- **Kural: planlanan her yeni YouTube videosunu Claude deftere kendisi ekler (TikTok YOK, kullanıcı istemedi); kullanıcı sadece sayı girer.** 19 Kasım'da 23 Kasım'a kadarki tüm planlı videolar eklendi.
 - Kaynak dosya: scratchpad/veri/index.html (GitHub: lanternfall/veri/index.html). Her değerlendirmeden önce buradan oku.
 
 ## ⭐ 1 NUMARALI KURAL
