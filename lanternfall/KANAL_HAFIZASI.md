@@ -2,6 +2,10 @@
 
 Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
+## 📒 VERİ DEFTERİ (19 Kasım'dan itibaren)
+- Kullanıcı 3./6./24. saat verilerini **https://claude.ai/artifact/81JvFUJEKvRjit4PtHzvyZ** sayfasına giriyor. Claude okur: ArtifactData action 'list', collection 'videos' (doc: title, date, platform, slot, format, cp.{h3,h6,h24}.{views, active, stayed, avg, likes, comments, subs, total, note}).
+- Kaynak dosya: scratchpad/veri/index.html (GitHub: lanternfall/veri/index.html). Her değerlendirmeden önce buradan oku.
+
 ## ⭐ 1 NUMARALI KURAL
 **Her video bir öncekinden çok daha iyi olmalı: görsel, hikâye anlatımı, içerik, CTA ve izlenme olarak.**
 
