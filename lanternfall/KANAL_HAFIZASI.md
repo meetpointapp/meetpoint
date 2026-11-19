@@ -64,6 +64,11 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Deneme 1: Derinkuyu (İngilizce, 47 sn). scripts/ill_derinkuyu.py: PIL ile çizilmiş köy + 8 katlı kesit dünyası, kodla çizilmiş karakterler (adam: kasket+bıyık+kahverengi ceket, lamba), keçiler, ateş/lamba ışıması, taş kapı animasyonu, akıncılar, turistler, 20.000 sayacı, döngülü dönüş. Kullanıcı: "tarz geliştirilmeli, gerçek görüntülerle desteklenmeli, sahne geçişi yok, karakterler duvardan geçmemeli, makyaj/montaj/hareket lazım, referansa yaklaş; asıl olay izletmek".
 - Deneme 2 (v2, 35 sn): scripts/ill2.py. 19 sahne montaj (çizim + gerçek foto: tünel, merdiven, odalar, kuyu, taş kapı, kasaba), karakterler gerçek yol/merdivenden yürüyor, chibi yüz ifadeleri, konuşma balonları, çekiçte kamera sarsıntısı + moloz, flaş/zoom/whip geçişleri, SFX (çekiç, rüzgâr, taş gürültüsü, ayak sesi), karanlık + ışık, toz; kapanış izleyicinin hayatına bağlanıyor ("...is that a draft?") ve döngü. Kullanıcı: "Süper olmuş gerçekten" ama loop yoktu → düzeltildi: son cümle yarım kalıp ilk cümleye bağlanıyor ("...remember, it all started when…" → "This man broke one wall…"), son kare = ilk kare (aynı kadraj, çekiç havada), sonda boşluk yok. **Kural: her Short'ta son cümle ilk cümleye dilbilgisel olarak bağlanacak + son kare ilk kare.**
 
+## 👥 KİTLE (YouTube, son 28 gün, 19 Kasım)
+- %83 erkek. Yaş: 65+ %23,7, 45–54 %22, 55–64 %20,2, 35–44 %19,2, 25–34 %11,8, <25 %3,3 → **%66'sı 45 yaş üstü; belgesel/tarih kanalı izleyicisi.**
+- Ülkeler: ABD %16,5, Hindistan %7,5, Rusya %4,9, Endonezya %4,2, Türkiye %3,6 → çoğu ana dili İngilizce olmayan.
+- Sonuçlar: sade İngilizce, kısa cümle, sakin tempo; büyük okunur altyazı ve kapak yazısı; gerçek görüntü/güvenilirlik öne çıkacak; kapaklarda sinematik-belgesel ton (masalsı/çocuksu değil). Çizim formatında sevimli chibi karakterler bu kitleye çocukça gelebilir → test tutmazsa daha gerçekçi 'boyanmış' belgesel çizim stiline geç. Test videosunun 24. saatte yaş dağılımına bak (yeni genç kitle mi getirdi?).
+
 ## 🖼️ KAPAK KURALI (19 Kasım)
 - Kodla çizilmiş kapaklar (sade karakter) kullanıcıya göre "çok amatör, tıklatmaz". Kapaklar artık FLUX.1-schnell ile üretilen detaylı dijital resim (dramatik ışık, büyük ölçek, sinematik) + büyük kalın 2 satır yazı (beyaz + sarı) + üst/alt karartma. Prompt'ta 'no text'. 768x1344 → 1080x1920 LANCZOS + unsharp.
 
