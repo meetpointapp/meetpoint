@@ -88,7 +88,7 @@ def build_world():
     for k in range(6):  # stairs from house into basement
         d.rectangle([S(840 + k * 22), S(GY + 20 + k * 36), S(866 + k * 22), S(GY + 30 + k * 36)], fill=(120, 96, 74))
     # tunnel behind the wall, then stairs to level 0
-    ty0, ty1 = GY + 170, GY + 250
+    ty0, ty1 = GY + 125, GY + 250
     d.rectangle([S(1090), S(ty0), S(1400), S(ty1)], fill=C["rock"])
     path_stairs(d, S, 1400, ty1, LX1 - 60, LEVY[0])
     # levels
@@ -118,7 +118,7 @@ def path_stairs(d, S, x0, y0, x1, y1, left=False):
         a = k / steps
         x = x0 + (x1 - x0) * a
         y = y0 + (y1 - 150 + 150 - y0) * a
-        d.rectangle([S(min(x, x + 60) - 30), S(y - 70), S(x + 30), S(y + 4)], fill=C["rock"])
+        d.rectangle([S(min(x, x + 60) - 30), S(y - 132), S(x + 30), S(y + 4)], fill=C["rock"])
         d.rectangle([S(x - 30), S(y), S(x + 30), S(y + 6)], fill=(90, 66, 50))
 
 
