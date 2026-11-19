@@ -346,3 +346,10 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - HUNİ: Her Short'a "İlgili video" bağlantısı = o haftanın uzun videosu. Çizim Derinkuyu Short'u → 21 Kasım Derinkuyu uzun video.
 - Shorts: günde 2, çizim formatı ağırlık; seri ismi + sondaki soru + sabit yorumda "Part 2?".
 - Uzun video sıklığını yalnızca bir uzun video 500+ izlenme aldığında yeniden değerlendir.
+
+## DÜZELTME — ÇİZİM FORMATI HENÜZ KANITLANMADI (19 Kasım, 4 sa 20 dk)
+- 2:36'da 1.327 → 4:20'de 1.384 (durdu). Beğeni 41→38 (YouTube temizliği). Devam %60,5 (flüt 24 saatte %57) → olağanüstü değil.
+- Okuma: Çizim formatı YouTube'un İLK test havuzunu en büyük aldı ama ikinci dalgaya geçemedi. ~%40 hâlâ ilk saniyede kaydırıyor. 14 kat kıyası tek videoya dayanıyordu → aşırı genelleme yaptım.
+- Karar düzeltmesi: Çizim = HİPOTEZ, kazanan değil. 3-4 çizim Short daha + aynı dönemde gerçek format karşılaştırması → sonra karar. Uzun videoyu formata bağlamadan önce de bu sonuç beklenir.
+- Formattan bağımsız kesin işler: kapak tıklanma (CTR), ilk 30 sn, açık döngüler, Shorts→uzun huni (İlgili video bağlantısı), seri adı + sondaki soru.
+- Bekleme: 24. saat (flüt 7. saatte 525 → 24. saatte 1.155 olmuştu; geç dalga mümkün).
