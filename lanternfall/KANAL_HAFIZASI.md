@@ -64,6 +64,11 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Deneme 1: Derinkuyu (İngilizce, 47 sn). scripts/ill_derinkuyu.py: PIL ile çizilmiş köy + 8 katlı kesit dünyası, kodla çizilmiş karakterler (adam: kasket+bıyık+kahverengi ceket, lamba), keçiler, ateş/lamba ışıması, taş kapı animasyonu, akıncılar, turistler, 20.000 sayacı, döngülü dönüş. Kullanıcı: "tarz geliştirilmeli, gerçek görüntülerle desteklenmeli, sahne geçişi yok, karakterler duvardan geçmemeli, makyaj/montaj/hareket lazım, referansa yaklaş; asıl olay izletmek".
 - Deneme 2 (v2, 35 sn): scripts/ill2.py. 19 sahne montaj (çizim + gerçek foto: tünel, merdiven, odalar, kuyu, taş kapı, kasaba), karakterler gerçek yol/merdivenden yürüyor, chibi yüz ifadeleri, konuşma balonları, çekiçte kamera sarsıntısı + moloz, flaş/zoom/whip geçişleri, SFX (çekiç, rüzgâr, taş gürültüsü, ayak sesi), karanlık + ışık, toz; kapanış izleyicinin hayatına bağlanıyor ("...is that a draft?") ve döngü. Kullanıcı: "Süper olmuş gerçekten" ama loop yoktu → düzeltildi: son cümle yarım kalıp ilk cümleye bağlanıyor ("...remember, it all started when…" → "This man broke one wall…"), son kare = ilk kare (aynı kadraj, çekiç havada), sonda boşluk yok. **Kural: her Short'ta son cümle ilk cümleye dilbilgisel olarak bağlanacak + son kare ilk kare.**
 
+## 🎯 STRATEJİ KARARI (19 Kasım, kullanıcı)
+- Çizim v2 (döngülü) 19 Kasım 16:00'da TEST olarak yayınlanıyor (o slottaki planlı Short 20 Kasım 00:00'a kaydırıldı).
+- **Test tutarsa: 23 Kasım'dan sonra YENİ ÜRETİM SADECE ÇİZİM HİKÂYE FORMATINDA.** Kullanıcı: TikTok'ta bu tarzla 300K takipçi, 500K–3M izlenme alan kanallar var; yurt dışında bizim konseptle (arkeoloji/gizem) neredeyse yok.
+- Açık soru: uzun videolar bu formata nasıl uyarlanır (kullanıcı için çok önemli; ilk uzun video zayıf kaldı).
+
 ## 🚀 BÜYÜME PLANI (18 Kasım, kullanıcı onayladı, bu sırayla)
 1. **Haber takibi:** Her konuşmada/gün son 24–48 saatin dünya arkeoloji haberlerini tara; büyük haber çıkarsa aynı gün Short üret, kullanıcı planlı bir Short'un yerine koysun (planlı olan sonraki boş güne kayar). (Otomatik günlük zamanlanmış görev izin sistemi tarafından reddedildi; manuel yapılıyor.)
 2. **Seriler (sabit başlık/renk/açılış):** "Lost Underwater" (su altı), "Underground Cities" (yeraltı), "Older Than the Pyramids" (çok eski yerler).
