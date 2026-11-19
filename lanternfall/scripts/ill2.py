@@ -473,11 +473,17 @@ def build(LT, WT):
     add(b10 + 0.2, m11, type="photo", img="p50", label="DERINKUYU TODAY", tr="flash", move="in")
     add(m11, b11 + 0.2, type="photo", img="p30", tr="punch", move="in")
     a12, b12 = LT[12]
+    m12 = a12 + (b12 - a12) * 0.55
     def man_end(d, T, s, t, lt, dur):
         X, Y = T(980, GY + 260)
         char(d, X, Y, s * 1.5, brow=-1, t=t, **{**M, "body": (90, 110, 150), "cap": None, "mustache": False}, hair=(60, 40, 30))
-        if lt > 0.6: bubble(d, X, Y - 120 * s, "...is that a draft?", s * 0.85)
-    add(b11 + 0.2, b12 + 0.9, type="world", cam=((1020, 1070, 2.3), (1010, 1070, 2.6)), wall="crack", draw=[man_end], over=[air], dark=0.3, tr="punch")
+        if lt > 0.3: bubble(d, X, Y - 120 * s, "...is that a draft?", s * 0.85)
+    add(b11 + 0.2, m12, type="world", cam=((1020, 1070, 2.3), (1015, 1070, 2.45)), wall="crack", draw=[man_end], over=[air], dark=0.3, tr="punch")
+    def man_loop(d, T, s, t, lt, dur):
+        X, Y = T(1010, GY + 260)
+        char(d, X, Y, s * 1.5, hammer=0.01, brow=1, t=t, **M)
+    # final shot = exact first-frame framing (wall intact, hammer raised) -> seamless loop
+    add(m12, b12 + 0.05, type="world", cam=((1000, 1060, 2.6), (1000, 1060, 2.6)), wall="crack", draw=[man_loop], dark=0.25, tr="whip")
     return S
 
 
@@ -545,7 +551,7 @@ def main(p):
         dur = float(subprocess.run(["ffprobe", "-v", "quiet", "-show_entries", "format=duration", "-of", "csv=p=0", ap], capture_output=True, text=True).stdout)
         LT.append((cur, cur + dur)); paths.append(ap)
         cur += dur + (0.15 if i == 0 else 0.35)
-    total = cur + 0.6
+    total = LT[-1][1] + 0.05
     # word timings
     from faster_whisper import WhisperModel
     m = WhisperModel("small", device="cpu", compute_type="int8")
@@ -569,6 +575,7 @@ def main(p):
     wd = [(a, max(b, min(allw[k + 1][0] if k + 1 < len(allw) else b + 0.3, a + 0.6)), w) for k, (a, b, w) in enumerate(allw)]
     S = build(LT, WT)
     S[-1]["t1"] = total
+    S[0]["t0"] = 0.0
     os.makedirs(os.path.join(P_, "out"), exist_ok=True)
     sfx = sfx_track(S, total)
     sf.write(os.path.join(P_, "out", "sfx.wav"), sfx, SR)
