@@ -336,3 +336,13 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - v8c: boyalı sahnede karakter entegrasyonu → integrate() (sahnenin ortalama ışık rengine tint + pozlama + kâğıt dokusu), contact_shadow() ayak gölgesi, meşale ışık çekirdeği sınırlandı (min r 5). Final "is that a draft?" sahnesi boyalı bodrumda. Konuşma balonları y=640 (altyazı y~300 ile çakışmasın).
 - v9 (rig): yuvarlak gövde silüeti (chaikin), yaka + kıyafet kıvrımları, sivrilen uzuvlar (_seg/_limb taper 1.05→0.8), ince dış çizgi (ow 1.5*s), boşta nefes/salınım (breath). Yedek: rig_v7.py.
 - v10: _hand() başparmaklı eldiven el (ön ve arka kol), daha doğal yürüyüş (hip 0.972, stride 11.5, ayak kaldırma cos², yumuşak bob). paint_world.py: world.png → world_painted.png (ton lekeleri, fırça izi, kâğıt dokusu + FLUX kaya dokusu bg/rocktex.png sadece yer altında, GY*SS=1810 altı). story8 world_painted.png varsa onu yükler. Komut: python3 scripts/paint_world.py <P>/world.png <P>/world_painted.png bg/rocktex.png
+
+## STRATEJİ v2 — MÜDÜR KARARI (19 Kasım akşam)
+- Patron uyarısı: "Her dediğime haklısın deme, müdür sensin." → Kararları ben veririm, gerekçeyle; katılmıyorsam söylerim.
+- UZUN VİDEO VAZGEÇİLMEZ (para = 4.000 saat + uzun video RPM). Sıklık: haftada 1 (artırmıyoruz; darboğaz sayı değil, kapak tıklanma + izleyici tutma).
+- Göbekli uzun video: 43 gösterim, CTR %2,5, ort. 1:50 / 8 dk (~%23). Hedef: CTR %5+, ort. izleme %40+ (3+ dk).
+- Uzun video formatı artık: ÇİZİM BELGESEL + gerçek fotoğraf geçişleri (Shorts'ta 14 kat kanıtlandı). 0-30 sn: hikâyenin en duygusal anı + soru; her 60-90 sn'de açık döngü ("ama asıl soru…"); bölümler; final cevap.
+- Kapak: karakter yüzü + duygu + tek güçlü obje + 3-4 kelime. Her uzun videoya 3 kapak → Test & Compare.
+- HUNİ: Her Short'a "İlgili video" bağlantısı = o haftanın uzun videosu. Çizim Derinkuyu Short'u → 21 Kasım Derinkuyu uzun video.
+- Shorts: günde 2, çizim formatı ağırlık; seri ismi + sondaki soru + sabit yorumda "Part 2?".
+- Uzun video sıklığını yalnızca bir uzun video 500+ izlenme aldığında yeniden değerlendir.
