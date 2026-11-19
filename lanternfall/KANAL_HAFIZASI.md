@@ -82,6 +82,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **Derinkuyu duvarı (18 Kasım 16:00), 1 saat 10 dk:** 35 izlenme, 2 beğeni, %24 devam (küçük örnek). **3. saat: 114 izlenme / 40 aktif, %37,4 devam, ort. 0:14.** Grafik doğrusal yükseliyor (16:00 tipik). Kanal 20 abone. **6. saat: 157 izlenme / 60 aktif, %42 devam, ort. 0:17, 2 beğeni, 0 abone; grafik yavaşlıyor.** 16:00'ın zayıf Short'u (Taş Baş 6. saatte ~1.000'di). Canlandırmayla açılış + 16:00 yavaşlığı. Truva flütü 12 beğeni. Kanal 21 abone (18 Kasım gece).
 
+- **5.000 yıllık ekmek (19 Kasım 10:00), 1 saat 50 dk:** 95 izlenme, 3 beğeni, %38 devam. (Eski kuralla yapılmış; 6–12. saat beklenecek.)
+
 ## 🧱 1.000–1.500 TAVANI (17 Kasım analizi)
 - En iyi Shortlar hep 1.000–1.500'de duruyor: Hasankeyf 1,3K, Stonehenge 1K, 10.000 yıllık yüzler 1.378, Taş Baş 1.420.
 - Ortak zayıflık: izlemeye devam %58–62 (ilk saniyede %40 kaydırma) ve ort. izleme süresinin büyük kısmı tek izleme (tekrar yok).
