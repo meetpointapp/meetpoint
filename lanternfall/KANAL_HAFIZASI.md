@@ -319,3 +319,9 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - **Yeni ses akışı:** tts_local.py → audio_raw → scripts/prep_audio.sh (atempo 1.1) → audio.
 - **Kurgu:** v31/v32/v33_build.py (v30 tabanlı, ALT_IMG ve klip desteği). Eski şablon: scripts/v26_build.py (klip desteğiyle), scripts/make_builds_27_29.py ile yeni video üretimi.
 - **Kapak:** vNN/kapak.html şablonu (Chromium ile).
+
+## ÇİZİM TESTİ İLK VERİ (19 Kasım 16:00, "Behind This Wall…") — 2 saat 36 dk
+- 1.327 izlenme | 640 aktif | %60,5 izlemeye devam | ort. 26 sn (~35 sn videoda ~%75) | 41 beğeni | 0 yorum | +2 abone (toplam 23)
+- Karşılaştırma ~3. saat: flüt 189, ekmek 279, duvar 114 → çizim ~5-7 kat hızlı başladı. Beğeni (41) flütün 24 saatlik toplamının (16) 2,5 katı.
+- Tavanın (1.000–1.500) 3. saatte aşılması bekleniyor. Kesin karar 24. saatte; şimdiden güçlü sinyal: çizim formatı + loop + duygu çalışıyor.
+- Zayıf nokta: abone dönüşümü düşük (2) ve yorum yok → sonraki çizimlerde sonda yorum sorusu / seri hissi ("Part 2?") dene.
