@@ -43,6 +43,8 @@ def _ik(hip, foot, l1, l2, bend):
 def draw_char(d, x, y, s, look, pose):
     face = pose.get("face", 1)
     t = pose.get("t", 0.0)
+    if pose.get("tremble"):
+        x = x + math.sin(t * 47) * 1.2 * s + math.sin(t * 31) * 0.8 * s
     kid = pose.get("kid", False)
     s = s * (0.72 if kid else 1.0)
     ow = max(1.0, 2.2 * s)
@@ -181,6 +183,22 @@ def draw_char(d, x, y, s, look, pose):
         el = (shoulder[0] + 9 * s * face, shoulder[1] + 16 * s)
         _limb(d, shoulder, el, hand, 7.5 * s, shirt, ow)
         d.rounded_rectangle([hand[0] - 1.5 * s, hand[1] - 8 * s, hand[0] + 1.5 * s, hand[1] + 1 * s], radius=int(1.5 * s), fill=skin, outline=OUT)
+    elif pose.get("gesture") in ("hug", "push", "pray", "cower", "point"):
+        g = pose["gesture"]
+        if g == "hug":      # arm wraps forward around someone in front, hand at their back
+            el = (shoulder[0] + 13 * s * face, shoulder[1] + 9 * s); hand = (el[0] + 12 * s * face, el[1] - 2 * s)
+        elif g == "push":   # both arms straight forward (pushing a stone)
+            el = (shoulder[0] + 14 * s * face, shoulder[1] + 2 * s); hand = (el[0] + 13 * s * face, el[1] + 1 * s)
+        elif g == "pray":
+            el = (shoulder[0] + 8 * s * face, shoulder[1] + 16 * s); hand = (shoulder[0] + 11 * s * face, shoulder[1] + 4 * s)
+        elif g == "cower":  # hands up near face
+            el = (shoulder[0] + 10 * s * face, shoulder[1] + 2 * s); hand = (hc[0] + 9 * s * face, hc[1] + 2 * s)
+        else:               # point forward and slightly up
+            el = (shoulder[0] + 14 * s * face, shoulder[1] - 2 * s); hand = (el[0] + 14 * s * face, el[1] - 5 * s)
+        _limb(d, shoulder, el, hand, 7.5 * s, shirt, ow)
+        d.ellipse([hand[0] - 3 * s, hand[1] - 3 * s, hand[0] + 3 * s, hand[1] + 3 * s], fill=skin, outline=OUT)
+        if g == "point":
+            d.line([hand, (hand[0] + 6 * s * face, hand[1] - 2 * s)], fill=skin, width=int(2.4 * s))
     elif prop == "hammer":
         k = pose.get("hammer", 0.0)            # 0 raised .. 1 struck
         a = math.radians(-120 + 150 * k)
@@ -220,6 +238,21 @@ def draw_char(d, x, y, s, look, pose):
             d.polygon([(tx - 5 * s, ty), (tx + 5 * s, ty), (tx + math.sin(t * 13) * 2 * s, ty - fh)], fill=(255, 150, 40))
             d.polygon([(tx - 2.5 * s, ty), (tx + 2.5 * s, ty), (tx, ty - fh * 0.6)], fill=(255, 230, 120))
             lights.append((tx, ty - 5 * s, 8 * s * fl, 130 * s * fl, (255, 150, 60)))
+    fx = pose.get("fx") or ()
+    if "sweat" in fx:
+        q = (t * 0.7) % 1.0
+        sx_, sy_ = hc[0] - 2 * s * face, hc[1] - head_r * 0.6 + q * 14 * s
+        d.polygon([(sx_, sy_ - 3 * s), (sx_ - 2 * s, sy_ + 1.5 * s), (sx_ + 2 * s, sy_ + 1.5 * s)], fill=(190, 225, 255))
+        d.ellipse([sx_ - 2 * s, sy_, sx_ + 2 * s, sy_ + 3.5 * s], fill=(190, 225, 255), outline=(90, 130, 170))
+    if "tears" in fx:
+        q = (t * 0.5) % 1.0
+        tx_, ty_ = eye[0] - 1 * s * face, eye[1] + 3 * s + q * 9 * s
+        d.ellipse([tx_ - 1.4 * s, ty_ - 1.4 * s, tx_ + 1.4 * s, ty_ + 2.4 * s], fill=(170, 210, 250))
+        d.line([(eye[0] - 1 * s * face, eye[1] + 3 * s), (tx_, ty_)], fill=(170, 210, 250, 160), width=max(1, int(1.2 * s)))
+    if "breath" in fx:
+        q = (t * 0.6) % 1.0
+        bx_, by_ = m[0] + (4 + q * 10) * s * face, m[1] - q * 4 * s
+        d.ellipse([bx_ - (2 + q * 4) * s, by_ - (1.5 + q * 3) * s, bx_ + (2 + q * 4) * s, by_ + (1.5 + q * 3) * s], fill=(235, 240, 245, int(120 * (1 - q))))
     return lights
 
 
