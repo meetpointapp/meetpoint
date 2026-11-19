@@ -113,6 +113,31 @@ def volume(lay, face, warm=(255, 214, 160)):
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
 
 
+AMB = [None]
+_TEX = np.clip(np.asarray(Image.fromarray((np.random.default_rng(11).normal(128, 40, (256, 256))).clip(0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.6))).astype(np.float32), 0, 255)
+
+
+def integrate(lay, amb):
+    """match a flat sprite to a painted background: ambient tint, exposure, paper texture"""
+    a = np.asarray(lay).astype(np.float32)
+    amb = np.array(amb, np.float32)
+    lum = amb.mean() + 1e-3
+    tint = 0.72 + 0.28 * amb / lum
+    expo = float(np.clip(0.55 + lum / 160.0, 0.72, 1.04))
+    a[..., :3] *= tint * expo
+    tex = np.asarray(Image.fromarray(_TEX.astype(np.uint8)).resize((lay.size[0], lay.size[1]), Image.BICUBIC)).astype(np.float32)
+    a[..., :3] *= (1 + (tex[..., None] - 128) / 128 * 0.07)
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
+
+
+def contact_shadow(img, X, Y, bw):
+    w, h = int(bw * 0.42), max(6, int(bw * 0.07))
+    sh = Image.new("L", (w * 2, h * 4), 0)
+    ImageDraw.Draw(sh).ellipse([w * 0.5, h * 1.5, w * 1.5, h * 2.5], fill=120)
+    sh = sh.filter(ImageFilter.GaussianBlur(max(2, h * 0.5)))
+    img.paste((20, 12, 8), (int(X - w), int(Y - h * 2)), sh)
+
+
 def actor(d, X, Y, sc, look, pose):
     """draw a rig character (2x supersampled) at screen feet (X,Y) with rig scale sc"""
     img = d._image
@@ -123,8 +148,11 @@ def actor(d, X, Y, sc, look, pose):
     L = RIG.draw_char(ld, ox * 2, oy * 2, sc * 2, look, pose)
     lay = volume(lay.resize((bw, bh), Image.LANCZOS), pose.get("face", 1))
     px, py = int(round(X - ox)), int(round(Y - oy))
+    if AMB[0] is not None:
+        lay = integrate(lay, AMB[0])
+        if Y < img.size[1] + 10: contact_shadow(img, X, Y, bw)
     img.paste(lay, (px, py), lay)
-    return [(px + lx / 2, py + ly / 2, r / 2, g / 2, col) for (lx, ly, r, g, col) in L]
+    return [(px + lx / 2, py + ly / 2, min(r / 2, 5), g / 2, col) for (lx, ly, r, g, col) in L]
 
 
 def bubble(d, x, y, text, s=1.0):
@@ -392,6 +420,7 @@ def shot_scene(sh, t, lt, dur):
     cw, ch = min(cw, big.size[0]), min(ch, big.size[1])
     x0 = min(max(fx * big.size[0] - cw / 2, 0), big.size[0] - cw); y0 = min(max(fy * big.size[1] - ch / 2, 0), big.size[1] - ch)
     fr = big.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
+    AMB[0] = fr.resize((1, 1), Image.BOX).getpixel((0, 0))
     d = ImageDraw.Draw(fr, "RGBA")
     lights = []
     zs = z  # characters scale with the push-in, anchored at screen centre-bottom
@@ -399,6 +428,7 @@ def shot_scene(sh, t, lt, dur):
     for fn in sh.get("draw", []):
         r = fn(d, T, zs, t, lt, dur)
         if r: lights.extend(r)
+    AMB[0] = None
     apply_lights(fr, lights, sh.get("dark", 0.0) * 0.55)
     fr = grade(fr, sh.get("grade"))
     d = ImageDraw.Draw(fr, "RGBA")
@@ -673,7 +703,7 @@ def build(LT, WT):
         X, Y = T(470, 1760)
         out += actor(d, X, Y, 7.4 * s, RAID, dict(face=1, prop="torch", expr="surprised", t=t))
         out.append((X + 70 * s, Y - 560 * s, 10, 260, C["fire"]))
-        if lt > 0.3: bubble(d, 560, 420, "...where is everyone?", 2.6)
+        if lt > 0.3: bubble(d, 560, 640, "...where is everyone?", 2.6)
         return out
     add(t10[3], b10 + 0.2, type="scene", bg="village_night", focus=(0.35, 0.65), zoom=(1.05, 1.1), draw=[raider_q], dark=0.15, tr="punch")
     a11, b11 = LT[11]
@@ -682,11 +712,14 @@ def build(LT, WT):
     add(m11, b11 + 0.2, type="photo", img="p30", tr="punch", move="in")
     a12, b12 = LT[12]
     m12 = a12 + (b12 - a12) * 0.55
+    MOD = dict(RIG.LOOKS["modern"])
     def man_end(d, T, s, t, lt, dur):
-        X, Y = T(980, GY + 260)
-        char(d, X, Y, s * 1.5, brow=-1, t=t, **{**M, "body": (90, 110, 150), "cap": None, "mustache": False}, hair=(60, 40, 30))
-        if lt > 0.3: bubble(d, X, Y - 120 * s, "...is that a draft?", s * 0.85)
-    add(b11 + 0.2, m12, type="world", cam=((1020, 1070, 2.3), (1015, 1070, 2.45)), wall="crack", draw=[man_end], over=[air], dark=0.3, tr="punch")
+        out = []
+        X, Y = T(430, 1730)
+        out += actor(d, X, Y, 7.6 * s, MOD, dict(face=1, expr="surprised", t=t))
+        if lt > 0.3: bubble(d, 600, 640, "...is that a draft?", 2.6)
+        return out
+    add(b11 + 0.2, m12, type="scene", bg="basement", focus=(0.55, 0.6), zoom=(1.0, 1.07), draw=[man_end], dark=0.1, tr="punch", dust=True)
     def man_loop(d, T, s, t, lt, dur):
         X, Y = T(1010, GY + 260)
         char(d, X, Y, s * 1.5, hammer=0.01, brow=1, t=t, **M)
