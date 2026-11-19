@@ -86,6 +86,12 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 ## 📰 Haber takibi günlüğü
 - 18 Kasım: Larsa (Irak) 3.800 yıllık Babil köprüsü; Sutton Hoo (İngiltere) yeni Anglo-Sakson mezarı (gövde kumda iz olarak korunmuş); Eriha 2.000 yıllık mezarlık. En güçlü aday: Sutton Hoo (dünyaca ünlü) ve Larsa köprüsü.
 
+## 📊 11–18 KASIM (YouTube AI, 19 Kasım)
+- 7.783 görüntüleme, 32,4 saat, +21 abone, 2.974 tekil izleyici, 1.622 yeni izleyici.
+- İlk 5: Yüzler 1.429 (%62,5, 33/47 sn), Hasankeyf 1.368 (%64,7, 30/43 sn), Göbekli vs Stonehenge 1.232 (%59,2), Taş Baş 1.224 (%59,6), Truva flütü 1.154 (%57,3).
+- AI önerisi: Türkiye/Yakın Doğu somut keşifleri (yüz, heykel, su altı şehir) en iyi sonuç veriyor; kusursuz döngü ile ort. izleme %'sini artır (uyguluyoruz). → Küresel konu kuralı geçerli ama Türkiye/Yakın Doğu ağırlığı korunacak (~%60).
+- 19 Kasım: 'Animated History Mysteries' oynatma listesi oluşturuldu; çizim testi 16:00'da, kaydırılan Short 23:00'te.
+
 ## 🌍 KONU KURALI DEĞİŞTİ (18 Kasım, kullanıcı kararı)
 - **Lanternfall artık sadece Türkiye ile sınırlı DEĞİL. Odak: GÜNCEL arkeoloji/tarih keşifleri, hangi ülke olursa olsun.** Türkiye haberleri devam eder ama zorunlu değil.
 - Başlık kalıbı: "…Was Just Found in [Ülke/Yer]". Kurallar aynı: gerçek kaynak, doğrulanmış bilgi, boş tık tuzağı yok, etiketli AI/örnek görsel.
