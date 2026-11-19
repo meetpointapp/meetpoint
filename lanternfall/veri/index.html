@@ -132,7 +132,9 @@ button:disabled{opacity:.5;cursor:default}
       o.textContent = `${v.data.date || ""} ${v.data.slot || ""} · ${v.data.title || v.id} (${v.data.platform || ""})`;
       sel.appendChild(o);
     });
-    sel.value = cur && [...sel.options].some(o => o.value === cur) ? cur : (videos[0] ? videos[0].id : "__new");
+    const today = new Date().toISOString().slice(0,10);
+    const live = videos.find(v => (v.data.date || "") <= today);
+    sel.value = cur && [...sel.options].some(o => o.value === cur) ? cur : (live ? live.id : (videos[0] ? videos[0].id : "__new"));
     $("#newBox").hidden = sel.value !== "__new";
     fillFromExisting();
   }
@@ -144,6 +146,7 @@ button:disabled{opacity:.5;cursor:default}
       const d = v.data, el = document.createElement("div"); el.className = "vid";
       const top = document.createElement("div"); top.className = "vid-top";
       const t = document.createElement("div"); t.className = "vid-title"; t.textContent = d.title || v.id;
+      if ((d.date || "") > new Date().toISOString().slice(0,10)) el.style.opacity = ".55";
       const m = document.createElement("div"); m.className = "meta"; m.textContent = `${d.date || ""} ${d.slot || ""} · ${d.platform || ""} · ${d.format || ""}`;
       top.append(t, m);
       const chips = document.createElement("div"); chips.className = "chips";
