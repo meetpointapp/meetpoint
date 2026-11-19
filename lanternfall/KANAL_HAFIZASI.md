@@ -5,6 +5,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 ## 📒 VERİ DEFTERİ (19 Kasım'dan itibaren)
 - Kullanıcı 3./6./24. saat verilerini **https://claude.ai/artifact/81JvFUJEKvRjit4PtHzvyZ** sayfasına giriyor. Claude okur: ArtifactData action 'list', collection 'videos' (doc: title, date, platform, slot, format, cp.{h3,h6,h24}.{views, active, stayed, avg, likes, comments, subs, total, note}).
 - **Kural: planlanan her yeni YouTube videosunu Claude deftere kendisi ekler (TikTok YOK, kullanıcı istemedi); kullanıcı sadece sayı girer.** 19 Kasım'da 23 Kasım'a kadarki tüm planlı videolar eklendi.
+- Veri girişi Claude'a otomatik bildirim GÖNDERMEZ; kullanıcı "bak" dediğinde ya da konuşma sırasında Claude defteri okur.
 - Kaynak dosya: scratchpad/veri/index.html (GitHub: lanternfall/veri/index.html). Her değerlendirmeden önce buradan oku.
 
 ## ⭐ 1 NUMARALI KURAL
@@ -111,7 +112,7 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **Derinkuyu duvarı (18 Kasım 16:00), 1 saat 10 dk:** 35 izlenme, 2 beğeni, %24 devam (küçük örnek). **3. saat: 114 izlenme / 40 aktif, %37,4 devam, ort. 0:14.** Grafik doğrusal yükseliyor (16:00 tipik). Kanal 20 abone. **6. saat: 157 izlenme / 60 aktif, %42 devam, ort. 0:17, 2 beğeni, 0 abone; grafik yavaşlıyor.** 16:00'ın zayıf Short'u (Taş Baş 6. saatte ~1.000'di). Canlandırmayla açılış + 16:00 yavaşlığı. Truva flütü 12 beğeni. Kanal 21 abone (18 Kasım gece).
 
-- **5.000 yıllık ekmek (19 Kasım 10:00), 1 saat 50 dk:** 95 izlenme, 3 beğeni, %38 devam. (Eski kuralla yapılmış; 6–12. saat beklenecek.)
+- **5.000 yıllık ekmek (19 Kasım 10:00), 1 saat 50 dk:** 95 izlenme, 3 beğeni, %38 devam. (Eski kuralla yapılmış; 6–12. saat beklenecek.) **3 saat 20 dk (defterden): 279 izlenme / 103 aktif, %44,6 devam, ort. 0:19, 6 beğeni, 0 abone** — flütün aynı saatinden (189, %42) önde.
 
 - **24. saat özetleri (19 Kasım):** Truva flütü (10:00) 1.155 izlenme / 596 aktif, %57,3 devam, 0:16, +4 abone, 16 beğeni → 1.000 kulübüne 5. video. Derinkuyu duvarı (16:00) ~20. saat 368 / 164 aktif, %50,6 devam, 0:20, 0 abone, 5 beğeni. **Ders: izlemeye devam % zamanla yükseliyor (flüt %12→57, duvar %24→51); YouTube doğru kitleyi buldukça artıyor. Değerlendirme 24. saatte yapılmalı.**
 
