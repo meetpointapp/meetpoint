@@ -327,3 +327,9 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Zayıf nokta: abone dönüşümü düşük (2) ve yorum yok → sonraki çizimlerde sonda yorum sorusu / seri hissi ("Part 2?") dene.
 - YouTube "En iyi yeni videolar" (ilk 2 sa 41 dk, son 10 Shorts): ÇİZİM 1,3B #1 | 10.000 yıllık yüzler 853 | Stone Head 372 | 12.000 yıllık şehir 226 | Ekmek 172 | Flüt 130 | Göbekli 112 | "He Broke One Wall…" (AYNI Derinkuyu konusu, gerçek görüntü formatı) 92 | POV 39 | Gömülü tapınak 2.
 - EN ÖNEMLİ KANIT: Aynı konu, aynı hikâye. Gerçek görüntü formatı 92, çizim formatı 1.300 → ~14 kat fark. Fark konudan değil, FORMATTAN geliyor.
+
+## MOTOR v8b — BOYALI ARKA PLANLAR (19 Kasım)
+- Kota notu: Ortama kayıtlı (proxy) HF token'larının kotası doldu; 3. hesap (HF3) çalışıyor. FLUX çağrısında token=HF3 kullan.
+- bg/: basement, hideroom, tunnel, village_night, stonedoor (768x1344, FLUX schnell, seed 7, STYLE flat 2D + painterly). stonedoor ahşap kapı çıktı → kullanılmadı, taş kapı kodla gölgeli çiziliyor.
+- Yeni shot tipi "scene": boyalı arka plan + yavaş zoom + ekran koordinatında karakterler (feet ~y1700, yetişkin actor sc ~7.5, yakın plan 19, bulanık bg blur=9).
+- Duygu sahneleri (saklanma odası, akıncılar köyde, babanın kapıyı itmesi, kızın yakın planı, "where is everyone?") artık boyalı sahnede. Dünya kesiti (genel plan) aynen kaldı → geniş plan kesit + yakın plan boyalı sahne kombinasyonu.

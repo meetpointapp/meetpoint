@@ -368,13 +368,59 @@ def shot_photo(sh, t, lt, dur):
     return fr
 
 
+BG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "bg")
+
+
+@functools.lru_cache(maxsize=8)
+def load_bg(name, blur):
+    im = Image.open(os.path.join(BG_DIR, name + ".png")).convert("RGB")
+    sc = max(W / im.size[0], H / im.size[1]) * 1.12
+    im = im.resize((int(im.size[0] * sc), int(im.size[1] * sc)), Image.LANCZOS)
+    if blur: im = im.filter(ImageFilter.GaussianBlur(blur))
+    return im
+
+
+def shot_scene(sh, t, lt, dur):
+    """painted background + characters in screen space; slow push-in"""
+    k = ease(lt / max(dur, 0.01))
+    big = load_bg(sh["bg"], sh.get("blur", 0))
+    z0, z1 = sh.get("zoom", (1.0, 1.06))
+    z = lerp(z0, z1, k)
+    fx, fy = sh.get("focus", (0.5, 0.6))
+    cw, ch = big.size[0] / 1.12 / z * 1.0, big.size[1] / 1.12 / z
+    cw, ch = W / (1.12 * z) * 1.12 * (big.size[0] / (W * 1.12)), H / (1.12 * z) * 1.12 * (big.size[1] / (H * 1.12))
+    cw, ch = min(cw, big.size[0]), min(ch, big.size[1])
+    x0 = min(max(fx * big.size[0] - cw / 2, 0), big.size[0] - cw); y0 = min(max(fy * big.size[1] - ch / 2, 0), big.size[1] - ch)
+    fr = big.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
+    d = ImageDraw.Draw(fr, "RGBA")
+    lights = []
+    zs = z  # characters scale with the push-in, anchored at screen centre-bottom
+    def T(x, y): return (W / 2 + (x - W / 2) * zs, H * 0.86 + (y - H * 0.86) * zs)
+    for fn in sh.get("draw", []):
+        r = fn(d, T, zs, t, lt, dur)
+        if r: lights.extend(r)
+    apply_lights(fr, lights, sh.get("dark", 0.0) * 0.55)
+    fr = grade(fr, sh.get("grade"))
+    d = ImageDraw.Draw(fr, "RGBA")
+    if sh.get("dust"): dust(d, t, 45)
+    for fn in sh.get("over", []):
+        fn(d, T, zs, t, lt, dur)
+    return fr
+
+
+def shot_any(sh, t, lt, dur):
+    if sh["type"] == "world": return shot_world(sh, t, lt, dur)
+    if sh["type"] == "scene": return shot_scene(sh, t, lt, dur)
+    return shot_photo(sh, t, lt, dur)
+
+
 def render(t):
     sh = None
     for s_ in SHOTS:
         if s_["t0"] <= t < s_["t1"]: sh = s_
     if sh is None: sh = SHOTS[-1]
     lt, dur = t - sh["t0"], sh["t1"] - sh["t0"]
-    fr = shot_world(sh, t, lt, dur) if sh["type"] == "world" else shot_photo(sh, t, lt, dur)
+    fr = shot_any(sh, t, lt, dur)
     # transition in
     tr = sh.get("tr", "punch")
     if tr == "punch" and lt < 0.22:
@@ -390,7 +436,7 @@ def render(t):
             if abs(s_["t1"] - sh["t0"]) < 1e-6 or (s_["t0"] < sh["t0"] and s_["t1"] >= sh["t0"] - 1e-6 and s_ is not sh): prev = s_
         if prev is not None:
             pd = prev["t1"] - prev["t0"]
-            pf = shot_world(prev, t, pd - 0.01, pd) if prev["type"] == "world" else shot_photo(prev, t, pd - 0.01, pd)
+            pf = shot_any(prev, t, pd - 0.01, pd)
             k = ease(lt / 0.5)
             m = Image.new("L", (W, H), 0); md = ImageDraw.Draw(m)
             edge = -400 + (W + H + 800) * k
@@ -576,53 +622,60 @@ def build(LT, WT):
     HX, HY = LX0 + 520, LEVY[2]
     def hide_room(d, T, s, t, lt, dur):
         out = []
-        X, Y = T(HX, HY)
-        out += actor(d, X - 26 * s, Y, s * 0.95, MOM, dict(face=1, gesture="hug", expr="scared", t=t, fx=("tears",)))
-        out += actor(d, X + 10 * s, Y, s * 0.95, GIRL, dict(face=-1, kid=True, expr="scared", gesture="cower", tremble=True, t=t))
-        LX, LY = T(HX - 70, HY - 105)
-        out.append((LX, LY, 5 * s, 70 * s, C["glow"]))
+        X, Y = T(560, 1720)
+        out += actor(d, X - 190 * s, Y, 8.0 * s, MOM, dict(face=1, gesture="hug", expr="scared", t=t, fx=("tears",)))
+        out += actor(d, X + 110 * s, Y, 8.0 * s, GIRL, dict(face=-1, kid=True, expr="scared", gesture="cower", tremble=True, t=t))
+        out.append((T(300, 900)[0], T(300, 900)[1], 10, 260, C["glow"]))
         return out
-    add(m9, b9 + 0.2, type="world", cam=((HX - 5, HY - 52, 6.2), (HX - 5, HY - 54, 7.0)), wall="open", draw=[hide_room], dark=0.5, tr="punch")
+    add(m9, b9 + 0.2, type="scene", bg="hideroom", focus=(0.5, 0.62), zoom=(1.0, 1.08), draw=[hide_room], dark=0.25, tr="punch", dust=True)
     a10, b10 = LT[10]
     q = (b10 + 0.2 - (b9 + 0.2)) / 4
     t10 = [b9 + 0.2 + q * k for k in range(5)]
     def raiders(d, T, s, t, lt, dur):
         out = []
         for kk in range(5):
-            x = min(200 + lt * 160 + kk * 90, 760 + kk * 80)
-            X, Y = T(x, GY)
-            stop = x >= 760 + kk * 80
-            out += actor(d, X, Y, s * 1.0, RAID, dict(face=1, walk=None if stop else x * math.pi / 27.0, prop="torch" if kk != 4 else None,
-                                                    gesture="point" if (kk == 4 and stop) else None, expr="angry", t=t))
+            x = -260 + lt * 260 + kk * 210
+            y = 1660 + (kk % 2) * 110
+            X, Y = T(x, y)
+            out += actor(d, X, Y, (3.6 + (kk % 2) * 0.5) * s, RAID, dict(face=1, walk=x * math.pi / 30.0, prop="torch" if kk != 4 else None, expr="angry", t=t))
+            if kk != 4: out.append((X + 40 * s, Y - 330 * s, 8, 150, C["fire"]))
         return out
-    add(t10[0], t10[1], type="world", cam=((760, 1040, 1.3), (880, 1060, 1.4)), wall="open", draw=[raiders], dark=0.6, tr="whip", grade="night")
+    add(t10[0], t10[1], type="scene", bg="village_night", focus=(0.5, 0.6), zoom=(1.0, 1.05), draw=[raiders], dark=0.2, tr="whip")
     def dad_door(d, T, s, t, lt, dur):
         out = []
-        X, Y = T(LX0 + 205, LEVY[4] - 58)
-        r = 56 * s
-        d.ellipse([X - r, Y - r, X + r, Y + r], fill=C["stone"], outline=C["stone2"], width=max(2, int(5 * s)))
-        d.ellipse([X - 12 * s, Y - 12 * s, X + 12 * s, Y + 12 * s], fill=C["stone2"])
-        PX, PY = T(LX0 + 290, LEVY[4])
-        out += actor(d, PX, PY, s * 0.95, DAD, dict(face=-1, gesture="push", expr="angry", fx=("sweat",), t=t, tremble=True))
+        X, Y = T(330, 1300)
+        r = 330 * s
+        rot = math.sin(lt * 2.0) * 0.04
+        for kk in range(14):
+            f = 1 - kk / 14; rr = r * f
+            col = tuple(int(c * (0.62 + 0.38 * (1 - f) ** 0.6)) for c in (176, 140, 104))
+            d.ellipse([X - rr - (1 - f) * 40 * s, Y - rr - (1 - f) * 50 * s, X + rr - (1 - f) * 40 * s, Y + rr - (1 - f) * 50 * s], fill=col)
+        d.ellipse([X - r, Y - r, X + r, Y + r], outline=(70, 50, 36), width=int(12 * s))
+        for kk in range(9):
+            a_ = kk * 0.7 + rot * 6
+            d.line([X + math.cos(a_) * r * 0.35, Y + math.sin(a_) * r * 0.35, X + math.cos(a_) * r * 0.8, Y + math.sin(a_) * r * 0.8], fill=(120, 90, 66), width=int(5 * s))
+        d.ellipse([X - 60 * s + rot * 400, Y - 60 * s, X + 60 * s + rot * 400, Y + 60 * s], fill=(66, 48, 34))
+        PX, PY = T(800, 1760)
+        out += actor(d, PX, PY, 7.6 * s, DAD, dict(face=-1, gesture="push", expr="angry", fx=("sweat",), t=t, tremble=True))
+        out.append((T(900, 700)[0], T(900, 700)[1], 8, 240, C["glow"]))
         return out
-    add(t10[1], t10[2], type="world", cam=((LX0 + 245, LEVY[4] - 60, 4.6), (LX0 + 250, LEVY[4] - 62, 5.2)), wall="open", draw=[dad_door], dark=0.5, tr="punch")
+    add(t10[1], t10[2], type="scene", bg="tunnel", focus=(0.5, 0.62), zoom=(1.0, 1.07), draw=[dad_door], dark=0.35, tr="punch", shake_k=1)
     def girl_close(d, T, s, t, lt, dur):
         out = []
-        X, Y = T(HX + 10, HY)
-        out += actor(d, X, Y, s * 0.95, GIRL, dict(face=-1, kid=True, expr="scared", t=t, tremble=True, fx=("sweat",)))
-        # torch light sweeping above (through the ceiling cracks)
+        X, Y = T(600, 2420)
+        out += actor(d, X, Y, 19.0 * s, GIRL, dict(face=-1, kid=True, expr="scared", t=t, tremble=True, fx=("sweat",)))
         sw = (lt / max(dur, 0.1))
-        LX, LY = T(HX - 120 + sw * 260, HY - 150)
-        out.append((LX, LY, 4 * s, 90 * s, (255, 150, 60)))
+        out.append((-100 + sw * 1300, 250, 6, 420, (255, 150, 60)))
         return out
-    add(t10[2], t10[3], type="world", cam=((HX + 13, HY - 64, 24.0), (HX + 13, HY - 64, 27.0)), wall="open", draw=[girl_close], dark=0.65, tr="punch", grade="night")
+    add(t10[2], t10[3], type="scene", bg="hideroom", blur=9, focus=(0.4, 0.5), zoom=(1.0, 1.06), draw=[girl_close], dark=0.5, tr="punch", grade="night")
     def raider_q(d, T, s, t, lt, dur):
         out = []
-        X, Y = T(940, GY)
-        out += actor(d, X, Y, s * 1.0, RAID, dict(face=1, prop="torch", expr="surprised", t=t))
-        if lt > 0.3: bubble(d, X + 20 * s, Y - 120 * s, "...where is everyone?", s * 0.85)
+        X, Y = T(470, 1760)
+        out += actor(d, X, Y, 7.4 * s, RAID, dict(face=1, prop="torch", expr="surprised", t=t))
+        out.append((X + 70 * s, Y - 560 * s, 10, 260, C["fire"]))
+        if lt > 0.3: bubble(d, 560, 420, "...where is everyone?", 2.6)
         return out
-    add(t10[3], b10 + 0.2, type="world", cam=((960, 820, 2.4), (970, 815, 2.6)), wall="open", draw=[raider_q], dark=0.45, tr="punch", grade="night")
+    add(t10[3], b10 + 0.2, type="scene", bg="village_night", focus=(0.35, 0.65), zoom=(1.05, 1.1), draw=[raider_q], dark=0.15, tr="punch")
     a11, b11 = LT[11]
     m11 = (a11 + b11) / 2
     add(b10 + 0.2, m11, type="photo", img="p50", label="DERINKUYU TODAY", tr="flash", move="in")
