@@ -353,3 +353,12 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Karar düzeltmesi: Çizim = HİPOTEZ, kazanan değil. 3-4 çizim Short daha + aynı dönemde gerçek format karşılaştırması → sonra karar. Uzun videoyu formata bağlamadan önce de bu sonuç beklenir.
 - Formattan bağımsız kesin işler: kapak tıklanma (CTR), ilk 30 sn, açık döngüler, Shorts→uzun huni (İlgili video bağlantısı), seri adı + sondaki soru.
 - Bekleme: 24. saat (flüt 7. saatte 525 → 24. saatte 1.155 olmuştu; geç dalga mümkün).
+
+## KANAL YÖNÜ (19 Kasım akşam, patronla kararlaştırıldı)
+- Kimlik: "Yeni keşif açıklandığında YouTube'da en hızlı + en güvenilir anlatan kanal". Shorts günde 2 (güncel keşif) + haftalık uzun "This Week in Archaeology" (10-12 dk, 5-6 keşif, bölümlü). Kaynak kartı her videoda; gerçek/temsili etiketleri.
+- HARMAN KURALI (her video, Shorts ve uzun): gerçek görsel + çizim + AI birlikte. Oran sabit yüzde değil, ROLE göre:
+  * GERÇEK (~%40-50): kanıt ve kanca. Keşfin kendisi, kazı alanı, buluntu. Kritik "reveal" anları gerçek.
+  * ÇİZİM (~%35-45): hikâye/olay/"nasıl oldu" + karakterler, duygu anları, haritalar/kesitler.
+  * AI görüntü/video (~%10-15): atmosfer B-roll (antik şehir manzarası vb.), daima "AI reconstruction" etiketli.
+- Patron önerisi: çizim %60 / gerçek %30 / AI %10. Benim görüşüm: haber kanalında kanıt gerçek görselde → gerçek payı daha yüksek. Çözüm: ilk 4 Shorts'ta iki oranı dönüşümlü test et (A: çizim ağırlıklı, B: gerçek ağırlıklı), veriye göre sabitle.
+- Açılış karesi testi de buna dahil: çizim açılış (Derinkuyu çizim 1.384) vs gerçek buluntu açılış.
