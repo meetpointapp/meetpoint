@@ -84,6 +84,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 - **5.000 yıllık ekmek (19 Kasım 10:00), 1 saat 50 dk:** 95 izlenme, 3 beğeni, %38 devam. (Eski kuralla yapılmış; 6–12. saat beklenecek.)
 
+- **24. saat özetleri (19 Kasım):** Truva flütü (10:00) 1.155 izlenme / 596 aktif, %57,3 devam, 0:16, +4 abone, 16 beğeni → 1.000 kulübüne 5. video. Derinkuyu duvarı (16:00) ~20. saat 368 / 164 aktif, %50,6 devam, 0:20, 0 abone, 5 beğeni. **Ders: izlemeye devam % zamanla yükseliyor (flüt %12→57, duvar %24→51); YouTube doğru kitleyi buldukça artıyor. Değerlendirme 24. saatte yapılmalı.**
+
 ## 🧱 1.000–1.500 TAVANI (17 Kasım analizi)
 - En iyi Shortlar hep 1.000–1.500'de duruyor: Hasankeyf 1,3K, Stonehenge 1K, 10.000 yıllık yüzler 1.378, Taş Baş 1.420.
 - Ortak zayıflık: izlemeye devam %58–62 (ilk saniyede %40 kaydırma) ve ort. izleme süresinin büyük kısmı tek izleme (tekrar yok).
