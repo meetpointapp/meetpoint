@@ -800,7 +800,8 @@ def sfx_track(S, total):
 def init(p, shots, wd):
     global P, SHOTS, WORDS, WORLD, VIG
     P, SHOTS, WORDS = p, shots, wd
-    WORLD = Image.open(os.path.join(P, "world.png")); WORLD.load()
+    wp = os.path.join(P, "world_painted.png")
+    WORLD = Image.open(wp if os.path.exists(wp) else os.path.join(P, "world.png")); WORLD.load()
     VIG = make_vig()
     global GRAIN
     rng = np.random.default_rng(5)

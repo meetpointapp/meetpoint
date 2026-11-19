@@ -38,6 +38,31 @@ def _limb(d, p0, p1, p2, w, col, ow):
             d.ellipse([p[0] - r, p[1] - r, p[0] + r, p[1] + r], fill=c)
 
 
+def _hand(d, el, hand, s, skin, face, ow):
+    """mitten hand with thumb, oriented along the forearm"""
+    dx, dy = hand[0] - el[0], hand[1] - el[1]
+    L = math.hypot(dx, dy) or 1e-3
+    ux, uy = dx / L, dy / L; nx, ny = -uy, ux
+    if nx * face > 0 or (abs(nx) < 1e-3 and ny > 0): nx, ny = -nx, -ny   # thumb on the upper/front side
+    c = (hand[0] + ux * 2.2 * s, hand[1] + uy * 2.2 * s)
+    def oval(cx, cy, a, b, col, grow=0.0):
+        pts = []
+        for k in range(18):
+            th = k / 18 * 2 * math.pi
+            px, py = math.cos(th) * (a + grow), math.sin(th) * (b + grow)
+            pts.append((cx + ux * px + nx * py, cy + uy * px + ny * py))
+        d.polygon(pts, fill=col)
+    th = (hand[0] + ux * 0.8 * s + nx * 2.6 * s, hand[1] + uy * 0.8 * s + ny * 2.6 * s)
+    oval(th[0], th[1], 2.0 * s, 1.2 * s, OUT, ow * 0.8)
+    oval(c[0], c[1], 3.6 * s, 2.7 * s, OUT, ow * 0.8)
+    oval(th[0], th[1], 2.0 * s, 1.2 * s, skin)
+    oval(c[0], c[1], 3.6 * s, 2.7 * s, skin)
+    # knuckle line
+    k0 = (c[0] + ux * 1.6 * s - nx * 1.6 * s, c[1] + uy * 1.6 * s - ny * 1.6 * s)
+    k1 = (c[0] + ux * 1.6 * s + nx * 1.0 * s, c[1] + uy * 1.6 * s + ny * 1.0 * s)
+    d.line([k0, k1], fill=_shade(skin, 0.8), width=max(1, int(0.6 * s)))
+
+
 def _chaikin(pts, n=3):
     for _ in range(n):
         q = []
@@ -81,16 +106,16 @@ def draw_char(d, x, y, s, look, pose):
     leg_l1, leg_l2 = 21 * s, 21 * s
     torso_h = 38 * s * (1 - 0.15 * crouch)
     head_r = 11.5 * s
-    hip_h = (leg_l1 + leg_l2) * ((0.985 if walk is None else 0.95) - 0.35 * crouch)
+    hip_h = (leg_l1 + leg_l2) * ((0.985 if walk is None else 0.972) - 0.35 * crouch)
 
     walk = pose.get("walk")
     ph = walk if walk is not None else 0.0
-    bob = (abs(math.sin(ph)) * 2.2 * s) if walk is not None else 0.0
+    bob = (-abs(math.cos(ph)) * 1.2 * s + 0.6 * s) if walk is not None else 0.0
     hip = (x, y - hip_h + bob)
-    stride = 14 * s if walk is not None else 0
+    stride = 11.5 * s if walk is not None else 0
     # feet positions
-    fA = (x + math.sin(ph) * stride * face, y - max(0, math.cos(ph)) * 4 * s * (1 if walk is not None else 0))
-    fB = (x - math.sin(ph) * stride * face, y - max(0, -math.cos(ph)) * 4 * s * (1 if walk is not None else 0))
+    fA = (x + math.sin(ph) * stride * face, y - max(0, math.cos(ph)) ** 2 * 5 * s * (1 if walk is not None else 0))
+    fB = (x - math.sin(ph) * stride * face, y - max(0, -math.cos(ph)) ** 2 * 5 * s * (1 if walk is not None else 0))
     if walk is None:
         fA, fB = (x + 3 * s * face, y), (x - 3 * s * face, y)
     lean = (3.5 * s * face if walk is not None else 0) + 6 * s * face * crouch
@@ -111,6 +136,7 @@ def draw_char(d, x, y, s, look, pose):
     eB = (shoulder[0] + math.sin(-sw) * 15 * s * face, shoulder[1] + math.cos(sw) * 15 * s)
     hB = (eB[0] + math.sin(-sw * 1.3 + 0.3 * face) * 13 * s * face, eB[1] + math.cos(sw * 1.3) * 13 * s)
     _limb(d, shoulder, eB, hB, 7.5 * s, _shade(shirt, 0.78), ow)
+    _hand(d, eB, hB, s, _shade(skin, 0.88), face, ow)
 
     # torso: rounded organic silhouette (chaikin-smoothed), collar, cloth folds
     w_sh, w_hip = 15 * s, 12 * s
@@ -175,7 +201,7 @@ def draw_char(d, x, y, s, look, pose):
         else:               # point forward and slightly up
             el = (shoulder[0] + 14 * s * face, shoulder[1] - 2 * s); hand = (el[0] + 14 * s * face, el[1] - 5 * s)
         _limb(d, shoulder, el, hand, 7.5 * s, shirt, ow)
-        d.ellipse([hand[0] - 3 * s, hand[1] - 3 * s, hand[0] + 3 * s, hand[1] + 3 * s], fill=skin, outline=OUT)
+        _hand(d, el, hand, s, skin, face, ow)
         if g == "point":
             d.line([hand, (hand[0] + 6 * s * face, hand[1] - 2 * s)], fill=skin, width=int(2.4 * s))
     elif prop == "hammer":
@@ -201,7 +227,7 @@ def draw_char(d, x, y, s, look, pose):
             el = (shoulder[0] + math.sin(-sw2) * 15 * s * face, shoulder[1] + math.cos(sw2) * 15 * s)
             hand = (el[0] + math.sin(-sw2 * 1.3 + 0.35) * 13 * s * face, el[1] + math.cos(sw2 * 1.3) * 13 * s)
         _limb(d, shoulder, el, hand, 7.5 * s, shirt, ow)
-        d.ellipse([hand[0] - 3 * s, hand[1] - 3 * s, hand[0] + 3 * s, hand[1] + 3 * s], fill=skin, outline=OUT)
+        _hand(d, el, hand, s, skin, face, ow)
         fl = 1 + 0.1 * math.sin(t * 19 + x * 0.013) + 0.05 * math.sin(t * 37)
         if prop == "lamp":
             lx, ly = hand[0], hand[1] + 4 * s
