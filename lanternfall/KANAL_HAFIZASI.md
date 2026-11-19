@@ -334,3 +334,4 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Yeni shot tipi "scene": boyalı arka plan + yavaş zoom + ekran koordinatında karakterler (feet ~y1700, yetişkin actor sc ~7.5, yakın plan 19, bulanık bg blur=9).
 - Duygu sahneleri (saklanma odası, akıncılar köyde, babanın kapıyı itmesi, kızın yakın planı, "where is everyone?") artık boyalı sahnede. Dünya kesiti (genel plan) aynen kaldı → geniş plan kesit + yakın plan boyalı sahne kombinasyonu.
 - v8c: boyalı sahnede karakter entegrasyonu → integrate() (sahnenin ortalama ışık rengine tint + pozlama + kâğıt dokusu), contact_shadow() ayak gölgesi, meşale ışık çekirdeği sınırlandı (min r 5). Final "is that a draft?" sahnesi boyalı bodrumda. Konuşma balonları y=640 (altyazı y~300 ile çakışmasın).
+- v9 (rig): yuvarlak gövde silüeti (chaikin), yaka + kıyafet kıvrımları, sivrilen uzuvlar (_seg/_limb taper 1.05→0.8), ince dış çizgi (ow 1.5*s), boşta nefes/salınım (breath). Yedek: rig_v7.py.

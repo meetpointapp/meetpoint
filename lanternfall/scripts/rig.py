@@ -19,13 +19,33 @@ def _shade(c, k):
     return tuple(max(0, min(255, int(v * k))) for v in c)
 
 
+def _seg(d, a, b, wa, wb, col):
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    L = math.hypot(dx, dy) or 1e-3
+    nx, ny = -dy / L, dx / L
+    d.polygon([(a[0] + nx * wa / 2, a[1] + ny * wa / 2), (b[0] + nx * wb / 2, b[1] + ny * wb / 2),
+               (b[0] - nx * wb / 2, b[1] - ny * wb / 2), (a[0] - nx * wa / 2, a[1] - ny * wa / 2)], fill=col)
+
+
 def _limb(d, p0, p1, p2, w, col, ow):
-    # outline pass then color pass for a two-segment limb
-    d.line([p0, p1, p2], fill=OUT, width=int(w + 2 * ow), joint="curve")
-    d.line([p0, p1, p2], fill=col, width=int(w), joint="curve")
-    for p in (p0, p1, p2):
-        r = w / 2
-        d.ellipse([p[0] - r, p[1] - r, p[0] + r, p[1] + r], fill=col)
+    """tapered two-segment limb (thick at root, slimmer at the end) with outline and rounded joints"""
+    ws = (w * 1.05, w * 0.92, w * 0.8)
+    for pass_, c, add in ((0, OUT, 2 * ow), (1, col, 0)):
+        _seg(d, p0, p1, ws[0] + add, ws[1] + add, c)
+        _seg(d, p1, p2, ws[1] + add, ws[2] + add, c)
+        for p, ww in zip((p0, p1, p2), ws):
+            r = (ww + add) / 2
+            d.ellipse([p[0] - r, p[1] - r, p[0] + r, p[1] + r], fill=c)
+
+
+def _chaikin(pts, n=3):
+    for _ in range(n):
+        q = []
+        for i in range(len(pts)):
+            a, b = pts[i], pts[(i + 1) % len(pts)]
+            q += [(a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25), (a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75)]
+        pts = q
+    return pts
 
 
 def _ik(hip, foot, l1, l2, bend):
@@ -47,7 +67,7 @@ def draw_char(d, x, y, s, look, pose):
         x = x + math.sin(t * 47) * 1.2 * s + math.sin(t * 31) * 0.8 * s
     kid = pose.get("kid", False)
     s = s * (0.72 if kid else 1.0)
-    ow = max(1.0, 2.2 * s)
+    ow = max(1.0, 1.5 * s)
     crouch = pose.get("crouch", 0.0)
     skin = look.get("skin", (226, 182, 142))
     shirt = look.get("shirt", (196, 180, 150))
@@ -74,7 +94,8 @@ def draw_char(d, x, y, s, look, pose):
     if walk is None:
         fA, fB = (x + 3 * s * face, y), (x - 3 * s * face, y)
     lean = (3.5 * s * face if walk is not None else 0) + 6 * s * face * crouch
-    neck = (hip[0] + lean, hip[1] - torso_h)
+    breath = (math.sin(t * 2.4 + x * 0.01) * 0.7 * s) if walk is None else 0.0   # idle breathing / sway
+    neck = (hip[0] + lean + math.sin(t * 1.1 + x * 0.02) * 0.5 * s * (walk is None), hip[1] - torso_h + breath)
     shoulder = (neck[0] - 1 * s * face, neck[1] + 5 * s)
 
     # ground shadow
@@ -91,21 +112,36 @@ def draw_char(d, x, y, s, look, pose):
     hB = (eB[0] + math.sin(-sw * 1.3 + 0.3 * face) * 13 * s * face, eB[1] + math.cos(sw * 1.3) * 13 * s)
     _limb(d, shoulder, eB, hB, 7.5 * s, _shade(shirt, 0.78), ow)
 
-    # torso (trapezoid with outline) + two-tone shading
+    # torso: rounded organic silhouette (chaikin-smoothed), collar, cloth folds
     w_sh, w_hip = 15 * s, 12 * s
-    tor = [(neck[0] - w_sh, neck[1] + 3 * s), (neck[0] + w_sh, neck[1] + 3 * s),
-           (hip[0] + w_hip, hip[1] + 4 * s), (hip[0] - w_hip, hip[1] + 4 * s)]
-    d.polygon(tor, fill=shirt, outline=OUT, width=int(ow))
-    back = [(neck[0] - w_sh * face, neck[1] + 3 * s), (neck[0] - 3 * s * face, neck[1] + 3 * s),
-            (hip[0] - 3 * s * face, hip[1] + 4 * s), (hip[0] - w_hip * face, hip[1] + 4 * s)]
-    d.polygon(back, fill=_shade(shirt, 0.93))
+    def tp(k, off):   # point at fraction k from neck (0) to hip (1), horizontal offset off
+        return (neck[0] + (hip[0] - neck[0]) * k + off, neck[1] + 3 * s + (hip[1] + 4 * s - neck[1] - 3 * s) * k)
+    prof = [(0.0, w_sh - 5 * s), (0.06, w_sh), (0.22, w_sh + 0.5 * s), (0.55, w_hip + 0.5 * s), (0.8, w_hip), (1.0, w_hip + 1 * s)]
+    right = [tp(k, w) for k, w in prof]
+    left = [tp(k, -w) for k, w in reversed(prof)]
+    tor = _chaikin(right + left, 3)
+    d.polygon(tor, fill=OUT)
+    inner = [(neck[0] + (px - neck[0]) * 1, py) for px, py in tor]
+    # shrink by outline width toward the torso centre
+    cxm = (neck[0] + hip[0]) / 2; cym = (neck[1] + hip[1]) / 2
+    inner = [(px + (cxm - px) * ow / max(w_sh, 1), py + (cym - py) * ow / max(torso_h, 1)) for px, py in tor]
+    d.polygon(inner, fill=shirt)
+    # collar
+    cx0 = neck[0] + 1 * s * face
+    d.polygon([(cx0 - 4 * s, neck[1] + 3 * s), (cx0 + 4 * s, neck[1] + 3 * s), (cx0 + 0.8 * s * face, neck[1] + 9 * s)], fill=_shade(shirt, 0.72))
+    # cloth folds (armpit to waist, waist crease)
+    fc = _shade(shirt, 0.8)
+    a0 = tp(0.25, -w_sh * 0.55 * face); a1 = tp(0.55, -w_hip * 0.1 * face)
+    d.line([a0, ((a0[0] + a1[0]) / 2 + 2 * s * face, (a0[1] + a1[1]) / 2), a1], fill=fc, width=max(1, int(1.3 * s)), joint="curve")
+    b0 = tp(0.78, w_hip * 0.6 * face); b1 = tp(0.86, w_hip * 0.05 * face)
+    d.line([b0, b1], fill=fc, width=max(1, int(1.1 * s)))
     if vest:
-        vv = [(neck[0] - w_sh + 2 * s, neck[1] + 4 * s), (neck[0] - 2 * s * face, neck[1] + 5 * s),
-              (hip[0] - 2 * s * face, hip[1] + 3 * s), (hip[0] - w_hip + 1 * s, hip[1] + 3 * s)]
-        vv2 = [(neck[0] + 4 * s * face, neck[1] + 5 * s), (neck[0] + w_sh - 2 * s, neck[1] + 4 * s),
-               (hip[0] + w_hip - 1 * s, hip[1] + 3 * s), (hip[0] + 3 * s * face, hip[1] + 3 * s)]
-        d.polygon(vv if face > 0 else vv2, fill=vest, outline=OUT)
-        d.polygon(vv2 if face > 0 else vv, fill=_shade(vest, 1.08), outline=OUT)
+        vv = [tp(0.04, -w_sh + 2.5 * s), tp(0.06, -2 * s * face if face > 0 else -w_sh + 2.5 * s), tp(0.97, -2 * s * face if face > 0 else -w_hip + 1.5 * s), tp(0.97, -w_hip + 1.5 * s)]
+        vv = [tp(0.05, -(w_sh - 2.5 * s)), tp(0.05, -1.5 * s), tp(0.95, -1.5 * s), tp(0.95, -(w_hip - 0.5 * s))]
+        vv2 = [(2 * neck[0] - x_ + 2 * s * face * 0 + (hip[0] - neck[0]) * 0, y_) for x_, y_ in vv]
+        vv2 = [tp(0.05, (w_sh - 2.5 * s)), tp(0.05, 3 * s), tp(0.95, 2.5 * s), tp(0.95, (w_hip - 0.5 * s))]
+        for poly, k in ((vv, 1.0), (vv2, 1.08)):
+            d.polygon(_chaikin(poly, 2), fill=_shade(vest, k), outline=OUT)
     # belt
     d.rectangle([hip[0] - w_hip, hip[1] - 1 * s, hip[0] + w_hip, hip[1] + 3 * s], fill=_shade(pants, 0.6))
 
