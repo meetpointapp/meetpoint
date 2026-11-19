@@ -59,6 +59,10 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Adaylar: host/host_1.jpg (kazı alanı, güler yüzlü), host/host_2.jpg (fenerli tünel, önerilen).
 - Test: ilk birkaç Short sunuculu, izlemeye devam %'si sunucusuzlarla karşılaştırılacak.
 
+## ✏️ ÇİZİM HİKÂYE FORMATI (19 Kasım, kullanıcı fikri)
+- Referans: TikTok Türkiye'de viral 2D çizim hikâye videosu ("Bir deli kuyuya taş atar…"): tanıdık kanca + merak sorusu, düz 2D yan görünüş tek büyük dünya + kesit, kamera gezinmesi, tek kelime altyazı (anahtar kelime sarı), sakin anlatıcı, sonda bugüne bağlama, döngülü son kare. Üreticinin karakter/çizimleri KOPYALANMAZ, sadece format mantığı.
+- Deneme 1: Derinkuyu (İngilizce, 47 sn). scripts/ill_derinkuyu.py: PIL ile çizilmiş köy + 8 katlı kesit dünyası, kodla çizilmiş karakterler (adam: kasket+bıyık+kahverengi ceket, lamba), keçiler, ateş/lamba ışıması, taş kapı animasyonu, akıncılar, turistler, 20.000 sayacı, döngülü dönüş. Kullanıcı yorumu bekleniyor.
+
 ## 🚀 BÜYÜME PLANI (18 Kasım, kullanıcı onayladı, bu sırayla)
 1. **Haber takibi:** Her konuşmada/gün son 24–48 saatin dünya arkeoloji haberlerini tara; büyük haber çıkarsa aynı gün Short üret, kullanıcı planlı bir Short'un yerine koysun (planlı olan sonraki boş güne kayar). (Otomatik günlük zamanlanmış görev izin sistemi tarafından reddedildi; manuel yapılıyor.)
 2. **Seriler (sabit başlık/renk/açılış):** "Lost Underwater" (su altı), "Underground Cities" (yeraltı), "Older Than the Pyramids" (çok eski yerler).
