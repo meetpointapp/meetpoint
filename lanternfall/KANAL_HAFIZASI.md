@@ -325,3 +325,5 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 - Karşılaştırma ~3. saat: flüt 189, ekmek 279, duvar 114 → çizim ~5-7 kat hızlı başladı. Beğeni (41) flütün 24 saatlik toplamının (16) 2,5 katı.
 - Tavanın (1.000–1.500) 3. saatte aşılması bekleniyor. Kesin karar 24. saatte; şimdiden güçlü sinyal: çizim formatı + loop + duygu çalışıyor.
 - Zayıf nokta: abone dönüşümü düşük (2) ve yorum yok → sonraki çizimlerde sonda yorum sorusu / seri hissi ("Part 2?") dene.
+- YouTube "En iyi yeni videolar" (ilk 2 sa 41 dk, son 10 Shorts): ÇİZİM 1,3B #1 | 10.000 yıllık yüzler 853 | Stone Head 372 | 12.000 yıllık şehir 226 | Ekmek 172 | Flüt 130 | Göbekli 112 | "He Broke One Wall…" (AYNI Derinkuyu konusu, gerçek görüntü formatı) 92 | POV 39 | Gömülü tapınak 2.
+- EN ÖNEMLİ KANIT: Aynı konu, aynı hikâye. Gerçek görüntü formatı 92, çizim formatı 1.300 → ~14 kat fark. Fark konudan değil, FORMATTAN geliyor.
