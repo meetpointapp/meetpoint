@@ -362,3 +362,14 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
   * AI görüntü/video (~%10-15): atmosfer B-roll (antik şehir manzarası vb.), daima "AI reconstruction" etiketli.
 - Patron önerisi: çizim %60 / gerçek %30 / AI %10. Benim görüşüm: haber kanalında kanıt gerçek görselde → gerçek payı daha yüksek. Çözüm: ilk 4 Shorts'ta iki oranı dönüşümlü test et (A: çizim ağırlıklı, B: gerçek ağırlıklı), veriye göre sabitle.
 - Açılış karesi testi de buna dahil: çizim açılış (Derinkuyu çizim 1.384) vs gerçek buluntu açılış.
+
+## UZUN VİDEO DÖNGÜSÜ (19 Kasım, patron onayıyla)
+- 21 Kasım Derinkuyu uzun video KALIYOR (huni testi + eski format kıyas noktası). Yeni formatın 1. bölümü 28 Kasım Cmt 16:00.
+- Patron itirazı: her hafta güçlü keşif çıkmaz → tek format sürdürülemez. Haber sayısı bol (günde birkaç; Arkeonews, HeritageDaily, Archaeology Mag, Smithsonian, ScienceDaily, Phys.org) ama "vay be" seviyesi haftada 2-3.
+- 4 haftalık döngü (her Cumartesi 16:00):
+  1) This Week in Archaeology (haftanın 5 keşfi) — 28 Kasım
+  2) Ayın Keşifleri (geri sayım 10) — 5 Aralık
+  3) Derin Dalış (son haftaların en büyük keşfi, tek konu) — 12 Aralık
+  4) Çözülemeyen Gizem (yeni araştırmayla gündeme gelen eski sır) — 19 Aralık
+- Shorts bu formatların en iyi anlarından + güncel keşiflerden beslenir.
+- Not (19 Kasım taraması): Menorca süt+şarap kapları, Lake Mezzano tunç kılıç, İsviçre Alpleri 2.600 m 4.000 yıllık takı, Eriha anıtsal mezarlar, Sutton Hoo yeni mezar, Mexico City ossuary, İtalya Messap yazıtlı mezar, Nazca bebek mezarları, Moğol anıtsal mezar.
