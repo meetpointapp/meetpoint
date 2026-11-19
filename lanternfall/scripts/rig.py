@@ -114,69 +114,12 @@ def draw_char(d, x, y, s, look, pose):
     _limb(d, (hip[0] + 2 * s * face, hip[1] + 1 * s), kA, fA, 9.5 * s, pants, ow)
     d.ellipse([fA[0] - (3 if face > 0 else 9) * s, fA[1] - 4 * s, fA[0] + (9 if face > 0 else 3) * s, fA[1] + 1 * s], fill=shoes, outline=OUT)
 
-    # head
+    # head (detailed v7)
     hc = (neck[0] + 2 * s * face, neck[1] - head_r + 1 * s)
-    d.rectangle([neck[0] - 3 * s, neck[1] - 3 * s, neck[0] + 3 * s, neck[1] + 4 * s], fill=_shade(skin, 0.9))
-    d.ellipse([hc[0] - head_r, hc[1] - head_r * 1.08, hc[0] + head_r, hc[1] + head_r], fill=skin, outline=OUT, width=int(ow))
-    # ear
-    ex_ = hc[0] - 2.5 * s * face
-    d.ellipse([ex_ - 2.6 * s, hc[1] - 1 * s, ex_ + 2.6 * s, hc[1] + 4 * s], fill=_shade(skin, 0.9), outline=OUT)
-    if look.get("hair"):
-        hair = look["hair"]
-        d.chord([hc[0] - head_r, hc[1] - head_r * 1.1, hc[0] + head_r, hc[1] + head_r * 0.5], 180, 360, fill=hair, outline=OUT)
-        d.polygon([(hc[0] - head_r * face, hc[1] - 3 * s), (hc[0] - head_r * 0.2 * face, hc[1] - head_r * 0.6),
-                   (hc[0] - head_r * 1.05 * face, hc[1] + 6 * s)], fill=hair)
-    if look.get("headscarf"):
-        sc = look["headscarf"]
-        d.ellipse([hc[0] - head_r * 1.15 - 1.5 * s * face, hc[1] - head_r * 1.25, hc[0] + head_r * 0.95 - 1.5 * s * face, hc[1] + head_r * 1.05], fill=sc, outline=OUT)
-        d.polygon([(hc[0] - head_r * 0.9 * face, hc[1] + 2 * s), (hc[0] - head_r * 1.4 * face, hc[1] + head_r * 1.9),
-                   (hc[0] - head_r * 0.1 * face, hc[1] + head_r * 1.3)], fill=_shade(sc, 0.88), outline=OUT)
-        # face opening
-        d.ellipse([hc[0] - head_r * 0.25 + 2 * s * face, hc[1] - head_r * 0.85, hc[0] + head_r * 0.95 + 1 * s * face, hc[1] + head_r * 0.9], fill=skin)
-    if look.get("cap"):
-        cp = look["cap"]
-        d.chord([hc[0] - head_r * 1.04, hc[1] - head_r * 1.22, hc[0] + head_r * 1.04, hc[1] + head_r * 0.25], 180, 360, fill=cp, outline=OUT)
-        bx0 = hc[0] + (0 if face > 0 else -15 * s); bx1 = hc[0] + (15 * s if face > 0 else 0)
-        d.rounded_rectangle([min(bx0, bx1), hc[1] - 5 * s, max(bx0, bx1), hc[1] - 2 * s], radius=int(1.5 * s), fill=_shade(cp, 0.8), outline=OUT)
-    if look.get("helmet"):
-        hm = look["helmet"]
-        d.chord([hc[0] - head_r * 1.1, hc[1] - head_r * 1.35, hc[0] + head_r * 1.1, hc[1] + head_r * 0.3], 180, 360, fill=hm, outline=OUT)
-        d.polygon([(hc[0], hc[1] - head_r * 1.5), (hc[0] - 3 * s, hc[1] - head_r * 1.1), (hc[0] + 3 * s, hc[1] - head_r * 1.1)], fill=(180, 40, 30))
-    # eye / brow / nose / mouth
-    expr = pose.get("expr", "neutral")
-    blink = (t % 3.3) < 0.11
-    eye = (hc[0] + 5.5 * s * face, hc[1] - 1.5 * s)
-    if blink:
-        d.line([(eye[0] - 2.4 * s, eye[1]), (eye[0] + 2.4 * s, eye[1])], fill=OUT, width=max(1, int(1.6 * s)))
-    else:
-        er = 2.6 * s * (1.35 if expr in ("surprised", "scared") else 1)
-        d.ellipse([eye[0] - er, eye[1] - er, eye[0] + er, eye[1] + er], fill=(250, 248, 240), outline=OUT, width=max(1, int(0.9 * s)))
-        pr = 1.4 * s
-        d.ellipse([eye[0] + 0.6 * s * face - pr, eye[1] - pr + 0.2 * s, eye[0] + 0.6 * s * face + pr, eye[1] + pr + 0.2 * s], fill=(28, 22, 18))
-    br = {"surprised": -2.6, "scared": -2.0, "angry": 1.6, "smile": -0.6}.get(expr, 0) * s
-    tilt = {"angry": 1.6, "scared": -1.2}.get(expr, 0) * s * face
-    d.line([(eye[0] - 3.5 * s, eye[1] - 5 * s + br - tilt), (eye[0] + 3.5 * s, eye[1] - 5 * s + br + tilt)], fill=OUT, width=max(1, int(1.8 * s)))
-    nose = (hc[0] + 10.5 * s * face, hc[1] + 2 * s)
-    d.polygon([(hc[0] + 8 * s * face, hc[1] - 1 * s), nose, (hc[0] + 8 * s * face, hc[1] + 3.5 * s)], fill=_shade(skin, 0.88), outline=OUT)
-    m = (hc[0] + 6.5 * s * face, hc[1] + 6.5 * s)
-    talking = expr == "talk" and int(t * 10) % 2 == 0
-    if expr in ("surprised", "scared") or talking:
-        d.ellipse([m[0] - 2 * s, m[1] - 1.6 * s, m[0] + 2 * s, m[1] + 2.4 * s], fill=(96, 34, 30), outline=OUT)
-    elif expr == "smile":
-        d.arc([m[0] - 3 * s, m[1] - 3 * s, m[0] + 3 * s, m[1] + 1.5 * s], 20, 160, fill=OUT, width=max(1, int(1.5 * s)))
-    elif expr == "angry":
-        d.line([(m[0] - 2.5 * s, m[1] + 1 * s), (m[0] + 2.5 * s, m[1])], fill=OUT, width=max(1, int(1.5 * s)))
-    else:
-        d.line([(m[0] - 2.2 * s, m[1]), (m[0] + 2.2 * s, m[1])], fill=OUT, width=max(1, int(1.4 * s)))
-    if look.get("mustache"):
-        mc = look.get("hair_col", (64, 46, 34))
-        d.rounded_rectangle([m[0] - 3.5 * s + 2 * s * face, m[1] - 3.2 * s, m[0] + 3.5 * s + 2 * s * face, m[1] - 1.0 * s], radius=int(1.2 * s), fill=mc)
-    if look.get("beard"):
-        bc = look["beard"]
-        d.chord([hc[0] - head_r * 0.9, hc[1] - 2 * s, hc[0] + head_r * 1.0, hc[1] + head_r * 1.15], 0, 180, fill=bc, outline=OUT)
-        d.ellipse([m[0] - 2.2 * s, m[1] - 1 * s, m[0] + 2.2 * s, m[1] + 1.6 * s], fill=(96, 34, 30))
+    eye, m = _head(d, hc, head_r, s, face, look, pose.get("expr", "neutral"), t, skin, neck, ow, kid)
 
     # front arm + props
+    expr = pose.get("expr", "neutral")
     prop = pose.get("prop")
     if expr == "shh":
         hand = (m[0] + 1 * s * face, m[1] - 1 * s)
@@ -241,9 +184,9 @@ def draw_char(d, x, y, s, look, pose):
     fx = pose.get("fx") or ()
     if "sweat" in fx:
         q = (t * 0.7) % 1.0
-        sx_, sy_ = hc[0] - 2 * s * face, hc[1] - head_r * 0.6 + q * 14 * s
-        d.polygon([(sx_, sy_ - 3 * s), (sx_ - 2 * s, sy_ + 1.5 * s), (sx_ + 2 * s, sy_ + 1.5 * s)], fill=(190, 225, 255))
-        d.ellipse([sx_ - 2 * s, sy_, sx_ + 2 * s, sy_ + 3.5 * s], fill=(190, 225, 255), outline=(90, 130, 170))
+        sx_, sy_ = hc[0] + 1.2 * s * face, hc[1] - head_r * 0.82 + q * 6 * s
+        d.polygon([(sx_, sy_ - 2 * s), (sx_ - 1.2 * s, sy_ + 1 * s), (sx_ + 1.2 * s, sy_ + 1 * s)], fill=(200, 230, 255))
+        d.ellipse([sx_ - 1.2 * s, sy_, sx_ + 1.2 * s, sy_ + 2.2 * s], fill=(200, 230, 255), outline=(110, 150, 190))
     if "tears" in fx:
         q = (t * 0.5) % 1.0
         tx_, ty_ = eye[0] - 1 * s * face, eye[1] + 3 * s + q * 9 * s
@@ -267,3 +210,141 @@ LOOKS = {
     "tourist2": dict(shirt=(230, 120, 90), pants=(200, 190, 170), hair=(220, 190, 120)),
     "modern": dict(shirt=(84, 106, 140), pants=(52, 56, 66), hair=(56, 40, 30)),
 }
+
+
+def _head(d, hc, head_r, s, face, look, expr, t, skin, neck, ow, kid=False):
+    """Detailed 3/4-profile head. Returns (eye, mouth) anchor points."""
+    hx, hy = hc
+    fem = bool(look.get("headscarf") or look.get("long_hair"))
+    shade = _shade(skin, 0.86)
+    blush = (226, 150, 128)
+    # neck
+    d.polygon([(neck[0] - 3.2 * s, neck[1] - 4 * s), (neck[0] + 3.2 * s, neck[1] - 4 * s), (neck[0] + 3.6 * s, neck[1] + 4 * s), (neck[0] - 3.6 * s, neck[1] + 4 * s)],
+              fill=_shade(skin, 0.84), outline=OUT)
+    # back hair mass (long hair) behind head
+    if look.get("long_hair"):
+        lh = look["long_hair"]
+        d.polygon([(hx - head_r * 1.0 * face, hy - head_r * 0.4), (hx - head_r * 1.25 * face, hy + head_r * 1.6),
+                   (hx + head_r * 0.1 * face, hy + head_r * 1.4), (hx + head_r * 0.3 * face, hy)], fill=lh, outline=OUT)
+    if look.get("headscarf"):
+        sc0 = look["headscarf"]
+        d.ellipse([hx - head_r * 1.25 - 2 * s * face, hy - head_r * 1.25, hx + head_r * 0.9 - 2 * s * face, hy + head_r * 1.25], fill=sc0, outline=OUT)
+        d.polygon([(hx - head_r * 0.8 * face, hy + 2 * s), (hx - head_r * 1.45 * face, hy + head_r * 2.0),
+                   (hx + head_r * 0.1 * face, hy + head_r * 1.5)], fill=_shade(sc0, 0.86), outline=OUT)
+    # skull + jaw: ellipse + chin polygon
+    d.ellipse([hx - head_r, hy - head_r * 1.08, hx + head_r, hy + head_r * 0.92], fill=skin, outline=OUT, width=int(ow))
+    chin = [(hx - head_r * 0.35 * face, hy + head_r * 0.55), (hx + head_r * 0.62 * face, hy + head_r * 0.62),
+            (hx + head_r * 0.55 * face, hy + head_r * 1.02), (hx + head_r * 0.05 * face, hy + head_r * 1.12)]
+    d.polygon(chin, fill=skin, outline=OUT)
+    d.polygon([(chin[0][0] + 0.8 * s * face, chin[0][1] - 1 * s), (chin[1][0] - 0.5 * s * face, chin[1][1] - 0.6 * s),
+               (chin[2][0] - 0.8 * s * face, chin[2][1] - 0.6 * s), (chin[3][0], chin[3][1] - 1 * s)], fill=skin)
+    # face shading: back half darker
+    d.chord([hx - head_r, hy - head_r * 1.08, hx + head_r, hy + head_r * 0.92], 110 if face > 0 else 290, 250 if face > 0 else 430, fill=shade)
+    # ear
+    ex_ = hx - 2.2 * s * face
+    d.ellipse([ex_ - 2.8 * s, hy - 1.5 * s, ex_ + 2.8 * s, hy + 4.5 * s], fill=_shade(skin, 0.92), outline=OUT)
+    d.arc([ex_ - 1.4 * s, hy - 0.3 * s, ex_ + 1.4 * s, hy + 3.2 * s], 300 if face > 0 else 60, 120 if face > 0 else 240, fill=_shade(skin, 0.7), width=max(1, int(0.9 * s)))
+    # cheek blush
+    cx_ = hx + 5.5 * s * face
+    d.ellipse([cx_ - 2 * s, hy + 3.6 * s, cx_ + 2 * s, hy + 5.6 * s], fill=blush)
+    # elder wrinkles / stubble
+    if look.get("beard") and look["beard"][0] > 200:
+        for k in range(3):
+            d.arc([hx - 2 * s + 4 * s * face, hy - head_r * 0.85 + k * 2 * s, hx + 6 * s + 4 * s * face, hy - head_r * 0.6 + k * 2 * s], 200, 340, fill=_shade(skin, 0.75), width=max(1, int(0.8 * s)))
+    if look.get("mustache") or look.get("stubble"):
+        for k in range(28):
+            u = (k * 0.618) % 1; v = (k * 0.381) % 1
+            px = hx + (2 + u * 8) * s * face; py = hy + (5 + v * 6) * s
+            d.ellipse([px - 0.35 * s, py - 0.35 * s, px + 0.35 * s, py + 0.35 * s], fill=_shade(skin, 0.7))
+    # eyes
+    blink = (t % 3.3) < 0.11
+    wide = expr in ("surprised", "scared")
+    eye = (hx + 5.2 * s * face, hy - 1.2 * s)
+    ew, eh = 3.1 * s, (2.6 if not wide else 3.4) * s
+    if blink:
+        d.arc([eye[0] - ew, eye[1] - eh, eye[0] + ew, eye[1] + eh], 20, 160, fill=OUT, width=max(1, int(1.4 * s)))
+    else:
+        d.ellipse([eye[0] - ew, eye[1] - eh, eye[0] + ew, eye[1] + eh], fill=(252, 250, 245), outline=OUT, width=max(1, int(0.9 * s)))
+        iris = look.get("eyes", (96, 66, 40))
+        ir = 1.9 * s * (0.85 if wide else 1)
+        ix = eye[0] + 0.9 * s * face
+        d.ellipse([ix - ir, eye[1] - ir + 0.2 * s, ix + ir, eye[1] + ir + 0.2 * s], fill=iris)
+        d.ellipse([ix - ir * 0.5, eye[1] - ir * 0.5 + 0.2 * s, ix + ir * 0.5, eye[1] + ir * 0.5 + 0.2 * s], fill=(18, 14, 12))
+        d.ellipse([ix - ir * 0.7 + 0.8 * s, eye[1] - ir * 0.8, ix - ir * 0.7 + 1.6 * s, eye[1] - ir * 0.8 + 0.8 * s], fill=(255, 255, 255))
+        # upper lid
+        lid = {"angry": 0.45, "sad": 0.35, "neutral": 0.15, "talk": 0.15, "smile": 0.2}.get(expr, 0.0)
+        if lid > 0:
+            d.chord([eye[0] - ew, eye[1] - eh, eye[0] + ew, eye[1] + eh], 180, 360, fill=_shade(skin, 0.85))
+            d.rectangle([eye[0] - ew, eye[1] - eh * (1 - lid * 2), eye[0] + ew, eye[1] - eh * (1 - lid * 2) + 0.01], fill=OUT)
+        d.arc([eye[0] - ew, eye[1] - eh, eye[0] + ew, eye[1] + eh], 190, 350, fill=OUT, width=max(1, int(1.5 * s)))
+        if fem:
+            for k in (-1, 0, 1):
+                bx_ = eye[0] + (k * 1.4 + 1.6 * face) * s
+                d.line([(bx_, eye[1] - eh * 0.9), (bx_ + 0.9 * s * face, eye[1] - eh * 1.4)], fill=OUT, width=max(1, int(0.8 * s)))
+    # eyebrow (shaped)
+    by = eye[1] - 4.8 * s + {"surprised": -2.2, "scared": -1.6, "angry": 1.0, "smile": -0.4, "sad": -0.8}.get(expr, 0) * s
+    tilt = {"angry": 1.8, "scared": -1.4, "sad": -1.6}.get(expr, 0) * s
+    bc = look.get("hair_col") or look.get("hair") or (60, 44, 32)
+    bw_ = 1.1 * s if not fem else 0.8 * s
+    d.polygon([(eye[0] - 3.8 * s * face, by - tilt * face * 0 - tilt), (eye[0] + 3.6 * s * face, by + tilt),
+               (eye[0] + 3.6 * s * face, by + tilt + bw_), (eye[0] - 3.8 * s * face, by - tilt + bw_ * 1.6)], fill=bc if isinstance(bc, tuple) else (60, 44, 32))
+    # nose (profile) with nostril
+    nb = (hx + 8.2 * s * face, hy - 1.5 * s)
+    tip = (hx + 11.4 * s * face, hy + 2.6 * s)
+    base = (hx + 8.4 * s * face, hy + 4.0 * s)
+    d.polygon([nb, tip, base], fill=_shade(skin, 0.95), outline=OUT)
+    d.arc([base[0] - 1.6 * s, base[1] - 2.2 * s, base[0] + 1.6 * s, base[1] + 0.4 * s], 0, 180, fill=_shade(skin, 0.65), width=max(1, int(0.8 * s)))
+    # mouth with expression / visemes
+    m = (hx + 6.6 * s * face, hy + 7.0 * s)
+    lip = (178, 92, 86) if fem else _shade(skin, 0.7)
+    vis = int(t * 11) % 4 if expr == "talk" else -1
+    if expr in ("surprised", "scared") or vis in (0, 2):
+        oh = (2.8 if expr in ("surprised", "scared") else (1.8 if vis == 0 else 1.2)) * s
+        d.ellipse([m[0] - 2.2 * s, m[1] - oh * 0.5, m[0] + 2.2 * s, m[1] + oh], fill=(90, 32, 30), outline=OUT, width=max(1, int(0.9 * s)))
+        d.rectangle([m[0] - 1.6 * s, m[1] - oh * 0.45, m[0] + 1.6 * s, m[1] - oh * 0.15], fill=(245, 242, 235))
+    elif expr == "smile":
+        d.chord([m[0] - 3.2 * s, m[1] - 2.2 * s, m[0] + 3.2 * s, m[1] + 2.4 * s], 0, 180, fill=(90, 32, 30), outline=OUT)
+        d.rectangle([m[0] - 2.6 * s, m[1] + 0.1 * s, m[0] + 2.6 * s, m[1] + 0.9 * s], fill=(245, 242, 235))
+    elif expr in ("angry", "sad"):
+        d.arc([m[0] - 3 * s, m[1] + 0.2 * s, m[0] + 3 * s, m[1] + 4 * s], 200, 340, fill=OUT, width=max(1, int(1.3 * s)))
+    else:
+        d.line([(m[0] - 2.4 * s, m[1] + 0.2 * s), (m[0] + 2.4 * s, m[1])], fill=OUT, width=max(1, int(1.2 * s)))
+        d.line([(m[0] - 1.8 * s, m[1] + 1.2 * s), (m[0] + 1.6 * s, m[1] + 1.1 * s)], fill=lip, width=max(1, int(0.9 * s)))
+    if look.get("mustache"):
+        mc = look.get("hair_col", (64, 46, 34))
+        d.polygon([(m[0] - 3.4 * s, m[1] - 1.0 * s), (m[0] - 0.5 * s, m[1] - 3.0 * s), (m[0] + 3.0 * s, m[1] - 2.6 * s),
+                   (m[0] + 4.2 * s, m[1] - 0.6 * s), (m[0] + 0.5 * s, m[1] - 1.6 * s)], fill=mc, outline=OUT)
+    if look.get("beard"):
+        bcol = look["beard"]
+        d.polygon([(hx - head_r * 0.25 * face, hy + head_r * 0.35), (hx + head_r * 0.35 * face, hy + head_r * 0.62),
+                   (hx + head_r * 0.72 * face, hy + head_r * 0.58), (hx + head_r * 0.62 * face, hy + head_r * 1.15),
+                   (hx + head_r * 0.1 * face, hy + head_r * 1.3), (hx - head_r * 0.35 * face, hy + head_r * 0.85)], fill=bcol, outline=OUT)
+        d.ellipse([m[0] - 2 * s, m[1] - 1 * s, m[0] + 2 * s, m[1] + 1.4 * s], fill=(90, 32, 30))
+    # hair / headwear on top
+    if look.get("hair"):
+        hair = look["hair"]
+        d.chord([hx - head_r * 1.02, hy - head_r * 1.14, hx + head_r * 1.02, hy + head_r * 0.35], 180, 360, fill=hair, outline=OUT)
+        d.polygon([(hx - head_r * 0.98 * face, hy - 4 * s), (hx - head_r * 0.15 * face, hy - head_r * 0.55),
+                   (hx - head_r * 1.0 * face, hy + 5 * s)], fill=hair)
+        d.polygon([(hx + head_r * 0.2 * face, hy - head_r * 0.95), (hx + head_r * 0.85 * face, hy - head_r * 0.55),
+                   (hx + head_r * 0.45 * face, hy - head_r * 0.35)], fill=hair, outline=OUT)
+        for k in range(5):
+            x0 = hx + (-0.7 + k * 0.32) * head_r * face
+            d.line([(x0, hy - head_r * 1.0), (x0 + 2 * s * face, hy - head_r * 0.62)], fill=_shade(hair, 0.75), width=max(1, int(0.8 * s)))
+    if look.get("headscarf"):
+        sc_ = look["headscarf"]
+        d.chord([hx - head_r * 1.12, hy - head_r * 1.25, hx + head_r * 1.12, hy + head_r * 0.2], 180, 360, fill=sc_, outline=OUT)
+        d.line([(hx - head_r * 1.05, hy - head_r * 0.52), (hx + head_r * 1.05, hy - head_r * 0.52)], fill=_shade(sc_, 0.8), width=max(1, int(1.2 * s)))
+    if look.get("cap"):
+        cp = look["cap"]
+        d.chord([hx - head_r * 1.05, hy - head_r * 1.24, hx + head_r * 1.05, hy + head_r * 0.22], 180, 360, fill=cp, outline=OUT)
+        d.line([(hx - head_r * 0.9, hy - head_r * 0.42), (hx + head_r * 0.9, hy - head_r * 0.42)], fill=_shade(cp, 0.7), width=max(1, int(1.2 * s)))
+        bx0 = hx + (0 if face > 0 else -15 * s); bx1 = hx + (15 * s if face > 0 else 0)
+        d.rounded_rectangle([min(bx0, bx1), hy - 5.2 * s, max(bx0, bx1), hy - 2.2 * s], radius=int(1.5 * s), fill=_shade(cp, 0.8), outline=OUT)
+    if look.get("helmet"):
+        hm = look["helmet"]
+        d.chord([hx - head_r * 1.12, hy - head_r * 1.38, hx + head_r * 1.12, hy + head_r * 0.28], 180, 360, fill=hm, outline=OUT)
+        d.line([(hx - head_r * 1.08, hy - head_r * 0.45), (hx + head_r * 1.08, hy - head_r * 0.45)], fill=_shade(hm, 0.6), width=max(1, int(1.4 * s)))
+        d.rectangle([hx + 8.6 * s * face - 0.8 * s, hy - head_r * 0.45, hx + 8.6 * s * face + 0.8 * s, hy + 1.5 * s], fill=_shade(hm, 0.8), outline=OUT)
+        d.polygon([(hx, hy - head_r * 1.55), (hx - 3 * s, hy - head_r * 1.12), (hx + 3 * s, hy - head_r * 1.12)], fill=(180, 40, 30), outline=OUT)
+    return eye, m
