@@ -80,7 +80,8 @@ Son güncelleme: 16 Kasım 2026. Her yeni veriyle güncellenir.
 
 ## 🛠️ ÇİZİM MOTORU GELİŞTİRME (19 Kasım, kullanıcı önceliği: "motoru olabildiğince iyi seviyeye getir")
 - v3 (scripts/rig.py + scripts/story3.py): yetişkin oranlı karakterler (kontur, iki ton gölge, dizli/dirsekli yürüyüş, göz kırpma, ifadeler: surprised/scared/angry/smile/talk/shh, kıyafet: yelek/kemer/başörtüsü/kask/sakal, ayak gölgesi), 2x süpersample sprite; dünya dokusu + derinlikte kararma; film greni; 'çizimden gerçeğe' parlak çapraz perde geçişi (reveal) + yükselen ses (riser) ve derin vuruş (boom); taş sürtünme, meşale çıtırtısı SFX.
-- Sıradaki: önde parallax kaya siluetleri, ışık hüzmeleri, daha detaylı çizim dünyası (eşyalar, dokular), sahne bazlı renk tonu, gerçek foto üzerinde oklu açıklamalar.
+- v4 (scripts/story4.py): ışık hüzmeleri (lamba/meşale/ateş etrafında yumuşak ışınlar), delikten ışık huzmesi (beam), kenarlarda parallax kaya siluetleri (1.8x, sabit px boyut, en fazla 5), sahne renk tonu (cold/warm/night), dünya detayları (kemerli nişler + lambalar, kilimler, sepetler, keski izleri, perdeler, çitler), gerçek fotoda animasyonlu ok + açıklama (callouts). İlk denemede ön kayalar ekranı kapladı → küçültüldü.
+- Sıradaki fikirler: karakterlerde daha fazla jest (kafa çevirme, işaret etme), sahne arası 'match cut', harita animasyonu, müzikte sahneye göre vurgu.
 
 ## 🎯 STRATEJİ KARARI (19 Kasım, kullanıcı)
 - Çizim v2 (döngülü) 19 Kasım 16:00'da TEST olarak yayınlanıyor (o slottaki planlı Short 20 Kasım 00:00'a kaydırıldı).
